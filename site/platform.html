@@ -67,13 +67,13 @@
 </div>
 <p class="diagram-note mute">Every module reads and writes the same linked objects, so a task can advance a goal and a transaction can be traced to a person or a meal.</p>
 <div class="stack-list">
-<div><h3>Data</h3><p>Your entries, CSV files you choose to import, and JSON backups. By default all of it is stored in IndexedDB in your own browser, and only there. Every table is declared in one schema, and upgrades are versioned so existing data survives.</p></div>
-<div><h3>Models</h3><p>Deterministic rules you can read: overdue detection, budget pace, contact cadence. Opt-in AI is a possible later addition and would never be on by default or send data without your explicit approval.</p></div>
-<div><h3>Ontology</h3><p>Seven object types (Task, Goal, Person, Transaction, Meal, Course, Event) with typed links. Each object has properties, functions that compute from it, actions you can take, and automations that fire as a result.</p></div>
-<div><h3>Workflows</h3><p>Quick capture turns one line of text into the right object. The Weekly Review summarizes the week and sets the next. The Planner, Habits and Journal read and write the same store. Each aims at one or two taps for the common case.</p></div>
-<div><h3>Analytics</h3><p>Insights are charts and summaries drawn from the same objects, so a number on a chart can be traced to the entries behind it.</p></div>
-<div><h3>Integrations</h3><p>Deliberately narrow and all opt-in. Bank data comes in only as a CSV you pick yourself, with no bank logins. Backups go out only as a file you save. The Data Hub can connect your Google Calendar read-only; that starts only when you press Connect, and nothing you stored is sent to Google. Food search can query Open Food Facts, only when you turn it on, and sends just the text you search for. Optional sync copies end-to-end encrypted records to your own Supabase project.</p></div>
-<div><h3>The timeline</h3><p>Whenever something meaningful happens, such as a task done or a course finished, one event is written. History and the milestones wall read only from that timeline.</p></div>
+<div><h2>Data</h2><p>Your entries, CSV files you choose to import, and JSON backups. By default all of it is stored in IndexedDB in your own browser, and only there. Every table is declared in one schema, and upgrades are versioned so existing data survives.</p></div>
+<div><h2>Models</h2><p>Deterministic rules you can read: overdue detection, budget pace, contact cadence. Opt-in AI is a possible later addition and would never be on by default or send data without your explicit approval.</p></div>
+<div><h2>Ontology</h2><p>Seven object types (Task, Goal, Person, Transaction, Meal, Course, Event) with typed links. Each object has properties, functions that compute from it, actions you can take, and automations that fire as a result.</p></div>
+<div><h2>Workflows</h2><p>Quick capture turns one line of text into the right object. The Weekly Review summarizes the week and sets the next. The Planner, Habits and Journal read and write the same store. Each aims at one or two taps for the common case.</p></div>
+<div><h2>Analytics</h2><p>Insights are charts and summaries drawn from the same objects, so a number on a chart can be traced to the entries behind it.</p></div>
+<div><h2>Integrations</h2><p>Deliberately narrow and all opt-in. Bank data comes in only as a CSV you pick yourself, with no bank logins. Backups go out only as a file you save. The Data Hub can connect your Google Calendar read-only; that starts only when you press Connect, and nothing you stored is sent to Google. Food search can query Open Food Facts, only when you turn it on, and sends just the text you search for. Optional sync copies end-to-end encrypted records to your own Supabase project.</p></div>
+<div><h2>The timeline</h2><p>Whenever something meaningful happens, such as a task done or a course finished, one event is written. History and the milestones wall read only from that timeline.</p></div>
 </div>
 <p><a class="btn" href="app/">Open Northstar</a></p>
 </div></section>

@@ -21,7 +21,7 @@ function TotalLine({ label, value, unit, target }: { label: string; value: numbe
       </div>
       {target ? (
         <>
-          <Progress value={(value / target) * 100} />
+          <Progress value={(value / target) * 100} label={label} />
           <span className={`tiny ${left < 0 ? 'muted' : 'faint'}`}>{left >= 0 ? `${left.toLocaleString()} ${unit} left` : `${(-left).toLocaleString()} ${unit} over`}</span>
         </>
       ) : null}

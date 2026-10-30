@@ -135,7 +135,7 @@ export default function Today() {
                           <span>{g.title}</span>
                           <span className="faint">{progressLabel(p)}</span>
                         </div>
-                        <Progress value={p.pct} />
+                        <Progress value={p.pct} label={`${g.title} progress`} />
                       </Link>
                     )
                   })
@@ -165,7 +165,7 @@ export default function Today() {
                           <span>{g.title}</span>
                           <span className="faint">{progressLabel(p)}</span>
                         </div>
-                        <Progress value={p.pct} />
+                        <Progress value={p.pct} label={`${g.title} progress`} />
                       </Link>
                     )
                   })

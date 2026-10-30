@@ -29,7 +29,7 @@ export function ActiveCard({ item, weekMinutes, goalTitle, onEdit }: { item: Lea
   return (
     <section className="card learn-card">
       <div className="row-between learn-card-head">
-        <h3 className="learn-title">{item.title}</h3>
+        <h2 className="learn-title">{item.title}</h2>
         <button className="btn btn-ghost btn-sm" onClick={onEdit}>
           Edit
         </button>

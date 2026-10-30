@@ -66,11 +66,11 @@ export function HabitCard({ habit, dates, today, goalTitle, onEdit }: { habit: H
               type="button"
               className={`habit-day ${on ? 'on' : ''} ${d === today ? 'today' : ''}`}
               aria-pressed={on}
-              aria-label={`${habit.name}, ${formatDate(d, { weekday: 'long', month: 'short', day: 'numeric' })}${on ? ', done' : ''}`}
               onClick={() => void toggleCheckIn(habit, d)}
             >
-              {DOW[dow]}
-              <b>{Number(d.slice(8))}</b>
+              <span aria-hidden>{DOW[dow]}</span>
+              <b aria-hidden>{Number(d.slice(8))}</b>
+              <span className="sr-only">{`${habit.name}, ${formatDate(d, { weekday: 'long', month: 'short', day: 'numeric' })}${on ? ', done' : ''}`}</span>
             </button>
           )
         })}

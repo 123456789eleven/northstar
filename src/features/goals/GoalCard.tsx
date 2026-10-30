@@ -83,7 +83,7 @@ export function GoalCard({
 
         {p.basis !== 'none' && (
           <div className="goal-progress">
-            <Progress value={p.pct} />
+            <Progress value={p.pct} label={`${goal.title} progress`} />
             <span className="goal-progress-label">{progressLabel(p)}</span>
           </div>
         )}

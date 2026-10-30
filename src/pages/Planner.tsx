@@ -68,9 +68,9 @@ export default function Planner() {
       />
 
       <div className="pl-bar">
-        <button className="btn btn-sm" onClick={() => setAnchor(addDays(anchor, -step))} aria-label="Previous">Prev</button>
+        <button className="btn btn-sm" onClick={() => setAnchor(addDays(anchor, -step))} aria-label="Previous period">Previous</button>
         <button className="btn btn-sm" onClick={() => setAnchor(t)}>Today</button>
-        <button className="btn btn-sm" onClick={() => setAnchor(addDays(anchor, step))} aria-label="Next">Next</button>
+        <button className="btn btn-sm" onClick={() => setAnchor(addDays(anchor, step))} aria-label="Next period">Next</button>
         <span className="pl-title">{title}</span>
         <span className="grow" />
         <div className="pl-toggle" role="group" aria-label="View">
@@ -88,8 +88,8 @@ export default function Planner() {
             <div className="pl-week">
               {days.map((d) => (
                 <section key={d} className={`pl-day ${d === t ? 'today' : ''}`}>
-                  <button className="pl-day-head" onClick={() => { setAnchor(d); setView('day') }} aria-label={`Open ${d}`}>
-                    <b>{formatDate(d, { weekday: 'short' })}</b>
+                  <button className="pl-day-head" onClick={() => { setAnchor(d); setView('day') }} aria-label={`${formatDate(d, { weekday: 'short' })} ${formatDate(d, { month: 'short', day: 'numeric' })}, open day view`}>
+                    <b>{formatDate(d, { weekday: 'short' })}</b>{' '}
                     <span>{formatDate(d, { month: 'short', day: 'numeric' })}</span>
                   </button>
                   <div className="pl-day-body">{dayBody(d)}</div>

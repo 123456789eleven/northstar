@@ -41,7 +41,7 @@ export default function DataTable<T>({ columns, rows, rowKey, selectable, select
             {selectable && (
               <th className="dt-check"><input type="checkbox" className="check" aria-label="Select all" checked={allOn} onChange={() => onSelectedChange?.(allOn ? new Set() : new Set(rows.map(rowKey)))} /></th>
             )}
-            {columns.map((c) => <th key={c.key} className={c.align === 'right' ? 'num' : ''}>{c.header}</th>)}
+            {columns.map((c) => <th key={c.key} className={c.align === 'right' ? 'num' : ''}>{c.header || <span className="sr-only">{c.key === 'act' ? 'Action' : c.key}</span>}</th>)}
           </tr>
         </thead>
         <tbody>

@@ -40,7 +40,7 @@ function MoneyRow() {
       value={money(data.spent)}
       note={data.limit > 0 ? (over ? `${money(data.spent - data.limit)} over a ${money(data.limit)} budget` : `${money(data.limit - data.spent)} left of ${money(data.limit)}`) : 'No budgets set'}
     >
-      {data.limit > 0 && <Progress value={(data.spent / data.limit) * 100} />}
+      {data.limit > 0 && <Progress value={(data.spent / data.limit) * 100} label="Spent of monthly budget" />}
     </Row>
   )
 }

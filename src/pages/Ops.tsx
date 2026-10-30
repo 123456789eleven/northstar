@@ -216,7 +216,7 @@ export default function Ops() {
         ) : (
           !phone && (
             <aside className="side-panel cmd-empty-panel" aria-label="Review proposal">
-              <div className="sheet-head"><h3>Review proposal</h3></div>
+              <div className="sheet-head"><h2>Review proposal</h2></div>
               <div className="sheet-body faint small">Select a proposal to review it.</div>
             </aside>
           )

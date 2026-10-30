@@ -45,10 +45,10 @@ export function Stat({ label, value, note }: { label: string; value: ReactNode; 
   )
 }
 
-export function Progress({ value }: { value: number }) {
+export function Progress({ value, label = 'Progress' }: { value: number; label?: string }) {
   const v = Math.max(0, Math.min(100, value))
   return (
-    <div className="progress" role="progressbar" aria-valuenow={Math.round(v)} aria-valuemin={0} aria-valuemax={100}>
+    <div className="progress" role="progressbar" aria-label={label} aria-valuenow={Math.round(v)} aria-valuemin={0} aria-valuemax={100}>
       <div style={{ width: `${v}%` }} />
     </div>
   )
@@ -64,7 +64,7 @@ export function Modal({ title, onClose, children }: { title: string; onClose: ()
   return (
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div ref={ref} className="modal" role="dialog" aria-modal="true" aria-label={title} tabIndex={-1}>
-        <h3>{title}</h3>
+        <h2>{title}</h2>
         {children}
       </div>
     </div>

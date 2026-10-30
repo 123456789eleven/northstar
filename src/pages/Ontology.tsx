@@ -43,7 +43,7 @@ function Diagram({ counts, active, onPick }: { counts: Record<string, number>; a
   let over = 0
   return (
     <div className="onto-diagram">
-      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Object types and their links">
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="group" aria-label="Object types and their links">
         {edges.map((e, i) => {
           const a = pos[e.from]
           const b = pos[e.to]
@@ -84,7 +84,7 @@ function Diagram({ counts, active, onPick }: { counts: Record<string, number>; a
           const p = pos[t.key]
           let y = p.y + 30
           return (
-            <g key={t.key} className={`node ${active === t.key ? 'active' : ''}`} onClick={() => onPick(t.key)} role="button" aria-label={`${t.label}, ${counts[t.key] ?? 0} rows`}>
+            <g key={t.key} className={`node ${active === t.key ? 'active' : ''}`} onClick={() => onPick(t.key)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(t.key) } }} role="button" tabIndex={0} aria-pressed={active === t.key}>
               <rect className="node-box" x={p.x} y={p.y} width={BOX_W} height={p.h} rx={3} />
               <text className="head" x={p.x + 10} y={p.y + 18}>{t.label}</text>
               <text x={p.x + BOX_W - 10} y={p.y + 18} textAnchor="end">{counts[t.key] ?? 0} {(counts[t.key] ?? 0) === 1 ? 'row' : 'rows'}</text>
@@ -94,10 +94,10 @@ function Diagram({ counts, active, onPick }: { counts: Record<string, number>; a
                 y += LINE
                 return (
                   <g key={s.name}>
-                    <text className="sec" x={p.x + 10} y={head}>{s.name}</text>
+                    <text aria-hidden className="sec" x={p.x + 10} y={head}>{s.name}</text>
                     {s.lines.map((ln) => {
                       y += LINE
-                      return <text key={ln} x={p.x + 14} y={y - 3}>{clip(ln, 30)}</text>
+                      return <text aria-hidden key={ln} x={p.x + 14} y={y - 3}>{clip(ln, 30)}</text>
                     })}
                   </g>
                 )

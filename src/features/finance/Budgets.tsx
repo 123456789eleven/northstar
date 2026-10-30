@@ -98,7 +98,7 @@ function BudgetBar({ spent, limit }: { spent: number; limit: number }) {
   const ratio = limit > 0 ? spent / limit : 0
   return (
     <div className={ratio > 1 ? 'fin-over' : ratio > 0.9 ? 'fin-near' : ''}>
-      <Progress value={ratio * 100} />
+      <Progress value={ratio * 100} label="Budget used" />
     </div>
   )
 }

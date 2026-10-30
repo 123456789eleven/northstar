@@ -154,7 +154,7 @@ ol.steps li::before { content: counter(s, decimal-leading-zero); position: absol
 
 .stack-list { border-top: 1px solid var(--line); margin: 32px 0; }
 .stack-list > div { display: grid; grid-template-columns: 180px 1fr; gap: 24px; padding: 16px 0; border-bottom: 1px solid var(--line); }
-.stack-list h3 { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); padding-top: 4px; }
+.stack-list h2 { max-width: none; margin: 0; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); padding-top: 4px; }
 .stack-list p { margin: 0; }
 
 table.plain { border-collapse: collapse; width: 100%; max-width: 760px; font-size: 15px; }

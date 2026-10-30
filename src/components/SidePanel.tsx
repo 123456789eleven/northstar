@@ -9,7 +9,7 @@ export default function SidePanel({ title, onClose, children, inline = false }: 
     return (
       <aside className="side-panel" aria-label={title}>
         <div className="sheet-head">
-          <h3>{title}</h3>
+          <h2>{title}</h2>
           <button className="btn btn-ghost btn-sm" onClick={onClose} aria-label={`Close ${title}`}>Close</button>
         </div>
         <div className="sheet-body">{children}</div>

@@ -24,3 +24,9 @@ export const NAV: NavItem[] = [
 ]
 
 export const PRIMARY_TABS = ['/ops', '/', '/planner', '/tasks']
+
+/** Browser tab title for a router pathname: "Tasks | Northstar", bare "Northstar" when unknown. */
+export function routeTitle(pathname: string): string {
+  const item = NAV.find((n) => (n.to === '/' ? pathname === '/' : pathname === n.to || pathname.startsWith(n.to + '/')))
+  return item ? `${item.label} | Northstar` : 'Northstar'
+}

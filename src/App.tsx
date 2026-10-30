@@ -1,5 +1,6 @@
-import { lazy, Suspense } from 'react'
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { lazy, Suspense, useEffect } from 'react'
+import { HashRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { routeTitle } from './components/nav'
 import { Rail, TabBar, TopBar } from './components/Shell'
 import ToastProvider from './components/Toast'
 import UpdatePrompt from './components/UpdatePrompt'
@@ -32,12 +33,15 @@ function PageFallback() {
 }
 
 function Shell() {
+  const { pathname } = useLocation()
+  useEffect(() => { document.title = routeTitle(pathname) }, [pathname])
   return (
       <div className="shell">
+        <a className="skip-link" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus() }}>Skip to content</a>
         <Rail />
         <div className="stage">
         <TopBar />
-        <main className="main" id="main">
+        <main className="main" id="main" tabIndex={-1}>
           <Suspense fallback={<PageFallback />}>
           <Routes>
             <Route path="/" element={<Today />} />
