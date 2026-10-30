@@ -106,14 +106,21 @@ export function matchGoal(tag: string, goals: CaptureGoal[]): CaptureGoal | unde
   return undefined
 }
 
-function parseDue(words: string[], i: number, todayISO: ISODate): { due: ISODate; used: number } | undefined {
+function parseDue(words: string[], i: number, todayISO: ISODate, prev = ''): { due: ISODate; used: number } | undefined {
   const w = clean(words[i])
   const w2 = words[i + 1] ? clean(words[i + 1]) : ''
   const w3 = words[i + 2] ? clean(words[i + 2]) : ''
   if (w === 'today' || w === 'tonight') return { due: todayISO, used: 1 }
   if (w === 'tomorrow' || w === 'tmr' || w === 'tmrw') return { due: addDays(todayISO, 1), used: 1 }
   if (w === 'yesterday' || w === 'yday') return { due: addDays(todayISO, -1), used: 1 }
-  if (w in WEEKDAYS) return { due: nextWeekday(todayISO, WEEKDAYS[w]), used: 1 }
+  if (w in WEEKDAYS) {
+    // Abbreviations (sat, wed, mon...) double as ordinary words, so they only count as a date at the
+    // end of the line (before any !priority/#tag) or right after on/by/due/next/this. Full names always count.
+    const abbreviated = !w.endsWith('day')
+    const atEnd = words.slice(i + 1).every((x) => /^[!#]/.test(x))
+    const cued = FILLER.has(prev) || prev === 'next' || prev === 'this'
+    if (!abbreviated || atEnd || cued) return { due: nextWeekday(todayISO, WEEKDAYS[w]), used: 1 }
+  }
   if (w === 'next' && w2 === 'week') return { due: nextWeekday(todayISO, 1), used: 2 }
   if (w === 'next' && w2 === 'month') return { due: addMonths(todayISO, 1).slice(0, 8) + '01', used: 2 }
   if (w === 'next' && w2 in WEEKDAYS) return { due: nextWeekday(todayISO, WEEKDAYS[w2]), used: 2 }
@@ -194,7 +201,7 @@ export function parseTask(input: string, ctx: CaptureContext = {}): TaskCapture 
     }
 
     if (!due) {
-      const r = parseDue(words, i, todayISO)
+      const r = parseDue(words, i, todayISO, i > 0 ? clean(words[i - 1]) : '')
       if (r) {
         due = r.due
         i += r.used - 1

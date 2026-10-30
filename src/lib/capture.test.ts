@@ -128,10 +128,17 @@ describe('task due dates', () => {
     const friday = { now: new Date(2026, 4, 8, 9) }
     expect(task('report fri', friday)).toMatchObject({ title: 'report', due: '2026-05-15' })
   })
-  it('ambiguous sat is read as Saturday (documented behavior)', () => {
+  it('abbreviated weekdays only count as dates at the end of the line or after a cue word', () => {
     expect(task('sat').due).toBe('2026-05-09')
-    expect(task('sat').title).toBe('')
     expect(task('book table sat').due).toBe('2026-05-09')
+    expect(task('call mom fri !1')).toMatchObject({ title: 'call mom', due: '2026-05-08', priority: 1 })
+    expect(task('by sat finish report')).toMatchObject({ title: 'finish report', due: '2026-05-09' })
+    const plain = task('sat exam prep')
+    expect(plain.due).toBeUndefined()
+    expect(plain.title).toBe('sat exam prep')
+    expect(task('mon dashboard redesign').due).toBeUndefined()
+    expect(task('wed meeting notes').due).toBeUndefined()
+    expect(task('saturday exam prep').due).toBe('2026-05-09')
   })
   it('weekday words with trailing punctuation', () => {
     expect(task('x friday.').due).toBe('2026-05-08')
