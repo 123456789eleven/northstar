@@ -19,6 +19,9 @@ async function seedEverything() {
   await db.interactions.add({ personId: personId!, date: '2026-03-01', kind: 'call', note: 'hi' })
   await db.events.add({ at: T, area: 'career', kind: 'goal.done', title: 'Done', refTable: 'goals', refId: goalId, refKey: 'k', milestone: true })
   await db.reviews.add({ weekOf: '2026-02-23', wins: 'w', struggles: 's', focusNext: 'f', ratings: { career: 4 }, createdAt: T })
+  const habitId = (await db.habits.add({ name: 'Walk', area: 'health', perWeek: 5, createdAt: T })) as number
+  await db.habitLogs.add({ habitId, date: '2026-03-02' })
+  await db.journal.add({ date: '2026-03-02', mood: 4, text: 'ok day', tags: ['a'], createdAt: T })
   await db.settings.put({ key: 'food.targets', value: { protein: 120 } })
   await db.settings.put({ key: BACKUP_LAST_KEY, value: T })
 }

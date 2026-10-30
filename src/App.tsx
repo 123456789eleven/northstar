@@ -13,6 +13,10 @@ import People from './pages/People'
 import History from './pages/History'
 import Review from './pages/Review'
 import Settings from './pages/Settings'
+import Habits from './pages/Habits'
+import Journal from './pages/Journal'
+import Planner from './pages/Planner'
+import DataHub from './pages/DataHub'
 
 const NAV: { section?: string; to: string; label: string }[] = [
   { to: '/ops', label: 'Command' },
@@ -81,6 +85,10 @@ function Shell() {
             <Route path="/history" element={<History />} />
             <Route path="/review" element={<Review />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/habits" element={<Habits />} />
+            <Route path="/journal" element={<Journal />} />
+            <Route path="/planner" element={<Planner />} />
+            <Route path="/data" element={<DataHub />} />
           </Routes>
         </main>
         <nav className="tabbar" aria-label="Main mobile" ref={tabbar}>

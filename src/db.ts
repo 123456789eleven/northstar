@@ -162,6 +162,35 @@ export interface Review {
   createdAt: ISOTime
 }
 
+export interface Habit {
+  id?: number
+  name: string
+  area: Area
+  /** Target completions per week (7 = daily). */
+  perWeek: number
+  goalId?: number
+  archived?: boolean
+  createdAt: ISOTime
+}
+
+export interface HabitLog {
+  id?: number
+  habitId: number
+  date: ISODate
+}
+
+export interface JournalEntry {
+  id?: number
+  date: ISODate
+  /** 1-5 */
+  mood?: number
+  /** 1-5 */
+  energy?: number
+  text: string
+  tags?: string[]
+  createdAt: ISOTime
+}
+
 export interface Setting {
   key: string
   value: unknown
@@ -182,6 +211,9 @@ export const db = new Dexie('northstar') as Dexie & {
   events: EntityTable<LifeEvent, 'id'>
   reviews: EntityTable<Review, 'id'>
   settings: EntityTable<Setting, 'key'>
+  habits: EntityTable<Habit, 'id'>
+  habitLogs: EntityTable<HabitLog, 'id'>
+  journal: EntityTable<JournalEntry, 'id'>
 }
 
 db.version(1).stores({
@@ -217,4 +249,11 @@ export async function setSetting(key: string, value: unknown) {
 // v2: drop the 'milestone' index on events — booleans aren't valid IndexedDB keys, so it never matched.
 db.version(2).stores({
   events: '++id, at, area',
+})
+
+// v3: habits, habit check-ins (one per habit per day), journal.
+db.version(3).stores({
+  habits: '++id, archived, goalId',
+  habitLogs: '++id, habitId, date, &[habitId+date]',
+  journal: '++id, date',
 })
