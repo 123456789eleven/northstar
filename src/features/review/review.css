@@ -1,5 +1,5 @@
 .rv-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
-@media (max-width: 980px) { .rv-layout { grid-template-columns: 1fr; } }
+@media (max-width: 980px) { .rv-layout { grid-template-columns: minmax(0, 1fr); } }
 
 .rv-weeknav { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
 .rv-weeknav .btn { width: 34px; padding: 0; }

@@ -182,6 +182,7 @@ tr:focus-visible { outline-offset: -2px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--pad); }
 .card-flush { padding: 0; overflow: hidden; }
 .card-title { font-size: 14px; line-height: 20px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.card-flush > .card-title { padding: 16px 16px 0; }
 .grid { display: grid; gap: var(--gap); }
 .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }

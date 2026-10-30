@@ -55,7 +55,7 @@ export async function loadDemo(): Promise<boolean> {
       }
       const events: Omit<LifeEvent, 'id'>[] = []
       const ev = (date: string, area: LifeEvent['area'], kind: string, title: string, refTable?: string, refId?: number, milestone = false, refKey?: string) =>
-        events.push({ at: at(date), area, kind, title, refTable, refId, refKey, milestone })
+        events.push({ at: at(date, `${String(8 + ((events.length * 5) % 11)).padStart(2, '0')}:${String((events.length * 17) % 60).padStart(2, '0')}`), area, kind, title, refTable, refId, refKey, milestone })
       const created = at(d(-85))
 
       // Goals: two chains (life -> year -> quarter) plus one finished quarter goal.

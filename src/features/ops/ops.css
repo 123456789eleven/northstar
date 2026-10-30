@@ -75,7 +75,7 @@
 .cmd-facet[aria-pressed='true'] { color: var(--ink); background: var(--surface-2); }
 .cmd-queue { min-width: 0; }
 .cmd-queue .ops-clip { max-width: 360px; display: block; }
-.cmd .side-panel { width: 380px; min-height: 420px; }
+.cmd .side-panel { width: 380px; min-height: 340px; }
 .cmd-review { display: flex; flex-direction: column; gap: 12px; }
 .cmd-review-meta { display: flex; align-items: center; gap: 8px; }
 .cmd-review-title { font-size: 15px; font-weight: 600; line-height: 22px; }
