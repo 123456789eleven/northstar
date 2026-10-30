@@ -3,8 +3,8 @@
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { formatDate, money } from '../../lib/dates'
 import { compactMoney } from './model'
+import { SERIES } from './series'
 
-const SERIES = { income: '#3987e5', spending: '#d95926', net: '#3987e5', bars: '#3987e5' }
 const GRID = '#262a33'
 const AXIS = '#a6a49d'
 
@@ -30,8 +30,6 @@ function ChartTip({ active, payload, label, labelFmt }: { active?: boolean; payl
     </div>
   )
 }
-
-export const TREND_LEGEND = [{ label: 'Income', color: SERIES.income }, { label: 'Spending', color: SERIES.spending }]
 
 export function Legend({ items }: { items: { label: string; color: string; line?: boolean }[] }) {
   return (

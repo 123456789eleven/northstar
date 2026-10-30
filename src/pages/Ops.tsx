@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { Card, PageHeader } from '../components/ui'
+import { useNow } from '../components/useNow'
 import KpiStrip from '../components/KpiStrip'
 import DataTable, { type Column } from '../components/DataTable'
 import SidePanel from '../components/SidePanel'
@@ -123,7 +124,7 @@ export default function Ops() {
   }, [sel?.id])
 
   const auto = state?.auto ?? {}
-  const weekAgo = Date.now() - WEEK_MS
+  const weekAgo = useNow().getTime() - WEEK_MS
   const log = state?.log ?? []
   const autoWeek = log.filter((e) => e.auto && !e.undone && new Date(e.at).getTime() >= weekAgo).length
   const needs = (proposals ?? []).filter((p) => needsApproval(p, auto)).length

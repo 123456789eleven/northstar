@@ -5,7 +5,8 @@ import KpiStrip from '../../components/KpiStrip'
 import { db } from '../../db'
 import { money } from '../../lib/dates'
 import { merchantLabel, UNCATEGORIZED } from './categories'
-import { CategoryBars, TREND_LEGEND, TrendChart } from './charts'
+import { CategoryBars, TrendChart } from './charts'
+import { TREND_LEGEND } from './series'
 import { monthLabel, monthRange, pct, shiftMonth, summarize, topMerchants, useMonthTx } from './model'
 
 export default function Overview({ month, goTo }: { month: string; goTo: (tab: 'transactions' | 'import' | 'budgets', category?: string) => void }) {

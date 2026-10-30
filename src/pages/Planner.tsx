@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type CalendarEvent, type ISODate } from '../db'
 import { Card, PageHeader } from '../components/ui'
+import { useNow } from '../components/useNow'
 import { addDays, formatDate, today } from '../lib/dates'
 import { allDayOn, daySegments, weekDates } from '../features/planner/layout'
 import { EventModal } from '../features/planner/EventModal'
@@ -33,7 +34,7 @@ export default function Planner() {
       ? `${formatDate(days[0])} - ${formatDate(days[6], { month: 'short', day: 'numeric', year: 'numeric' })}`
       : formatDate(anchor, { weekday: 'long', month: 'long', day: 'numeric' })
   const planDate = view === 'day' ? anchor : t < days[0] || t > days[6] ? days[0] : t
-  const nowDate = new Date()
+  const nowDate = useNow()
   const nowMin = nowDate.getHours() * 60 + nowDate.getMinutes()
 
   const tasksOn = (d: ISODate) => (tasks ?? []).filter((x) => x.due === d)

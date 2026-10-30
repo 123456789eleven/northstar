@@ -1,7 +1,7 @@
 // Suggestions under the Food add row: instant offline search of the bundled reference,
 // plus an opt-in (default OFF) search of Open Food Facts that runs only when you press the button.
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { searchFoods } from '../../data/foods'
 import { db, setSetting } from '../../db'
 import { OFF_OPTIN_KEY, searchOpenFoodFacts, type OffFood } from '../data/offSearch'
@@ -17,14 +17,9 @@ export default function FoodLookup({ query, onPick }: { query: string; onPick: (
   const [picked, setPicked] = useState('')
   const [online, setOnline] = useState<{ q: string; items: OffFood[] } | null>(null)
   const [busy, setBusy] = useState(false)
-  const [err, setErr] = useState('')
+  const [errState, setErr] = useState<{ q: string; msg: string } | null>(null)
   const q = query.trim()
   const local = useMemo(() => searchFoods(q, 5), [q])
-
-  useEffect(() => {
-    setOnline(null)
-    setErr('')
-  }, [q])
 
   if (q.length < 2 || q === picked) return null
 
@@ -34,11 +29,11 @@ export default function FoodLookup({ query, onPick }: { query: string; onPick: (
   }
   async function runOnline() {
     setBusy(true)
-    setErr('')
+    setErr(null)
     try {
       setOnline({ q, items: await searchOpenFoodFacts(q) })
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Lookup failed.')
+      setErr({ q, msg: e instanceof Error ? e.message : 'Lookup failed.' })
     } finally {
       setBusy(false)
     }
@@ -65,7 +60,7 @@ export default function FoodLookup({ query, onPick }: { query: string; onPick: (
           </button>
         ))}
       {online?.q === q && online.items.length === 0 && <div className="tiny faint">No online matches.</div>}
-      {err && <div className="tiny warn">{err}</div>}
+      {errState?.q === q && <div className="tiny warn">{errState.msg}</div>}
       <div className="row wrap" style={{ gap: 10 }}>
         <label className="row tiny muted" style={{ gap: 6 }}>
           <input type="checkbox" className="check" checked={optin} onChange={(e) => void setSetting(OFF_OPTIN_KEY, e.target.checked)} />

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../../db'
 import { Card } from '../../components/ui'
+import { useNow } from '../../components/useNow'
 import { addDays, relativeDay, today } from '../../lib/dates'
 import { toggleCheckIn } from '../habits/habitData'
 import { streak } from '../habits/stats'
@@ -48,10 +49,10 @@ export function HabitsTile() {
 }
 
 export function NextUp() {
+  const now = useNow()
   const d = today()
   const events = useLiveQuery(() => db.calendar.where('date').between(d, addDays(d, 1), true, true).toArray(), [d])
   if (events === undefined) return null
-  const now = new Date()
   const next = sortedUpcoming(events, d, now.getHours() * 60 + now.getMinutes()).slice(0, 3)
   return (
     <Card title="Next up" action={<Link className="card-link" to="/planner">Planner</Link>}>
