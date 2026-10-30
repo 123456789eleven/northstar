@@ -15,6 +15,7 @@
     "build:pages": "npm run build && node -e \"const fs=require('fs');fs.rmSync('pages-dist',{recursive:true,force:true});fs.cpSync('site','pages-dist',{recursive:true});fs.cpSync('dist','pages-dist/app',{recursive:true})\""
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "dexie": "^4.4.7",
     "dexie-react-hooks": "^4.4.0",
     "papaparse": "^5.7.0",

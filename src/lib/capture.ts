@@ -31,6 +31,7 @@ export type Capture =
   | { kind: 'transaction'; amount: number; description: string; date: ISODate }
   | { kind: 'meal'; name: string; calories?: number; slot: MealSlot; date: ISODate }
   | { kind: 'win'; title: string; area: Area }
+  | { kind: 'journal'; text: string }
   | { kind: 'empty' }
 
 const WEEKDAYS: Record<string, number> = {
@@ -240,6 +241,10 @@ export function parseCapture(input: string, ctx: CaptureContext = {}): Capture {
     return { kind: 'transaction', amount: income ? amt : -amt, description, date: todayISO }
   }
 
+  // Journal: "journal: long walk, felt clear" appends to today's entry
+  const journal = /^journal\s*:\s*(.+)$/i.exec(text)
+  if (journal) return { kind: 'journal', text: journal[1].trim() }
+
   // Win: "win: shipped the report #career"
   const win = /^win\s*:\s*(.*)$/i.exec(text)
   if (win) {
@@ -309,7 +314,9 @@ export function describeCapture(c: Capture, ctx: { now?: Date } = {}): string[] 
       return ['Meal', c.slot[0].toUpperCase() + c.slot.slice(1), c.calories != null ? `${c.calories} cal` : undefined].filter(
         (x): x is string => !!x,
       )
+    case 'journal':
+      return ['Journal entry']
     case 'win':
-      return ['Win', c.area[0].toUpperCase() + c.area.slice(1)]
+      return ['Win',c.area[0].toUpperCase() + c.area.slice(1)]
   }
 }

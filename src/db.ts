@@ -1,6 +1,7 @@
-// Northstar data layer. Everything lives on-device in IndexedDB — nothing leaves the browser.
+// Northstar data layer. Everything lives on-device in IndexedDB; only the opt-in sync (src/sync) sends ciphertext off-device.
 // Every module writes its own tables and also calls logEvent() so History stays a single timeline.
 import Dexie, { type EntityTable } from 'dexie'
+import { installOutbox } from './sync/outbox'
 
 export type Area = 'career' | 'health' | 'finance' | 'learning' | 'relationships' | 'personal'
 export const AREAS: Area[] = ['career', 'health', 'finance', 'learning', 'relationships', 'personal']
@@ -275,3 +276,11 @@ db.version(3).stores({
   journal: '++id, date',
   calendar: '++id, date, uid, importBatch',
 })
+
+// v4: bookkeeping for the optional end-to-end encrypted sync (src/sync). Device-local; holds no user content.
+// outbox: one row per locally changed record waiting to be pushed. syncMeta: local key <-> stable cross-device id.
+db.version(4).stores({
+  outbox: '[table+key], at',
+  syncMeta: '[table+key], &[table+syncId]',
+})
+installOutbox(db, { autoStart: true })

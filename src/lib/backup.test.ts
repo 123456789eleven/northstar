@@ -25,6 +25,9 @@ async function seedEverything() {
   await db.journal.add({ date: '2026-03-02', mood: 4, text: 'ok day', tags: ['a'], createdAt: T })
   await db.settings.put({ key: 'food.targets', value: { protein: 120 } })
   await db.settings.put({ key: BACKUP_LAST_KEY, value: T })
+  // v4 sync bookkeeping (device-local, no user content).
+  await db.table('outbox').put({ table: 'tasks', key: 1, at: T, rev: 1 })
+  await db.table('syncMeta').put({ table: 'tasks', key: 1, syncId: '6f1c2e9a-0000-4000-8000-000000000001', updatedAt: T })
 }
 
 const snapshot = async () => Object.fromEntries(await Promise.all(db.tables.map(async (t) => [t.name, await t.toArray()])))

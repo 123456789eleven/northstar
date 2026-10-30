@@ -9,7 +9,7 @@ import { generateInsights, nextBestAction, type Insight, type NextAction, type S
 export async function loadSnapshot(): Promise<Snapshot> {
   const d = today()
   const since = addDays(d, -70) // enough history for month-over-month and streak checks
-  const [tasks, goals, meals, transactions, budgets, studySessions, people, events, targets, lastBackupAt] = await Promise.all([
+  const [tasks, goals, meals, transactions, budgets, studySessions, people, events, targets, lastBackupAt, habits, habitLogs, calendar] = await Promise.all([
     db.tasks.toArray(),
     db.goals.toArray(),
     db.meals.where('date').aboveOrEqual(since).toArray(),
@@ -20,8 +20,11 @@ export async function loadSnapshot(): Promise<Snapshot> {
     db.events.where('at').aboveOrEqual(new Date(addDays(d, -30)).toISOString()).toArray(),
     getSetting<FoodTargets>(TARGETS_KEY, {}),
     getSetting<string | null>(BACKUP_LAST_KEY, null),
+    db.habits.toArray(),
+    db.habitLogs.where('date').aboveOrEqual(addDays(d, -400)).toArray(),
+    db.calendar.where('date').equals(d).toArray(),
   ])
-  return { today: d, tasks, goals, meals, transactions, budgets, studySessions, people, events, proteinTarget: targets.protein, lastBackupAt }
+  return { today: d, tasks, goals, meals, transactions, budgets, studySessions, people, events, habits, habitLogs, calendar, hour: new Date().getHours(), proteinTarget: targets.protein, lastBackupAt }
 }
 
 export interface InsightsState {

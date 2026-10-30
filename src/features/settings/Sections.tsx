@@ -3,11 +3,13 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, getSetting, setSetting } from '../../db'
 import { Card, Field, Modal } from '../../components/ui'
 import { BACKUP_LAST_KEY, BACKUP_REMIND_DAYS, eraseAll, exportBackup, importBackup, parseBackup, type ParsedBackup } from '../../lib/backup'
+import { eraseLocalWithoutSync, restoreWithoutSync } from '../../sync/manager'
 
 const TABLE_LABEL: Record<string, string> = {
   tasks: 'Tasks', goals: 'Goals', meals: 'Meals', favoriteMeals: 'Favorite meals', transactions: 'Transactions',
   budgets: 'Budgets', balances: 'Balances', learning: 'Learning items', studySessions: 'Study sessions',
   people: 'People', interactions: 'Interactions', events: 'History events', reviews: 'Reviews', settings: 'Settings',
+  outbox: 'Sync queue', syncMeta: 'Sync ids',
 }
 const label = (t: string) => TABLE_LABEL[t] ?? t
 
@@ -94,7 +96,8 @@ export function BackupSection() {
     if (!pending) return
     setBusy(true)
     try {
-      await importBackup(pending.data)
+      // Restoring is not a burst of new edits: it is not queued for sync (Settings > Sync then asks how to reconcile).
+      await restoreWithoutSync(() => importBackup(pending.data))
       setDone(`Restored backup from ${fmtWhen(pending.data.exportedAt)}.`)
       setPending(null)
     } catch (e) {
@@ -186,8 +189,8 @@ export function StorageSection() {
   return (
     <Card title="Storage">
       <p className="set-text">
-        Your data lives only in this browser, on this device. It is not synced anywhere. Clearing site data, uninstalling the browser,
-        or using a private window will remove it. Backups are how you protect it or move it.
+        Your data lives in this browser, on this device. Unless you turn on Sync, it is not copied anywhere. Clearing site data, uninstalling
+        the browser, or using a private window will remove it. Backups (and, if you choose, encrypted sync) are how you protect it or move it.
       </p>
       {supported ? (
         <>
@@ -225,7 +228,8 @@ export function DangerSection() {
 
   async function erase() {
     setBusy(true)
-    await eraseAll()
+    // Erasing this device never deletes the cloud copy; that is a separate action under Sync.
+    await eraseLocalWithoutSync(eraseAll)
     setBusy(false)
     setOpen(false)
     setTyped('')
@@ -241,7 +245,7 @@ export function DangerSection() {
       {done && <p className="set-ok" role="status">All data erased.</p>}
       {open && (
         <Modal title="Erase all data" onClose={() => !busy && setOpen(false)}>
-          <p className="set-text">This deletes every task, goal, transaction, meal, person, review and history entry on this device. It cannot be undone. Export a backup first if you might want any of it.</p>
+          <p className="set-text">This deletes every task, goal, transaction, meal, person, review and history entry on this device. It cannot be undone. It does not touch an encrypted cloud copy if you use Sync (delete that under Sync). Export a backup first if you might want any of it.</p>
           <form className="stack" onSubmit={(e) => { e.preventDefault(); if (typed === 'ERASE') void erase() }}>
             <Field label="Type ERASE to confirm">
               <input className="input" value={typed} onChange={(e) => setTyped(e.target.value)} autoFocus autoComplete="off" autoCapitalize="characters" />
@@ -261,8 +265,10 @@ export function AboutSection() {
   return (
     <Card title="About">
       <p className="set-text">
-        Northstar is a private, local-first dashboard. Nothing you enter leaves this device: there are no accounts, no servers, no analytics
-        and no third-party services. Bank data only enters through CSV files you choose to import, and no credentials are ever stored.
+        Northstar is a private, local-first dashboard. With sync off (the default) nothing you enter leaves this device: no accounts, no servers,
+        no analytics. If you turn on Sync, records are encrypted on this device before being sent to your Supabase project, which stores only
+        ciphertext. Supabase can still see your account email, how many records each section has, when they change, and their encrypted sizes,
+        but not what they say. Bank data only enters through CSV files you choose to import, and no bank credentials are ever stored.
       </p>
       <p className="set-text small faint">Data format version {db.verno}.</p>
     </Card>

@@ -1,0 +1,39 @@
+/* Habits */
+.habit-list { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 900px) { .habit-list { grid-template-columns: minmax(0, 1fr); } }
+.habit { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.habit.archived { opacity: 0.6; }
+.habit-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.habit-name { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+.habit-meta { font-size: 12px; color: var(--ink-3); margin-top: 2px; display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.habit-streak { text-align: right; white-space: nowrap; }
+.habit-streak strong { font-family: var(--serif); font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.habit-streak span { display: block; font-size: 12px; color: var(--ink-3); }
+
+.habit-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.habit-day {
+  min-height: 44px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--surface-2);
+  color: var(--ink-2); font: inherit; font-size: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+}
+.habit-day b { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.habit-day:hover { border-color: var(--ink-3); }
+.habit-day.today { border-color: var(--ink-3); color: var(--ink); }
+.habit-day.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+.habit-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.habit-week { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.heat { display: block; width: 100%; max-width: 220px; height: auto; }
+.heat rect { fill: var(--accent); }
+
+.seg { display: flex; gap: 4px; flex-wrap: wrap; }
+.seg button {
+  min-height: 36px; min-width: 40px; padding: 0 12px; border-radius: var(--radius-sm); border: 1px solid var(--line);
+  background: var(--surface-2); color: var(--ink-2); font: inherit; font-size: 14px; cursor: pointer;
+}
+.seg button:hover { border-color: var(--ink-3); }
+.seg button[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+.habit-tile-row { display: flex; align-items: center; gap: 10px; min-height: 36px; }
+.habit-tile-row .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.habit-tile-row .streak { font-size: 12px; color: var(--ink-3); }
+.hb-check { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex: 0 0 32px; cursor: pointer; }

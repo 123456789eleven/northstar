@@ -80,6 +80,22 @@ describe('generateInsights', () => {
     expect(ids(snap({ studySessions: days('2026-10-27', '2026-10-28') }))).not.toContain('study-streak')
   })
 
+  it('warns when a habit streak of 3+ would break tonight', () => {
+    const habits = [{ id: 1, name: 'Walk', area: 'health', perWeek: 7, createdAt: '' }] as never
+    const logs = (...d: string[]) => d.map((date) => ({ habitId: 1, date })) as never
+    const three = logs('2026-10-26', '2026-10-27', '2026-10-28')
+    expect(ids(snap({ habits, habitLogs: three, hour: 19 }))).toContain('habit-at-risk')
+    expect(ids(snap({ habits, habitLogs: three, hour: 17 }))).not.toContain('habit-at-risk')
+    expect(ids(snap({ habits, habitLogs: logs('2026-10-27', '2026-10-28'), hour: 19 }))).not.toContain('habit-at-risk')
+    expect(ids(snap({ habits, habitLogs: logs('2026-10-26', '2026-10-27', '2026-10-28', '2026-10-29'), hour: 19 }))).not.toContain('habit-at-risk')
+  })
+
+  it('notes a calendar-heavy day at 5+ events', () => {
+    const cal = (n: number) => Array.from({ length: n }, (_, i) => ({ title: `e${i}`, date: '2026-10-29', allDay: true })) as never
+    expect(ids(snap({ calendar: cal(5) }))).toContain('busy-day')
+    expect(ids(snap({ calendar: cal(4) }))).not.toContain('busy-day')
+  })
+
   it('names the most overdue people and upcoming birthdays', () => {
     const people = [
       { id: 1, name: 'Ana', relation: '', cadenceDays: 7, lastContact: '2026-10-01', birthday: '11-02' },

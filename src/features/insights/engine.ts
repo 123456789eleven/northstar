@@ -2,8 +2,9 @@
 // Everything runs on-device from a snapshot the caller passes in. `generateInsights` is the single
 // seam: a future opt-in AI generator would implement the same `(snapshot) => Insight[]` signature,
 // and would need the owner's explicit approval because it would send personal data off-device.
-import type { Budget, Goal, ISODate, LifeEvent, Meal, Person, StudySession, Task, Transaction } from '../../db'
+import type { Budget, CalendarEvent, Goal, Habit, HabitLog, ISODate, LifeEvent, Meal, Person, StudySession, Task, Transaction } from '../../db'
 import { addDays, daysBetween, parseISODate } from '../../lib/dates'
+import { isDaily, streak } from '../habits/stats'
 
 export type Severity = 'note' | 'nudge' | 'win'
 
@@ -29,6 +30,11 @@ export interface Snapshot {
   studySessions: StudySession[]
   people: Person[]
   events: LifeEvent[]
+  habits?: Habit[]
+  habitLogs?: HabitLog[]
+  calendar?: CalendarEvent[]
+  /** Local hour of day, 0-23 (the engine never reads the clock itself). */
+  hour?: number
   proteinTarget?: number
   /** ISO timestamp of the last export, or null if never. */
   lastBackupAt: string | null
@@ -307,7 +313,31 @@ const wins: Rule = (s) => {
   return [{ id: 'wins', severity: 'win', text, href: '/history', score: 50 + Math.min(ms.length, 5) }]
 }
 
-const RULES: Rule[] = [goalDrift, overdueTasks, budgetPace, categoryMover, savingsRate, food, studyAtRisk, peopleOverdue, birthdays, backupAge, wins]
+/** A daily habit with a 3+ day streak, still unchecked after 6pm. */
+const habitAtRisk: Rule = (s) => {
+  if ((s.hour ?? 0) < 18 || !s.habits?.length) return []
+  const risky: { name: string; n: number }[] = []
+  for (const h of s.habits) {
+    if (h.archived || h.id == null || !isDaily(h.perWeek)) continue
+    const dates = new Set((s.habitLogs ?? []).filter((l) => l.habitId === h.id).map((l) => l.date))
+    if (dates.has(s.today)) continue
+    const n = streak(dates, s.today, h.perWeek).count
+    if (n >= 3) risky.push({ name: h.name, n })
+  }
+  if (!risky.length) return []
+  risky.sort((a, b) => b.n - a.n || a.name.localeCompare(b.name))
+  const top = risky[0]
+  const more = risky.length > 1 ? ` ${risky.length - 1} other habit${risky.length === 2 ? '' : 's'} also at risk.` : ''
+  return [{ id: 'habit-at-risk', severity: 'nudge', text: `Your ${top.n}-day "${top.name}" streak ends tonight unless you check in.${more}`, href: '/habits', score: 64 }]
+}
+
+const busyDay: Rule = (s) => {
+  const n = (s.calendar ?? []).filter((e) => e.date === s.today).length
+  if (n < 5) return []
+  return [{ id: 'busy-day', severity: 'note', text: `${n} events on your calendar today. Protect a gap to eat and reset.`, href: '/planner', score: 48 }]
+}
+
+const RULES: Rule[] = [goalDrift, overdueTasks, budgetPace, categoryMover, savingsRate, food, studyAtRisk, habitAtRisk, busyDay, peopleOverdue, birthdays, backupAge, wins]
 
 /** Ranked by usefulness and capped. Returns [] when nothing is worth saying. */
 export function generateInsights(snapshot: Snapshot): Insight[] {

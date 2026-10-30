@@ -18,6 +18,17 @@ describe('parseCapture: empty & routing', () => {
   })
 })
 
+describe('journal', () => {
+  it('"journal: text" captures the text for today\'s entry', () => {
+    expect(parseCapture('journal: long walk, felt clear', ctx)).toEqual({ kind: 'journal', text: 'long walk, felt clear' })
+    expect(describeCapture(parseCapture('Journal:  hi', ctx))).toEqual(['Journal entry'])
+  })
+  it('a bare "journal:" or a plain mention stays a task', () => {
+    expect(parseCapture('journal:', ctx).kind).toBe('task')
+    expect(parseCapture('journal about trip', ctx).kind).toBe('task')
+  })
+})
+
 describe('transactions', () => {
   it('dollar amount plus description is an expense dated today', () => {
     expect(parseCapture('$12.50 chipotle', ctx)).toEqual({ kind: 'transaction', amount: -12.5, description: 'chipotle', date: '2026-05-06' })

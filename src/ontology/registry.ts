@@ -1,6 +1,10 @@
 // Ontology: a typed registry of the things Northstar knows about, how they link, and what you can do with them.
 // Actions call the existing feature functions (never duplicate logic). Everything is on-device.
-import { db, type Budget, type Goal, type Interaction, type LearningItem, type LifeEvent, type Meal, type Person, type Review, type Task, type Transaction } from '../db'
+import { db, type Budget, type CalendarEvent, type Goal, type Habit, type HabitLog, type Interaction, type JournalEntry, type LearningItem, type LifeEvent, type Meal, type Person, type Review, type Task, type Transaction } from '../db'
+import { archiveHabit, toggleCheckIn } from '../features/habits/habitData'
+import { perWeekLabel, streak } from '../features/habits/stats'
+import { wordCount } from '../features/journal/stats'
+import { timeLabel } from '../features/planner/layout'
 import { daysBetween, today } from '../lib/dates'
 import { goalProgress, progressLabel } from '../features/goals/progress'
 import { completeGoal, reopenGoal, setPaused } from '../features/goals/goalActions'
@@ -10,7 +14,7 @@ import { merchantKey, merchantLabel } from '../features/finance/categories'
 import { completeTask, reopenTask, togglePin } from '../features/tasks/taskActions'
 import { RULE_META, type RuleId } from '../features/ops/proposals'
 
-export type TypeKey = 'Task' | 'Goal' | 'Person' | 'Transaction' | 'Meal' | 'LearningItem' | 'Interaction' | 'LifeEvent' | 'Review' | 'Budget'
+export type TypeKey = 'Task' | 'Goal' | 'Person' | 'Transaction' | 'Meal' | 'LearningItem' | 'Interaction' | 'LifeEvent' | 'Review' | 'Budget' | 'Habit' | 'HabitLog' | 'JournalEntry' | 'CalendarEvent'
 export type Row = { id?: number } & Record<string, unknown>
 
 export interface PropDef { name: string; type: string }
@@ -174,7 +178,59 @@ const budget = erase<Budget>({
   automations: [auto('budget-over')],
 })
 
-export const TYPE_LIST: TypeDef[] = [goal, task, learning, budget, transaction, person, interaction, meal, review, lifeEvent]
+const habit = erase<Habit>({
+  key: 'Habit', label: 'Habit', table: 'habits',
+  title: (o) => o.name,
+  subtitle: (o) => `${perWeekLabel(o.perWeek)} · ${o.area}${o.archived ? ' · archived' : ''}`,
+  properties: [{ name: 'name', type: 'string' }, { name: 'area', type: 'Area' }, { name: 'perWeek', type: '1-7' }, { name: 'goalId', type: 'Goal.id?' }, { name: 'archived', type: 'boolean?' }],
+  links: [{ name: 'goalId', label: 'supports', to: 'Goal', via: 'goalId', mode: 'fk' }],
+  actions: [
+    { id: 'check-in', label: 'Check in today', when: (o) => !o.archived, run: async (o) => { if (!(await db.habitLogs.where('[habitId+date]').equals([o.id!, today()]).first())) await toggleCheckIn(o, today()) } },
+    { id: 'archive', label: 'Archive', when: (o) => !o.archived, run: (o) => archiveHabit(o, true) },
+    { id: 'restore', label: 'Restore', when: (o) => !!o.archived, run: (o) => archiveHabit(o, false) },
+  ],
+  functions: [{
+    name: 'streak', label: 'Current streak',
+    run: async (o) => { const s = streak(new Set((await db.habitLogs.where('habitId').equals(o.id!).toArray()).map((l) => l.date)), today(), o.perWeek); return `${s.count} ${s.unit}${s.count === 1 ? '' : 's'}` },
+  }],
+  automations: [],
+})
+
+const habitLog = erase<HabitLog>({
+  key: 'HabitLog', label: 'Habit check-in', table: 'habitLogs',
+  title: (o) => `Check-in ${o.date}`,
+  subtitle: (o) => o.date,
+  properties: [{ name: 'habitId', type: 'Habit.id' }, { name: 'date', type: 'date' }],
+  links: [{ name: 'habitId', label: 'checks in', to: 'Habit', via: 'habitId', mode: 'fk' }],
+  actions: [],
+  functions: [{ name: 'daysAgo', label: 'Days ago', run: async (o) => daysBetween(o.date, today()) }],
+  automations: [],
+})
+
+const journalEntry = erase<JournalEntry>({
+  key: 'JournalEntry', label: 'Journal entry', table: 'journal',
+  // Titles never include the entry text.
+  title: (o) => `Journal ${o.date}`,
+  subtitle: (o) => `${wordCount(o.text)} words${o.mood ? ` · mood ${o.mood}` : ''}`,
+  properties: [{ name: 'date', type: 'date' }, { name: 'text', type: 'string (private)' }, { name: 'mood', type: '1-5?' }, { name: 'energy', type: '1-5?' }, { name: 'tags', type: 'string[]?' }],
+  links: [],
+  actions: [],
+  functions: [{ name: 'wordCount', label: 'Word count', run: async (o) => wordCount(o.text) }],
+  automations: [],
+})
+
+const calendarEvent = erase<CalendarEvent>({
+  key: 'CalendarEvent', label: 'Calendar event', table: 'calendar',
+  title: (o) => o.title,
+  subtitle: (o) => `${o.date} · ${timeLabel(o)}`,
+  properties: [{ name: 'title', type: 'string' }, { name: 'date', type: 'date' }, { name: 'allDay', type: 'boolean' }, { name: 'start', type: 'HH:MM?' }, { name: 'end', type: 'HH:MM?' }, { name: 'location', type: 'string?' }],
+  links: [],
+  actions: [],
+  functions: [{ name: 'daysUntil', label: 'Days until', run: async (o) => daysBetween(today(), o.date) }],
+  automations: [],
+})
+
+export const TYPE_LIST: TypeDef[] = [goal, task, learning, budget, transaction, person, interaction, meal, review, lifeEvent, habit, habitLog, journalEntry, calendarEvent]
 export const REGISTRY = Object.fromEntries(TYPE_LIST.map((t) => [t.key, t])) as Record<TypeKey, TypeDef>
 
 export const typeForTable = (table: string): TypeDef | undefined => TYPE_LIST.find((t) => t.table === table)

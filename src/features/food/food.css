@@ -54,3 +54,5 @@
   .food-totals { gap: 14px; }
   .food-totals .stat-value { font-size: 24px; }
 }
+.food-lookup { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.food-lookup-item { display: flex; gap: 10px; width: 100%; justify-content: space-between; min-height: 32px; }

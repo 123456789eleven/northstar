@@ -21,7 +21,7 @@
 <section class="page-hero dark"><div class="wrap"><p class="label">Privacy</p><h1>Your data stays where you put it.</h1><p class="lede mute">Northstar is local-first by design, not by policy. There is no backend that could receive your data.</p></div></section>
 <section class="light"><div class="wrap"><div class="prose">
 <h2 style="margin-top:0">How data stays on your device</h2>
-<p>The app is a set of static files. Once loaded, it reads and writes a database inside your browser (IndexedDB). It makes no network requests carrying your information. A strict content security policy limits the app and this site to loading resources from their own origin, and fonts are self-hosted.</p>
+<p>The app is a set of static files. Once loaded, it reads and writes a database inside your browser (IndexedDB). With sync off it makes no network requests carrying your records. With sync on, the only place your (encrypted) records go is your own Supabase project. A strict content security policy limits what the app can connect to, and fonts are self-hosted.</p>
 <h2>What is stored</h2>
 <table class="plain"><thead><tr><th scope="col">Area</th><th scope="col">Examples</th></tr></thead><tbody>
 <tr><td>Tasks and goals</td><td>Titles, due dates, progress, recurrence</td></tr>
@@ -33,13 +33,21 @@
 </tbody></table>
 <p class="mute" style="margin-top:16px">Bank credentials are never asked for or stored. Bank data enters only through a CSV file you pick.</p>
 <h2>What is not collected</h2>
-<ul><li>No accounts, sign-ins or email addresses.</li><li>No analytics, advertising or tracking scripts.</li><li>No cloud storage or sync.</li><li>No third-party fonts, CDNs or embeds.</li></ul>
+<ul><li>No accounts, sign-ins or email addresses, unless you turn on sync (below).</li><li>No analytics, advertising or tracking scripts.</li><li>No cloud storage by default.</li><li>No third-party fonts, CDNs or embeds.</li></ul>
+<h2>Optional encrypted sync</h2>
+<p>Sync is off unless you turn it on in Settings. When on, it copies your records between your own devices through a Supabase project you create. Before anything is sent, each record is encrypted on your device (AES-256-GCM) with a key that is itself protected by your passphrase (PBKDF2-SHA256, 600,000 rounds) and by a one-time recovery code. Your passphrase, recovery code and keys never leave your devices. The app talks only to your Supabase project&rsquo;s address, and the database only lets your signed-in account read or write your own rows.</p>
+<table class="plain"><thead><tr><th scope="col">Supabase can see</th><th scope="col">Supabase cannot see</th></tr></thead><tbody>
+<tr><td>Your account email and sign-in times</td><td>Any task, goal, transaction, journal entry, person, note or setting</td></tr>
+<tr><td>How many records each section has (for example, the number of journal rows)</td><td>Names, amounts, dates or text inside a record</td></tr>
+<tr><td>When records are created, changed or deleted, and the size of each encrypted record</td><td>Your passphrase, recovery code or encryption keys</td></tr>
+</tbody></table>
+<p class="mute" style="margin-top:16px">If you lose both your passphrase and your recovery code, nobody can decrypt the cloud copy, including you, Supabase or Northstar. The readable data on each device is unaffected. You can delete every encrypted record from the cloud in Settings at any time; erasing data on a device never deletes the cloud copy by itself.</p>
 <h2>Backups</h2>
 <p>In Settings you can export a JSON backup of everything, and import one later. The file is created and saved by your browser on your device. Treat it like any personal document: it holds your data in plain form. Importing a backup runs as a single step so a failed import cannot leave things half-written.</p>
 <h2>Offline and the service worker</h2>
 <p>A service worker caches the app&rsquo;s own files so it opens without a connection. It caches application code and assets only, never your data.</p>
 <h2>Clearing your data</h2>
-<p>Clearing this site&rsquo;s data in your browser settings erases your Northstar data from that device. Export a backup first if you want to keep it. Because there is no cloud copy, it cannot be recovered for you.</p>
+<p>Clearing this site&rsquo;s data in your browser settings erases your Northstar data from that device. Export a backup first if you want to keep it. Without sync there is no cloud copy, so it cannot be recovered for you. With sync on, your other devices and the encrypted cloud copy still have it.</p>
 <p><a class="btn" href="app/">Open Northstar</a></p>
 </div></div></section>
 </main>

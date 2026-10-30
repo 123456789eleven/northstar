@@ -129,7 +129,7 @@ function Panel({ type, row, onGo }: { type: TypeKey; row: Row; onGo: (t: TypeKey
         {Object.entries(row).map(([k, v]) => (
           <div key={k} style={{ display: 'contents' }}>
             <dt>{k}</dt>
-            <dd>{typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v ?? '')}</dd>
+            <dd>{PRIVATE_FIELDS[type]?.includes(k) ? '(hidden)' : typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v ?? '')}</dd>
           </div>
         ))}
       </dl>
@@ -180,6 +180,9 @@ function Panel({ type, row, onGo }: { type: TypeKey; row: Row; onGo: (t: TypeKey
     </div>
   )
 }
+
+// Free-text fields never printed in the explorer (it can be on screen in shared/recorded sessions).
+const PRIVATE_FIELDS: Record<string, string[]> = { JournalEntry: ['text'] }
 
 export default function Ontology() {
   const [params, setParams] = useSearchParams()

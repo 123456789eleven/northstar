@@ -3,7 +3,8 @@
 A local-first web app (installable PWA) for one person: tasks, goals, finances, food, learning, relationships, history/achievements, weekly review.
 
 ## Hard rules
-- **Privacy: all data stays on-device** in IndexedDB via Dexie (`src/db.ts`). No network calls with user data, no analytics, no third-party APIs, no cloud sync. Backups are user-initiated JSON export/import (Settings). Any feature that would send data off-device needs the owner's explicit approval first.
+- **Privacy: data lives on-device** in IndexedDB via Dexie (`src/db.ts`), which is always the source of truth. No analytics, no third-party APIs with user data. Backups are user-initiated JSON export/import (Settings).
+- **The ONLY allowed path for stored user data to leave the device is the opt-in, end-to-end encrypted Supabase sync in `src/sync/`** (default OFF). (Other outbound requests, such as the opt-in Open Food Facts search or the Google Calendar read-only import, must never carry stored records.) Plaintext user data never leaves the device: every record is AES-GCM encrypted on-device (AAD = table + record id) before upload; passphrase, recovery code and keys never leave. Supabase holds only ciphertext plus metadata it can see (account email, table names, opaque ids, row counts, timestamps, ciphertext sizes). Only the Supabase host is contacted, RLS restricts every row to `auth.uid()`, and a service-role key must never appear in the app or repo. Any other feature that would send data off-device needs the owner's explicit approval first.
 - Bank data enters only via CSV import the user picks themselves. Never store bank credentials.
 
 ## Stack
@@ -12,6 +13,7 @@ Vite + React 19 + TypeScript, react-router-dom (HashRouter), Dexie + `dexie-reac
 ## Architecture
 - `src/db.ts` — all types + schema. Every table is declared there. Adding a table/index = bump `db.version(n)` with a new `.stores()` block; never edit a shipped version.
 - **Single timeline:** whenever something meaningful happens (task completed, goal done, course finished, budget set, person contacted…), call `logEvent({ area, kind, title, refTable, refId, milestone? })`. `milestone: true` puts it on the Achievements wall. History reads only `db.events`.
+- **Sync (`src/sync/`):** `outbox.ts` is a Dexie DBCore middleware (installed in `db.ts`) that queues one outbox row per changed record in the same transaction, only once sync is set up; `engine.ts` pulls by server `seq` and pushes ciphertext, last-writer-wins on the timestamp inside the ciphertext; `syncMeta` maps local ids to stable cross-device `syncId`s and foreign keys travel as syncIds (add new FK fields to `schema.ts` FOREIGN_KEYS, unique natural keys to `naturalKey`/`uniqueLookup`). Device-local settings keys (`sync.*`, `gcal.*`, `backup.lastAt`, `ops.autolog`, `food.lookup.optin`) never sync; add new device-local keys to `isLocalOnlySetting`. Bulk replaces (backup import, erase) must run inside `withSyncSuppressed`. Server schema: `supabase/migrations`, setup: `supabase/README.md`.
 - `src/lib/dates.ts` — use these helpers; dates are local `YYYY-MM-DD` strings, timestamps ISO.
 - `src/components/ui.tsx` — shared primitives (PageHeader, Card, Stat, Progress, Empty, Modal, Field, Tabs). Use them plus the CSS classes in `index.css` (`.card .btn .btn-primary .input .chip .list-item .table .grid-2/3/4 .stack .row` …).
 - One page per route in `src/pages/`. Page-specific components go in `src/features/<module>/`.
@@ -41,3 +43,4 @@ Design every module so the common action takes ≤ 2 taps or one line of typing 
 
 ## Model efficiency (cost vs quality)
 Default to sonnet; opus only for architecture, schema/migrations, privacy audits, strategy, or after two failed fixes; haiku (`northstar-scout`) for searching and mechanical edits. Don't spawn agents for 1-3 tool-call jobs; give each disjoint files and the context up front; reports under ~300 words. Quality is enforced by `npm run verify` and the definition-of-done gates, never by model size. Full rules: the `northstar-model-efficiency` skill.
+- Skills: start at `northstar-master` (index by type); validate with `python "C:\Users\bearf\OneDrive\Desktop\The One\tools\check_skills.py"`.

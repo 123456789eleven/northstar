@@ -4,7 +4,7 @@ import { REGISTRY, resolveLinks, timelineFor, TYPE_LIST } from './registry'
 
 describe('ontology registry', () => {
   it('declares every type with a table that exists', () => {
-    expect(TYPE_LIST.length).toBe(10)
+    expect(TYPE_LIST.length).toBe(14)
     for (const t of TYPE_LIST) expect(db.tables.map((x) => x.name)).toContain(t.table)
   })
 
@@ -34,6 +34,21 @@ describe('ontology registry', () => {
     expect((await resolveLinks('LifeEvent', ev as never)).find((g) => g.direction === 'out')?.type).toBe('Transaction')
     expect((await resolveLinks('Transaction', tx as never)).find((g) => g.type === 'LifeEvent' && g.direction === 'in')?.objects).toHaveLength(1)
     expect((await timelineFor({ table: 'transactions', id: tid })).map((e) => e.title)).toEqual(['about tx'])
+  })
+
+  it('links habits to goals and check-ins to habits, and keeps journal text out of titles', async () => {
+    const goalId = (await db.goals.add({ title: 'G', area: 'health', horizon: 'quarter', status: 'active', milestones: [], createdAt: '2026-01-01T00:00:00.000Z' })) as number
+    const habitId = (await db.habits.add({ name: 'Walk', area: 'health', perWeek: 7, goalId, createdAt: '2026-01-01T00:00:00.000Z' })) as number
+    await db.habitLogs.add({ habitId, date: '2026-10-29' })
+    const habit = (await db.habits.get(habitId))!
+    expect((await resolveLinks('Habit', habit as never)).find((g) => g.direction === 'out' && g.type === 'Goal')?.objects.map((o) => o.id)).toEqual([goalId])
+    expect((await resolveLinks('Habit', habit as never)).find((g) => g.direction === 'in' && g.type === 'HabitLog')?.objects).toHaveLength(1)
+    expect((await resolveLinks('Goal', (await db.goals.get(goalId))! as never)).find((g) => g.direction === 'in' && g.type === 'Habit')?.objects).toHaveLength(1)
+    expect(REGISTRY.Habit.actions.map((a) => a.id)).toContain('check-in')
+    const entry = { id: 1, date: '2026-10-29', text: 'very private words', createdAt: '' }
+    expect(REGISTRY.JournalEntry.title(entry as never)).not.toContain('private')
+    expect(REGISTRY.JournalEntry.subtitle(entry as never)).not.toContain('private')
+    expect(REGISTRY.CalendarEvent.table).toBe('calendar')
   })
 
   it('functions compute derived values via existing logic', async () => {

@@ -18,3 +18,4 @@
 .set-file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .set-profile-row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
 .set-profile-row .field { flex: 1; min-width: 200px; }
+.set-code { font-size: 17px; letter-spacing: 0.06em; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; margin: 0; overflow-wrap: anywhere; user-select: all; }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FavoriteMeal, ISODate, Meal, MealSlot } from '../../db'
+import FoodLookup from './FoodLookup'
 import { addMeal, copyYesterday, logFavorite, optNum, removeMeal, sumMeals } from './foodData'
 
 export interface Suggestion {
@@ -118,6 +119,14 @@ export default function SlotCard({
           Add
         </button>
       </form>
+      <FoodLookup
+        query={name}
+        onPick={(f) => {
+          setName(f.name)
+          setKcal(f.kcal != null ? String(f.kcal) : '')
+          setProtein(f.protein != null ? String(f.protein) : '')
+        }}
+      />
     </section>
   )
 }
