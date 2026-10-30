@@ -1,4 +1,4 @@
-// KpiStrip: one bordered bar of 2-5 cells. Items: {label, value, delta?, deltaTone?, note?, to?}. Phone: 2x2.
+// KpiStrip: one bordered bar of 2-5 cells. Items: {label, value, delta?, deltaTone?, note?, to?}. Phone: 2x2 (3 cells stay in one row).
 import { Link } from 'react-router-dom'
 import type { ReactNode } from 'react'
 
@@ -6,7 +6,7 @@ export interface KpiItem { label: string; value: ReactNode; delta?: string; delt
 
 export default function KpiStrip({ items }: { items: KpiItem[] }) {
   return (
-    <div className="kpi-strip" style={{ ['--kpi-n' as string]: items.length }}>
+    <div className="kpi-strip" data-n={items.length} style={{ ['--kpi-n' as string]: items.length }}>
       {items.map((it) => {
         const body = (
           <>

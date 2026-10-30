@@ -12,6 +12,7 @@ import { buildTodayView } from '../features/today/todayQueue'
 import { goalProgress, progressLabel } from '../features/goals/progress'
 import { GlanceTiles } from '../features/today/GlanceTiles'
 import { HabitsTile, NextUp } from '../features/today/HabitsNext'
+import { FirstRunCard } from '../features/onboarding/FirstRunCard'
 import { InsightsCard } from '../features/insights/InsightsCard'
 import '../features/tasks/tasks.css'
 import '../features/today/today.css'
@@ -32,7 +33,6 @@ export default function Today() {
   const habitsDone = new Set((habitLogs ?? []).map((l) => l.habitId))
   const habitsOpen = (habits ?? []).filter((h) => !habitsDone.has(h.id!)).length
   const loaded = tasks !== undefined && goals !== undefined && habits !== undefined
-  const brandNew = loaded && tasks.length === 0 && goals.length === 0 && habits.length === 0
 
   const row = (t: Task) => (
     <TaskRow
@@ -60,16 +60,9 @@ export default function Today() {
         sub={loaded ? `${v.openCount} open${v.overdueCount ? ` · ${v.overdueCount} overdue` : ''}` : ' '}
       />
 
-      {brandNew ? (
-        <Card title="Get started" className="today-start">
-          <p className="muted small" style={{ margin: 0 }}>Three small steps and this page fills in. Everything stays on this device.</p>
-          <ol>
-            <li><span><span className="step-n">1</span>Capture a task: press / and type "call dentist tmr !1"</span></li>
-            <li><span><span className="step-n">2</span>Write a goal for this quarter</span><Link className="btn btn-sm" to="/goals">Open Goals</Link></li>
-            <li><span><span className="step-n">3</span>Add a habit you can finish in two minutes</span><Link className="btn btn-sm" to="/habits">Open Habits</Link></li>
-          </ol>
-        </Card>
-      ) : (
+      <FirstRunCard />
+
+      {(
         <>
           {loaded && (
             <KpiStrip

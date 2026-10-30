@@ -1,6 +1,6 @@
 // App shell parts: desktop rail, top bar (context, capture, sync, date), phone bottom bar + More sheet.
-import { useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { getSetting } from '../db'
 import { parseISODate, today } from '../lib/dates'
@@ -81,6 +81,14 @@ export function TopBar() {
   const phone = useMedia(PHONE_QUERY)
   const [open, setOpen] = useState(false)
   const ctx = useRouteContext()
+  const { search } = useLocation()
+  const navigate = useNavigate()
+  // PWA shortcut "Quick capture" opens #/?capture=1: focus the capture line (desktop) or open the sheet (phone).
+  useEffect(() => {
+    if (!new URLSearchParams(search).has('capture')) return
+    navigate('/', { replace: true })
+    setTimeout(() => (phone ? setOpen(true) : window.dispatchEvent(new KeyboardEvent('keydown', { key: '/' }))), 0)
+  }, [search, phone, navigate])
   return (
     <header className="topbar">
       <div className="topbar-ctx">

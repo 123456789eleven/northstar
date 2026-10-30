@@ -1,22 +1,35 @@
+import { lazy, Suspense } from 'react'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import { Rail, TabBar, TopBar } from './components/Shell'
 import ToastProvider from './components/Toast'
-import Today from './pages/Today'
-import Ops from './pages/Ops'
-import Ontology from './pages/Ontology'
-import Tasks from './pages/Tasks'
-import Goals from './pages/Goals'
-import Food from './pages/Food'
-import Finance from './pages/Finance'
-import Learning from './pages/Learning'
-import People from './pages/People'
-import History from './pages/History'
-import Review from './pages/Review'
-import Settings from './pages/Settings'
-import Habits from './pages/Habits'
-import Journal from './pages/Journal'
-import Planner from './pages/Planner'
-import DataHub from './pages/DataHub'
+import UpdatePrompt from './components/UpdatePrompt'
+
+const Today = lazy(() => import('./pages/Today'))
+const Ops = lazy(() => import('./pages/Ops'))
+const Ontology = lazy(() => import('./pages/Ontology'))
+const Tasks = lazy(() => import('./pages/Tasks'))
+const Goals = lazy(() => import('./pages/Goals'))
+const Food = lazy(() => import('./pages/Food'))
+const Finance = lazy(() => import('./pages/Finance'))
+const Learning = lazy(() => import('./pages/Learning'))
+const People = lazy(() => import('./pages/People'))
+const History = lazy(() => import('./pages/History'))
+const Review = lazy(() => import('./pages/Review'))
+const Settings = lazy(() => import('./pages/Settings'))
+const Habits = lazy(() => import('./pages/Habits'))
+const Journal = lazy(() => import('./pages/Journal'))
+const Planner = lazy(() => import('./pages/Planner'))
+const DataHub = lazy(() => import('./pages/DataHub'))
+
+function PageFallback() {
+  return (
+    <div className="page-skel" aria-busy="true" aria-label="Loading">
+      <div className="skel skel-title" />
+      <div className="skel skel-strip" />
+      <div className="skel skel-block" />
+    </div>
+  )
+}
 
 function Shell() {
   return (
@@ -25,6 +38,7 @@ function Shell() {
         <div className="stage">
         <TopBar />
         <main className="main" id="main">
+          <Suspense fallback={<PageFallback />}>
           <Routes>
             <Route path="/" element={<Today />} />
             <Route path="/ops" element={<Ops />} />
@@ -43,9 +57,11 @@ function Shell() {
             <Route path="/planner" element={<Planner />} />
             <Route path="/data" element={<DataHub />} />
           </Routes>
+          </Suspense>
         </main>
         </div>
         <TabBar />
+        <UpdatePrompt />
       </div>
   )
 }

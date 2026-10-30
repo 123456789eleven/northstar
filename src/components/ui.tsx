@@ -3,7 +3,7 @@
 // Sibling components (default exports): KpiStrip{items}, DataTable{columns,rows,rowKey,selectable,selected,onSelectedChange,onRow,activeKey},
 // ListRow{leading,title,meta,trailing,onClick,selected}, SidePanel{title,onClose,inline?}, BottomSheet{title,onClose,side?},
 // StatusChip{status,children}, ChartFrame{title,controls,legend,hasData,table}, ToastProvider + useToast() (toastContext.ts).
-import { useRef, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { useFocusTrap } from './useFocusTrap'
 
 export function PageHeader({ title, sub, actions, tabs }: { title: string; sub?: ReactNode; actions?: ReactNode; tabs?: ReactNode }) {
@@ -81,8 +81,16 @@ export function Field({ label, children }: { label: string; children: ReactNode 
 }
 
 export function Tabs<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { value: T; label: string }[] }) {
+  const ref = useRef<HTMLDivElement>(null)
+  // Keep the active tab in view on a narrow strip; the next tab peeks in as the scroll cue.
+  useEffect(() => {
+    const el = ref.current?.querySelector<HTMLElement>('.tab.active')
+    const box = ref.current
+    if (!el || !box || box.scrollWidth <= box.clientWidth) return
+    box.scrollLeft += el.getBoundingClientRect().left - box.getBoundingClientRect().left - 24
+  }, [value])
   return (
-    <div className="tabs" role="tablist">
+    <div className="tabs" role="tablist" ref={ref}>
       {options.map((o) => (
         <button key={o.value} role="tab" aria-selected={o.value === value} className={`tab ${o.value === value ? 'active' : ''}`} onClick={() => onChange(o.value)}>
           {o.label}

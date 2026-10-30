@@ -59,8 +59,6 @@ function ReviewPanel({ p, mode, setMode, onDone }: { p: Proposal; mode: Mode; se
         {canModify && <button className="btn btn-sm" aria-pressed={mode === 'modify'} onClick={() => toggle('modify')}>Modify</button>}
         <button className="btn btn-sm" onClick={async () => { await decide(p.id, 'dismissed'); onDone() }}>Dismiss</button>
         <button className="btn btn-sm btn-ghost" onClick={async () => { await decide(p.id, 'snoozed', { days: 1 }); onDone() }}>Snooze 1 day</button>
-      </div>
-      <div className="ops-actions">
         <button className="btn btn-sm btn-ghost" aria-pressed={mode === 'explain'} onClick={() => toggle('explain')}>Evidence</button>
         <button className="btn btn-sm btn-ghost" aria-pressed={mode === 'logic'} onClick={() => toggle('logic')}>Show logic</button>
       </div>

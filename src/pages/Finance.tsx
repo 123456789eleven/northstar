@@ -39,7 +39,7 @@ export default function Finance() {
     <>
       <PageHeader
         title="Finance"
-        sub="Stays on this device. Import CSVs from your bank — no logins, no syncing."
+        sub="Stays on this device. Import CSVs from your bank. No logins, no syncing."
         actions={
           showMonth && (
             <div className="row fin-month" role="group" aria-label="Month">
