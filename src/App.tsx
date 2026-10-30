@@ -1,0 +1,86 @@
+import { HashRouter, NavLink, Route, Routes } from 'react-router-dom'
+import QuickCapture from './components/QuickCapture'
+import Today from './pages/Today'
+import Tasks from './pages/Tasks'
+import Goals from './pages/Goals'
+import Food from './pages/Food'
+import Finance from './pages/Finance'
+import Learning from './pages/Learning'
+import People from './pages/People'
+import History from './pages/History'
+import Review from './pages/Review'
+import Settings from './pages/Settings'
+
+const NAV: { section?: string; to: string; label: string }[] = [
+  { to: '/', label: 'Today' },
+  { to: '/tasks', label: 'Tasks' },
+  { to: '/goals', label: 'Goals' },
+  { section: 'Life', to: '/finance', label: 'Finance' },
+  { to: '/food', label: 'Food' },
+  { to: '/learning', label: 'Learning' },
+  { to: '/people', label: 'People' },
+  { section: 'Reflect', to: '/history', label: 'History' },
+  { to: '/review', label: 'Review' },
+  { to: '/settings', label: 'Settings' },
+]
+
+function Mark() {
+  return (
+    <svg className="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
+      <path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19" strokeLinecap="round" opacity="0.35" />
+      <path d="M12 4l2 8-2 8-2-8z" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+function Links() {
+  return (
+    <>
+      {NAV.map((n) => (
+        <span key={n.to} style={{ display: 'contents' }}>
+          {n.section && <div className="nav-section">{n.section}</div>}
+          <NavLink to={n.to} end={n.to === '/'} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <span className="nav-dot" />
+            {n.label}
+          </NavLink>
+        </span>
+      ))}
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <HashRouter>
+      <div className="shell">
+        <nav className="sidebar" aria-label="Main">
+          <div className="brand"><Mark />Northstar</div>
+          <Links />
+        </nav>
+        <main className="main">
+          <QuickCapture />
+          <Routes>
+            <Route path="/" element={<Today />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/goals" element={<Goals />} />
+            <Route path="/food" element={<Food />} />
+            <Route path="/finance" element={<Finance />} />
+            <Route path="/learning" element={<Learning />} />
+            <Route path="/people" element={<People />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/review" element={<Review />} />
+            <Route path="/settings" element={<Settings />} />
+          </Routes>
+        </main>
+        <nav className="tabbar" aria-label="Main mobile">
+          {NAV.map((n) => (
+            <NavLink key={n.to} to={n.to} end={n.to === '/'} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+              <span className="nav-dot" />
+              {n.label}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+    </HashRouter>
+  )
+}
