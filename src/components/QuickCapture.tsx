@@ -7,7 +7,7 @@ import { describeCapture, parseCapture, type CaptureGoal } from '../lib/capture'
 import { saveCapture, type Saved } from '../features/tasks/captureSave'
 import '../features/tasks/tasks.css'
 
-export default function QuickCapture() {
+export default function QuickCapture({ autoFocus = false }: { autoFocus?: boolean }) {
   const [text, setText] = useState('')
   const [saved, setSaved] = useState<Saved | null>(null)
   const ref = useRef<HTMLInputElement>(null)
@@ -63,9 +63,10 @@ export default function QuickCapture() {
       <div className="qc-box">
         <input
           ref={ref}
+          autoFocus={autoFocus}
           className="qc-input"
           value={text}
-          placeholder="Capture… e.g. 'call mom fri !1 #career'"
+          placeholder="Capture: call mom fri !1 #career"
           aria-label="Quick capture"
           onChange={(e) => {
             setText(e.target.value)

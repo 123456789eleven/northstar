@@ -1,8 +1,14 @@
 // Shared UI primitives. Modules should compose these + the classes in index.css rather than invent new chrome.
-import { useEffect, type ReactNode } from 'react'
+// Here: PageHeader{title,sub,actions,tabs?} Card{title,action,flush?} Stat Progress Empty Modal Field Tabs.
+// Sibling components (default exports): KpiStrip{items}, DataTable{columns,rows,rowKey,selectable,selected,onSelectedChange,onRow,activeKey},
+// ListRow{leading,title,meta,trailing,onClick,selected}, SidePanel{title,onClose,inline?}, BottomSheet{title,onClose,side?},
+// StatusChip{status,children}, ChartFrame{title,controls,legend,hasData,table}, ToastProvider + useToast() (toastContext.ts).
+import { useRef, type ReactNode } from 'react'
+import { useFocusTrap } from './useFocusTrap'
 
-export function PageHeader({ title, sub, actions }: { title: string; sub?: ReactNode; actions?: ReactNode }) {
+export function PageHeader({ title, sub, actions, tabs }: { title: string; sub?: ReactNode; actions?: ReactNode; tabs?: ReactNode }) {
   return (
+    <>
     <div className="page-head">
       <div>
         <h1 className="page-title">{title}</h1>
@@ -10,12 +16,14 @@ export function PageHeader({ title, sub, actions }: { title: string; sub?: React
       </div>
       {actions && <div className="row wrap">{actions}</div>}
     </div>
+    {tabs}
+    </>
   )
 }
 
-export function Card({ title, action, children, className = '' }: { title?: ReactNode; action?: ReactNode; children: ReactNode; className?: string }) {
+export function Card({ title, action, children, className = '', flush = false }: { title?: ReactNode; action?: ReactNode; children: ReactNode; className?: string; flush?: boolean }) {
   return (
-    <section className={`card ${className}`}>
+    <section className={`card ${flush ? 'card-flush' : ''} ${className}`}>
       {(title || action) && (
         <div className="card-title">
           <span>{title}</span>
@@ -51,14 +59,11 @@ export function Empty({ children }: { children: ReactNode }) {
 }
 
 export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  const ref = useRef<HTMLDivElement>(null)
+  useFocusTrap(ref, onClose)
   return (
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal" role="dialog" aria-modal="true" aria-label={title}>
+      <div ref={ref} className="modal" role="dialog" aria-modal="true" aria-label={title} tabIndex={-1}>
         <h3>{title}</h3>
         {children}
       </div>
@@ -87,13 +92,5 @@ export function Tabs<T extends string>({ value, onChange, options }: { value: T;
   )
 }
 
-export const AREA_LABEL: Record<string, string> = {
-  career: 'Career',
-  health: 'Health',
-  finance: 'Finance',
-  learning: 'Learning',
-  relationships: 'Relationships',
-  personal: 'Personal',
-  tasks: 'Tasks',
-  food: 'Food',
-}
+// Re-exported so existing imports keep working; new code may import from './uiConsts'.
+export { AREA_LABEL } from './uiConsts'
