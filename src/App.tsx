@@ -21,15 +21,19 @@ import DataHub from './pages/DataHub'
 const NAV: { section?: string; to: string; label: string }[] = [
   { to: '/ops', label: 'Command' },
   { to: '/', label: 'Today' },
+  { to: '/planner', label: 'Planner' },
   { to: '/tasks', label: 'Tasks' },
   { to: '/goals', label: 'Goals' },
+  { to: '/habits', label: 'Habits' },
   { section: 'Life', to: '/finance', label: 'Finance' },
   { to: '/food', label: 'Food' },
   { to: '/learning', label: 'Learning' },
   { to: '/people', label: 'People' },
-  { section: 'Reflect', to: '/history', label: 'History' },
+  { section: 'Reflect', to: '/journal', label: 'Journal' },
+  { to: '/history', label: 'History' },
   { to: '/review', label: 'Review' },
   { to: '/ontology', label: 'Ontology' },
+  { to: '/data', label: 'Data' },
   { to: '/settings', label: 'Settings' },
 ]
 
