@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, Empty, PageHeader } from '../components/ui'
 import DataTable from '../components/DataTable'
@@ -12,6 +13,8 @@ import { undoImport } from '../features/finance/importActions'
 import { IMPORTS_KEY, type ImportRecord } from '../features/finance/model'
 import GoogleCalendarCard from '../features/gcal/GoogleCalendarCard'
 import '../features/data/data.css'
+
+const PacksPanel = lazy(() => import('../features/packs/PacksPanel'))
 
 interface Status {
   state?: string
@@ -119,6 +122,8 @@ export default function DataHub() {
         <div id="import-calendar"><CalendarImport /></div>
         <div id="gcal"><GoogleCalendarCard /></div>
         <div id="import-contacts"><ContactsImport /></div>
+
+        <Suspense fallback={null}><PacksPanel /></Suspense>
 
         <Card title="Import history">
           {history.length === 0 ? (

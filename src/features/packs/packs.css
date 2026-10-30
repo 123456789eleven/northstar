@@ -1,0 +1,12 @@
+.pack-list { display: flex; flex-direction: column; }
+.pack { padding: 12px 0; border-top: 1px solid var(--line); }
+.pack:first-child { border-top: 0; padding-top: 0; }
+.pack-head { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+.pack-head .grow { flex: 1 1 260px; min-width: 0; }
+.pack-name { font-weight: 600; font-size: 14px; }
+.pack-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.pack-preview { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; }
+.pack-preview ul { margin: 2px 0 8px; padding-left: 18px; font-size: 13px; color: var(--ink-2); }
+.pack-preview li { padding: 1px 0; overflow-wrap: anywhere; }
+.pack-h { text-transform: uppercase; letter-spacing: .04em; }
+.pack-msg { color: var(--good); margin: 10px 0 0; }

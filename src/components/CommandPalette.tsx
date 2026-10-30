@@ -4,6 +4,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { searchAll, scoreFields, type SearchGroup } from '../lib/search'
+import { openBulk } from '../features/bulk/openBulk'
 import { NAV } from './nav'
 import { useFocusTrap } from './useFocusTrap'
 
@@ -46,6 +47,7 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
   const baseItems = useMemo<Item[]>(() => {
     const actions: Item[] = [
       { id: 'act:capture', group: 'Actions', label: 'New task', secondary: 'Focus the capture bar', run: () => { onClose(); setTimeout(() => window.dispatchEvent(new Event(CAPTURE_EVENT)), 0) } },
+      { id: 'act:bulk', group: 'Actions', label: 'Add many items', secondary: 'Paste tasks, people, goals, meals, transactions', run: () => { onClose(); setTimeout(openBulk, 0) } },
       { id: 'act:backup', group: 'Actions', label: 'Export or restore backup', secondary: 'Settings', run: go('/settings') },
     ]
     const pages = NAV.map((n): Item => ({ id: `nav:${n.to}`, group: 'Go to', label: n.label, secondary: n.group, run: go(n.to) }))

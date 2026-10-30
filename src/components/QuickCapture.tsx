@@ -5,6 +5,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { describeCapture, parseCapture, type CaptureGoal } from '../lib/capture'
 import { saveCapture, type Saved } from '../features/tasks/captureSave'
+import { openBulk } from '../features/bulk/openBulk'
 import '../features/tasks/tasks.css'
 
 export default function QuickCapture({ autoFocus = false }: { autoFocus?: boolean }) {
@@ -98,9 +99,14 @@ export default function QuickCapture({ autoFocus = false }: { autoFocus?: boolea
             </button>
           </div>
         ) : (
-          <span className="qc-kbd" aria-hidden>
-            /
-          </span>
+          <>
+            <button type="button" className="btn btn-ghost btn-sm qc-many" onClick={() => openBulk()}>
+              Add many
+            </button>
+            <span className="qc-kbd" aria-hidden>
+              /
+            </span>
+          </>
         )}
       </div>
     </div>

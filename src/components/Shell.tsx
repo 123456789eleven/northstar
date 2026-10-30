@@ -5,6 +5,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { getSetting } from '../db'
 import { parseISODate, today } from '../lib/dates'
 import QuickCapture from './QuickCapture'
+import BulkHost from '../features/bulk/BulkHost'
+import { SetupHost } from '../features/onboarding/SetupWizard'
 import BottomSheet from './BottomSheet'
 import { Icon } from './Icons'
 import { NAV, NAV_GROUPS, PRIMARY_TABS } from './nav'
@@ -153,6 +155,8 @@ export function TopBar() {
         )}
       </div>
       <PaletteHost />
+      <BulkHost />
+      <SetupHost />
       {phone && open && (
         <BottomSheet title="Capture" onClose={() => setOpen(false)}>
           <QuickCapture autoFocus />

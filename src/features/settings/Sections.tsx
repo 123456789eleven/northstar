@@ -5,6 +5,7 @@ import { Card, Field, Modal } from '../../components/ui'
 import { demoCounts, removeDemo } from '../../lib/demo'
 import { loadDemoWithConfirm } from '../onboarding/demoActions'
 import { BACKUP_LAST_KEY, BACKUP_REMIND_DAYS, eraseAll, exportBackup, importBackup, parseBackup, type ParsedBackup } from '../../lib/backup'
+import { openSetup } from '../onboarding/setupLogic'
 import * as sync from '../../sync/manager'
 import { eraseLocalWithoutSync, restoreWithoutSync } from '../../sync/manager'
 
@@ -50,6 +51,10 @@ export function ProfileSection() {
         </Field>
         <button className="btn" type="submit" disabled={!dirty}>Save</button>
       </form>
+      <div className="row-between" style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--line)' }}>
+        <span className="small muted">Guided setup: goals, habits, budgets, people and first tasks.</span>
+        <button className="btn btn-sm" onClick={openSetup}>Run setup</button>
+      </div>
       <p className="set-text tiny faint" style={{ marginTop: 8 }} role="status">{saved ? 'Saved.' : 'Northstar is dark only and has no other display options. The name stays on this device unless you turn on Sync.'}</p>
     </Card>
   )

@@ -12,8 +12,8 @@ export const SYNC_META = 'syncMeta'
 export const INTERNAL_TABLES = new Set([OUTBOX, SYNC_META])
 
 /** Settings that describe this device, not the person: never synced. */
-const LOCAL_SETTING_PREFIXES = ['sync.', 'gcal.', 'demo.']
-const LOCAL_SETTING_KEYS = new Set(['backup.lastAt', 'ops.autolog', 'food.lookup.optin'])
+const LOCAL_SETTING_PREFIXES = ['sync.', 'gcal.', 'demo.', 'packs.']
+const LOCAL_SETTING_KEYS = new Set(['backup.lastAt', 'ops.autolog', 'food.lookup.optin', 'ui.setup.done'])
 export function isLocalOnlySetting(key: unknown): boolean {
   return typeof key !== 'string' || LOCAL_SETTING_KEYS.has(key) || LOCAL_SETTING_PREFIXES.some((p) => key.startsWith(p))
 }
