@@ -28,13 +28,23 @@ const AMOUNT_NAMES = /^(amount|transaction amount|amt|value|net amount)$/i
 const DEBIT_NAMES = /^(debit|debits|withdrawal|withdrawals|money out|debit amount|outflow|paid out)$/i
 const CREDIT_NAMES = /^(credit|credits|deposit|deposits|money in|credit amount|inflow|paid in)$/i
 
+export const MAX_CSV_BYTES = 5 * 1024 * 1024
+export const MAX_CSV_ROWS = 50_000
+
 export function parseCsv(file: File): Promise<ParsedFile> {
+  if (file.size > MAX_CSV_BYTES) return Promise.reject(new Error(`That file is ${(file.size / 1048576).toFixed(1)} MB. CSV imports are limited to 5 MB - export a shorter date range from your bank.`))
+  return file.text().then((text) => parseCsvText(file.name, text))
+}
+
+/** Parses CSV text (split out of parseCsv so it is testable without a File). */
+export function parseCsvText(name: string, text: string): Promise<ParsedFile> {
   return new Promise((resolve, reject) => {
-    Papa.parse<string[]>(file, {
+    Papa.parse<string[]>(text, {
       skipEmptyLines: 'greedy',
       complete: (res) => {
         const all = res.data.filter((r) => Array.isArray(r) && r.some((c) => String(c).trim() !== ''))
         if (all.length === 0) return reject(new Error('That file has no rows.'))
+        if (all.length > MAX_CSV_ROWS) return reject(new Error(`That file has ${all.length.toLocaleString()} rows. CSV imports are limited to ${MAX_CSV_ROWS.toLocaleString()} rows - export a shorter date range.`))
         // Some banks put a few lines of account info above the header. Find the first row that looks like one.
         let headerIdx = -1
         for (let i = 0; i < Math.min(15, all.length); i++) {
@@ -51,9 +61,9 @@ export function parseCsv(file: File): Promise<ParsedFile> {
             ? Array.from({ length: width }, (_, i) => String(all[headerIdx][i] ?? '').trim() || `Column ${i + 1}`)
             : Array.from({ length: width }, (_, i) => `Column ${i + 1}`)
         const rows = all.slice(headerIdx + 1).map((r) => r.map((c) => String(c ?? '').trim()))
-        resolve({ name: file.name, headers, rows })
+        resolve({ name, headers, rows })
       },
-      error: (err) => reject(err),
+      error: (err: Error) => reject(err),
     })
   })
 }

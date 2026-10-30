@@ -11,7 +11,8 @@ export async function completeTask(t: Task) {
   await db.transaction('rw', db.tasks, db.events, async () => {
     await db.tasks.update(t.id!, { status: 'done', doneAt: now })
     await logEvent({ area: 'tasks', kind: 'task.done', title: t.title, refTable: 'tasks', refId: t.id })
-    const next = nextRecurrence(t.due, t.recurrence, today())
+    const anchor = t.recurrence === 'monthly' ? (t.recurDay ?? (t.due ? Number(t.due.slice(8, 10)) : undefined)) : undefined
+    const next = nextRecurrence(t.due, t.recurrence, today(), anchor)
     if (next) {
       await db.tasks.add({
         title: t.title,
@@ -20,6 +21,7 @@ export async function completeTask(t: Task) {
         priority: t.priority,
         status: 'open',
         recurrence: t.recurrence,
+        recurDay: anchor,
         goalId: t.goalId,
         createdAt: now,
       })

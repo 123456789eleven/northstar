@@ -32,6 +32,6 @@ export const HORIZON_LABEL: Record<Goal['horizon'], string> = { life: 'Life', ye
 export const CHILD_HORIZON: Record<Goal['horizon'], Goal['horizon'] | undefined> = { life: 'year', year: 'quarter', quarter: undefined }
 
 export const newId = () =>
-  typeof crypto !== 'undefined' && 'randomUUID' in crypto && window.isSecureContext
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto && globalThis.isSecureContext
     ? crypto.randomUUID()
     : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`

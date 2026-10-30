@@ -6,6 +6,7 @@ import { addDays, formatDate, parseISODate, startOfWeek, today } from '../lib/da
 import { avgRating, reviewStreak } from '../features/review/summary'
 import { Digest, ReviewForm } from '../features/review/ReviewParts'
 import { RatingsTrend } from '../features/review/RatingsTrend'
+import { InsightsWeek } from '../features/insights/InsightsCard'
 import '../features/review/review.css'
 
 function Chevron({ dir }: { dir: 'l' | 'r' }) {
@@ -51,6 +52,8 @@ export default function Review() {
           <button className="btn btn-sm btn-primary" onClick={() => setWeekOf(lastWeek)}>Review last week</button>
         </div>
       )}
+
+      <InsightsWeek />
 
       <div className="rv-weeknav">
         <button className="btn" aria-label="Previous week" onClick={() => setWeekOf(addDays(weekOf, -7))}><Chevron dir="l" /></button>

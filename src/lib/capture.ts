@@ -45,10 +45,10 @@ const WEEKDAYS: Record<string, number> = {
 
 const clean = (w: string) => w.toLowerCase().replace(/[.,;:!?]+$/, '')
 
-/** Add whole months, clamping to the last day of the target month. */
-export function addMonths(s: ISODate, n: number): ISODate {
+/** Add whole months, clamping to the last day of the target month. `anchorDay` (default: s's own day) is the day to aim for. */
+export function addMonths(s: ISODate, n: number, anchorDay?: number): ISODate {
   const d = parseISODate(s)
-  const day = d.getDate()
+  const day = anchorDay ?? d.getDate()
   d.setDate(1)
   d.setMonth(d.getMonth() + n)
   const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()
@@ -63,18 +63,21 @@ export function nextWeekday(from: ISODate, dow: number): ISODate {
   return addDays(from, diff)
 }
 
-export function advance(s: ISODate, rec: Task['recurrence']): ISODate {
+export function advance(s: ISODate, rec: Task['recurrence'], anchorDay?: number): ISODate {
   if (rec === 'daily') return addDays(s, 1)
   if (rec === 'weekly') return addDays(s, 7)
-  if (rec === 'monthly') return addMonths(s, 1)
+  if (rec === 'monthly') return addMonths(s, 1, anchorDay)
   return s
 }
 
-/** Next due date for a recurring task: step from its due date until it lands after today. */
-export function nextRecurrence(due: ISODate | undefined, rec: Task['recurrence'], todayISO: ISODate): ISODate | undefined {
+/**
+ * Next due date for a recurring task: step from its due date until it lands after today.
+ * `anchorDay` is the original day-of-month for monthly tasks, so Jan 31 -> Feb 28 -> Mar 31 doesn't drift to the 28th.
+ */
+export function nextRecurrence(due: ISODate | undefined, rec: Task['recurrence'], todayISO: ISODate, anchorDay?: number): ISODate | undefined {
   if (rec === 'none') return undefined
-  let next = advance(due ?? todayISO, rec)
-  for (let i = 0; next <= todayISO && i < 1000; i++) next = advance(next, rec)
+  let next = advance(due ?? todayISO, rec, anchorDay)
+  for (let i = 0; next <= todayISO && i < 1000; i++) next = advance(next, rec, anchorDay)
   return next
 }
 
@@ -107,8 +110,9 @@ function parseDue(words: string[], i: number, todayISO: ISODate): { due: ISODate
   const w = clean(words[i])
   const w2 = words[i + 1] ? clean(words[i + 1]) : ''
   const w3 = words[i + 2] ? clean(words[i + 2]) : ''
-  if (w === 'today' || w === 'tonight' || w === 'tod') return { due: todayISO, used: 1 }
-  if (w === 'tomorrow' || w === 'tmr' || w === 'tmrw' || w === 'tom') return { due: addDays(todayISO, 1), used: 1 }
+  if (w === 'today' || w === 'tonight') return { due: todayISO, used: 1 }
+  if (w === 'tomorrow' || w === 'tmr' || w === 'tmrw') return { due: addDays(todayISO, 1), used: 1 }
+  if (w === 'yesterday' || w === 'yday') return { due: addDays(todayISO, -1), used: 1 }
   if (w in WEEKDAYS) return { due: nextWeekday(todayISO, WEEKDAYS[w]), used: 1 }
   if (w === 'next' && w2 === 'week') return { due: nextWeekday(todayISO, 1), used: 2 }
   if (w === 'next' && w2 === 'month') return { due: addMonths(todayISO, 1).slice(0, 8) + '01', used: 2 }
@@ -255,8 +259,11 @@ export function parseCapture(input: string, ctx: CaptureContext = {}): Capture {
     let slot = slotForTime(now)
     const forSlot = /\s*\bfor (breakfast|lunch|dinner|snack)\b/i.exec(rest)
     if (forSlot) { slot = forSlot[1].toLowerCase() as MealSlot; rest = rest.replace(forSlot[0], ' ') }
+    let date = todayISO
+    const yest = /\s*\b(?:yesterday|yday)\b/i.exec(rest)
+    if (yest) { date = addDays(todayISO, -1); rest = rest.replace(yest[0], ' ') }
     const name = rest.replace(/\s+/g, ' ').trim()
-    if (name) return { kind: 'meal', name, calories, slot, date: todayISO }
+    if (name) return { kind: 'meal', name, calories, slot, date }
   }
 
   return parseTask(text, ctx)

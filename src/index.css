@@ -1,3 +1,7 @@
+/* Self-hosted fonts (latin subset) - no third-party requests. */
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 100 900; font-display: swap; src: url(../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2) format('woff2-variations'); }
+@font-face { font-family: 'Fraunces'; font-style: normal; font-weight: 100 900; font-display: swap; src: url(../node_modules/@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2) format('woff2-variations'); }
+
 /* Northstar design system.
    Restraint rules: one accent hue (amber). Color variety is reserved for data, never chrome.
    No glow blobs, no glassmorphism, no dashed "badge" borders, no per-card accent colors. */

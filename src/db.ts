@@ -19,6 +19,8 @@ export interface Task {
   status: 'open' | 'done'
   doneAt?: ISOTime
   recurrence: 'none' | 'daily' | 'weekly' | 'monthly'
+  /** Original day-of-month for monthly tasks (31 stays 31 after a short month clamps it). */
+  recurDay?: number
   goalId?: number
   /** Pinned into today's top 3. Stores the date it was pinned for. */
   focusDate?: ISODate
@@ -142,6 +144,8 @@ export interface LifeEvent {
   title: string
   refTable?: string
   refId?: number
+  /** String reference for things keyed by a string id (e.g. a CSV import batch). */
+  refKey?: string
   /** Shown on the Achievements wall. */
   milestone: boolean
 }

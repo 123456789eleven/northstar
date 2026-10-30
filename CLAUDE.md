@@ -29,4 +29,12 @@ Design every module so the common action takes ≤ 2 taps or one line of typing 
 ## Commands
 - `npm run dev` — dev server (also on LAN for phone testing)
 - `npm run build` — typecheck + production build
-- Typecheck only: `npx tsc -p tsconfig.app.json --noEmit`
+- `npm run verify` — **run before calling anything done**: typecheck (`tsc -p tsconfig.app.json --noEmit`) && lint (`oxlint`) && tests (`vitest run`) && build
+- `npm test` — run tests once; `npm run test:watch` — watch mode; `npx vitest run --coverage` — coverage report
+- Typecheck only: `npm run typecheck`
+
+## Testing
+- Vitest (node env) + `fake-indexeddb`, set up in `src/test/setup.ts` (tables are cleared after every test; TZ pinned to America/New_York in `vitest.config.ts`). Tests sit next to the code as `*.test.ts`.
+- Test-first for bugs and new logic: keep parsers/math in pure functions (e.g. `lib/capture.ts`, `finance/csv.ts`) so they are testable; use `vi.useFakeTimers({ toFake: ['Date'] })` + `vi.setSystemTime` to pin "today" for DB-backed code.
+- Schema changes need a migration test in `src/db.migration.test.ts` (frozen v1 fixture -> open current version -> data intact). `backup.test.ts` round-trips every table; add a seed row there for any new table.
+- Monthly recurring tasks store `recurDay` so a 31st task survives short months; undoing a CSV import (`finance/importActions.ts`) also removes its History event (`refKey` = batch id).

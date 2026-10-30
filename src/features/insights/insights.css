@@ -1,0 +1,15 @@
+/* Insights: on-device weekly summary. One accent; severity is a text label, not a color set. */
+.ins-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.ins-row {
+  display: flex; gap: 12px; align-items: baseline; min-height: 40px; padding: 9px 0;
+  border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; font-size: 14px; line-height: 1.45;
+}
+.ins-list li:last-child .ins-row { border-bottom: 0; }
+.ins-row:hover .ins-text { color: var(--ink); text-decoration: underline; text-decoration-color: var(--ink-3); text-underline-offset: 3px; }
+.ins-tag { flex: 0 0 44px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+.ins-nudge .ins-tag { color: var(--accent); }
+.ins-win .ins-tag { color: var(--good); }
+.ins-text { min-width: 0; color: var(--ink); }
+
+.ins-empty { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 14px; color: var(--ink-2); }
+.ins-quiet { margin: 0; font-size: 14px; color: var(--ink-3); }

@@ -1,11 +1,12 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo, useRef, useState, type DragEvent } from 'react'
 import { Card, Empty, Field } from '../../components/ui'
-import { db, getSetting, logEvent, setSetting, type Transaction } from '../../db'
+import { db, type Transaction } from '../../db'
 import { formatDate, money } from '../../lib/dates'
 import { UNCATEGORIZED } from './categories'
 import { buildRow, dedupeKey, detectMapping, parseCsv, type Mapping, type ParsedFile } from './csv'
-import { IMPORTS_KEY, useImports, useRules, type ImportRecord } from './model'
+import { commitImport, undoImport } from './importActions'
+import { useImports, useRules } from './model'
 
 interface Result {
   added: number
@@ -91,13 +92,9 @@ export default function Import({ onDone }: { onDone: (category?: string, month?:
     if (!file || !plan || !counts) return
     setBusy(true)
     try {
-      const batch = `imp-${Date.now().toString(36)}`
-      const rows = built.flatMap((b, i) => (plan[i] === 'new' && b.tx ? [{ ...b.tx, importBatch: batch }] : []))
-      await db.transactions.bulkAdd(rows)
+      const rows = built.flatMap((b, i) => (plan[i] === 'new' && b.tx ? [b.tx] : []))
+      const { batch } = await commitImport(file.name, rows, counts.dup, counts.error)
       const dates = rows.map((r) => r.date).sort()
-      const rec: ImportRecord = { id: batch, at: new Date().toISOString(), file: file.name, added: rows.length, skipped: counts.dup, errors: counts.error }
-      await setSetting(IMPORTS_KEY, [rec, ...(await getSetting<ImportRecord[]>(IMPORTS_KEY, []))].slice(0, 50))
-      await logEvent({ area: 'finance', kind: 'finance.import', title: `Imported ${rows.length} transaction${rows.length === 1 ? '' : 's'} from ${file.name}` })
       setResult({ added: rows.length, skipped: counts.dup, errors: counts.error, uncategorized: rows.filter((r) => r.category === UNCATEGORIZED).length, from: dates[0], to: dates.at(-1), batch })
       setFile(null)
       setMap(null)
@@ -109,8 +106,7 @@ export default function Import({ onDone }: { onDone: (category?: string, month?:
   async function undo(id: string) {
     const n = await db.transactions.where('importBatch').equals(id).count()
     if (!window.confirm(`Remove the ${n} transaction${n === 1 ? '' : 's'} added by this import?`)) return
-    await db.transactions.where('importBatch').equals(id).delete()
-    await setSetting(IMPORTS_KEY, (await getSetting<ImportRecord[]>(IMPORTS_KEY, [])).filter((r) => r.id !== id))
+    await undoImport(id)
     if (result?.batch === id) setResult(null)
   }
 

@@ -10,6 +10,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
+      workbox: { globPatterns: ['**/*.{js,css,html,svg,woff2}'] },
       manifest: {
         name: 'Northstar',
         short_name: 'Northstar',

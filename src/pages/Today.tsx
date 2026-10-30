@@ -9,6 +9,7 @@ import { TaskEditor } from '../features/tasks/TaskEditor'
 import { MAX_FOCUS, byDue, byUrgency, togglePin } from '../features/tasks/taskActions'
 import { goalProgress, progressLabel } from '../features/goals/progress'
 import { GlanceTiles } from '../features/today/GlanceTiles'
+import { InsightsCard } from '../features/insights/InsightsCard'
 import '../features/tasks/tasks.css'
 import '../features/today/today.css'
 
@@ -128,6 +129,7 @@ export default function Today() {
               )
             )}
           </Card>
+          <InsightsCard />
           <GlanceTiles />
         </div>
       </div>

@@ -45,8 +45,12 @@ export interface ParsedBackup {
   unknown: string[]
 }
 
+export const MAX_BACKUP_BYTES = 50 * 1024 * 1024
+
 /** Parses and validates a backup file. Throws an Error with a plain-language message on failure. */
 export async function parseBackup(file: File): Promise<ParsedBackup> {
+  if (file.size > MAX_BACKUP_BYTES) throw new Error(`This file is ${(file.size / 1048576).toFixed(0)} MB, which is too large for a Northstar backup (limit 50 MB).`)
+  if (!/.json$/i.test(file.name) && file.type && !/json|text/.test(file.type)) throw new Error('This does not look like a backup file. Choose a northstar-backup-....json file.')
   let raw: unknown
   try {
     raw = JSON.parse(await file.text())
