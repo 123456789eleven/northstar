@@ -209,3 +209,8 @@ export async function getSetting<T>(key: string, fallback: T): Promise<T> {
 export async function setSetting(key: string, value: unknown) {
   await db.settings.put({ key, value })
 }
+
+// v2: drop the 'milestone' index on events — booleans aren't valid IndexedDB keys, so it never matched.
+db.version(2).stores({
+  events: '++id, at, area',
+})

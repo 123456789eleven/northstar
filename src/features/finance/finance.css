@@ -1,0 +1,67 @@
+/* Finance module. Uses tokens from index.css; series colors live in charts.tsx. */
+
+.fin-month { gap: 6px; }
+.fin-month .btn-sm { height: 32px; min-width: 32px; padding: 0 8px; }
+.fin-month-label { min-width: 132px; text-align: center; font-size: 14px; font-variant-numeric: tabular-nums; }
+
+.nowrap { white-space: nowrap; }
+
+/* Quick-add rows (transactions + balances) */
+.fin-add { display: grid; grid-template-columns: 150px minmax(0, 1fr) 200px 170px auto; gap: 8px; padding: 12px; align-items: center; }
+.fin-add-amt { min-width: 0; }
+@media (max-width: 860px) {
+  .fin-add { grid-template-columns: 1fr 1fr; }
+  .fin-add-desc { grid-column: 1 / -1; order: -1; }
+  .fin-add .btn-primary { grid-column: 1 / -1; }
+}
+
+.fin-filters .select { max-width: 200px; }
+
+.fin-table td { vertical-align: middle; }
+.fin-desc { min-width: 180px; max-width: 360px; overflow-wrap: anywhere; }
+.fin-cat { height: 32px; min-width: 150px; font-size: 13px; padding: 0 6px; background: transparent; }
+.fin-cat-un { border-color: var(--accent); color: var(--accent); }
+.fin-x { width: 32px; height: 32px; padding: 0; font-size: 18px; color: var(--ink-3); }
+.fin-x:hover { color: var(--warn); }
+
+.fin-offer { padding: 12px 14px; border-color: var(--accent); }
+
+.fin-pick { display: flex; flex-wrap: wrap; gap: 6px; }
+.fin-pick .btn-sm { height: 32px; }
+
+/* Budgets */
+.fin-budget-row { gap: 14px; }
+.fin-budget-input { width: 96px; flex: 0 0 96px; height: 32px; text-align: right; }
+.fin-near .progress > div { background: var(--accent); }
+.fin-over .progress > div { background: var(--warn); }
+
+/* Import drop zone */
+.fin-drop {
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
+  padding: 36px 20px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center;
+}
+.fin-drop:hover, .fin-drop:focus-visible { border-color: var(--ink-3); outline: none; }
+.fin-drop.is-drag { border-color: var(--accent); background: var(--surface-2); }
+
+/* Charts */
+.fin-legend { display: flex; gap: 16px; font-size: 12px; color: var(--ink-2); margin-bottom: 8px; }
+.fin-legend-box { width: 10px; height: 10px; border-radius: 2px; }
+.fin-legend-line { width: 14px; height: 2px; border-radius: 1px; }
+
+.fin-tip { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 10px; font-size: 12px; }
+.fin-tip-label { color: var(--ink-2); margin-bottom: 4px; }
+.fin-tip-row { display: flex; align-items: center; gap: 8px; }
+.fin-tip-row strong { color: var(--ink); font-weight: 600; }
+.fin-tip-key { width: 12px; height: 2px; border-radius: 1px; }
+
+.fin-hbars { display: flex; flex-direction: column; gap: 2px; }
+.fin-hbar {
+  display: grid; grid-template-columns: minmax(84px, 120px) minmax(0, 1fr) auto; gap: 10px; align-items: center;
+  background: none; border: 0; padding: 5px 4px; border-radius: var(--radius-sm); cursor: pointer; text-align: left; min-height: 32px;
+}
+.fin-hbar:hover, .fin-hbar:focus-visible { background: var(--surface-2); outline: none; }
+.fin-hbar-label { font-size: 13px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fin-hbar-track { height: 10px; display: block; }
+.fin-hbar-fill { display: block; height: 100%; border-radius: 0 4px 4px 0; }
+.fin-hbar:hover .fin-hbar-fill { filter: brightness(1.15); }
+.fin-hbar-value { font-size: 13px; color: var(--ink); min-width: 72px; text-align: right; }

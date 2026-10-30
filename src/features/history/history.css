@@ -1,0 +1,52 @@
+.hist-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.hist-filters .input { flex: 1; min-width: 180px; }
+.hist-filters .select { width: auto; min-width: 150px; }
+
+.hist-day { margin-bottom: 4px; }
+.hist-day-head {
+  position: sticky; top: 0; z-index: 2; background: var(--page);
+  padding: 10px 0 6px; font-size: 13px; color: var(--ink-2); font-weight: 600;
+  border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 8px;
+}
+.hist-day-head .faint { font-weight: 400; }
+.hist-item { display: flex; align-items: center; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line); min-height: 44px; }
+.hist-item:last-child { border-bottom: 0; }
+.hist-time { flex: 0 0 64px; font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.hist-title { flex: 1; min-width: 0; font-size: 14px; overflow-wrap: anywhere; }
+.hist-title.is-milestone { color: var(--ink); font-weight: 500; }
+.hist-chip { flex: 0 0 auto; }
+.hist-del { width: 32px; height: 32px; padding: 0; flex: 0 0 32px; opacity: 0.55; }
+.hist-del:hover, .hist-del:focus-visible { opacity: 1; }
+.hist-del svg { width: 14px; height: 14px; }
+@media (max-width: 520px) {
+  .hist-item { flex-wrap: wrap; gap: 4px 10px; }
+  .hist-time { flex-basis: auto; }
+  .hist-title { flex-basis: 100%; order: 3; }
+  .hist-del { margin-left: auto; }
+}
+.hist-more { display: flex; justify-content: center; padding: 16px 0 4px; }
+
+.hist-past { margin-bottom: 16px; }
+.hist-past-item { display: flex; gap: 12px; padding: 6px 0; font-size: 14px; border-bottom: 1px solid var(--line); }
+.hist-past-item:last-child { border-bottom: 0; }
+.hist-past-year { flex: 0 0 64px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+/* Achievements wall */
+.ach-year { margin-bottom: 36px; }
+.ach-year-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 6px; }
+.ach-year-num { font-family: var(--serif); font-size: 34px; font-weight: 500; line-height: 1; font-variant-numeric: lining-nums; }
+.ach-year-total { color: var(--ink-2); font-size: 14px; font-weight: 400; margin-left: 10px; }
+.ach-areas { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--ink-2); }
+.ach-areas b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.ach-month { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.ach-month:last-child { border-bottom: 0; }
+.ach-month-name { color: var(--ink-3); font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; }
+.ach-list { display: flex; flex-direction: column; gap: 10px; }
+.ach-entry { display: flex; gap: 12px; align-items: baseline; }
+.ach-entry-title { flex: 1; min-width: 0; font-size: 15px; overflow-wrap: anywhere; }
+.ach-entry-meta { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+@media (max-width: 520px) {
+  .ach-month { grid-template-columns: 1fr; gap: 6px; }
+  .ach-entry { flex-direction: column; gap: 0; }
+}
+.hist-toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; min-height: 32px; }

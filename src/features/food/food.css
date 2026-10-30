@@ -1,0 +1,56 @@
+/* Food module + shared MiniBars tooltip. Uses only tokens from index.css. */
+
+.ns-tip {
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 6px 10px; font-size: 13px; color: var(--ink);
+}
+
+/* Compact stat row shared by Food week + Learning log: stays 2-up on phones instead of stacking tall cards. */
+.ns-stats { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+@media (max-width: 620px) {
+  .ns-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .ns-stats .card { padding: 12px 14px; }
+  .ns-stats .stat-value { font-size: 24px; }
+  .ns-stats > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+
+.food-stepper { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.food-stepper .btn[aria-label] { width: 36px; padding: 0; font-size: 18px; }
+.food-stepper-label { display: flex; flex-direction: column; line-height: 1.2; min-width: 96px; text-align: center; }
+
+.food-totals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.food-total { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.food-total-value { display: flex; align-items: baseline; gap: 2px; }
+.food-total-value .stat-value { margin-top: 0; }
+
+.food-slot .card-title { margin-bottom: 6px; }
+.food-slot-head { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; min-width: 0; }
+.food-slot-sum { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--ink-3); white-space: nowrap; }
+.food-meal { padding: 6px 0; }
+.food-meal-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.food-x { width: 32px; height: 32px; padding: 0; font-size: 16px; }
+
+.food-favs { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 2px; }
+.food-fav {
+  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px;
+  border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2);
+  color: var(--ink); font-size: 13px; cursor: pointer; max-width: 100%;
+}
+.food-fav span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.food-fav:hover { border-color: var(--accent); }
+.food-fav:active { background: var(--accent-soft); }
+
+.food-add { display: flex; gap: 6px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
+.food-add-name { flex: 1 1 140px; min-width: 0; width: auto; }
+.food-add-num { flex: 0 0 68px; width: 68px; padding: 0 8px; }
+.food-fav-toggle { display: inline-flex; align-items: center; gap: 5px; height: 36px; cursor: pointer; padding: 0 2px; }
+
+.food-fav-row { flex-wrap: wrap; gap: 6px; }
+.food-fav-row .input.grow { flex: 1 1 160px; }
+.food-fav-slot { width: auto; flex: 0 0 auto; }
+.food-fav-uses { min-width: 28px; text-align: right; }
+
+@media (max-width: 620px) {
+  .food-totals { gap: 14px; }
+  .food-totals .stat-value { font-size: 24px; }
+}
