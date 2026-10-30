@@ -22,7 +22,8 @@
 
 .habit-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .habit-week { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.heat { display: block; width: 100%; max-width: 220px; height: auto; }
+.heat { display: block; width: 100%; height: auto; }
+.heat-month { fill: var(--ink-3); font-size: 10px; }
 .heat rect { fill: var(--accent); }
 
 .seg { display: flex; gap: 4px; flex-wrap: wrap; }

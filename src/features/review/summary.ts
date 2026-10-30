@@ -1,4 +1,5 @@
 import { AREAS, db, type ISODate, type LifeEvent, type Review } from '../../db'
+import { isSpend } from '../finance/categories'
 import { addDays, parseISODate, startOfWeek, today } from '../../lib/dates'
 
 export interface WeekDigest {
@@ -16,13 +17,12 @@ export interface WeekDigest {
 }
 
 const ts = (d: ISODate) => parseISODate(d).toISOString()
-const isTransfer = (c: string) => /transfer/i.test(c)
 
 async function spentBetween(from: ISODate, to: ISODate) {
   const rows = await db.transactions.where('date').between(from, to, true, true).toArray()
   return {
     n: rows.length,
-    spent: rows.reduce((s, t) => (t.amount < 0 && !isTransfer(t.category) ? s - t.amount : s), 0),
+    spent: rows.reduce((s, t) => (isSpend(t) ? s - t.amount : s), 0),
   }
 }
 
@@ -69,4 +69,12 @@ export function reviewStreak(reviews: Review[], now: ISODate = today()) {
 export function avgRating(r: Review) {
   const vals = AREAS.map((a) => r.ratings[a]).filter((v): v is number => typeof v === 'number')
   return vals.length ? vals.reduce((s, v) => s + v, 0) / vals.length : null
+}
+
+/** Week-over-week spend change, or null unless both weeks have spend within 3x of each other (otherwise it is noise). */
+export function spendChange(spent: number, prev: number): number | null {
+  if (spent <= 0 || prev <= 0) return null
+  const ratio = spent / prev
+  if (ratio > 3 || ratio < 1 / 3) return null
+  return Math.round((ratio - 1) * 100)
 }

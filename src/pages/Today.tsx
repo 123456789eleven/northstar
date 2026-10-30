@@ -4,6 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Task } from '../db'
 import { Card, Empty, PageHeader, Progress } from '../components/ui'
 import KpiStrip from '../components/KpiStrip'
+import { useMedia, PHONE_QUERY } from '../components/useMedia'
 import { formatDate, today } from '../lib/dates'
 import { TaskRow } from '../features/tasks/TaskRow'
 import { TaskEditor } from '../features/tasks/TaskEditor'
@@ -19,6 +20,7 @@ import '../features/today/today.css'
 
 export default function Today() {
   const d = today()
+  const phone = useMedia(PHONE_QUERY)
   const tasks = useLiveQuery(() => db.tasks.toArray(), [])
   const goals = useLiveQuery(() => db.goals.toArray(), [])
   const habits = useLiveQuery(() => db.habits.filter((h) => !h.archived).toArray(), [])
@@ -116,6 +118,13 @@ export default function Today() {
             </div>
 
             <div className="today-col">
+              {phone && (
+                <>
+                  <HabitsTile />
+                  <NextUp />
+                  <details className="card today-more">
+                    <summary>More: quarter goals, insights, across your life</summary>
+                    <div className="today-more-body">
               <Card title="This quarter" action={<Link className="card-link" to="/goals">Goals</Link>}>
                 {quarter.length > 0 ? (
                   quarter.map((g) => {
@@ -138,10 +147,42 @@ export default function Today() {
                   )
                 )}
               </Card>
-              <NextUp />
-              <HabitsTile />
-              <InsightsCard />
-              <GlanceTiles />
+                      <InsightsCard />
+                      <GlanceTiles />
+                    </div>
+                  </details>
+                </>
+              )}
+              {!phone && (
+                <>
+              <Card title="This quarter" action={<Link className="card-link" to="/goals">Goals</Link>}>
+                {quarter.length > 0 ? (
+                  quarter.map((g) => {
+                    const p = goalProgress(g, tasks ?? [])
+                    return (
+                      <Link key={g.id} to="/goals" className="qgoal">
+                        <div className="qgoal-head">
+                          <span>{g.title}</span>
+                          <span className="faint">{progressLabel(p)}</span>
+                        </div>
+                        <Progress value={p.pct} />
+                      </Link>
+                    )
+                  })
+                ) : (
+                  goals !== undefined && (
+                    <div className="tile-empty">
+                      No quarter goals yet. <Link to="/goals">Set one on Goals</Link>: what would make this quarter a win?
+                    </div>
+                  )
+                )}
+              </Card>
+                  <NextUp />
+                  <HabitsTile />
+                  <InsightsCard />
+                  <GlanceTiles />
+                </>
+              )}
             </div>
           </div>
         </>

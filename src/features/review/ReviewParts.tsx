@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { AREAS, db, logEvent, type Area, type ISODate, type Review } from '../../db'
 import { AREA_LABEL, Card, Field } from '../../components/ui'
 import { formatDate, money, toISODate } from '../../lib/dates'
-import { weekDigest } from './summary'
+import { spendChange, weekDigest } from './summary'
 
 function Fact({ label, value, zero, note }: { label: string; value: string; zero?: boolean; note?: string }) {
   return (
@@ -29,10 +29,8 @@ export function Digest({ weekOf }: { weekOf: ISODate }) {
 
   let spendNote: string | undefined
   if (d.hasMoney) {
-    if (d.spentPrev > 0) {
-      const pct = Math.round(((d.spent - d.spentPrev) / d.spentPrev) * 100)
-      spendNote = `${pct === 0 ? 'same as' : `${Math.abs(pct)}% ${pct > 0 ? 'more than' : 'less than'}`} prior week (${money(d.spentPrev)})`
-    } else spendNote = 'nothing spent the prior week'
+    const pct = spendChange(d.spent, d.spentPrev)
+    if (pct !== null) spendNote = `${pct === 0 ? 'same as' : `${Math.abs(pct)}% ${pct > 0 ? 'more than' : 'less than'}`} prior week (${money(d.spentPrev)})`
   }
 
   return (

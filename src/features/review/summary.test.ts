@@ -122,3 +122,14 @@ describe('avgRating', () => {
     expect(avgRating(review(WEEK, {}))).toBeNull()
   })
 })
+
+describe('spendChange', () => {
+  it('says nothing when a week has no spend or the weeks are not comparable', async () => {
+    const { spendChange } = await import('./summary')
+    expect(spendChange(1420, 0)).toBeNull()
+    expect(spendChange(0, 300)).toBeNull()
+    expect(spendChange(1420, 282)).toBeNull() // rent week vs a normal week: the old "403% more"
+    expect(spendChange(150, 100)).toBe(50)
+    expect(spendChange(100, 100)).toBe(0)
+  })
+})

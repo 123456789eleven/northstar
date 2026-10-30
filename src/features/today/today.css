@@ -28,3 +28,6 @@
 .card-link { display: inline-flex; align-items: center; min-height: 32px; min-width: 32px; font-size: 12px; color: var(--ink-3); text-decoration: none; font-weight: 400; }
 .card-link:hover { color: var(--ink); }
 .tile-empty { font-size: 13px; color: var(--ink-2); }
+
+.today-more > summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; font-size: 14px; color: var(--ink-2); }
+.today-more-body { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }

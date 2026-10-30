@@ -127,3 +127,19 @@ describe('Mobil gas-station rule', () => {
     expect(categorize('MOBILE PHONE CASE', -9, DEFAULT_RULES)).toBe(UNCATEGORIZED)
   })
 })
+
+describe('transfers are never spending', () => {
+  const cat = (d: string, a = -10) => categorize(d, a, DEFAULT_RULES)
+  it('recognises own-account moves and card payoffs', () => {
+    for (const d of ['Transfer to savings', 'XFER FROM SAVINGS', 'ACH TRANSFER 4411', 'CREDIT CARD PAYMENT THANK YOU', 'CHASE CARD AUTOPAY']) expect(cat(d)).toBe(TRANSFER)
+    expect(cat('STUDENT LOAN PAYMENT')).toBe('Debt payment')
+  })
+  it('isSpend excludes Savings, Savings/Transfer, income and inflows', async () => {
+    const { isSpend } = await import('./categories')
+    expect(isSpend(tx({ category: 'Savings' }))).toBe(false)
+    expect(isSpend(tx({ category: TRANSFER }))).toBe(false)
+    expect(isSpend(tx({ category: INCOME, amount: -5 }))).toBe(false)
+    expect(isSpend(tx({ amount: 5 }))).toBe(false)
+    expect(isSpend(tx({}))).toBe(true)
+  })
+})

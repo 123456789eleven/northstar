@@ -7,21 +7,30 @@ import { PER_WEEK_PRESETS, heatGrid, lastDays, perWeekLabel, streak, weekProgres
 
 export function HeatStrip({ dates, today }: { dates: Set<ISODate>; today: ISODate }) {
   const grid = heatGrid(dates, today, 12)
-  const size = 10
   const gap = 3
-  const w = 12 * (size + gap) - gap
-  const h = 7 * (size + gap) - gap
+  const cw = 36
+  const ch = 11
+  const top = 14
+  const w = 12 * (cw + gap) - gap
+  const h = top + 7 * (ch + gap) - gap
   return (
     <svg className="heat" viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Check-ins over the last 12 weeks">
-      {grid.map((col, x) =>
-        col.map((c, y) =>
-          c.future ? null : (
-            <rect key={c.date} x={x * (size + gap)} y={y * (size + gap)} width={size} height={size} rx={2} opacity={c.done ? 1 : 0.1}>
-              <title>{`${formatDate(c.date)}${c.done ? ': done' : ''}`}</title>
-            </rect>
-          ),
-        ),
-      )}
+      {grid.map((col, x) => {
+        const m = col[0].date.slice(5, 7)
+        const label = x === 0 || grid[x - 1][0].date.slice(5, 7) !== m ? formatDate(col[0].date, { month: 'short' }) : null
+        return (
+          <g key={col[0].date}>
+            {label && <text className="heat-month" x={x * (cw + gap)} y={10}>{label}</text>}
+            {col.map((c, y) =>
+              c.future ? null : (
+                <rect key={c.date} x={x * (cw + gap)} y={top + y * (ch + gap)} width={cw} height={ch} rx={2} opacity={c.done ? 1 : 0.1}>
+                  <title>{`${formatDate(c.date)}${c.done ? ': done' : ''}`}</title>
+                </rect>
+              ),
+            )}
+          </g>
+        )
+      })}
     </svg>
   )
 }
@@ -43,8 +52,8 @@ export function HabitCard({ habit, dates, today, goalTitle, onEdit }: { habit: H
           </div>
         </div>
         <div className="habit-streak">
-          <strong>{s.count}</strong>
-          <span>{s.unit}{s.count === 1 ? '' : 's'} streak</span>
+          <strong>{wp.done} of {wp.target}</strong>
+          <span>this week{s.count >= 1 ? ` · ${s.count} ${s.unit}${s.count === 1 ? '' : 's'} streak` : ' · no streak yet'}</span>
         </div>
       </div>
       <div className="habit-days">
@@ -66,12 +75,10 @@ export function HabitCard({ habit, dates, today, goalTitle, onEdit }: { habit: H
           )
         })}
       </div>
+      <HeatStrip dates={dates} today={today} />
       <div className="habit-foot">
-        <HeatStrip dates={dates} today={today} />
-        <div className="row" style={{ flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-          <span className="habit-week">{wp.done} / {wp.target} this week</span>
-          <button className="btn btn-ghost btn-sm" onClick={() => onEdit(habit)}>Edit</button>
-        </div>
+        <span className="habit-week">Last 12 weeks</span>
+        <button className="btn btn-ghost btn-sm" onClick={() => onEdit(habit)}>Edit</button>
       </div>
     </section>
   )

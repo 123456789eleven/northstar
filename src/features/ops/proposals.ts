@@ -3,7 +3,7 @@
 // Applying a proposal lives in opsActions.ts and goes through the existing feature actions.
 import type { Goal, ISODate, LearningItem, Task, Transaction } from '../../db'
 import { addDays, daysBetween, parseISODate } from '../../lib/dates'
-import { allRules, categorize, isSpending, merchantKey, merchantLabel, UNCATEGORIZED, type Rule } from '../finance/categories'
+import { allRules, categorize, isSpend, merchantKey, merchantLabel, UNCATEGORIZED, type Rule } from '../finance/categories'
 import type { Snapshot } from '../insights/engine'
 import { sessionStreak } from '../learning/learningData'
 import { MAX_FOCUS } from '../tasks/taskActions'
@@ -98,6 +98,15 @@ export function isSuppressed(d: Decision | undefined, now: string): boolean {
 
 const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`
 
+/** "today" / "tomorrow" / "Fri, Oct 31" for prose; ISO stays in evidence and logic. */
+export function friendlyDate(d: ISODate, now: ISODate): string {
+  const diff = daysBetween(now, d)
+  if (diff === 0) return 'today'
+  if (diff === 1) return 'tomorrow'
+  if (diff === -1) return 'yesterday'
+  return parseISODate(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+}
+
 type RuleFn = (s: OpsSnapshot) => Proposal[]
 
 const overdueTask: RuleFn = (s) => {
@@ -112,7 +121,7 @@ const overdueTask: RuleFn = (s) => {
         rule: 'overdue-task' as const,
         objectRef: ref,
         title: `Reschedule "${t.title}" to tomorrow`,
-        rationale: `This task is ${plural(late, 'day')} overdue. Moving it to ${tomorrow} keeps your list honest without dropping it.`,
+        rationale: `This task is ${plural(late, 'day')} overdue. Moving it to ${friendlyDate(tomorrow, s.today)} keeps your list honest without dropping it.`,
         evidence: [`task #${t.id} "${t.title}"`, `due ${t.due}`, `today ${s.today}`, `${plural(late, 'day')} overdue`],
         logic: `task.status == "open" AND task.due < today (${s.today}) -> set task.due = today + 1 day (${tomorrow})`,
         risk: 'low' as const,
@@ -220,7 +229,7 @@ const budgetOver: RuleFn = (s) => {
   const dim = new Date(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0).getDate()
   const spent = new Map<string, number>()
   for (const t of s.transactions) {
-    if (t.date.slice(0, 7) !== month || t.date > s.today || t.amount >= 0 || !isSpending(t)) continue
+    if (t.date.slice(0, 7) !== month || t.date > s.today || !isSpend(t)) continue
     spent.set(t.category, (spent.get(t.category) ?? 0) - t.amount)
   }
   const out: Proposal[] = []

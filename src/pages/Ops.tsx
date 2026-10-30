@@ -101,10 +101,18 @@ export default function Ops() {
 
   const state = useLiveQuery(async () => {
     const snap = await loadOpsSnapshot()
-    return { proposals: generateProposals(snap), auto: await getAuto(), log: await getAutoLog() }
+    const proposals = generateProposals(snap)
+    const names = new Map<string, string>()
+    for (const p of proposals) {
+      const t = typeForTable(p.objectRef.table)
+      const obj = t ? await db.table(t.table).get(p.objectRef.id) : undefined
+      if (t && obj) names.set(`${p.objectRef.table}:${p.objectRef.id}`, REGISTRY[t.key].title(obj))
+    }
+    return { proposals, names, auto: await getAuto(), log: await getAutoLog() }
   }, [])
 
   const proposals = state?.proposals
+  const names = state?.names
   const facetCounts = useMemo(() => {
     const m = new Map<TypeKey, number>()
     for (const p of proposals ?? []) m.set(typeOf(p), (m.get(typeOf(p)) ?? 0) + 1)
@@ -150,7 +158,7 @@ export default function Ops() {
 
   const columns: Column<Proposal>[] = [
     { key: 'p', header: 'Proposal', primary: true, render: (p) => <span className="ops-clip">{p.title}</span> },
-    { key: 'o', header: 'Object', render: (p) => <span className="faint">{REGISTRY[typeOf(p)].label} #{p.objectRef.id}</span> },
+    { key: 'o', header: 'Object', render: (p) => <span className="faint ops-clip">{REGISTRY[typeOf(p)].label}: {names?.get(`${p.objectRef.table}:${p.objectRef.id}`) ?? ''}</span> },
     // Rule name is shown in the review panel.
     { key: 'k', header: 'Risk', value: true, render: (p) => <StatusChip status={p.risk === 'low' ? 'info' : 'warn'}>{p.risk === 'low' ? 'Low' : 'Medium'}</StatusChip> },
   ]
@@ -215,16 +223,12 @@ export default function Ops() {
         )}
       </div>
 
-      <details className="card cmd-network">
-        <summary>Network view{graph ? <span className="faint"> · {REGISTRY[graph.type].title(graph.obj)}</span> : null}</summary>
+      {graph && <details className="card cmd-network">
+        <summary>Network view<span className="faint"> · {REGISTRY[graph.type].title(graph.obj)} · {graph.groups.reduce((n, g) => n + g.objects.length, 0)} links · Show</span></summary>
         <div style={{ marginTop: 12 }}>
-          {graph ? (
-            <NetworkGraph type={graph.type} obj={graph.obj} groups={graph.groups} onOpen={(t, id) => navigate(`/ontology?t=${t}&id=${id}`)} />
-          ) : (
-            <div className="faint small">Select a proposal to see the object and what it links to.</div>
-          )}
+          <NetworkGraph type={graph.type} obj={graph.obj} groups={graph.groups} onOpen={(t, id) => navigate(`/ontology?t=${t}&id=${id}`)} />
         </div>
-      </details>
+      </details>}
 
       <Card title="Auto-apply" className="cmd-auto">
         <p className="muted small" style={{ marginTop: 0 }}>

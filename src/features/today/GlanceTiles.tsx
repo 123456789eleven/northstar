@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../../db'
+import { isSpend } from '../finance/categories'
 import { Progress } from '../../components/ui'
 import { addDays, monthKey, money, startOfWeek, today } from '../../lib/dates'
 
@@ -26,7 +27,7 @@ function MoneyRow() {
     const budgets = await db.budgets.toArray()
     const budgeted = new Set(budgets.map((b) => b.category))
     // With budgets set, compare only budgeted categories against the limits; otherwise show total spending.
-    const spent = tx.filter((t) => t.amount < 0 && t.category !== 'Savings/Transfer' && (budgeted.size === 0 || budgeted.has(t.category))).reduce((s, t) => s - t.amount, 0)
+    const spent = tx.filter((t) => isSpend(t) && (budgeted.size === 0 || budgeted.has(t.category))).reduce((s, t) => s - t.amount, 0)
     const limit = budgets.reduce((s, b) => s + b.monthlyLimit, 0)
     return { spent, limit, count: tx.length }
   }, [])

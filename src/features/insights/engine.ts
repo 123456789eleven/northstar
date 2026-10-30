@@ -4,6 +4,7 @@
 // and would need the owner's explicit approval because it would send personal data off-device.
 import type { Budget, CalendarEvent, Goal, Habit, HabitLog, ISODate, LifeEvent, Meal, Person, StudySession, Task, Transaction } from '../../db'
 import { addDays, daysBetween, parseISODate } from '../../lib/dates'
+import { isSpend } from '../finance/categories'
 import { isDaily, streak } from '../habits/stats'
 
 export type Severity = 'note' | 'nudge' | 'win'
@@ -57,9 +58,8 @@ const daysInMonth = (month: string) => {
   return new Date(y, m, 0).getDate()
 }
 
-const isTransfer = (c: string) => /transfer/i.test(c)
 const isIncome = (t: Transaction) => t.category === 'Income' || (t.category === 'Uncategorized' && t.amount > 0)
-const isSpending = (t: Transaction) => !isTransfer(t.category) && !isIncome(t) && t.amount < 0
+const isSpending = isSpend
 
 /** Spending by category within a month, optionally only through a day of the month. */
 function spendByCategory(txs: Transaction[], month: string, throughDay = 31): Map<string, number> {

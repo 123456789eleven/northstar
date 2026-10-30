@@ -121,3 +121,17 @@ describe('formatters', () => {
     expect(compactMoney(25000)).toMatch(/25K/)
   })
 })
+
+describe('summarize excludes savings transfers', () => {
+  it('ignores Savings and Savings/Transfer rows', async () => {
+    const { summarize } = await import('./model')
+    const base = { date: '2026-03-02', description: 'x' }
+    const s = summarize([
+      { ...base, amount: -1380, category: 'Housing' },
+      { ...base, amount: -200, category: 'Savings' },
+      { ...base, amount: -200, category: 'Savings/Transfer' },
+      { ...base, amount: 2000, category: 'Income' },
+    ])
+    expect(s.spending).toBe(1380)
+  })
+})

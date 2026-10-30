@@ -39,8 +39,8 @@ export interface Rule {
 
 export const DEFAULT_RULES: Rule[] = [
   { pattern: 'PAYROLL|DIRECT DEP|DIR DEP|SALARY|PAYCHECK|INTEREST PAID|INTEREST EARNED|TAX REFUND|IRS TREAS', category: INCOME },
-  { pattern: 'TRANSFER|XFER|ZELLE TO SAVINGS|TO SAVINGS|FROM SAVINGS|VANGUARD|FIDELITY|SCHWAB|BETTERMENT|ACORNS|ROBINHOOD', category: TRANSFER },
-  { pattern: 'CREDIT CARD PAYMENT|AUTOPAY|CARD PAYMENT|LOAN PAYMENT|STUDENT LOAN|NAVIENT|NELNET|MOHELA|SALLIE MAE|CAPITAL ONE PAYMENT|DISCOVER PAYMENT|AMEX PAYMENT|CHASE CARD', category: 'Debt payment' },
+  { pattern: 'TRANSFER|XFER|ZELLE TO SAVINGS|TO SAVINGS|FROM SAVINGS|CREDIT CARD PAYMENT|CARD AUTOPAY|CARD PAYMENT|PAYMENT THANK YOU|VANGUARD|FIDELITY|SCHWAB|BETTERMENT|ACORNS|ROBINHOOD', category: TRANSFER },
+  { pattern: 'AUTOPAY|LOAN PAYMENT|STUDENT LOAN|NAVIENT|NELNET|MOHELA|SALLIE MAE|CAPITAL ONE PAYMENT|DISCOVER PAYMENT|AMEX PAYMENT|CHASE CARD', category: 'Debt payment' },
   { pattern: 'AIRLINE|DELTA AIR|UNITED AIR|AMERICAN AIR|SOUTHWEST|JETBLUE|SPIRIT AIR|FRONTIER|MARRIOTT|HILTON|HYATT|AIRBNB|VRBO|EXPEDIA|BOOKING\\.COM|HOTEL|HERTZ|ENTERPRISE RENT|AVIS', category: 'Travel' },
   { pattern: '\\bRENT\\b|MORTGAGE|APARTMENT|PROPERTY MGMT|HOA', category: 'Housing' },
   { pattern: 'ELECTRIC|ENERGY|POWER|WATER|SEWER|GAS & ELEC|COMCAST|XFINITY|SPECTRUM|VERIZON|AT&T|T-MOBILE|TMOBILE|INTERNET', category: 'Utilities' },
@@ -130,6 +130,16 @@ export function isIncome(t: Transaction) {
   return t.category === INCOME || (t.category === UNCATEGORIZED && t.amount > 0)
 }
 
+/** Money moved between own accounts (savings, card payoffs): never spending and never income. */
+export function isTransferCategory(category: string) {
+  return category === TRANSFER || category === 'Savings' || /transfer/i.test(category)
+}
+
 export function isSpending(t: Transaction) {
-  return t.category !== TRANSFER && !isIncome(t)
+  return !isTransferCategory(t.category) && !isIncome(t)
+}
+
+/** The ONE definition of "a spend" (an outflow that is not a transfer/savings move or income). */
+export function isSpend(t: Transaction) {
+  return t.amount < 0 && isSpending(t)
 }

@@ -115,7 +115,7 @@ export async function loadDemo(): Promise<boolean> {
       const tids = await add('tasks', taskRows)
       for (const i of [21, 22, 23, 24]) ev(taskRows[i].due!, 'tasks', 'task.done', taskRows[i].title, 'tasks', tids[i])
 
-      // Habits and six weeks of check-ins
+      // Habits and twelve weeks of check-ins
       const habitRows = [
         { name: 'Walk 20 minutes', area: 'health' as Area, perWeek: 5, createdAt: at(d(-45)) },
         { name: 'Study for 30 minutes', area: 'learning' as Area, perWeek: 4, goalId: gCert, createdAt: at(d(-45)) },
@@ -127,7 +127,7 @@ export async function loadDemo(): Promise<boolean> {
       const hl: { habitId: number; date: string }[] = []
       const rate = [0.7, 0.6, 0.65, 0.45]
       hids.forEach((habitId, i) => {
-        for (let n = 0; n < 42; n++) if (r() < rate[i] + (n < 14 ? 0.15 : 0)) hl.push({ habitId, date: d(-n) })
+        for (let n = 0; n < 84; n++) if (r() < rate[i] + (n < 14 ? 0.15 : 0)) hl.push({ habitId, date: d(-n) })
       })
       await add('habitLogs', hl)
       ev(d(-20), 'health', 'habit.streak', 'Walk 20 minutes: 7-day streak', 'habits', hids[0], true, 'demo-streak')
@@ -135,24 +135,24 @@ export async function loadDemo(): Promise<boolean> {
       // Transactions
       const tx: { date: string; amount: number; description: string; category: string; account: string }[] = []
       const T1 = (n: number, amount: number, description: string, category: string, account = 'Checking') => tx.push({ date: d(-n), amount, description, category, account })
-      for (let k = 0; k < 7; k++) T1(2 + k * 14, 2450, 'Paycheck', 'Income')
-      for (let k = 0; k < 3; k++) {
+      for (let k = 0; k < 13; k++) T1(2 + k * 14, 2450, 'Paycheck', 'Income')
+      for (let k = 0; k < 6; k++) {
         T1(3 + k * 30, -1380, 'Rent', 'Housing')
         T1(8 + k * 30, -95, 'Electric and internet', 'Utilities')
         T1(10 + k * 30, -15.99, 'Streaming service', 'Subscriptions')
         T1(12 + k * 30, -11.5, 'Music subscription', 'Subscriptions')
         T1(15 + k * 30, -120, 'Gym membership', 'Health', 'Credit card')
-        T1(20 + k * 30, -200, 'Transfer to savings', 'Savings')
+        T1(20 + k * 30, -200, 'Transfer to savings', 'Savings/Transfer')
       }
       const shops: [string, string, number, number][] = [
         ['Grocery store', 'Groceries', 28, 95], ['Corner cafe', 'Dining', 6, 18], ['Pizza night', 'Dining', 20, 45],
         ['Fuel', 'Transport', 30, 55], ['Pharmacy', 'Health', 8, 30], ['Bookshop', 'Shopping', 12, 40], ['Ride share', 'Transport', 10, 24],
       ]
       const rr = rng(21)
-      while (tx.length < 82) {
+      while (tx.length < 200) {
         const s = shops[Math.floor(rr() * shops.length)]
         const amt = -Math.round((s[2] + rr() * (s[3] - s[2])) * 100) / 100
-        T1(Math.floor(rr() * 88), amt, s[0], s[1], rr() < 0.4 ? 'Credit card' : 'Checking')
+        T1(Math.floor(rr() * 178), amt, s[0], s[1], rr() < 0.4 ? 'Credit card' : 'Checking')
       }
       await add('transactions', tx)
 

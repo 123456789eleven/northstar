@@ -196,3 +196,12 @@ describe('seeded overdue tasks reach the Command queue', () => {
     expect(generateProposals(await loadOpsSnapshot())).toHaveLength(3)
   })
 })
+
+describe('friendlyDate', () => {
+  it('uses words for near days and a weekday for the rest, never ISO', async () => {
+    const { friendlyDate } = await import('./proposals')
+    expect(friendlyDate('2026-10-31', '2026-10-30')).toBe('tomorrow')
+    expect(friendlyDate('2026-10-30', '2026-10-30')).toBe('today')
+    expect(friendlyDate('2026-11-06', '2026-10-30')).toBe('Fri, Nov 6')
+  })
+})
