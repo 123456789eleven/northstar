@@ -3,7 +3,9 @@ import { Card, Empty } from '../../components/ui'
 import ChartFrame from '../../components/ChartFrame'
 import KpiStrip from '../../components/KpiStrip'
 import { db } from '../../db'
-import { money } from '../../lib/dates'
+import { formatDate, money, today } from '../../lib/dates'
+import { useMemo } from 'react'
+import { detectRecurring, monthlyTotal } from './recurring'
 import { merchantLabel, UNCATEGORIZED } from './categories'
 import { CategoryBars, TrendChart } from './charts'
 import { TREND_LEGEND } from './series'
@@ -16,6 +18,9 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
   const trendTx = useLiveQuery(() => db.transactions.where('date').between(monthRange(first)[0], monthRange(month)[1], true, true).toArray(), [first, month])
   const anyTx = useLiveQuery(() => db.transactions.count(), [])
 
+  const allTx = useLiveQuery(() => db.transactions.toArray(), [])
+  const recurring = useMemo(() => (allTx ? detectRecurring(allTx, today()) : []), [allTx])
+
   if (!txs || !budgets || !trendTx || anyTx === undefined) return null
 
   if (anyTx === 0) {
@@ -23,9 +28,9 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
       <Card>
         <Empty>
           <p style={{ margin: '0 0 6px', color: 'var(--ink-2)' }}>No transactions yet.</p>
-          <p style={{ margin: '0 0 14px' }}>Log into your bank's website, download your recent transactions as a CSV file, then import it here. Everything stays on this device.</p>
+          <p style={{ margin: '0 0 14px' }}>Log into your bank's website, download your recent transactions (OFX/QFX preferred, CSV works too), then import the file here. Everything stays on this device.</p>
           <button className="btn btn-primary" onClick={() => goTo('import')}>
-            Import a CSV
+            Import a file
           </button>
         </Empty>
       </Card>
@@ -106,6 +111,22 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
           <TrendChart data={trend} />
         </ChartFrame>
       </div>
+
+      {recurring.length > 0 && (
+        <Card title="Recurring and subscriptions" action={<span className="mono small muted">{moneyExact(monthlyTotal(recurring))} / month</span>}>
+          <div className="list">
+            {recurring.map((r) => (
+              <div key={`${r.merchant}-${r.amount}`} className="list-item small fin-rec">
+                <span className="grow">
+                  {merchantLabel(r.merchant)}
+                  <span className="tiny faint"> · {r.cadence} · last {formatDate(r.last)} · next ~{formatDate(r.next)}</span>
+                </span>
+                <span className="mono" style={{ minWidth: 80, textAlign: 'right' }}>{moneyExact(r.amount)}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       <Card title="Top merchants">
         {merchants.length ? (

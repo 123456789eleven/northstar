@@ -15,6 +15,7 @@ import GoogleCalendarCard from '../features/gcal/GoogleCalendarCard'
 import '../features/data/data.css'
 
 const PacksPanel = lazy(() => import('../features/packs/PacksPanel'))
+const SimpleFinCard = lazy(() => import('../features/simplefin/SimpleFinCard'))
 
 interface Status {
   state?: string
@@ -122,6 +123,8 @@ export default function DataHub() {
         <div id="import-calendar"><CalendarImport /></div>
         <div id="gcal"><GoogleCalendarCard /></div>
         <div id="import-contacts"><ContactsImport /></div>
+
+        <div id="simplefin"><Suspense fallback={null}><SimpleFinCard /></Suspense></div>
 
         <Suspense fallback={null}><PacksPanel /></Suspense>
 

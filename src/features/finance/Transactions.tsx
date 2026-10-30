@@ -135,9 +135,9 @@ export default function Transactions({ month, category, setCategory, onImport }:
       >
         {total === 0 ? (
           <Empty>
-            <p style={{ margin: '0 0 12px' }}>Nothing here yet. Add one with the row above, or download a CSV from your bank's website and import it.</p>
+            <p style={{ margin: '0 0 12px' }}>Nothing here yet. Add one with the row above, or download an OFX or CSV file from your bank's website and import it.</p>
             <button className="btn btn-primary" onClick={onImport}>
-              Import a CSV
+              Import a file
             </button>
           </Empty>
         ) : shown.length === 0 ? (

@@ -21,7 +21,8 @@ Validate this index any time: `python "C:\Users\bearf\OneDrive\Desktop\The One\t
 | expose a table in ontology/sync | northstar-ontology-type |
 | log events / make undo clean | northstar-events-and-undo |
 | change the DB schema | northstar-schema-migrations |
-| build several things in parallel | northstar-parallel-build -> northstar-dispatch |
+| build several things in parallel | northstar-parallel-build -> northstar-dispatch (agents: scout, builder, assurance, architect) |
+| run browser QA fast | northstar-browser-qa (tools/qa.mjs, one command) |
 | merge agents' output | northstar-integrate |
 | fix a bug | northstar-bugfix-loop |
 | check my work | northstar-fast-verify, then northstar-definition-of-done |

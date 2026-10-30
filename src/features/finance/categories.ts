@@ -39,7 +39,7 @@ export interface Rule {
 
 export const DEFAULT_RULES: Rule[] = [
   { pattern: 'PAYROLL|DIRECT DEP|DIR DEP|SALARY|PAYCHECK|INTEREST PAID|INTEREST EARNED|TAX REFUND|IRS TREAS', category: INCOME },
-  { pattern: 'TRANSFER|XFER|ZELLE TO SAVINGS|TO SAVINGS|FROM SAVINGS|CREDIT CARD PAYMENT|CARD AUTOPAY|CARD PAYMENT|PAYMENT THANK YOU|VANGUARD|FIDELITY|SCHWAB|BETTERMENT|ACORNS|ROBINHOOD', category: TRANSFER },
+  { pattern: 'TRANSFER|XFER|ONLINE PMT|ONLINE PAYMENT|MOBILE PAYMENT|E-PAYMENT|EPAYMENT|PAYMENT - THANK|THANK YOU PAYMENT|ZELLE TO SAVINGS|TO SAVINGS|FROM SAVINGS|CREDIT CARD PAYMENT|CARD AUTOPAY|CARD PAYMENT|PAYMENT THANK YOU|VANGUARD|FIDELITY|SCHWAB|BETTERMENT|ACORNS|ROBINHOOD', category: TRANSFER },
   { pattern: 'AUTOPAY|LOAN PAYMENT|STUDENT LOAN|NAVIENT|NELNET|MOHELA|SALLIE MAE|CAPITAL ONE PAYMENT|DISCOVER PAYMENT|AMEX PAYMENT|CHASE CARD', category: 'Debt payment' },
   { pattern: 'AIRLINE|DELTA AIR|UNITED AIR|AMERICAN AIR|SOUTHWEST|JETBLUE|SPIRIT AIR|FRONTIER|MARRIOTT|HILTON|HYATT|AIRBNB|VRBO|EXPEDIA|BOOKING\\.COM|HOTEL|HERTZ|ENTERPRISE RENT|AVIS', category: 'Travel' },
   { pattern: '\\bRENT\\b|MORTGAGE|APARTMENT|PROPERTY MGMT|HOA', category: 'Housing' },
@@ -75,6 +75,20 @@ export function escapeRegex(s: string) {
 /** Rules in priority order: user rules first, then built-ins. */
 export function allRules(userRules: Rule[]): Rule[] {
   return [...userRules, ...DEFAULT_RULES]
+}
+
+export type RuleSource = 'rule' | 'default' | 'none'
+
+/** Like categorize, but says whether a user rule, a built-in keyword default, or nothing matched. */
+export function categorizeWithSource(raw: string, amount: number, userRules: Rule[]): { category: string; source: RuleSource } {
+  const description = raw.replace(/\s+/g, ' ')
+  const hit = (rs: Rule[]) => rs.find((r) => safeRegex(r.pattern)?.test(description))
+  const u = hit(userRules)
+  if (u) return { category: u.category, source: 'rule' }
+  const d = hit(DEFAULT_RULES)
+  if (d) return { category: d.category, source: 'default' }
+  if (amount > 0 && /DEPOSIT/i.test(description)) return { category: INCOME, source: 'default' }
+  return { category: UNCATEGORIZED, source: 'none' }
 }
 
 export function categorize(raw: string, amount: number, rules: Rule[]): string {

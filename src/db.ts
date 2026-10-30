@@ -78,6 +78,8 @@ export interface Transaction {
   category: string
   account?: string
   importBatch?: string
+  /** OFX/QFX only: hashed account + FITID, the dedupe key for bank-issued ids. */
+  fitid?: string
 }
 
 export interface Budget {

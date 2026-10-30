@@ -7,13 +7,14 @@ A personal life operations platform: tasks, goals, habits, planner, finance, foo
 
 ## Privacy
 
-Your data lives in your browser (IndexedDB) and stays there by default. There are no analytics, trackers or third-party fonts. Three optional connections exist, each off until you turn it on:
+Your data lives in your browser (IndexedDB) and stays there by default. There are no analytics, trackers or third-party fonts. Four optional connections exist, each off until you turn it on:
 
 | Feature | What leaves your device |
 |---|---|
 | End-to-end encrypted sync (Supabase) | Ciphertext only. Keys derive from your passphrase and never leave your devices. The server can see your email, row counts per table, timestamps and ciphertext sizes. |
 | Google Calendar (read-only) | Nothing of yours. Events are fetched from Google into your browser; Google's script loads only when you click Connect. |
 | Open Food Facts search | The search text you type. |
+| Live bank feed (SimpleFIN), off by default | Your SimpleFIN Setup Token / access URL and the date range, sent to a relay in your own Supabase project, which forwards them to SimpleFIN. Your transactions come back through it (SimpleFIN sees them); the relay stores and logs nothing. The access URL stays on this device only. Setup: `docs/simplefin-setup.md`. |
 
 Backups are JSON files you export and import yourself. Details: `site/privacy.html`.
 

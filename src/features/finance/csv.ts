@@ -3,6 +3,7 @@ import Papa from 'papaparse'
 import type { ISODate, Transaction } from '../../db'
 import { toISODate } from '../../lib/dates'
 import { categorize, type Rule } from './categories'
+import { shortHash } from './ofx'
 
 export interface ParsedFile {
   name: string
@@ -22,11 +23,29 @@ export interface Mapping {
   dayFirst: boolean
 }
 
-const DATE_NAMES = /^(transaction date|trans\.? date|date|posted date|posting date|post date|booking date|effective date)$/i
+const DATE_NAMES = /^(transaction date|trans\.? date|date|posted date|posted|posting date|post date|booking date|effective date|date posted)$/i
 const DESC_NAMES = /^(description|desc|payee|merchant|name|memo|details|transaction|narrative|transaction description|original description)$/i
-const AMOUNT_NAMES = /^(amount|transaction amount|amt|value|net amount)$/i
+const AMOUNT_NAMES = /^(amount|transaction amount|amt|value|net amount)(\s*\(.*\))?$/i
 const DEBIT_NAMES = /^(debit|debits|withdrawal|withdrawals|money out|debit amount|outflow|paid out)$/i
 const CREDIT_NAMES = /^(credit|credits|deposit|deposits|money in|credit amount|inflow|paid in)$/i
+
+// When several columns match a role, the earlier pattern wins ("Description" beats Chase's "Details" = DEBIT/CREDIT).
+const DESC_PRIORITY = [/^(description|transaction description|original description|payee|merchant|narrative)$/i, /^(name|memo|transaction|details)$/i]
+const DATE_PRIORITY = [/^(date|transaction date|trans\.? date)$/i, DATE_NAMES]
+
+/** Stable per-layout key: same header row -> same signature, regardless of case/spacing. */
+export function headerSignature(headers: string[]): string {
+  const s = headers.map((h) => h.trim().toLowerCase().replace(/\s+/g, ' ')).join('|')
+  return `${headers.length}.${shortHash(s)}`
+}
+export const MAP_KEY_PREFIX = 'finance.map.'
+
+/** One-line, human description of a mapping for the preview. */
+export function describeMapping(f: ParsedFile, m: Mapping): string {
+  const h = (i: number) => (i >= 0 ? `“${f.headers[i]}”` : 'none')
+  const amt = m.mode === 'amount' ? `Amount ${h(m.amount)}${m.expensesPositive ? ' (expenses positive)' : ''}` : `Money out ${h(m.debit)}, money in ${h(m.credit)}`
+  return `Date ${h(m.date)} · Description ${h(m.description)} · ${amt}${m.dayFirst ? ' · day/month dates' : ''}`
+}
 
 export const MAX_CSV_BYTES = 5 * 1024 * 1024
 export const MAX_CSV_ROWS = 50_000
@@ -39,7 +58,7 @@ export function parseCsv(file: File): Promise<ParsedFile> {
 /** Parses CSV text (split out of parseCsv so it is testable without a File). */
 export function parseCsvText(name: string, text: string): Promise<ParsedFile> {
   return new Promise((resolve, reject) => {
-    Papa.parse<string[]>(text, {
+    Papa.parse<string[]>(text.replace(/^﻿/, ''), {
       skipEmptyLines: 'greedy',
       complete: (res) => {
         const all = res.data.filter((r) => Array.isArray(r) && r.some((c) => String(c).trim() !== ''))
@@ -60,7 +79,12 @@ export function parseCsvText(name: string, text: string): Promise<ParsedFile> {
           headerIdx >= 0
             ? Array.from({ length: width }, (_, i) => String(all[headerIdx][i] ?? '').trim() || `Column ${i + 1}`)
             : Array.from({ length: width }, (_, i) => `Column ${i + 1}`)
-        const rows = all.slice(headerIdx + 1).map((r) => r.map((c) => String(c ?? '').trim()))
+        let rows = all.slice(headerIdx + 1).map((r) => r.map((c) => String(c ?? '').trim()))
+        // Summary/footer lines ("Total", "Ending balance", disclaimers) have no date in any cell: drop them quietly.
+        if (headerIdx >= 0) {
+          const hasDate = (r: string[]) => r.some((c) => parseDate(c, false) !== null || parseDate(c, true) !== null)
+          if (rows.some(hasDate)) rows = rows.filter(hasDate)
+        }
         resolve({ name, headers, rows })
       },
       error: (err: Error) => reject(err),
@@ -70,8 +94,16 @@ export function parseCsvText(name: string, text: string): Promise<ParsedFile> {
 
 export function detectMapping(f: ParsedFile): Mapping {
   const find = (re: RegExp) => f.headers.findIndex((h) => re.test(h.trim()))
-  let date = find(DATE_NAMES)
-  let description = find(DESC_NAMES)
+  const findFirst = (res: RegExp[]) => {
+    for (const re of res) {
+      const i = find(re)
+      if (i >= 0) return i
+    }
+    return -1
+  }
+  let date = findFirst(DATE_PRIORITY)
+  let description = findFirst(DESC_PRIORITY)
+  if (description < 0) description = find(DESC_NAMES)
   let amount = find(AMOUNT_NAMES)
   const debit = find(DEBIT_NAMES)
   const credit = find(CREDIT_NAMES)
@@ -105,7 +137,8 @@ export function detectMapping(f: ParsedFile): Mapping {
   }
 
   // Day-first if any first component exceeds 12.
-  const dayFirst = date >= 0 && sample.some((r) => {
+  const rowsAll = f.rows.slice(0, 200)
+  const dayFirst = date >= 0 && rowsAll.some((r) => {
     const m = /^(\d{1,2})[/.-](\d{1,2})[/.-]\d{2,4}/.exec(r[date] ?? '')
     return !!m && Number(m[1]) > 12
   })
@@ -126,7 +159,7 @@ export function parseDate(raw: string, dayFirst: boolean): ISODate | null {
     if (y < 100) y += 2000
     return dayFirst ? valid(y, +m[2], +m[1]) : valid(y, +m[1], +m[2])
   }
-  if (/[a-z]/i.test(s)) {
+  if (/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b/i.test(s) && /\d/.test(s)) {
     const t = Date.parse(s)
     if (!Number.isNaN(t)) return toISODate(new Date(t))
   }
@@ -186,4 +219,4 @@ export function buildRow(row: string[], m: Mapping, rules: Rule[], account: stri
 }
 
 export const dedupeKey = (t: Pick<Transaction, 'date' | 'amount' | 'description'>) =>
-  `${t.date}|${t.amount.toFixed(2)}|${t.description.trim().toLowerCase()}`
+  `${t.date}|${t.amount.toFixed(2)}|${t.description.replace(/\s+/g, ' ').trim().toLowerCase()}`

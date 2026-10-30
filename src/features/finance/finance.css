@@ -71,3 +71,6 @@
 .fin-left { display: inline-flex; gap: 10px; align-items: baseline; flex-wrap: wrap; justify-content: flex-end; }
 .fin-near-text { color: var(--accent); }
 .fin-sums { display: inline-flex; gap: 12px; font-weight: 400; }
+
+/* Recurring card: let long merchant lines wrap on phones */
+.fin-rec .grow { overflow-wrap: anywhere; min-width: 0; }

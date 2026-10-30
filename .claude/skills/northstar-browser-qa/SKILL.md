@@ -5,7 +5,10 @@ description: Use to verify Northstar in a real browser - how to drive the produc
 
 # Northstar: Browser QA
 
-## Setup (never in the repo, never the user's real profile)
+## Fast path (use this first)
+`node "C:\Users\bearf\OneDrive\Desktop\The One\tools\qa.mjs" --name <you> --routes home,finance --widths 1280,375 --demo` builds to a private folder, serves it on a free port, screenshots, prints JSON per route (console errors, hscroll, height) and stops only its own server. Options: `--skip-build`, `--full`. Use the manual setup below only for flows that need clicking (imports, undo, destructive paths).
+
+## Manual setup (never in the repo, never the user's real profile)
 1. Install `puppeteer-core` in the scratchpad dir, not the project.
 2. `npm run build && npx vite preview --port 4173` in the background. Stop it by PID when done (`netstat -ano | findstr :4173`); never kill all node/edge processes.
 3. Launch Edge/Chrome headless with `--user-data-dir=<scratchpad temp dir>`.

@@ -10,6 +10,8 @@ export interface BackupFile {
   tables: Record<string, unknown[]>
 }
 
+/** Settings under this prefix hold secrets: excluded from backups and kept across a restore. */
+export const SECRET_PREFIX = 'simplefin.'
 export const BACKUP_LAST_KEY = 'backup.lastAt'
 export const BACKUP_REMIND_DAYS = 14
 
@@ -18,6 +20,8 @@ export async function buildBackup(): Promise<BackupFile> {
   await db.transaction('r', db.tables, async () => {
     for (const t of db.tables) tables[t.name] = await t.toArray()
   })
+  // Device-only secrets (the SimpleFIN access URL) never go into a backup file.
+  tables.settings = (tables.settings ?? []).filter((r) => !String((r as { key?: unknown }).key).startsWith(SECRET_PREFIX))
   return { app: 'northstar', version: db.verno, exportedAt: new Date().toISOString(), tables }
 }
 
@@ -79,11 +83,13 @@ export async function parseBackup(file: File): Promise<ParsedBackup> {
 /** Replaces ALL local data with the backup's contents in one transaction. */
 export async function importBackup(data: BackupFile) {
   await db.transaction('rw', db.tables, async () => {
+    const secrets = await db.settings.filter((r) => r.key.startsWith(SECRET_PREFIX)).toArray()
     for (const t of db.tables) {
       await t.clear()
       const rows = data.tables[t.name]
-      if (rows?.length) await t.bulkAdd(rows as never[])
+      if (rows?.length) await t.bulkAdd((t.name === 'settings' ? rows.filter((r) => !String((r as { key?: unknown }).key).startsWith(SECRET_PREFIX)) : rows) as never[])
     }
+    if (secrets.length) await db.settings.bulkPut(secrets)
   })
 }
 
