@@ -20,7 +20,9 @@ function MoneyTile() {
     const m = monthKey()
     const tx = await db.transactions.where('date').between(`${m}-01`, `${m}-31`, true, true).toArray()
     const budgets = await db.budgets.toArray()
-    const spent = tx.filter((t) => t.amount < 0).reduce((s, t) => s - t.amount, 0)
+    const budgeted = new Set(budgets.map((b) => b.category))
+    // With budgets set, compare only budgeted categories against the limits; otherwise show total spending.
+    const spent = tx.filter((t) => t.amount < 0 && (budgeted.size === 0 || budgeted.has(t.category))).reduce((s, t) => s - t.amount, 0)
     const limit = budgets.reduce((s, b) => s + b.monthlyLimit, 0)
     return { spent, limit, count: tx.length }
   }, [])
@@ -96,6 +98,9 @@ function LearningTile() {
   )
 }
 
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const fmtBday = (b: string) => `${MONTHS[Number(b.slice(0, 2)) - 1] ?? ''} ${Number(b.slice(3))}`
+
 function PeopleTile() {
   const data = useLiveQuery(async () => {
     const d = today()
@@ -117,7 +122,7 @@ function PeopleTile() {
             <span className="tile-note">
               {[
                 data.due.slice(0, 2).map((p) => p.name).join(', '),
-                data.bdays.length ? `Birthday: ${data.bdays.slice(0, 2).map((p) => `${p.name} ${p.birthday}`).join(', ')}` : '',
+                data.bdays.length ? `Birthday: ${data.bdays.slice(0, 2).map((p) => `${p.name} ${fmtBday(p.birthday!)}`).join(', ')}` : '',
               ]
                 .filter(Boolean)
                 .join(' · ')}

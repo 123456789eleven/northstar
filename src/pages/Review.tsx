@@ -39,7 +39,7 @@ export default function Review() {
 
   const sub = reviews === undefined ? '' : reviews.length === 0
     ? 'Ten minutes each week: what went well, what didn’t, what’s next.'
-    : streak > 0 ? `${streak}-week streak · ${reviews.length} reviews in total` : `${reviews.length} reviews · no current streak`
+    : streak > 0 ? `${streak}-week streak · ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'} in total` : `${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'} · no current streak`
 
   return (
     <>

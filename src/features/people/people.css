@@ -38,3 +38,8 @@
 .ppl-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 480px) { .ppl-form-grid { grid-template-columns: 1fr; } }
 .ppl-bday-inputs { display: flex; gap: 6px; }
+
+@media (max-width: 480px) {
+  .ppl-row > .ppl-main { flex: 1 1 100%; }
+  .ppl-row > .ppl-status { flex: 1; }
+}

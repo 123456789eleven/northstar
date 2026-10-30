@@ -23,6 +23,8 @@ export async function buildBackup(): Promise<BackupFile> {
 
 /** Builds the backup, triggers a download, and records the time. */
 export async function exportBackup() {
+  // Record the time first so the file itself carries it (otherwise a restore reverts to "never backed up").
+  await setSetting(BACKUP_LAST_KEY, new Date().toISOString())
   const data = await buildBackup()
   const blob = new Blob([JSON.stringify(data)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
@@ -33,7 +35,6 @@ export async function exportBackup() {
   a.click()
   a.remove()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
-  await setSetting(BACKUP_LAST_KEY, data.exportedAt)
   return data
 }
 

@@ -25,5 +25,5 @@
 .qgoal:last-child { border-bottom: 0; }
 .qgoal-head { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; margin-bottom: 6px; }
 .qgoal-head .faint { white-space: nowrap; font-size: 12px; }
-.card-link { font-size: 12px; color: var(--ink-3); text-decoration: none; text-transform: none; letter-spacing: 0; font-weight: 400; }
+.card-link { display: inline-flex; align-items: center; min-height: 32px; font-size: 12px; color: var(--ink-3); text-decoration: none; text-transform: none; letter-spacing: 0; font-weight: 400; }
 .card-link:hover { color: var(--ink); }

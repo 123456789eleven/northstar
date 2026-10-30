@@ -1,4 +1,5 @@
-import { HashRouter, NavLink, Route, Routes } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
+import { HashRouter, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import QuickCapture from './components/QuickCapture'
 import Today from './pages/Today'
 import Tasks from './pages/Tasks'
@@ -49,9 +50,13 @@ function Links() {
   )
 }
 
-export default function App() {
+function Shell() {
+  const tabbar = useRef<HTMLElement>(null)
+  const { pathname } = useLocation()
+  useEffect(() => {
+    tabbar.current?.querySelector<HTMLElement>('.active')?.scrollIntoView({ inline: 'center', block: 'nearest' })
+  }, [pathname])
   return (
-    <HashRouter>
       <div className="shell">
         <nav className="sidebar" aria-label="Main">
           <div className="brand"><Mark />Northstar</div>
@@ -72,7 +77,7 @@ export default function App() {
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </main>
-        <nav className="tabbar" aria-label="Main mobile">
+        <nav className="tabbar" aria-label="Main mobile" ref={tabbar}>
           {NAV.map((n) => (
             <NavLink key={n.to} to={n.to} end={n.to === '/'} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
               <span className="nav-dot" />
@@ -81,6 +86,13 @@ export default function App() {
           ))}
         </nav>
       </div>
+  )
+}
+
+export default function App() {
+  return (
+    <HashRouter>
+      <Shell />
     </HashRouter>
   )
 }
