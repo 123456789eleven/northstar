@@ -2,12 +2,12 @@ import { useMemo, useState, type FormEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { AREAS, db, logEvent, type Area, type LifeEvent } from '../../db'
 import { AREA_LABEL, Empty, Field, Modal } from '../../components/ui'
-import { formatDate, parseISODate, toISODate, today } from '../../lib/dates'
+import { formatDate, parseISODate, today } from '../../lib/dates'
+import { countByArea, dayOf, groupByWeek, weekLabel } from './group'
 
 const PAGE = 100
 const EVENT_AREAS: LifeEvent['area'][] = [...AREAS, 'tasks', 'food']
 
-const dayOf = (e: LifeEvent) => toISODate(new Date(e.at))
 const timeOf = (e: LifeEvent) => new Date(e.at).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
 
 function XIcon() {
@@ -34,7 +34,25 @@ async function removeEvent(e: LifeEvent) {
   await db.events.delete(e.id)
 }
 
-export function Timeline() {
+/** Highlights the search match inside a title (accent text, no background). */
+function Hit({ text, needle }: { text: string; needle: string }) {
+  const i = needle ? text.toLowerCase().indexOf(needle) : -1
+  if (i < 0) return <>{text}</>
+  return <>{text.slice(0, i)}<mark className="hist-hit">{text.slice(i, i + needle.length)}</mark>{text.slice(i + needle.length)}</>
+}
+
+function AreaChips<T extends string>({ value, onChange, areas, label }: { value: '' | T; onChange: (v: '' | T) => void; areas: T[]; label: string }) {
+  return (
+    <div className="hist-chips" role="group" aria-label={label}>
+      <button type="button" className="hist-chipbtn" aria-pressed={value === ''} onClick={() => onChange('')}>All</button>
+      {areas.map((a) => (
+        <button type="button" key={a} className="hist-chipbtn" aria-pressed={value === a} onClick={() => onChange(value === a ? '' : a)}>{AREA_LABEL[a as LifeEvent['area']] ?? a}</button>
+      ))}
+    </div>
+  )
+}
+
+export function Timeline({ onAdd }: { onAdd: () => void }) {
   const [area, setArea] = useState<'' | LifeEvent['area']>('')
   const [q, setQ] = useState('')
   const [pages, setPages] = useState(1)
@@ -48,45 +66,54 @@ export function Timeline() {
 
   const hasMore = !!rows && rows.length > pages * PAGE
   const shown = useMemo(() => (rows ?? []).slice(0, pages * PAGE), [rows, pages])
-  const days = useMemo(() => {
-    const out: { day: string; items: LifeEvent[] }[] = []
-    for (const e of shown) {
-      const d = dayOf(e)
-      const last = out[out.length - 1]
-      if (last && last.day === d) last.items.push(e)
-      else out.push({ day: d, items: [e] })
-    }
-    return out
-  }, [shown])
+  const weeks = useMemo(() => groupByWeek(shown), [shown])
+  const filtered = !!area || !!needle
+  const clear = () => { setQ(''); setArea(''); setPages(1) }
 
   return (
     <div>
       <div className="hist-filters">
         <input className="input" type="search" value={q} onChange={(e) => { setQ(e.target.value); setPages(1) }} placeholder="Search history" aria-label="Search history" />
-        <select className="select" value={area} onChange={(e) => { setArea(e.target.value as LifeEvent['area']); setPages(1) }} aria-label="Filter by area">
-          <option value="">All areas</option>
-          {EVENT_AREAS.map((a) => <option key={a} value={a}>{AREA_LABEL[a]}</option>)}
-        </select>
+        <AreaChips<LifeEvent['area']> value={area} onChange={(v) => { setArea(v); setPages(1) }} areas={EVENT_AREAS} label="Filter by area" />
       </div>
-      {rows && days.length === 0 && (
+      {filtered && shown.length > 0 && (
+        <div className="hist-result small faint" role="status">
+          <span>
+            {shown.length}{hasMore ? '+' : ''} {shown.length === 1 ? 'entry' : 'entries'}
+            {area ? ` in ${AREA_LABEL[area]}` : ''}{needle ? ` matching “${q.trim()}”` : ''}
+          </span>
+          <button className="btn btn-ghost btn-sm" style={{ width: 'auto', padding: '0 10px' }} onClick={clear}>Clear filters</button>
+        </div>
+      )}
+      {rows && weeks.length === 0 && (
         <Empty>
-          {area || needle
-            ? 'Nothing matches that filter.'
-            : 'Your history fills itself as you complete tasks, log meals, contact people and finish goals. Add something worth remembering to start it now.'}
+          {filtered ? (
+            <>Nothing matches that filter.<br /><button className="btn btn-sm" style={{ marginTop: 10 }} onClick={clear}>Clear filters</button></>
+          ) : (
+            <>Your history fills itself as you complete tasks, log meals, contact people and finish goals.<br /><button className="btn btn-primary btn-sm" style={{ marginTop: 10 }} onClick={onAdd}>Add something worth remembering</button></>
+          )}
         </Empty>
       )}
-      {days.map(({ day, items }) => (
-        <section className="hist-day" key={day} aria-label={dayLabel(day)}>
-          <div className="hist-day-head">
-            <span>{dayLabel(day)}</span>
-            <span className="faint">{items.length}</span>
-          </div>
-          {items.map((e) => (
-            <div className="hist-item" key={e.id}>
-              <span className="hist-time">{timeOf(e)}</span>
-              <span className={e.milestone ? 'chip chip-accent hist-chip' : 'chip hist-chip'}>{AREA_LABEL[e.area] ?? e.area}</span>
-              <span className={e.milestone ? 'hist-title is-milestone' : 'hist-title'}>{e.title}</span>
-              <button className="btn btn-ghost hist-del" aria-label={`Remove ${e.title}`} onClick={() => removeEvent(e)}><XIcon /></button>
+      {weeks.map((w) => (
+        <section className="hist-week" key={w.weekOf} aria-label={weekLabel(w.weekOf)}>
+          <h2 className="hist-week-head">
+            <span>{weekLabel(w.weekOf)}</span>
+            <span className="faint">{w.count} {w.count === 1 ? 'entry' : 'entries'}</span>
+          </h2>
+          {w.days.map(({ day, items }) => (
+            <div className="hist-day" key={day}>
+              <div className="hist-day-head">
+                <span>{dayLabel(day)}</span>
+                <span className="faint">{items.length}</span>
+              </div>
+              {items.map((e) => (
+                <div className="hist-item" key={e.id}>
+                  <span className="hist-time">{timeOf(e)}</span>
+                  <span className={e.milestone ? 'chip chip-accent hist-chip' : 'chip hist-chip'}>{AREA_LABEL[e.area] ?? e.area}</span>
+                  <span className={e.milestone ? 'hist-title is-milestone' : 'hist-title'}><Hit text={e.title} needle={needle} /></span>
+                  <button className="btn btn-ghost hist-del" aria-label={`Remove ${e.title}`} onClick={() => removeEvent(e)}><XIcon /></button>
+                </div>
+              ))}
             </div>
           ))}
         </section>
@@ -98,12 +125,15 @@ export function Timeline() {
   )
 }
 
-export function Achievements() {
-  const items = useLiveQuery(() => db.events.orderBy('at').reverse().filter((e) => e.milestone).toArray(), [])
+export function Achievements({ onAdd }: { onAdd: () => void }) {
+  const all = useLiveQuery(() => db.events.orderBy('at').reverse().filter((e) => e.milestone).toArray(), [])
+  const [area, setArea] = useState<'' | LifeEvent['area']>('')
+  const items = useMemo(() => (all ?? []).filter((e) => !area || e.area === area), [all, area])
+  const areaCounts = useMemo(() => countByArea(all ?? []), [all])
 
   const years = useMemo(() => {
     const out: { year: string; total: number; areas: [string, number][]; months: { key: string; items: LifeEvent[] }[] }[] = []
-    for (const e of items ?? []) {
+    for (const e of items) {
       const d = dayOf(e)
       const year = d.slice(0, 4)
       const mk = d.slice(0, 7)
@@ -114,36 +144,48 @@ export function Achievements() {
       if (m && m.key === mk) m.items.push(e)
       else y.months.push({ key: mk, items: [e] })
     }
-    for (const y of out) {
-      const counts = new Map<string, number>()
-      for (const m of y.months) for (const e of m.items) counts.set(e.area, (counts.get(e.area) ?? 0) + 1)
-      y.areas = [...counts].sort((a, b) => b[1] - a[1])
-    }
+    for (const y of out) y.areas = countByArea(y.months.flatMap((m) => m.items))
     return out
   }, [items])
 
-  if (!items) return null
-  if (items.length === 0)
-    return <Empty>Milestones collect here: finished goals, completed courses, and anything you add with “Milestone” switched on.</Empty>
+  if (!all) return null
+  if (all.length === 0)
+    return (
+      <Empty>
+        Milestones collect here: finished goals, completed courses, and anything you add with “Milestone” switched on.<br />
+        <button className="btn btn-primary btn-sm" style={{ marginTop: 10 }} onClick={onAdd}>Add a milestone</button>
+      </Empty>
+    )
 
+  const latest = all[0]
   return (
     <div>
+      <p className="ach-summary small">
+        <b>{all.length}</b> {all.length === 1 ? 'milestone' : 'milestones'} since {formatDate(dayOf(all[all.length - 1]), { month: 'long', year: 'numeric' })}.
+        {' '}Latest: <span className="ach-latest">{latest.title}</span> <span className="faint">({formatDate(dayOf(latest))})</span>
+      </p>
+      {areaCounts.length > 1 && (
+        <div className="hist-filters">
+          <AreaChips<LifeEvent['area']> value={area} onChange={setArea} areas={areaCounts.map(([a]) => a as LifeEvent['area'])} label="Filter milestones by area" />
+        </div>
+      )}
       {years.map((y) => (
         <section className="ach-year" key={y.year}>
           <div className="ach-year-head">
             <h2><span className="ach-year-num">{y.year}</span><span className="ach-year-total">{y.total} {y.total === 1 ? 'milestone' : 'milestones'}</span></h2>
             <div className="ach-areas">
-              {y.areas.map(([a, n]) => <span key={a}>{AREA_LABEL[a] ?? a} <b>{n}</b></span>)}
+              {y.areas.map(([a, n]) => <span key={a}>{AREA_LABEL[a as LifeEvent['area']] ?? a} <b>{n}</b></span>)}
             </div>
           </div>
           {y.months.map((m) => (
             <div className="ach-month" key={m.key}>
-              <div className="ach-month-name">{formatDate(`${m.key}-01`, { month: 'long' })}</div>
+              <div className="ach-month-name">{formatDate(`${m.key}-01`, { month: 'long' })}<span className="faint"> · {m.items.length}</span></div>
               <div className="ach-list">
                 {m.items.map((e) => (
                   <div className="ach-entry" key={e.id}>
+                    <span className="ach-entry-date">{formatDate(dayOf(e))}</span>
                     <span className="ach-entry-title">{e.title}</span>
-                    <span className="ach-entry-meta">{AREA_LABEL[e.area] ?? e.area} · {formatDate(dayOf(e))}</span>
+                    <span className="ach-entry-meta">{AREA_LABEL[e.area] ?? e.area}</span>
                   </div>
                 ))}
               </div>

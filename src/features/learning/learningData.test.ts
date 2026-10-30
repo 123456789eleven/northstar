@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { db, type LearningItem } from '../../db'
-import { addSession, completeItem, fmtMinutes, saveItem, sessionStreak, startItem, type ItemDraft } from './learningData'
+import { addSession, completeItem, fmtMinutes, saveItem, sessionStreak, startItem, undoLast, type ItemDraft } from './learningData'
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] })
@@ -118,5 +118,12 @@ describe('startItem / completeItem', () => {
     await completeItem(it1)
     expect(await db.learning.get(it1.id!)).toMatchObject({ status: 'done', progress: 100, completedAt: '2026-06-15', startedAt: '2026-06-15' })
     expect(await events()).toMatchObject([{ kind: 'learning-completed', milestone: true, title: 'Completed Rust' }])
+  })
+
+  it('undoLast removes only the most recent matching session', async () => {
+    await addSession(1, 15)
+    await addSession(1, 15)
+    await undoLast(1, 15)
+    expect(await db.studySessions.count()).toBe(1)
   })
 })

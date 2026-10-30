@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Card, Empty, PageHeader, Tabs } from '../components/ui'
-import KpiStrip from '../components/KpiStrip'
-import { db, type LearningItem } from '../db'
+import { Card, Empty, PageHeader, Progress, Tabs } from '../components/ui'
+import { db, getSetting, setSetting, type LearningItem } from '../db'
 import { startOfWeek, today } from '../lib/dates'
 import ItemModal from '../features/learning/ItemModal'
 import { ActiveCard, DoneRow, PlannedRow } from '../features/learning/ItemCards'
@@ -12,6 +11,43 @@ import '../features/learning/learning.css'
 
 type View = 'active' | 'planned' | 'done' | 'log'
 type ModalState = { item?: LearningItem; status?: LearningItem['status'] } | null
+
+const TARGET_KEY = 'learning.weeklyTargetMin'
+
+/** Weekly study time vs a target the user can tap to change. */
+function WeekTarget({ minutes }: { minutes: number }) {
+  const target = useLiveQuery(() => getSetting<number>(TARGET_KEY, 120), [])
+  const [editing, setEditing] = useState(false)
+  const [val, setVal] = useState('')
+  if (target === undefined) return null
+  const save = async () => {
+    const n = Math.round(Number(val))
+    if (n > 0 && n <= 5000) await setSetting(TARGET_KEY, n)
+    setEditing(false)
+  }
+  return (
+    <div className="card learn-week">
+      <div className="row-between">
+        <span className="stat-label">Study this week</span>
+        {editing ? (
+          <form className="row" onSubmit={(e) => { e.preventDefault(); void save() }}>
+            <input className="input learn-target-in" inputMode="numeric" autoFocus value={val} onChange={(e) => setVal(e.target.value)} aria-label="Weekly target in minutes" placeholder="min" />
+            <button className="btn btn-sm" type="submit">Set</button>
+          </form>
+        ) : (
+          <button className="btn btn-ghost btn-sm" onClick={() => { setVal(String(target)); setEditing(true) }} aria-label="Change weekly target">
+            Target {fmtMinutes(target)}
+          </button>
+        )}
+      </div>
+      <div className="learn-week-line">
+        <span className="stat-value">{fmtMinutes(minutes)}</span>
+        <span className="small muted mono">{minutes >= target ? 'target met' : `${fmtMinutes(target - minutes)} to go`}</span>
+      </div>
+      <Progress value={(minutes / target) * 100} label="Weekly study target" />
+    </div>
+  )
+}
 
 export default function Learning() {
   const [view, setView] = useState<View>('active')
@@ -45,30 +81,21 @@ export default function Learning() {
     <>
       <PageHeader
         title="Learning"
-        sub={weekTotal ? `${fmtMinutes(weekTotal)} of study this week` : 'Courses, certifications, books and skills.'}
+        sub="Courses, certifications, books and skills."
         actions={
           <button className="btn btn-primary" onClick={addFor(view === 'planned' ? 'planned' : view === 'done' ? 'done' : 'active')}>
             Add item
           </button>
         }
       />
-      {loaded && (
-        <KpiStrip
-          items={[
-            { label: 'Active', value: active.length },
-            { label: 'Planned', value: planned.length },
-            { label: 'Completed', value: done.length },
-            { label: 'Study this week', value: fmtMinutes(weekTotal) },
-          ]}
-        />
-      )}
+      {loaded && <WeekTarget minutes={weekTotal} />}
       <Tabs
         value={view}
         onChange={setView}
         options={[
-          { value: 'active', label: 'Active' },
-          { value: 'planned', label: 'Planned' },
-          { value: 'done', label: 'Completed' },
+          { value: 'active', label: `Active${active.length ? ` ${active.length}` : ''}` },
+          { value: 'planned', label: `Planned${planned.length ? ` ${planned.length}` : ''}` },
+          { value: 'done', label: `Completed${done.length ? ` ${done.length}` : ''}` },
           { value: 'log', label: 'Log' },
         ]}
       />
@@ -91,7 +118,7 @@ export default function Learning() {
             </Empty>
           </Card>
         ) : (
-          <div className="grid grid-2">
+          <div className="grid grid-2 learn-grid">
             {active.map((i) => (
               <ActiveCard key={i.id} item={i} weekMinutes={weekByItem.get(i.id!) ?? 0} goalTitle={goalTitle(i.goalId)} onEdit={() => setModal({ item: i })} />
             ))}

@@ -88,6 +88,13 @@ export async function addSession(itemId: number, minutes: number, date: ISODate 
   await db.studySessions.add({ itemId, minutes: Math.round(minutes), date, note: note?.trim() || undefined })
 }
 
+/** Remove the most recent session for this item with this length (used by toast undo). */
+export async function undoLast(itemId: number, minutes: number, date: ISODate = today()) {
+  const rows = await db.studySessions.where('itemId').equals(itemId).filter((s) => s.minutes === minutes && s.date === date).toArray()
+  const last = rows.sort((a, b) => (b.id ?? 0) - (a.id ?? 0))[0]
+  if (last?.id != null) await db.studySessions.delete(last.id)
+}
+
 /** Consecutive days with a session, ending today (or yesterday if nothing logged yet today). */
 export function sessionStreak(dates: Set<ISODate>, from: ISODate = today()): number {
   let d = dates.has(from) ? from : addDays(from, -1)

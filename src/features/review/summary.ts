@@ -1,4 +1,4 @@
-import { AREAS, db, type ISODate, type LifeEvent, type Review } from '../../db'
+import { AREAS, db, type ISODate, type LifeEvent, type Review, type Task } from '../../db'
 import { isSpend } from '../finance/categories'
 import { addDays, parseISODate, startOfWeek, today } from '../../lib/dates'
 
@@ -13,6 +13,7 @@ export interface WeekDigest {
   studyMinutes: number
   peopleContacted: number
   milestones: LifeEvent[]
+  slipped: Task[]
   eventCount: number
 }
 
@@ -30,7 +31,7 @@ export async function weekDigest(weekOf: ISODate): Promise<WeekDigest> {
   const end = addDays(weekOf, 6)
   const [startTs, endTs] = [ts(weekOf), ts(addDays(weekOf, 7))]
 
-  const [tasks, goals, events, meals, study, interactions, money, moneyPrev] = await Promise.all([
+  const [tasks, goals, events, meals, study, interactions, money, moneyPrev, dueTasks] = await Promise.all([
     db.tasks.where('doneAt').between(startTs, endTs, true, false).count(),
     db.goals.filter((g) => !!g.completedAt && g.completedAt >= startTs && g.completedAt < endTs).count(),
     db.events.where('at').between(startTs, endTs, true, false).toArray(),
@@ -39,6 +40,7 @@ export async function weekDigest(weekOf: ISODate): Promise<WeekDigest> {
     db.interactions.where('date').between(weekOf, end, true, true).toArray(),
     spentBetween(weekOf, end),
     spentBetween(addDays(weekOf, -7), addDays(weekOf, -1)),
+    db.tasks.where('due').between(weekOf, end, true, true).toArray(),
   ])
 
   return {
@@ -53,6 +55,7 @@ export async function weekDigest(weekOf: ISODate): Promise<WeekDigest> {
     peopleContacted: new Set(interactions.map((i) => i.personId)).size,
     milestones: events.filter((e) => e.milestone && e.kind !== 'review.done'),
     eventCount: events.length,
+    slipped: slippedTasks(dueTasks, weekOf),
   }
 }
 
@@ -77,4 +80,19 @@ export function spendChange(spent: number, prev: number): number | null {
   const ratio = spent / prev
   if (ratio > 3 || ratio < 1 / 3) return null
   return Math.round((ratio - 1) * 100)
+}
+
+/** A review row may carry a lock timestamp (extra field on the row; no schema change, it is not indexed). */
+export type LockableReview = Review & { lockedAt?: string }
+
+/**
+ * Tasks due inside the week that are still open. In the current week only days already past count, so
+ * something due Friday is not "slipped" on Wednesday.
+ */
+export function slippedTasks(tasks: Task[], weekOf: ISODate, now: ISODate = today()): Task[] {
+  const end = addDays(weekOf, 6)
+  const last = now <= end ? addDays(now, -1) : end
+  return tasks
+    .filter((t) => t.status !== 'done' && !!t.due && t.due >= weekOf && t.due <= last)
+    .sort((a, b) => (a.due ?? '').localeCompare(b.due ?? '') || a.priority - b.priority)
 }

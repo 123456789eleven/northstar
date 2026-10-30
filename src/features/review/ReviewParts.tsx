@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { AREAS, db, logEvent, type Area, type ISODate, type Review } from '../../db'
+import { AREAS, db, logEvent, type Area, type ISODate } from '../../db'
 import { AREA_LABEL, Card, Field } from '../../components/ui'
-import { formatDate, money, toISODate } from '../../lib/dates'
-import { spendChange, weekDigest } from './summary'
+import { addDays, formatDate, money, toISODate } from '../../lib/dates'
+import { spendChange, weekDigest, type LockableReview } from './summary'
 
 function Fact({ label, value, zero, note }: { label: string; value: string; zero?: boolean; note?: string }) {
   return (
@@ -25,7 +25,7 @@ function fmtMinutes(m: number) {
 export function Digest({ weekOf }: { weekOf: ISODate }) {
   const res = useLiveQuery(async () => ({ weekOf, d: await weekDigest(weekOf) }), [weekOf])
   const d = res && res.weekOf === weekOf ? res.d : undefined
-  if (!d) return <Card title="The week in numbers"><div style={{ height: 120 }} /></Card>
+  if (!d) return <Card title="1 · What happened"><div style={{ height: 120 }} /></Card>
 
   let spendNote: string | undefined
   if (d.hasMoney) {
@@ -34,38 +34,55 @@ export function Digest({ weekOf }: { weekOf: ISODate }) {
   }
 
   return (
-    <Card title="The week in numbers">
-      {d.eventCount === 0 && d.tasksDone === 0 && d.mealDays === 0 && !d.hasMoney ? (
-        <p className="small faint" style={{ margin: 0 }}>Nothing was logged this week. The digest fills in from tasks, meals, spending, study and contacts.</p>
+    <Card title="1 · What happened">
+      {d.eventCount === 0 && d.tasksDone === 0 && d.mealDays === 0 && !d.hasMoney && d.slipped.length === 0 ? (
+        <p className="small faint" style={{ margin: 0 }}>Nothing was logged for {weekRange(weekOf)}. The digest fills in from tasks, meals, spending, study and contacts.</p>
       ) : (
         <>
           <div className="rv-digest">
             <Fact label="Tasks completed" value={String(d.tasksDone)} zero={!d.tasksDone} />
             <Fact label="Goals" value={d.goalsCompleted ? `${d.goalsCompleted} completed` : `${d.goalUpdates} updates`} zero={!d.goalsCompleted && !d.goalUpdates}
               note={d.goalsCompleted && d.goalUpdates ? `${d.goalUpdates} updates` : undefined} />
-            <Fact label="Spent" value={d.hasMoney ? money(d.spent) : '—'} zero={!d.hasMoney} note={spendNote ?? (d.hasMoney ? undefined : 'no transactions')} />
-            <Fact label="Meals logged" value={`${d.mealDays} of 7 days`} zero={!d.mealDays} />
+            <Fact label="Spent" value={d.hasMoney ? money(d.spent) : '—'} zero={!d.hasMoney} note={spendNote ?? (d.hasMoney ? 'imported transactions' : 'no transactions')} />
+            <Fact label="Meals logged" value={`${d.mealDays} of 7 days`} zero={!d.mealDays} note="days with at least one meal" />
             <Fact label="Study" value={fmtMinutes(d.studyMinutes)} zero={!d.studyMinutes} />
-            <Fact label="People contacted" value={String(d.peopleContacted)} zero={!d.peopleContacted} />
+            <Fact label="People contacted" value={String(d.peopleContacted)} zero={!d.peopleContacted} note="different people" />
           </div>
           {d.milestones.length > 0 && (
-            <ul className="rv-milestones" aria-label="Milestones this week">
-              {d.milestones.map((m) => <li key={m.id}>{m.title}</li>)}
-            </ul>
+            <div className="rv-sub">
+              <div className="rv-sub-title">Milestones</div>
+              <ul className="rv-milestones" aria-label="Milestones this week">
+                {d.milestones.map((m) => <li key={m.id}>{m.title}</li>)}
+              </ul>
+            </div>
           )}
         </>
+      )}
+      {d.slipped.length > 0 && (
+        <div className="rv-sub">
+          <div className="rv-sub-title">Slipped: {d.slipped.length} {d.slipped.length === 1 ? 'task' : 'tasks'} due this week, still open</div>
+          <ul className="rv-slipped" aria-label="Tasks that slipped">
+            {d.slipped.slice(0, 6).map((t) => <li key={t.id}><span className="rv-slip-due">{formatDate(t.due!)}</span>{t.title}</li>)}
+          </ul>
+          {d.slipped.length > 6 && <div className="small faint">and {d.slipped.length - 6} more on Tasks</div>}
+        </div>
       )}
     </Card>
   )
 }
 
-export function ReviewForm({ weekOf, existing }: { weekOf: ISODate; existing: Review | null }) {
+function weekRange(w: ISODate) {
+  return `${formatDate(w)} – ${formatDate(addDays(w, 6))}`
+}
+
+export function ReviewForm({ weekOf, existing, planned }: { weekOf: ISODate; existing: LockableReview | null; planned?: string }) {
   const [wins, setWins] = useState(existing?.wins ?? '')
   const [struggles, setStruggles] = useState(existing?.struggles ?? '')
   const [focusNext, setFocusNext] = useState(existing?.focusNext ?? '')
   const [ratings, setRatings] = useState<Partial<Record<Area, number>>>(existing?.ratings ?? {})
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
   const [dirty, setDirty] = useState(false)
+  const locked = !!existing?.lockedAt
 
   const edit = <T,>(set: (v: T) => void) => (v: T) => { set(v); setDirty(true); setStatus('idle') }
   const rate = (a: Area, n: number) => {
@@ -79,44 +96,56 @@ export function ReviewForm({ weekOf, existing }: { weekOf: ISODate; existing: Re
     setStatus('idle')
   }
 
-  async function save(e: FormEvent) {
-    e.preventDefault()
+  // lockedAt is an extra, unindexed field on the review row, so the typed table API needs a cast.
+  async function persist(lock: boolean) {
     setStatus('saving')
     const body = { wins: wins.trim(), struggles: struggles.trim(), focusNext: focusNext.trim(), ratings }
+    const lockedAt = lock ? new Date().toISOString() : undefined
     await db.transaction('rw', db.reviews, db.events, async () => {
       const row = await db.reviews.where('weekOf').equals(weekOf).first()
       if (row?.id != null) {
-        await db.reviews.update(row.id, body)
+        await db.reviews.update(row.id, (lock ? { ...body, lockedAt } : body) as never)
         return
       }
-      const id = await db.reviews.add({ weekOf, ...body, createdAt: new Date().toISOString() })
+      const id = await db.reviews.add({ weekOf, ...body, ...(lock ? { lockedAt } : {}), createdAt: new Date().toISOString() } as never)
       await logEvent({ area: 'personal', kind: 'review.done', title: `Reviewed the week of ${formatDate(weekOf)}`, refTable: 'reviews', refId: id })
     })
     setStatus('saved')
     setDirty(false)
   }
 
+  async function unlock() {
+    const row = await db.reviews.where('weekOf').equals(weekOf).first()
+    if (row?.id != null) await db.reviews.update(row.id, { lockedAt: undefined } as never)
+  }
+
   return (
-    <Card title={existing ? 'Your review' : 'Write your review'}>
-      <form className="stack" onSubmit={save}>
-        <Field label="Wins">
-          <textarea className="textarea" value={wins} onChange={(e) => edit(setWins)(e.target.value)} placeholder="What went well? What are you proud of?" />
+    <Card
+      title={locked ? 'Your review (locked)' : existing ? 'Your review' : 'Write your review'}
+      action={locked ? <button type="button" className="btn btn-sm" onClick={() => void unlock()}>Unlock to edit</button> : undefined}
+    >
+      <form className="stack" onSubmit={(e: FormEvent) => { e.preventDefault(); void persist(false) }}>
+        {planned && (
+          <p className="rv-planned small"><span className="faint">You planned for this week:</span> {planned}</p>
+        )}
+        <Field label="2 · Wins: what went well, what are you proud of?">
+          <textarea className="textarea" value={wins} readOnly={locked} onChange={(e) => edit(setWins)(e.target.value)} placeholder="Even small ones count." />
         </Field>
-        <Field label="Struggles">
-          <textarea className="textarea" value={struggles} onChange={(e) => edit(setStruggles)(e.target.value)} placeholder="What was hard or didn't happen?" />
+        <Field label="3 · Slipped: what was hard or did not happen?">
+          <textarea className="textarea" value={struggles} readOnly={locked} onChange={(e) => edit(setStruggles)(e.target.value)} placeholder="Say what got in the way, not just what was missed." />
         </Field>
-        <Field label="Focus next week">
-          <textarea className="textarea" value={focusNext} onChange={(e) => edit(setFocusNext)(e.target.value)} placeholder="The one to three things that matter most." />
+        <Field label="4 · Next week: the one to three things that matter most">
+          <textarea className="textarea" value={focusNext} readOnly={locked} onChange={(e) => edit(setFocusNext)(e.target.value)} placeholder="These show up here again when you review the following week." />
         </Field>
         <div>
-          <div className="field" style={{ marginBottom: 6 }}><span>How did each area feel? (1 = rough, 5 = great; tap again to clear)</span></div>
+          <div className="field" style={{ marginBottom: 6 }}><span>5 · How did each area feel? 1 = rough, 5 = great; tap again to clear.</span></div>
           <div className="rv-ratings">
             {AREAS.map((a) => (
               <div className="rv-rate-row" key={a}>
                 <span className="rv-rate-name">{AREA_LABEL[a]}</span>
                 <div className="rv-rate-btns" role="group" aria-label={`${AREA_LABEL[a]} rating`}>
                   {[1, 2, 3, 4, 5].map((n) => (
-                    <button type="button" key={n} className="btn" aria-pressed={ratings[a] === n} onClick={() => rate(a, n)}>{n}</button>
+                    <button type="button" key={n} className="btn" disabled={locked} aria-pressed={ratings[a] === n} onClick={() => rate(a, n)}>{n}</button>
                   ))}
                 </div>
               </div>
@@ -124,11 +153,18 @@ export function ReviewForm({ weekOf, existing }: { weekOf: ISODate; existing: Re
           </div>
         </div>
         <div className="rv-save">
-          {status === 'saved' && <span className="small good" role="status">Saved</span>}
-          {existing && !dirty && status !== 'saved' && <span className="small faint">Saved {formatDate(toISODate(new Date(existing.createdAt)))}</span>}
-          <button type="submit" className="btn btn-primary" disabled={status === 'saving' || (!!existing && !dirty)}>
-            {existing ? 'Save changes' : 'Save review'}
-          </button>
+          <span className="rv-save-state small">
+            {status === 'saved' ? <span className="good" role="status">{locked ? 'Saved and locked' : 'Saved'}</span>
+              : locked ? <span className="faint">Locked {formatDate(toISODate(new Date(existing!.lockedAt!)))}</span>
+              : dirty ? <span className="faint">Unsaved changes</span>
+              : existing ? <span className="faint">Saved {formatDate(toISODate(new Date(existing.createdAt)))}</span> : null}
+          </span>
+          {!locked && (
+            <>
+              <button type="submit" className="btn" disabled={status === 'saving' || (!!existing && !dirty)}>{existing ? 'Save changes' : 'Save draft'}</button>
+              <button type="button" className="btn btn-primary" disabled={status === 'saving'} onClick={() => void persist(true)}>Save and lock</button>
+            </>
+          )}
         </div>
       </form>
     </Card>

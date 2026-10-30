@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { db, type Person } from '../../db'
-import { ago, cadenceLabel, deleteInteraction, deletePerson, logContact, nextBirthday, personStatus, plural, sortPeople } from './people'
+import { ago, cadenceLabel, deleteInteraction, deletePerson, logContact, nextBirthday, personStatus, plural, sortPeople, undoContact } from './people'
 
 const NOW = '2026-06-15'
 const person = (over: Partial<Person> = {}): Person => ({ id: 1, name: 'Ann', relation: 'friend', cadenceDays: 14, ...over })
@@ -131,5 +131,15 @@ describe('contact logging (db)', () => {
     await logContact({ name: 'x', relation: '', cadenceDays: 0 }, 'text')
     await deletePerson({ name: 'x', relation: '', cadenceDays: 0 })
     expect(await db.interactions.count()).toBe(0)
+  })
+
+  it('undoContact removes the latest contact, its event and restores lastContact', async () => {
+    const id = (await db.people.add({ name: 'U', relation: '', cadenceDays: 7 })) as number
+    await logContact((await db.people.get(id))!, 'text', undefined, '2026-06-01')
+    await logContact((await db.people.get(id))!, 'text', undefined, '2026-06-10')
+    await undoContact(id, 'text', '2026-06-10')
+    expect((await db.people.get(id))!.lastContact).toBe('2026-06-01')
+    expect(await db.interactions.count()).toBe(1)
+    expect(await db.events.filter((e) => e.kind === 'person.contact').count()).toBe(1)
   })
 })

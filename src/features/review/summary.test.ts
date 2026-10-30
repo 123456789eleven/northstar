@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { db, type Review } from '../../db'
-import { avgRating, reviewStreak, weekDigest } from './summary'
+import { avgRating, reviewStreak, slippedTasks, weekDigest } from './summary'
 
 // Week under review: Monday 2026-06-08 .. Sunday 2026-06-14 (local time).
 const WEEK = '2026-06-08'
@@ -11,7 +11,7 @@ describe('weekDigest', () => {
   it('empty database -> zeros', async () => {
     expect(await weekDigest(WEEK)).toEqual({
       tasksDone: 0, goalsCompleted: 0, goalUpdates: 0, spent: 0, spentPrev: 0, hasMoney: false,
-      mealDays: 0, studyMinutes: 0, peopleContacted: 0, milestones: [], eventCount: 0,
+      mealDays: 0, studyMinutes: 0, peopleContacted: 0, milestones: [], eventCount: 0, slipped: [],
     })
   })
 
@@ -131,5 +131,20 @@ describe('spendChange', () => {
     expect(spendChange(1420, 282)).toBeNull() // rent week vs a normal week: the old "403% more"
     expect(spendChange(150, 100)).toBe(50)
     expect(spendChange(100, 100)).toBe(0)
+  })
+})
+
+describe('slippedTasks', () => {
+  const t = (due: string | undefined, status: 'open' | 'done' = 'open') => ({ title: due ?? 'none', priority: 2 as const, status, recurrence: 'none' as const, createdAt: '', due })
+  it('past week: every open task due inside it', () => {
+    const rows = [t('2026-06-08'), t('2026-06-14'), t('2026-06-15'), t('2026-06-07'), t('2026-06-10', 'done'), t(undefined)]
+    expect(slippedTasks(rows, WEEK, '2026-06-20').map((x) => x.due)).toEqual(['2026-06-08', '2026-06-14'])
+  })
+  it('current week: only days already past', () => {
+    const rows = [t('2026-06-09'), t('2026-06-10'), t('2026-06-12')]
+    expect(slippedTasks(rows, WEEK, '2026-06-10').map((x) => x.due)).toEqual(['2026-06-09'])
+  })
+  it('first day of the week: nothing has slipped yet', () => {
+    expect(slippedTasks([t('2026-06-08')], WEEK, '2026-06-08')).toEqual([])
   })
 })

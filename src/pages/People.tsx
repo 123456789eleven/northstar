@@ -2,16 +2,30 @@ import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Interaction, type Person } from '../db'
 import { Card, Empty, PageHeader } from '../components/ui'
-import KpiStrip from '../components/KpiStrip'
+import { useToast } from '../components/toastContext'
 import { daysBetween, formatDate, relativeDay, today } from '../lib/dates'
-import { KINDS, logContact, nextBirthday, sortPeople } from '../features/people/people'
+import { KINDS, cadenceLabel, logContact, nextBirthday, sortPeople, undoContact } from '../features/people/people'
 import { PersonDetail, PersonForm } from '../features/people/PersonModals'
 import '../features/people/people.css'
+
+const KIND_KEY = 'northstar.people.lastKind'
+const lastKind = (): Interaction['kind'] => {
+  try {
+    const v = localStorage.getItem(KIND_KEY)
+    return KINDS.some((k) => k.value === v) ? (v as Interaction['kind']) : 'text'
+  } catch {
+    return 'text'
+  }
+}
+const rememberKind = (k: Interaction['kind']) => {
+  try { localStorage.setItem(KIND_KEY, k) } catch { /* ignore */ }
+}
 
 function LogPanel({ person, onDone }: { person: Person; onDone: () => void }) {
   const [note, setNote] = useState('')
   const [date, setDate] = useState(today())
   const log = async (kind: Interaction['kind']) => {
+    rememberKind(kind)
     await logContact(person, kind, note, date)
     onDone()
   }
@@ -35,6 +49,13 @@ export default function People() {
   const [openId, setOpenId] = useState<number | null>(null)
   const [loggingId, setLoggingId] = useState<number | null>(null)
   const now = today()
+  const toast = useToast()
+  const quickLog = async (p: Person) => {
+    const kind = lastKind()
+    const label = KINDS.find((k) => k.value === kind)?.label.toLowerCase() ?? kind
+    await logContact(p, kind)
+    toast({ message: `Logged ${label} with ${p.name}`, undo: () => undoContact(p.id!, kind, today()) })
+  }
 
   const sorted = useMemo(() => (people ? sortPeople(people, now) : []), [people, now])
   const dueCount = sorted.filter((x) => x.s.overdue).length
@@ -58,38 +79,36 @@ export default function People() {
       {people && people.length === 0 ? (
         <Card>
           <Empty>
-            Add someone you want to stay close to and choose how often to check in. When you talk, tap “Logged contact” and Northstar will tell you who is due next.
+            Add someone you want to stay close to and choose how often to check in. When you talk, tap “Contacted” and Northstar will tell you who is due next.
             <div style={{ marginTop: 14 }}><button className="btn btn-primary" onClick={() => setAdding(true)}>Add your first person</button></div>
           </Empty>
         </Card>
       ) : (
         <>
-        <KpiStrip
-          items={[
-            { label: 'People', value: sorted.length },
-            { label: 'Due for check-in', value: dueCount, delta: dueCount ? 'overdue' : undefined, deltaTone: dueCount ? 'warn' : undefined },
-            { label: 'Birthdays, 30 days', value: birthdays.length },
-          ]}
-        />
         <div className="ppl-layout">
-          <Card title="Check-ins">
+          <Card title="Check-ins" flush>
             <div>
-              {sorted.map(({ p, s }) => (
-                <div className="ppl-row" key={p.id}>
-                  <button className="ppl-main" onClick={() => setOpenId(p.id!)}>
-                    <span className="ppl-name">{p.name}</span>
-                    <span className="ppl-meta">{[p.relation, p.lastContact && `last ${relativeDay(p.lastContact).toLowerCase()}`].filter(Boolean).join(' · ') || ' '}</span>
-                  </button>
-                  <span className={s.overdue ? 'ppl-status is-due' : 'ppl-status'}>{s.text}</span>
-                  {loggingId !== p.id && (
-                    <button className={s.overdue ? 'btn btn-sm btn-primary' : 'btn btn-sm'} style={{ height: 32 }} onClick={() => setLoggingId(p.id!)}>Logged contact</button>
-                  )}
-                  {loggingId === p.id && <LogPanel person={p} onDone={() => setLoggingId(null)} />}
+              {sorted.map(({ p, s }, idx) => (
+                <div key={p.id}>
+                  {idx === 0 && s.overdue && <div className="ppl-group">Due now · {dueCount}</div>}
+                  {!s.overdue && (idx === 0 || sorted[idx - 1].s.overdue) && <div className="ppl-group">{dueCount ? 'Up to date' : 'Everyone'}</div>}
+                  <div className="ppl-row">
+                    <button className="ppl-main" onClick={() => setOpenId(p.id!)}>
+                      <span className="ppl-name">{p.name}</span>
+                      <span className="ppl-meta">
+                        {[p.relation, p.cadenceDays ? cadenceLabel(p.cadenceDays).toLowerCase() : null, p.lastContact ? `last ${relativeDay(p.lastContact).toLowerCase()}` : 'never contacted'].filter(Boolean).join(' · ')}
+                      </span>
+                    </button>
+                    <span className={s.overdue ? 'ppl-status is-due' : 'ppl-status'}>{s.text.replace(' · never logged', '')}</span>
+                    <button className={s.overdue ? 'btn btn-sm btn-primary ppl-act' : 'btn btn-sm ppl-act'} onClick={() => quickLog(p)} aria-label={`Contacted ${p.name} today`}>Contacted</button>
+                    <button className="btn btn-sm btn-ghost ppl-more" onClick={() => setLoggingId(loggingId === p.id ? null : p.id!)} aria-label={`Log details for ${p.name}`} aria-expanded={loggingId === p.id}>Details</button>
+                    {loggingId === p.id && <LogPanel person={p} onDone={() => setLoggingId(null)} />}
+                  </div>
                 </div>
               ))}
             </div>
           </Card>
-          <Card title="Birthdays · next 30 days">
+          <Card title="Birthdays · next 30 days" className={birthdays.length ? 'ppl-bday-card' : 'ppl-bday-card is-empty'}>
             {birthdays.length === 0 ? (
               <p className="small faint" style={{ margin: 0 }}>None coming up. Add birthdays from a person’s Edit screen.</p>
             ) : (

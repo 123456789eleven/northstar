@@ -15,9 +15,9 @@ export default function History() {
         sub="Everything you have done, in one place."
         actions={<button className="btn btn-primary" onClick={() => setAdding(true)}>Add entry</button>}
       />
-      <OnThisDay />
+
       <Tabs<Tab> value={tab} onChange={setTab} options={[{ value: 'timeline', label: 'Timeline' }, { value: 'achievements', label: 'Achievements' }]} />
-      {tab === 'timeline' ? <Timeline /> : <Achievements />}
+      {tab === 'timeline' ? <><OnThisDay /><Timeline onAdd={() => setAdding(true)} /></> : <Achievements onAdd={() => setAdding(true)} />}
       {adding && <AddEntry onClose={() => setAdding(false)} />}
     </>
   )

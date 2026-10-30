@@ -110,3 +110,17 @@ export async function deletePerson(p: Person) {
     await db.people.delete(p.id!)
   })
 }
+
+/** Undo the most recent logged contact of this kind/date: removes the interaction, its timeline event, and recomputes lastContact. */
+export async function undoContact(personId: number, kind: Interaction['kind'], date: ISODate = today()) {
+  await db.transaction('rw', db.interactions, db.people, db.events, async () => {
+    const rows = await db.interactions.where('personId').equals(personId).filter((i) => i.kind === kind && i.date === date).toArray()
+    const last = rows.sort((a, b) => (b.id ?? 0) - (a.id ?? 0))[0]
+    if (last?.id == null) return
+    await db.interactions.delete(last.id)
+    const rest = await db.interactions.where('personId').equals(personId).toArray()
+    await db.people.update(personId, { lastContact: rest.reduce<string | undefined>((m, r) => (!m || r.date > m ? r.date : m), undefined) })
+    const ev = (await db.events.where('area').equals('relationships').filter((e) => e.kind === 'person.contact' && e.refId === personId).toArray()).sort((a, b) => (b.id ?? 0) - (a.id ?? 0))[0]
+    if (ev?.id != null) await db.events.delete(ev.id)
+  })
+}

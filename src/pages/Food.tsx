@@ -42,7 +42,7 @@ export default function Food() {
           { value: 'week', label: 'Week' },
         ]}
       />
-      {view === 'day' ? <DayView date={date} setDate={setDate} targets={targets} /> : <WeekView end={date} targets={targets} />}
+      {view === 'day' ? <DayView date={date} setDate={setDate} targets={targets} onTargets={() => setModal('targets')} /> : <WeekView end={date} targets={targets} />}
       {modal === 'targets' && <TargetsModal targets={targets} onClose={() => setModal(null)} />}
       {modal === 'favorites' && <FavoritesModal onClose={() => setModal(null)} />}
     </>

@@ -1,11 +1,12 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { type FormEvent, useMemo, useState } from 'react'
+import { type FormEvent, useMemo, useRef, useState } from 'react'
 import { Card, Empty, Modal } from '../../components/ui'
 import DataTable from '../../components/DataTable'
 import { db, type Transaction } from '../../db'
-import { formatDate, money, today } from '../../lib/dates'
+import { formatDate, today } from '../../lib/dates'
 import { addMerchantRule, CATEGORIES, categorize, INCOME, merchantKey, merchantLabel, UNCATEGORIZED } from './categories'
-import { monthLabel, monthRange, useRules } from './model'
+import { monthLabel, monthRange, moneyExact, useRules } from './model'
+import { parseQuickAdd } from './quickAdd'
 
 interface Offer {
   merchant: string
@@ -120,7 +121,18 @@ export default function Transactions({ month, category, setCategory, onImport }:
         </div>
       )}
 
-      <Card flush={shown.length > 0} title={`${shown.length} transaction${shown.length === 1 ? '' : 's'}${allTime ? '' : ` · ${monthLabel(month)}`}`}>
+      <Card
+        flush={shown.length > 0}
+        title={`${shown.length} transaction${shown.length === 1 ? '' : 's'}${allTime ? '' : ` · ${monthLabel(month)}`}`}
+        action={
+          shown.length > 0 ? (
+            <span className="mono small muted fin-sums">
+              <span>{moneyExact(-shown.reduce((s, t) => s + Math.min(0, t.amount), 0))} out</span>
+              <span className="good">+{moneyExact(shown.reduce((s, t) => s + Math.max(0, t.amount), 0))} in</span>
+            </span>
+          ) : undefined
+        }
+      >
         {total === 0 ? (
           <Empty>
             <p style={{ margin: '0 0 12px' }}>Nothing here yet. Add one with the row above, or download a CSV from your bank's website and import it.</p>
@@ -146,7 +158,7 @@ export default function Transactions({ month, category, setCategory, onImport }:
                   {!CATEGORIES.includes(t.category as (typeof CATEGORIES)[number]) && <option value={t.category}>{t.category}</option>}
                 </select>
               ) },
-              { key: 'amt', header: 'Amount', align: 'right', value: true, render: (t) => <span className={`mono nowrap ${t.amount > 0 ? 'good' : ''}`}>{t.amount > 0 ? '+' : ''}{money(t.amount)}</span> },
+              { key: 'amt', header: 'Amount', align: 'right', value: true, render: (t) => <span className={`mono nowrap ${t.amount > 0 ? 'good' : ''}`}>{t.amount > 0 ? '+' : ''}{moneyExact(t.amount)}</span> },
               { key: 'x', header: '', render: (t) => (
                 <button className="btn btn-ghost btn-sm fin-x" onClick={(e) => { e.stopPropagation(); remove(t) }} aria-label={`Delete ${t.description}`} title="Delete">×</button>
               ) },
@@ -173,25 +185,31 @@ function AddRow({ month, rules }: { month: string; rules: ReturnType<typeof useR
     setDate(defaultDate())
   }
 
-  const n = Number(amt.replace(/[$,\s]/g, ''))
-  const ok = desc.trim() && Number.isFinite(n) && n !== 0
-  const signed = dir === 'out' ? -Math.abs(n) : Math.abs(n)
-  const suggested = desc.trim() ? categorize(desc, signed, rules) : ''
+  const descRef = useRef<HTMLInputElement>(null)
+  // One-line entry: "Kroger 42.50" or "Paycheck +1200" in the description box while the amount box is empty.
+  const quick = !amt.trim() ? parseQuickAdd(desc) : null
+  const n = quick ? quick.amount : Number(amt.replace(/[$,\s]/g, ''))
+  const direction = quick ? quick.dir : dir
+  const text = quick ? quick.description : desc.trim()
+  const ok = Boolean(text) && Number.isFinite(n) && n !== 0 && (quick !== null || amt.trim() !== '')
+  const signed = direction === 'out' ? -Math.abs(n) : Math.abs(n)
+  const suggested = text ? categorize(text, signed, rules) : ''
 
   async function add(e: FormEvent) {
     e.preventDefault()
     if (!ok) return
-    const category = cat || (suggested === UNCATEGORIZED && dir === 'in' ? INCOME : suggested) || UNCATEGORIZED
-    await db.transactions.add({ date: date || today(), description: desc.trim(), amount: Math.round(signed * 100) / 100, category })
+    const category = cat || (suggested === UNCATEGORIZED && direction === 'in' ? INCOME : suggested) || UNCATEGORIZED
+    await db.transactions.add({ date: date || today(), description: text, amount: Math.round(signed * 100) / 100, category })
     setDesc('')
     setAmt('')
     setCat('')
+    descRef.current?.focus()
   }
 
   return (
     <form className="card fin-add" onSubmit={add}>
       <input className="input" type="date" value={date} onChange={(e) => setDate(e.target.value)} aria-label="Date" />
-      <input className="input fin-add-desc" placeholder="Description, e.g. Kroger" value={desc} onChange={(e) => setDesc(e.target.value)} aria-label="Description" />
+      <input ref={descRef} className="input fin-add-desc" placeholder="Type “Kroger 42.50” or “Paycheck +1200”" value={desc} onChange={(e) => setDesc(e.target.value)} aria-label="Description" />
       <div className="row fin-add-amt" style={{ gap: 4 }}>
         <select className="select" style={{ width: 'auto' }} value={dir} onChange={(e) => setDir(e.target.value as 'out' | 'in')} aria-label="Direction">
           <option value="out">Spent</option>
@@ -254,7 +272,7 @@ function Triage({ onClose }: { onClose: () => void }) {
             <div style={{ fontSize: 17 }}>{current.description}</div>
             <div className={`mono ${current.amount > 0 ? 'good' : ''}`} style={{ fontFamily: 'var(--serif)', fontSize: 26 }}>
               {current.amount > 0 ? '+' : ''}
-              {money(current.amount)}
+              {moneyExact(current.amount)}
             </div>
             {current.account && <div className="tiny faint">{current.account}</div>}
           </div>

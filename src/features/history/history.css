@@ -50,3 +50,25 @@
   .ach-entry { flex-direction: column; gap: 0; }
 }
 .hist-toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; min-height: 32px; }
+
+/* Area chips, week headings, search hits */
+.hist-filters { align-items: center; }
+.hist-chips { display: flex; flex-wrap: wrap; gap: 6px; flex-basis: 100%; }
+.hist-chipbtn { min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: none; color: var(--ink-2); font: inherit; font-size: 13px; cursor: pointer; }
+.hist-chipbtn:hover { color: var(--ink); }
+.hist-chipbtn[aria-pressed='true'] { background: var(--accent-soft); border-color: transparent; color: var(--accent); font-weight: 500; }
+.hist-result { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: -4px 0 10px; }
+.hist-week { margin-bottom: 18px; }
+.hist-week-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 0 0 2px; font: inherit; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.hist-week-head .faint { font-weight: 400; text-transform: none; letter-spacing: 0; }
+.hist-day-head { top: 0; }
+.hist-hit { background: none; color: var(--accent); font-weight: 600; }
+.ach-summary { margin: 0 0 12px; color: var(--ink-2); }
+.ach-summary b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.ach-latest { color: var(--ink); }
+.ach-entry-date { flex: 0 0 52px; font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) {
+  .ach-entry { flex-direction: row; flex-wrap: wrap; gap: 0 10px; }
+  .ach-entry-title { flex-basis: calc(100% - 62px); order: 2; }
+  .ach-entry-meta { order: 3; flex-basis: 100%; padding-left: 62px; }
+}

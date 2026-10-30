@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Empty, Progress } from '../../components/ui'
 import { db, type ISODate } from '../../db'
@@ -8,7 +8,7 @@ import { copyYesterday, SLOTS, sumMeals, type FoodTargets } from './foodData'
 
 const LIST_ID = 'food-recent-names'
 
-function TotalLine({ label, value, unit, target }: { label: string; value: number; unit: string; target?: number }) {
+function TotalLine({ label, value, unit, target, onSetTarget }: { label: string; value: number; unit: string; target?: number; onSetTarget?: () => void }) {
   const left = target ? target - value : 0
   return (
     <div className="food-total">
@@ -24,12 +24,17 @@ function TotalLine({ label, value, unit, target }: { label: string; value: numbe
           <Progress value={(value / target) * 100} label={label} />
           <span className={`tiny ${left < 0 ? 'muted' : 'faint'}`}>{left >= 0 ? `${left.toLocaleString()} ${unit} left` : `${(-left).toLocaleString()} ${unit} over`}</span>
         </>
+      ) : onSetTarget ? (
+        <button className="btn btn-ghost btn-sm food-set-target" onClick={onSetTarget}>
+          Set a target
+        </button>
       ) : null}
     </div>
   )
 }
 
-export default function DayView({ date, setDate, targets }: { date: ISODate; setDate: (d: ISODate) => void; targets: FoodTargets }) {
+export default function DayView({ date, setDate, targets, onTargets }: { date: ISODate; setDate: (d: ISODate) => void; targets: FoodTargets; onTargets: () => void }) {
+  const picker = useRef<HTMLInputElement>(null)
   const yesterday = addDays(date, -1)
   const meals = useLiveQuery(() => db.meals.where('date').equals(date).toArray(), [date])
   const prevMeals = useLiveQuery(() => db.meals.where('date').equals(yesterday).toArray(), [yesterday])
@@ -47,6 +52,21 @@ export default function DayView({ date, setDate, targets }: { date: ISODate; set
     return map
   }, [favorites, recent])
 
+  const recentBySlot = useMemo(() => {
+    const favNames = new Set((favorites ?? []).map((f) => f.name.trim().toLowerCase()))
+    const out = new Map<string, Suggestion[]>()
+    const seen = new Set<string>()
+    for (const m of recent ?? []) {
+      const k = `${m.slot}|${m.name.trim().toLowerCase()}`
+      if (m.date === date || seen.has(k) || favNames.has(m.name.trim().toLowerCase())) continue
+      seen.add(k)
+      const list = out.get(m.slot) ?? []
+      if (list.length < 3) list.push({ name: m.name, calories: m.calories, protein: m.protein })
+      out.set(m.slot, list)
+    }
+    return out
+  }, [favorites, recent, date])
+
   const totals = sumMeals(meals ?? [])
   const isToday = date === today()
 
@@ -56,9 +76,12 @@ export default function DayView({ date, setDate, targets }: { date: ISODate; set
         <button className="btn" onClick={() => setDate(addDays(date, -1))} aria-label="Previous day">
           ‹
         </button>
-        <div className="food-stepper-label">
+        <div className="food-stepper-pick">
+        <button className="food-stepper-label" onClick={() => picker.current?.showPicker?.()} aria-label="Pick a date">
           <strong>{relativeDay(date)}</strong>
           <span className="faint small">{formatDate(date, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+        </button>
+          <input ref={picker} className="food-date-input" type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)} tabIndex={-1} aria-hidden="true" />
         </div>
         <button className="btn" onClick={() => setDate(addDays(date, 1))} aria-label="Next day">
           ›
@@ -77,8 +100,8 @@ export default function DayView({ date, setDate, targets }: { date: ISODate; set
       </div>
 
       <section className="card food-totals">
-        <TotalLine label="Calories" value={totals.calories} unit="kcal" target={targets.calories} />
-        <TotalLine label="Protein" value={totals.protein} unit="g" target={targets.protein} />
+        <TotalLine label="Calories" value={totals.calories} unit="kcal" target={targets.calories} onSetTarget={onTargets} />
+        <TotalLine label="Protein" value={totals.protein} unit="g" target={targets.protein} onSetTarget={onTargets} />
       </section>
 
       {meals && meals.length === 0 && (favorites?.length ?? 0) === 0 && (
@@ -101,6 +124,7 @@ export default function DayView({ date, setDate, targets }: { date: ISODate; set
             meals={(meals ?? []).filter((m) => m.slot === s.value)}
             favorites={(favorites ?? []).filter((f) => !f.slot || f.slot === s.value).slice(0, 8)}
             suggestions={suggestions}
+            recents={recentBySlot.get(s.value) ?? []}
             hasYesterday={(prevMeals ?? []).some((m) => m.slot === s.value)}
             listId={LIST_ID}
           />

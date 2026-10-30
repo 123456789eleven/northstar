@@ -111,3 +111,6 @@ export const pct = (n: number) => `${Math.round(n * 100)}%`
 
 export const compactMoney = (n: number) =>
   n.toLocaleString(undefined, { style: 'currency', currency: 'USD', notation: Math.abs(n) >= 10000 ? 'compact' : 'standard', maximumFractionDigits: 0 })
+
+/** Always two decimals, so amounts in a column line up ($1,380.00, not $1,380). */
+export const moneyExact = (n: number) => n.toLocaleString(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 })

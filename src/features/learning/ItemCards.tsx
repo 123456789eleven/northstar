@@ -1,7 +1,8 @@
 import { useState, type CSSProperties } from 'react'
 import { db, type LearningItem } from '../../db'
 import { formatDate } from '../../lib/dates'
-import { addSession, completeItem, fmtMinutes, KIND_LABEL, startItem } from './learningData'
+import { useToast } from '../../components/toastContext'
+import { addSession, undoLast, completeItem, fmtMinutes, KIND_LABEL, startItem } from './learningData'
 
 function Meta({ item, goalTitle }: { item: LearningItem; goalTitle?: string }) {
   return (
@@ -26,6 +27,11 @@ export function ActiveCard({ item, weekMinutes, goalTitle, onEdit }: { item: Lea
     setDraft(null)
   }
   const id = item.id!
+  const toast = useToast()
+  const log = async (m: number) => {
+    await addSession(id, m)
+    toast({ message: `Logged ${m}m on ${item.title}`, undo: () => undoLast(id, m) })
+  }
   return (
     <section className="card learn-card">
       <div className="row-between learn-card-head">
@@ -38,7 +44,7 @@ export function ActiveCard({ item, weekMinutes, goalTitle, onEdit }: { item: Lea
 
       <div className="learn-progress">
         <div className="row-between small">
-          <span className="muted">Progress</span>
+          <span className="muted">{weekMinutes ? `${fmtMinutes(weekMinutes)} this week` : 'Nothing this week'}</span>
           <span className="mono">{value}%</span>
         </div>
         <input
@@ -57,19 +63,18 @@ export function ActiveCard({ item, weekMinutes, goalTitle, onEdit }: { item: Lea
         />
       </div>
 
-      <div className="row-between wrap learn-actions">
+      <div className="row wrap learn-actions">
         <div className="row learn-quick" role="group" aria-label="Log study time today">
           {[15, 30, 60].map((m) => (
-            <button key={m} className="btn btn-sm" onClick={() => addSession(id, m)}>
+            <button key={m} className="btn btn-sm" onClick={() => void log(m)}>
               +{m}m
             </button>
           ))}
         </div>
-        <span className="small muted mono">{weekMinutes ? `${fmtMinutes(weekMinutes)} this week` : 'Nothing this week'}</span>
+        <button className="btn btn-ghost btn-sm" onClick={() => completeItem(item)}>
+          {item.kind === 'certification' ? 'Mark earned' : 'Mark complete'}
+        </button>
       </div>
-      <button className="btn btn-sm learn-done" onClick={() => completeItem(item)}>
-        {item.kind === 'certification' ? 'Mark earned' : 'Mark complete'}
-      </button>
     </section>
   )
 }

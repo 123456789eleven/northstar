@@ -2,7 +2,10 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, getSetting, setSetting } from '../../db'
 import { Card, Field, Modal } from '../../components/ui'
+import { demoCounts, removeDemo } from '../../lib/demo'
+import { loadDemoWithConfirm } from '../onboarding/demoActions'
 import { BACKUP_LAST_KEY, BACKUP_REMIND_DAYS, eraseAll, exportBackup, importBackup, parseBackup, type ParsedBackup } from '../../lib/backup'
+import * as sync from '../../sync/manager'
 import { eraseLocalWithoutSync, restoreWithoutSync } from '../../sync/manager'
 
 const TABLE_LABEL: Record<string, string> = {
@@ -40,14 +43,14 @@ export function ProfileSection() {
   }
 
   return (
-    <Card title="Profile">
+    <Card title="Preferences">
       <form className="set-profile-row" onSubmit={(e) => { e.preventDefault(); void save() }}>
-        <Field label="Display name">
+        <Field label="Display name (used for the greeting on Today)">
           <input className="input" value={value} placeholder="What should Northstar call you?" onChange={(e) => setName(e.target.value)} maxLength={60} />
         </Field>
         <button className="btn" type="submit" disabled={!dirty}>Save</button>
       </form>
-      <p className="set-text tiny faint" style={{ marginTop: 8 }}>{saved ? 'Saved.' : 'Used for the greeting on Today.'}</p>
+      <p className="set-text tiny faint" style={{ marginTop: 8 }} role="status">{saved ? 'Saved.' : 'Northstar is dark only and has no other display options. The name stays on this device unless you turn on Sync.'}</p>
     </Card>
   )
 }
@@ -109,7 +112,7 @@ export function BackupSection() {
   }
 
   return (
-    <Card title="Backup">
+    <Card title="Backup & restore">
       {overdue && (
         <div className="set-notice" style={{ marginBottom: 14 }}>
           <span>{ageDays === null ? 'You have never made a backup.' : `Last backup was ${ageDays} days ago.`}</span>
@@ -117,8 +120,8 @@ export function BackupSection() {
         </div>
       )}
       <p className="set-text">
-        A backup is a single JSON file with everything in Northstar. Save it somewhere safe (a USB drive, your own cloud folder).
-        To move to another device or browser, export here and import there.
+        A backup is a single JSON file with everything in Northstar, saved by your browser to your own device. Keep a copy somewhere safe (a USB drive,
+        your own cloud folder). To move to another device or browser, export here and import there. Importing replaces what is in this browser.
       </p>
       <dl className="set-kv">
         <dt>Last backup</dt>
@@ -156,6 +159,14 @@ export function BackupSection() {
 }
 
 export function StorageSection() {
+  const demo = useLiveQuery(async () => ({ v: await demoCounts() }), [])
+  const rows = useLiveQuery(async () => {
+    let n = 0
+    for (const t of db.tables) n += await t.count()
+    return n
+  }, [])
+  const [demoBusy, setDemoBusy] = useState(false)
+  const [demoMsg, setDemoMsg] = useState('')
   const [persisted, setPersisted] = useState<boolean | null>(null)
   const [est, setEst] = useState<{ usage?: number; quota?: number } | null>(null)
   const [msg, setMsg] = useState('')
@@ -187,7 +198,7 @@ export function StorageSection() {
   }
 
   return (
-    <Card title="Storage">
+    <Card title="Data on this device">
       <p className="set-text">
         Your data lives in this browser, on this device. Unless you turn on Sync, it is not copied anywhere. Clearing site data, uninstalling
         the browser, or using a private window will remove it. Backups (and, if you choose, encrypted sync) are how you protect it or move it.
@@ -195,6 +206,8 @@ export function StorageSection() {
       {supported ? (
         <>
           <dl className="set-kv">
+            <dt>Rows stored</dt>
+            <dd>{rows == null ? '—' : rows.toLocaleString()}</dd>
             <dt>Protected from cleanup</dt>
             <dd>{persisted === null ? 'Unknown' : persisted ? <span className="good">Yes</span> : 'No'}</dd>
             <dt>Used</dt>
@@ -211,20 +224,71 @@ export function StorageSection() {
       ) : (
         <p className="set-text small">This browser does not report storage details.</p>
       )}
+      {demo && (
+        <div className="set-sub">
+          <div className="row-between wrap">
+            <p className="set-text" style={{ margin: 0 }}>
+              {demo.v
+                ? `Sample data is loaded (${demo.v.rows.toLocaleString()} rows). You can remove it under Danger zone.`
+                : 'Demo data fills the app with a fictional three months so you can see how it works. Removable at any time.'}
+            </p>
+            {!demo.v && (
+              <button className="btn" disabled={demoBusy} onClick={() => { setDemoBusy(true); void loadDemoWithConfirm().then((r) => setDemoMsg(r === 'loaded' ? 'Demo data loaded.' : '')).finally(() => setDemoBusy(false)) }}>Load demo data</button>
+            )}
+          </div>
+          <p className="set-text tiny faint" style={{ marginTop: 8 }}>Demo data stays on this device and never syncs, even if sync is on.</p>
+          {demoMsg && <p className="set-ok" role="status">{demoMsg}</p>}
+        </div>
+      )}
     </Card>
+  )
+}
+
+export function StatusStrip() {
+  const syncStatus = useLiveQuery(() => getSetting<sync.SyncStatus>(sync.STATUS_KEY, { state: 'off', lastSyncedAt: null, pending: 0 }), [])
+  const syncOn = useLiveQuery(() => getSetting<boolean>(sync.ENABLED_KEY, false), [])
+  const lastBackup = useLiveQuery(async () => {
+    const at = await getSetting<string | null>(BACKUP_LAST_KEY, null)
+    return { at, ageDays: at ? Math.floor((Date.now() - new Date(at).getTime()) / 86_400_000) : null }
+  }, [])
+  const demo = useLiveQuery(async () => ({ v: await demoCounts() }), [])
+  if (!syncStatus || !lastBackup || !demo) return <div className="set-status" aria-hidden style={{ minHeight: 64 }} />
+  const ageDays = lastBackup.ageDays
+  const stale = ageDays === null || ageDays > BACKUP_REMIND_DAYS
+  const syncLabel = !syncOn || syncStatus.state === 'off' ? 'Off' : ({ locked: 'Locked', syncing: 'Syncing', 'up-to-date': 'On, up to date', offline: 'On, offline', error: 'Error' } as Record<string, string>)[syncStatus.state] ?? 'On'
+  return (
+    <dl className="set-status" aria-label="Status">
+      <div>
+        <dt>Sync</dt>
+        <dd className={syncStatus.state === 'error' ? 'warn' : undefined}>{syncLabel}</dd>
+        <span className="set-status-note">{syncOn && syncStatus.lastSyncedAt ? `Last ${fmtWhen(syncStatus.lastSyncedAt)}` : 'Nothing leaves this device'}</span>
+      </div>
+      <div>
+        <dt>Last backup</dt>
+        <dd className={stale ? 'warn' : undefined}>{lastBackup.at ? fmtWhen(lastBackup.at) : 'Never'}</dd>
+        <span className="set-status-note">{ageDays === null ? 'Export one under Backup' : ageDays === 0 ? 'Today' : `${ageDays} ${ageDays === 1 ? 'day' : 'days'} ago`}</span>
+      </div>
+      <div>
+        <dt>Demo data</dt>
+        <dd>{demo.v ? 'Present' : 'None'}</dd>
+        <span className="set-status-note">{demo.v ? `${demo.v.rows.toLocaleString()} sample rows` : 'Only your own data'}</span>
+      </div>
+    </dl>
   )
 }
 
 export function DangerSection() {
   const [open, setOpen] = useState(false)
+  const [removeOpen, setRemoveOpen] = useState(false)
   const [typed, setTyped] = useState('')
   const [busy, setBusy] = useState(false)
-  const [done, setDone] = useState(false)
+  const [msg, setMsg] = useState('')
   const counts = useLiveQuery(async () => {
     let n = 0
     for (const t of db.tables) n += await t.count()
     return n
   }, [])
+  const demo = useLiveQuery(async () => ({ v: await demoCounts() }), [])
 
   async function erase() {
     setBusy(true)
@@ -233,16 +297,42 @@ export function DangerSection() {
     setBusy(false)
     setOpen(false)
     setTyped('')
-    setDone(true)
+    setMsg('All data erased.')
+  }
+
+  async function dropDemo() {
+    setBusy(true)
+    try {
+      setMsg(`Removed ${await removeDemo()} demo rows. Your own data was not touched.`)
+      setRemoveOpen(false)
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
     <Card title="Danger zone" className="set-danger">
-      <div className="row-between wrap">
-        <p className="set-text" style={{ margin: 0 }}>Permanently delete everything stored in this browser{counts ? ` (${counts.toLocaleString()} rows)` : ''}.</p>
-        <button className="btn btn-danger" onClick={() => { setOpen(true); setDone(false) }}>Erase all data…</button>
+      <p className="set-text small">These actions change data on this device. Each one asks you to confirm first.</p>
+      {demo?.v && (
+        <div className="row-between wrap set-danger-row">
+          <p className="set-text" style={{ margin: 0 }}><strong>Remove demo data.</strong> Deletes only the {demo.v.rows.toLocaleString()} sample rows. Your own entries stay.</p>
+          <button className="btn btn-danger" onClick={() => { setRemoveOpen(true); setMsg('') }}>Remove demo data…</button>
+        </div>
+      )}
+      <div className="row-between wrap set-danger-row">
+        <p className="set-text" style={{ margin: 0 }}><strong>Erase all data.</strong> Permanently deletes everything stored in this browser{counts ? ` (${counts.toLocaleString()} rows)` : ''}, including your own entries.</p>
+        <button className="btn btn-danger" onClick={() => { setOpen(true); setMsg('') }}>Erase all data…</button>
       </div>
-      {done && <p className="set-ok" role="status">All data erased.</p>}
+      {msg && <p className="set-ok" role="status">{msg}</p>}
+      {removeOpen && (
+        <Modal title="Remove demo data" onClose={() => !busy && setRemoveOpen(false)}>
+          <p className="set-text">This deletes the {demo?.v?.rows.toLocaleString()} sample rows that were loaded for the demo. Anything you added yourself stays. It cannot be undone, but you can load the demo again later.</p>
+          <div className="row" style={{ justifyContent: 'flex-end' }}>
+            <button type="button" className="btn btn-ghost" onClick={() => setRemoveOpen(false)} disabled={busy}>Cancel</button>
+            <button type="button" className="btn btn-danger" onClick={() => void dropDemo()} disabled={busy}>{busy ? 'Removing…' : 'Remove demo data'}</button>
+          </div>
+        </Modal>
+      )}
       {open && (
         <Modal title="Erase all data" onClose={() => !busy && setOpen(false)}>
           <p className="set-text">This deletes every task, goal, transaction, meal, person, review and history entry on this device. It cannot be undone. It does not touch an encrypted cloud copy if you use Sync (delete that under Sync). Export a backup first if you might want any of it.</p>
@@ -263,7 +353,7 @@ export function DangerSection() {
 
 export function AboutSection() {
   return (
-    <Card title="About">
+    <Card title="About & privacy">
       <p className="set-text">
         Northstar is a private, local-first dashboard. With sync off (the default) nothing you enter leaves this device: no accounts, no servers,
         no analytics. If you turn on Sync, records are encrypted on this device before being sent to your Supabase project, which stores only

@@ -7,7 +7,7 @@ import { money } from '../../lib/dates'
 import { merchantLabel, UNCATEGORIZED } from './categories'
 import { CategoryBars, TrendChart } from './charts'
 import { TREND_LEGEND } from './series'
-import { monthLabel, monthRange, pct, shiftMonth, summarize, topMerchants, useMonthTx } from './model'
+import { monthLabel, monthRange, moneyExact, pct, shiftMonth, summarize, topMerchants, useMonthTx } from './model'
 
 export default function Overview({ month, goTo }: { month: string; goTo: (tab: 'transactions' | 'import' | 'budgets', category?: string) => void }) {
   const txs = useMonthTx(month)
@@ -44,6 +44,9 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
     .map((b) => ({ ...b, spent: s.byCategory.get(b.category) ?? 0 }))
     .filter((b) => b.monthlyLimit > 0 && b.spent / b.monthlyLimit > 0.9)
     .sort((a, b) => b.spent / b.monthlyLimit - a.spent / a.monthlyLimit)
+  const budgeted = budgets.filter((b) => b.monthlyLimit > 0)
+  const budgetLeft = budgeted.reduce((sum, b) => sum + b.monthlyLimit - Math.max(0, s.byCategory.get(b.category) ?? 0), 0)
+  const budgetNote = budgeted.length ? (budgetLeft >= 0 ? `${money(budgetLeft)} left in budgets` : `${money(-budgetLeft)} over budgets`) : undefined
   const uncategorized = txs.filter((t) => t.category === UNCATEGORIZED).length
 
   return (
@@ -51,7 +54,7 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
       <KpiStrip
         items={[
           { label: 'Income', value: money(s.income) },
-          { label: 'Spending', value: money(s.spending) },
+          { label: 'Spending', value: money(s.spending), note: budgetNote },
           { label: 'Net', value: <span className={s.net >= 0 ? '' : 'warn'}>{money(s.net)}</span> },
           { label: 'Savings rate', value: s.savingsRate === null ? '—' : pct(s.savingsRate), note: s.savingsRate === null ? 'No income this month' : 'Net ÷ income' },
         ]}
@@ -69,16 +72,16 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
       )}
 
       {warnings.length > 0 && (
-        <Card title="Budget warnings">
+        <Card title="Budgets near or over limit" action={<button className="btn btn-ghost btn-sm" onClick={() => goTo('budgets')}>All budgets</button>}>
           <div className="list">
             {warnings.map((w) => (
               <div key={w.category} className="list-item small">
                 <span className="grow">{w.category}</span>
                 <span className="mono muted">
-                  {money(w.spent)} / {money(w.monthlyLimit)}
+                  {moneyExact(w.spent)} of {moneyExact(w.monthlyLimit)}
                 </span>
-                <span className={`mono ${w.spent > w.monthlyLimit ? 'warn' : ''}`} style={{ minWidth: 44, textAlign: 'right' }}>
-                  {pct(w.spent / w.monthlyLimit)}
+                <span className={`mono ${w.spent > w.monthlyLimit ? 'warn' : ''}`} style={{ minWidth: 92, textAlign: 'right' }}>
+                  {w.spent > w.monthlyLimit ? `${moneyExact(w.spent - w.monthlyLimit)} over` : `${moneyExact(w.monthlyLimit - w.spent)} left`}
                 </span>
               </div>
             ))}
@@ -114,7 +117,7 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
                   {v.count} {v.count === 1 ? 'purchase' : 'purchases'}
                 </span>
                 <span className="mono" style={{ minWidth: 80, textAlign: 'right' }}>
-                  {money(v.total)}
+                  {moneyExact(v.total)}
                 </span>
               </div>
             ))}

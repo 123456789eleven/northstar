@@ -33,7 +33,12 @@
 .learn-actions { gap: 8px; }
 .learn-quick { gap: 6px; }
 .learn-quick .btn { height: 32px; min-width: 52px; }
-.learn-done { align-self: flex-start; height: 32px; }
+.learn-actions .btn-ghost { margin-left: auto; }
+.learn-week-min { flex-basis: 100%; }
+.learn-week { margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
+.learn-week-line { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.learn-target-in { width: 72px; }
+.learn-grid { gap: 12px; }
 
 .learn-row { align-items: center; }
 .learn-row .grow { display: flex; flex-direction: column; gap: 4px; }

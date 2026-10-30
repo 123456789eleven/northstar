@@ -16,6 +16,7 @@ export default function SlotCard({
   meals,
   favorites,
   suggestions,
+  recents,
   hasYesterday,
   listId,
 }: {
@@ -26,6 +27,8 @@ export default function SlotCard({
   favorites: FavoriteMeal[]
   /** name (lowercased) → last-known numbers, for prefill. */
   suggestions: Map<string, Suggestion>
+  /** Recently logged meals for this slot that are not favorites: one-tap chips. */
+  recents: Suggestion[]
   hasYesterday: boolean
   /** id of the shared recent-names datalist */
   listId: string
@@ -90,12 +93,18 @@ export default function SlotCard({
         </div>
       )}
 
-      {favorites.length > 0 && (
-        <div className="food-favs" aria-label={`Favorites for ${label}`}>
+      {(favorites.length > 0 || recents.length > 0) && (
+        <div className="food-favs" aria-label={`Favorites and recent for ${label}`}>
           {favorites.map((f) => (
             <button key={f.id} className="food-fav" onClick={() => logFavorite(f, date, slot)} title={`Log ${f.name}`}>
               <span>+ {f.name}</span>
               {f.calories != null && <span className="faint mono">{f.calories}</span>}
+            </button>
+          ))}
+          {recents.map((r) => (
+            <button key={r.name} className="food-fav food-recent" onClick={() => void addMeal({ date, slot, name: r.name, calories: r.calories, protein: r.protein })} title={`Log ${r.name} again`}>
+              <span>+ {r.name}</span>
+              {r.calories != null && <span className="faint mono">{r.calories}</span>}
             </button>
           ))}
         </div>
@@ -111,7 +120,7 @@ export default function SlotCard({
         <input className="input food-add-name" placeholder={`Add to ${label.toLowerCase()}…`} value={name} onChange={(e) => onName(e.target.value)} list={listId} aria-label="Meal name" />
         <input className="input food-add-num" inputMode="numeric" placeholder="kcal" value={kcal} onChange={(e) => setKcal(e.target.value)} aria-label="Calories" />
         <input className="input food-add-num" inputMode="numeric" placeholder="prot g" value={protein} onChange={(e) => setProtein(e.target.value)} aria-label="Protein grams" />
-        <label className="food-fav-toggle small muted" title="Save as favorite">
+        <label className="food-fav-toggle small muted" title="Save as a favorite chip for this slot">
           <input type="checkbox" className="check" checked={fav} onChange={(e) => setFav(e.target.checked)} />
           Fav
         </label>

@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { Card, PageHeader } from '../components/ui'
-import KpiStrip from '../components/KpiStrip'
 import { addDays, formatDate, parseISODate, startOfWeek, today } from '../lib/dates'
-import { avgRating, reviewStreak } from '../features/review/summary'
+import { avgRating, reviewStreak, type LockableReview } from '../features/review/summary'
 import { Digest, ReviewForm } from '../features/review/ReviewParts'
 import { RatingsTrend } from '../features/review/RatingsTrend'
 import { InsightsWeek } from '../features/insights/InsightsCard'
@@ -37,6 +36,7 @@ export default function Review() {
   const dow = parseISODate(today()).getDay() // 0 Sun … 6 Sat
   const have = new Set((reviews ?? []).map((r) => r.weekOf))
   const suggestLast = reviews !== undefined && (dow === 1 || dow === 2) && weekOf === thisWeek && !have.has(lastWeek)
+  const planned = reviews?.find((r) => r.weekOf === addDays(weekOf, -7))?.focusNext || undefined
   const streak = reviews ? reviewStreak(reviews) : 0
 
   const sub = reviews === undefined ? '' : reviews.length === 0
@@ -54,32 +54,21 @@ export default function Review() {
         </div>
       )}
 
-      {reviews !== undefined && (
-        <KpiStrip
-          items={[
-            { label: 'Review streak', value: streak, note: streak === 1 ? 'week' : 'weeks' },
-            { label: 'Reviews', value: reviews.length, note: 'in total' },
-            { label: 'This week', value: have.has(thisWeek) ? 'Done' : 'Open', note: weekRange(thisWeek) },
-          ]}
-        />
-      )}
-
-      <InsightsWeek />
-
       <div className="rv-weeknav">
         <button className="btn" aria-label="Previous week" onClick={() => setWeekOf(addDays(weekOf, -7))}><Chevron dir="l" /></button>
         <button className="btn" aria-label="Next week" disabled={weekOf >= thisWeek} onClick={() => setWeekOf(addDays(weekOf, 7))}><Chevron dir="r" /></button>
         <span className="rv-week-label">
           {weekOf === thisWeek ? 'This week' : weekOf === lastWeek ? 'Last week' : 'Week of'} · {weekRange(weekOf)}
         </span>
-        <span className={current ? 'rv-week-state is-done' : 'rv-week-state'}>{current ? 'Reviewed' : current === null ? 'Not reviewed yet' : ''}</span>
+        <span className={current ? 'rv-week-state is-done' : 'rv-week-state'}>{current ? ((current as LockableReview).lockedAt ? 'Reviewed and locked' : 'Reviewed') : current === null ? 'Not reviewed yet' : ''}</span>
         {weekOf !== thisWeek && <button className="btn btn-ghost btn-sm" style={{ width: 'auto', padding: '0 10px' }} onClick={() => setWeekOf(thisWeek)}>Back to this week</button>}
       </div>
 
       <div className="rv-layout">
         <div className="stack" style={{ gap: 16 }}>
           <Digest weekOf={weekOf} />
-          {current !== undefined && <ReviewForm key={weekOf} weekOf={weekOf} existing={current} />}
+          {weekOf === thisWeek && <InsightsWeek />}
+          {current !== undefined && <ReviewForm key={weekOf} weekOf={weekOf} existing={current} planned={planned} />}
         </div>
         <div className="stack" style={{ gap: 16 }}>
           <Card title="Ratings over time">

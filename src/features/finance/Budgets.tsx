@@ -4,7 +4,8 @@ import { Card, Empty, Progress } from '../../components/ui'
 import { db, logEvent } from '../../db'
 import { money } from '../../lib/dates'
 import { EXPENSE_CATEGORIES } from './categories'
-import { monthLabel, monthRange, pct, shiftMonth, summarize, useMonthTx } from './model'
+import { monthLabel, monthRange, moneyExact, shiftMonth, summarize, useMonthTx } from './model'
+import { budgetStatus } from './quickAdd'
 
 async function saveBudget(category: string, limit: number) {
   const before = await db.budgets.count()
@@ -49,10 +50,9 @@ export default function Budgets({ month }: { month: string }) {
           <div className="row-between" style={{ alignItems: 'baseline' }}>
             <span className="stat-value" style={{ marginTop: 0 }}>
               {money(totalSpent)}
+              
             </span>
-            <span className="muted mono small">
-              of {money(totalLimit)} · {totalLimit > 0 ? pct(totalSpent / totalLimit) : '—'}
-            </span>
+            <LeftLabel spent={totalSpent} limit={totalLimit} />
           </div>
           <div style={{ marginTop: 10 }}>
             <BudgetBar spent={totalSpent} limit={totalLimit} />
@@ -94,6 +94,19 @@ export default function Budgets({ month }: { month: string }) {
   )
 }
 
+/** "$120.00 left" / "$30.00 over", with the spent-of-limit pair beside it. */
+function LeftLabel({ spent, limit }: { spent: number; limit: number }) {
+  const st = budgetStatus(spent, limit)
+  return (
+    <span className="mono small fin-left">
+      <span className="muted">{moneyExact(spent)} of {moneyExact(limit)}</span>
+      <span className={st.state === 'over' ? 'warn' : st.state === 'near' ? 'fin-near-text' : ''}>
+        {st.left >= 0 ? `${moneyExact(st.left)} left` : `${moneyExact(-st.left)} over`}
+      </span>
+    </span>
+  )
+}
+
 function BudgetBar({ spent, limit }: { spent: number; limit: number }) {
   const ratio = limit > 0 ? spent / limit : 0
   return (
@@ -121,11 +134,11 @@ function BudgetRow({ category, limit, spent, lastMonth }: { category: string; li
       <div className="grow">
         <div className="row-between small">
           <span>{category}</span>
-          <span className="mono muted">
-            {money(spent)}
-            {limit ? ` / ${money(limit)}` : ''}
-            {limit ? <span className={spent > limit ? 'warn' : ''}> · {pct(spent / limit)}</span> : null}
-          </span>
+          {limit ? (
+            <LeftLabel spent={spent} limit={limit} />
+          ) : (
+            <span className="mono muted">{moneyExact(spent)}</span>
+          )}
         </div>
         {limit ? (
           <div style={{ marginTop: 6 }}>

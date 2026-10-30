@@ -47,3 +47,15 @@
 .rv-trend-head { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-2); }
 .rv-trend-head .mono { color: var(--ink); }
 .rv-trend-range { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--line); }
+
+.rv-sub { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.rv-sub-title { font-size: 12px; color: var(--ink-2); margin-bottom: 6px; }
+.rv-sub .rv-milestones { margin: 0; padding: 0; border: 0; }
+.rv-slipped { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.rv-slip-due { display: inline-block; min-width: 56px; color: var(--ink-3); font-size: 13px; font-variant-numeric: tabular-nums; }
+.rv-planned { margin: 0; padding: 8px 12px; border-left: 3px solid var(--line); background: var(--surface-2); border-radius: var(--radius-sm); white-space: pre-wrap; }
+.rv-save { flex-wrap: wrap; }
+.rv-save-state { margin-right: auto; }
+.rv-rate-btns .btn:disabled { opacity: 0.55; }
+.rv-weeknav { padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+@media (max-width: 520px) { .rv-save .btn { flex: 1; } .rv-rate-btns .btn { width: 38px; } }

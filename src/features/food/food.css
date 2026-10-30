@@ -56,3 +56,19 @@
 }
 .food-lookup { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
 .food-lookup-item { display: flex; gap: 10px; width: 100%; justify-content: space-between; min-height: 32px; }
+
+.food-stepper-pick { position: relative; }
+.food-stepper-label { background: none; border: 0; color: inherit; font: inherit; cursor: pointer; padding: 2px 8px; border-radius: var(--radius-sm); min-height: 36px; justify-content: center; }
+.food-stepper-label:hover { background: var(--surface-2); }
+.food-date-input { position: absolute; left: 0; bottom: 0; width: 100%; height: 1px; opacity: 0; pointer-events: none; }
+.food-set-target { align-self: flex-start; padding-left: 0; }
+.food-recent { background: none; color: var(--ink-2); }
+
+/* Phone: name on its own line, then kcal / protein / Fav / Add in one row. */
+@media (max-width: 620px) {
+  .food-add { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto; gap: 6px; }
+  .food-add .input { min-width: 0; }
+  .food-slot { min-width: 0; }
+  .food-add-name { grid-column: 1 / -1; flex: none; }
+  .food-add-num { width: auto; flex: none; }
+}
