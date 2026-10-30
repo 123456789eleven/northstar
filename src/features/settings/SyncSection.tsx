@@ -16,6 +16,7 @@ function fmtWhen(iso: string) {
   return new Date(iso).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
 }
 
+const MIN_ACCOUNT_PASSWORD = 8
 const errMsg = (e: unknown) => (e instanceof Error ? e.message : 'Something went wrong.')
 
 type Step = 'idle' | 'config' | 'account' | 'checking' | 'create' | 'code' | 'unlock' | 'on'
@@ -137,13 +138,14 @@ function AccountStep({ busy, run, next }: StepProps & { next: () => Promise<void
   const [note, setNote] = useState('')
   const submit = (kind: 'in' | 'up') => (e?: FormEvent) => {
     e?.preventDefault()
+    setNote('')
     void run(async () => {
       if (kind === 'in') {
         await sync.signIn(email, pw)
         await next()
       } else {
         const r = await sync.signUp(email, pw)
-        if (r.needsConfirm) setNote('Check your email to confirm the account, then sign in here.')
+        if (r.needsConfirm) setNote('Check your email to confirm, then sign in.')
         else await next()
       }
     })
@@ -154,10 +156,14 @@ function AccountStep({ busy, run, next }: StepProps & { next: () => Promise<void
         Your account password signs you in to Supabase. It is separate from the encryption passphrase you set next, which never leaves this device.
       </p>
       <Field label="Email"><input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" /></Field>
-      <Field label="Account password"><input className="input" type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="current-password" minLength={8} /></Field>
+      <Field label="Account password"><input className="input" type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="current-password" minLength={MIN_ACCOUNT_PASSWORD} /></Field>
+      <p className="set-text small faint">
+        {pw.length < MIN_ACCOUNT_PASSWORD ? `Password: at least ${MIN_ACCOUNT_PASSWORD} characters (${MIN_ACCOUNT_PASSWORD - pw.length} more). ` : ''}
+        Supabase may require a stronger one and will say so if it does.
+      </p>
       <div className="row wrap">
-        <button className="btn btn-primary" type="submit" disabled={busy || !email || pw.length < 8}>Sign in</button>
-        <button className="btn" type="button" onClick={() => submit('up')()} disabled={busy || !email || pw.length < 8}>Create account</button>
+        <button className="btn btn-primary" type="submit" disabled={busy || !email || pw.length < MIN_ACCOUNT_PASSWORD}>Sign in</button>
+        <button className="btn" type="button" onClick={() => submit('up')()} disabled={busy || !email || pw.length < MIN_ACCOUNT_PASSWORD}>Create account</button>
       </div>
       {note && <p className="set-ok" role="status">{note}</p>}
     </form>

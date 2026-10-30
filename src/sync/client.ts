@@ -45,8 +45,31 @@ export class OfflineError extends Error {
 
 export function envConfig(): SyncConfig | null {
   const url = import.meta.env?.VITE_SUPABASE_URL as string | undefined
-  const anonKey = import.meta.env?.VITE_SUPABASE_ANON_KEY as string | undefined
+  // New Supabase projects call this the "publishable" key; both names are accepted.
+  const anonKey = (import.meta.env?.VITE_SUPABASE_ANON_KEY || import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY) as string | undefined
   return url && anonKey ? { url, anonKey } : null
+}
+
+/** Where the email-confirmation link should land: this app, not the Supabase project's default Site URL. */
+export function appRedirectUrl(loc: { origin: string; pathname: string } | undefined = typeof location === 'undefined' ? undefined : location): string | undefined {
+  if (!loc || !/^https?:\/\//.test(loc.origin)) return undefined
+  return loc.origin + loc.pathname
+}
+
+/** Turn a sign-up response into what the person should see. */
+export function signUpOutcome(data: { session: unknown; user: { identities?: unknown[] | null } | null }): 'signed-in' | 'confirm' | 'exists' {
+  if (data.session) return 'signed-in'
+  // Supabase hides whether an address is taken: it returns a user with no identities and sends no email.
+  if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) return 'exists'
+  return 'confirm'
+}
+
+/** Plain-language version of the auth errors people actually hit. */
+export function authErrorMessage(message: string): string {
+  if (/rate limit|too many/i.test(message)) return 'Supabase is limiting sign-up emails right now. Wait a few minutes and try again, or sign in if you already confirmed.'
+  if (/not confirmed/i.test(message)) return 'This email is not confirmed yet. Open the confirmation email, then sign in.'
+  if (/already (registered|been registered)/i.test(message)) return 'That email already has an account. Use Sign in.'
+  return message
 }
 
 /** Only https://<ref>.supabase.co is allowed (the CSP allows nothing else anyway). */

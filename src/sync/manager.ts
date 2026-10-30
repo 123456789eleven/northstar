@@ -2,7 +2,7 @@
 // Nothing here runs unless the person turns sync on in Settings.
 import Dexie from 'dexie'
 import { db, getSetting, setSetting } from '../db'
-import { envConfig, getSupabase, OfflineError, supabaseBackend, validateConfig, type SyncBackend, type SyncConfig } from './client'
+import { appRedirectUrl, authErrorMessage, envConfig, getSupabase, OfflineError, signUpOutcome, supabaseBackend, validateConfig, type SyncBackend, type SyncConfig } from './client'
 import {
   createVault, DecryptError, resetPassphrase, unlockWithPassphrase, unlockWithRecoveryCode, type CreatedVault, type VaultKeys,
 } from './crypto'
@@ -82,16 +82,18 @@ export async function refreshSession() {
 
 export async function signUp(email: string, password: string) {
   const sb = await client()
-  const { data, error } = await sb.auth.signUp({ email, password })
-  if (error) throw new Error(error.message)
+  const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: appRedirectUrl() } })
+  if (error) throw new Error(authErrorMessage(error.message))
+  const outcome = signUpOutcome(data)
+  if (outcome === 'exists') throw new Error(authErrorMessage('User already registered'))
   await refreshSession()
-  return { needsConfirm: !data.session }
+  return { needsConfirm: outcome === 'confirm' }
 }
 
 export async function signIn(email: string, password: string) {
   const sb = await client()
   const { error } = await sb.auth.signInWithPassword({ email, password })
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(authErrorMessage(error.message))
   await refreshSession()
 }
 
