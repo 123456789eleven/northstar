@@ -1,5 +1,5 @@
 /* Habits */
-.habit-list { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.habit-list { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 900px) { .habit-list { grid-template-columns: minmax(0, 1fr); } }
 .habit { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .habit.archived { opacity: 0.6; }
@@ -31,7 +31,7 @@
   background: var(--surface-2); color: var(--ink-2); font: inherit; font-size: 14px; cursor: pointer;
 }
 .seg button:hover { border-color: var(--ink-3); }
-.seg button[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.seg button[aria-pressed='true'] { background: var(--surface-3); border-color: var(--line-strong); color: var(--ink); }
 
 .habit-tile-row { display: flex; align-items: center; gap: 10px; min-height: 36px; }
 .habit-tile-row .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -1,12 +1,12 @@
 // Small multiples: one single-series line per area (1–5 rating), shared x (weeks).
-// Single accent hue in every panel — the panel title names the series, so no legend.
+// Single data hue (slot 1, blue) in every panel — the panel title names the series, so no legend.
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { AREAS, type Area, type Review } from '../../db'
 import { AREA_LABEL } from '../../components/ui'
 import { formatDate } from '../../lib/dates'
 
 // Mirrors index.css tokens (SVG presentation attributes can't read CSS variables reliably).
-const C = { accent: '#e3b261', grid: '#262a33', axis: '#6f6d68', surface: '#15171c', ink: '#eceae4', ink2: '#a6a49d', line: '#262a33', surface2: '#1c1f26' }
+const C = { accent: '#3987e5', grid: '#262a33', axis: '#a6a49d', surface: '#15171c', ink: '#eceae4', ink2: '#a6a49d', line: '#262a33', surface2: '#1c1f26' }
 
 interface TipProps { active?: boolean; payload?: { payload: { weekOf: string; v?: number } }[]; area: Area }
 function Tip({ active, payload, area }: TipProps) {

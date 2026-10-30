@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Card, Empty, Stat } from '../../components/ui'
+import { Card, Empty } from '../../components/ui'
+import KpiStrip from '../../components/KpiStrip'
 import { db, type LearningItem } from '../../db'
 import { addDays, daysBetween, formatDate, relativeDay, startOfWeek, today } from '../../lib/dates'
 import MiniBars, { type BarDatum } from '../food/MiniBars'
@@ -43,11 +44,13 @@ export default function LogView({ items }: { items: LearningItem[] }) {
 
   return (
     <div className="stack">
-      <div className="ns-stats">
-        <Stat label="Current streak" value={streak} note={streak === 1 ? 'day with study time' : 'days in a row with study time'} />
-        <Stat label="This week" value={fmtMinutes(weekTotal)} note="since Monday" />
-        <Stat label="Weekly average" value={fmtMinutes(avg)} note="previous 11 weeks" />
-      </div>
+      <KpiStrip
+        items={[
+          { label: 'Current streak', value: streak, note: streak === 1 ? 'day with study time' : 'days in a row with study time' },
+          { label: 'This week', value: fmtMinutes(weekTotal), note: 'since Monday' },
+          { label: 'Weekly average', value: fmtMinutes(avg), note: 'previous 11 weeks' },
+        ]}
+      />
 
       <MiniBars title="Minutes per week · last 12 weeks" data={weeks} unit="min" height={200} />
 

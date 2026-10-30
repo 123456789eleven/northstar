@@ -1,6 +1,7 @@
-import type { Task } from '../../db'
+import { db, type Task } from '../../db'
 import { relativeDay, today } from '../../lib/dates'
-import { isPinned, toggleDone, togglePin } from './taskActions'
+import { useToast } from '../../components/toastContext'
+import { isPinned, reopenTask, completeTask, togglePin } from './taskActions'
 
 export function PinIcon() {
   return (
@@ -19,25 +20,36 @@ export function TaskRow({
   onEdit,
   showPin = true,
   onPinFull,
+  selected = false,
 }: {
   task: Task
   goalTitle?: string
   onEdit?: (t: Task) => void
   showPin?: boolean
   onPinFull?: () => void
+  selected?: boolean
 }) {
+  const toast = useToast()
   const done = task.status === 'done'
   const overdue = !done && !!task.due && task.due < today()
   const pinned = isPinned(task)
+  async function toggle() {
+    if (done) {
+      await reopenTask(task)
+      return
+    }
+    await completeTask(task)
+    toast({ message: `Completed "${task.title}"`, undo: async () => { const fresh = await db.tasks.get(task.id!); if (fresh) await reopenTask(fresh) } })
+  }
   return (
-    <div className={`task-row ${done ? 'done' : ''}`}>
+    <div className={`task-row ${done ? 'done' : ''} ${selected ? 'selected' : ''}`} data-task-id={task.id}>
       <span className={`task-flag ${task.priority === 1 && !done ? 'p1' : ''}`} aria-hidden />
       <label className="check-hit">
         <input
           type="checkbox"
           className="check"
           checked={done}
-          onChange={() => void toggleDone(task)}
+          onChange={() => void toggle()}
           aria-label={done ? `Reopen ${task.title}` : `Complete ${task.title}`}
         />
       </label>

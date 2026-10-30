@@ -5,7 +5,7 @@ import type { MoodPoint } from './stats'
 
 const SERIES = '#3987e5'
 const GRID = '#262a33'
-const AXIS = '#6f6d68'
+const AXIS = '#a6a49d'
 
 export function MoodChart({ data }: { data: MoodPoint[] }) {
   const fmt = (d: string) => formatDate(d, { month: 'short', day: 'numeric' })

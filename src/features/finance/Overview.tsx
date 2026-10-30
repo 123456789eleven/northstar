@@ -1,9 +1,11 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Card, Empty, Stat } from '../../components/ui'
+import { Card, Empty } from '../../components/ui'
+import ChartFrame from '../../components/ChartFrame'
+import KpiStrip from '../../components/KpiStrip'
 import { db } from '../../db'
 import { money } from '../../lib/dates'
 import { merchantLabel, UNCATEGORIZED } from './categories'
-import { CategoryBars, TrendChart } from './charts'
+import { CategoryBars, TREND_LEGEND, TrendChart } from './charts'
 import { monthLabel, monthRange, pct, shiftMonth, summarize, topMerchants, useMonthTx } from './model'
 
 export default function Overview({ month, goTo }: { month: string; goTo: (tab: 'transactions' | 'import' | 'budgets', category?: string) => void }) {
@@ -45,12 +47,14 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
 
   return (
     <div className="stack" style={{ gap: 16 }}>
-      <div className="grid grid-4">
-        <Stat label="Income" value={money(s.income)} />
-        <Stat label="Spending" value={money(s.spending)} />
-        <Stat label="Net" value={<span className={s.net >= 0 ? '' : 'warn'}>{money(s.net)}</span>} />
-        <Stat label="Savings rate" value={s.savingsRate === null ? '—' : pct(s.savingsRate)} note={s.savingsRate === null ? 'No income recorded this month' : 'Net ÷ income'} />
-      </div>
+      <KpiStrip
+        items={[
+          { label: 'Income', value: money(s.income) },
+          { label: 'Spending', value: money(s.spending) },
+          { label: 'Net', value: <span className={s.net >= 0 ? '' : 'warn'}>{money(s.net)}</span> },
+          { label: 'Savings rate', value: s.savingsRate === null ? '—' : pct(s.savingsRate), note: s.savingsRate === null ? 'No income this month' : 'Net ÷ income' },
+        ]}
+      />
 
       {uncategorized > 0 && (
         <div className="card row-between wrap">
@@ -82,12 +86,21 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
       )}
 
       <div className="grid grid-2">
-        <Card title={`Spending by category · ${monthLabel(month, true)}`}>
-          {cats.length ? <CategoryBars rows={cats} onPick={(c) => goTo('transactions', c)} /> : <Empty>No spending recorded in {monthLabel(month)}.</Empty>}
-        </Card>
-        <Card title="Income vs spending · 6 months">
+        <ChartFrame
+          title={`Spending by category · ${monthLabel(month, true)}`}
+          hasData={cats.length > 0}
+          table={<MoneyTable head={['Category', 'Spent']} rows={cats.map((c) => [c.category, money(c.amount)])} />}
+        >
+          <CategoryBars rows={cats} onPick={(c) => goTo('transactions', c)} />
+        </ChartFrame>
+        <ChartFrame
+          title="Income vs spending · 6 months"
+          legend={TREND_LEGEND}
+          hasData={trend.some((t) => t.income > 0 || t.spending > 0)}
+          table={<MoneyTable head={['Month', 'Income', 'Spending']} rows={trend.map((t) => [t.label, money(t.income), money(t.spending)])} />}
+        >
           <TrendChart data={trend} />
-        </Card>
+        </ChartFrame>
       </div>
 
       <Card title="Top merchants">
@@ -110,5 +123,14 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
         )}
       </Card>
     </div>
+  )
+}
+
+function MoneyTable({ head, rows }: { head: string[]; rows: string[][] }) {
+  return (
+    <table className="table">
+      <thead><tr>{head.map((h, i) => <th key={h} style={i ? { textAlign: 'right' } : undefined}>{h}</th>)}</tr></thead>
+      <tbody>{rows.map((r) => <tr key={r[0]}>{r.map((c, i) => <td key={i} className={i ? 'mono' : ''} style={i ? { textAlign: 'right' } : undefined}>{c}</td>)}</tr>)}</tbody>
+    </table>
   )
 }

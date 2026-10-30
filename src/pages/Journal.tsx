@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type JournalEntry } from '../db'
 import { Card, Empty, PageHeader } from '../components/ui'
+import ChartFrame from '../components/ChartFrame'
+import KpiStrip from '../components/KpiStrip'
 import { formatDate, today } from '../lib/dates'
 import { EntryEditor } from '../features/journal/EntryEditor'
 import { MoodChart } from '../features/journal/MoodChart'
@@ -48,6 +50,15 @@ export default function Journal() {
         sub={entries === undefined ? ' ' : stats.streak ? `${stats.streak}-day writing streak` : 'Private to this device'}
         actions={date !== t && <button className="btn" onClick={() => setDate(t)}>Back to today</button>}
       />
+      {entries !== undefined && (
+        <KpiStrip
+          items={[
+            { label: 'Writing streak', value: stats.streak, note: stats.streak === 1 ? 'day' : 'days' },
+            { label: 'Entries', value: entries.filter((e) => e.text.trim()).length },
+            { label: 'This month', value: entries.filter((e) => e.text.trim() && e.date.startsWith(t.slice(0, 7))).length },
+          ]}
+        />
+      )}
       <div className="jr-grid">
         <div className="jr-col">
           <Card title={date === t ? 'Today' : formatDate(date, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}>
@@ -77,9 +88,18 @@ export default function Journal() {
           </Card>
         </div>
         <div className="jr-col">
-          <Card title="Mood, 90 days">
-            {stats.hasMood ? <MoodChart data={stats.series} /> : <Empty>Pick a mood in today's entry and the trend starts here.</Empty>}
-          </Card>
+          <ChartFrame
+            title="Mood, 90 days"
+            hasData={stats.hasMood}
+            table={
+              <table className="table">
+                <thead><tr><th>Date</th><th style={{ textAlign: 'right' }}>Mood</th></tr></thead>
+                <tbody>{stats.series.filter((p) => p.mood != null).reverse().slice(0, 30).map((p) => <tr key={p.date}><td>{formatDate(p.date, { month: 'short', day: 'numeric' })}</td><td className="mono" style={{ textAlign: 'right' }}>{p.mood}</td></tr>)}</tbody>
+              </table>
+            }
+          >
+            <MoodChart data={stats.series} />
+          </ChartFrame>
           {stats.then.length > 0 && (
             <Card title="On this day">
               {stats.then.map((e) => (

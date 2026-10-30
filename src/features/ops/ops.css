@@ -1,6 +1,4 @@
 /* Command + Ontology pages. Dense, flat, 1px borders; amber is the only accent. */
-:root { --mono: ui-monospace, 'Cascadia Code', Consolas, monospace; }
-
 .ops-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); }
 .ops-mono { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
 
@@ -68,6 +66,40 @@
 .onto-link { display: flex; width: 100%; align-items: center; gap: 8px; min-height: 32px; padding: 0 4px; background: transparent; border: 0; border-bottom: 1px solid var(--line); color: var(--ink); cursor: pointer; text-align: left; font-size: 13px; }
 .onto-link:hover { background: var(--surface-2); }
 
+/* Command layout */
+.cmd { display: grid; grid-template-columns: 180px minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+.cmd-facets { display: flex; flex-direction: column; gap: 2px; }
+.cmd-sub { font-size: 13px; font-weight: 600; color: var(--ink-2); margin-bottom: 4px; }
+.cmd-facet { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 32px; padding: 0 8px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--ink-3); cursor: pointer; font-size: 14px; text-align: left; }
+.cmd-facet:hover { background: var(--surface-2); }
+.cmd-facet[aria-pressed='true'] { color: var(--ink); background: var(--surface-2); }
+.cmd-queue { min-width: 0; }
+.cmd-queue .ops-clip { max-width: 360px; display: block; }
+.cmd .side-panel { width: 380px; min-height: 420px; }
+.cmd-review { display: flex; flex-direction: column; gap: 12px; }
+.cmd-review-meta { display: flex; align-items: center; gap: 8px; }
+.cmd-review-title { font-size: 15px; font-weight: 600; line-height: 22px; }
+.cmd-why { margin: 0; font-size: 14px; color: var(--ink-2); }
+.cmd-review .ops-actions { margin-top: 0; }
+.cmd-review .ops-block { margin-top: 0; }
+.cmd-network { margin-top: 12px; }
+.cmd-network summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600; }
+.cmd-auto { margin-top: 12px; }
+.cmd-toggle { align-items: flex-start; padding: 6px 0; }
+.cmd-toggle input { margin-top: 2px; }
+.cmd-toggle-text { display: flex; flex-direction: column; min-width: 0; }
+@media (max-width: 1399px) {
+  .cmd { grid-template-columns: minmax(0, 1fr) auto; }
+  .cmd-facets { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .cmd-facets .cmd-sub { margin: 0 4px 0 0; }
+  .cmd-facet { border: 1px solid var(--line); }
+  .cmd .side-panel { width: 340px; }
+}
+@media (max-width: 819px) {
+  .cmd { grid-template-columns: minmax(0, 1fr); }
+  .cmd-queue .ops-clip { max-width: none; }
+}
+
 @media (max-width: 1100px) {
   .ops-grid { grid-template-columns: 180px minmax(0, 1fr); }
   .ops-grid > :nth-child(3) { grid-column: 1 / -1; }
@@ -85,3 +117,4 @@
   .ops-table .col-rule { display: none; }
   .ops-clip { max-width: 180px; }
 }
+.cmd-queue .card-flush { overflow: visible; }

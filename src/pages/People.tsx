@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Interaction, type Person } from '../db'
 import { Card, Empty, PageHeader } from '../components/ui'
+import KpiStrip from '../components/KpiStrip'
 import { daysBetween, formatDate, relativeDay, today } from '../lib/dates'
 import { KINDS, logContact, nextBirthday, sortPeople } from '../features/people/people'
 import { PersonDetail, PersonForm } from '../features/people/PersonModals'
@@ -62,6 +63,14 @@ export default function People() {
           </Empty>
         </Card>
       ) : (
+        <>
+        <KpiStrip
+          items={[
+            { label: 'People', value: sorted.length },
+            { label: 'Due for check-in', value: dueCount, delta: dueCount ? 'overdue' : undefined, deltaTone: dueCount ? 'warn' : undefined },
+            { label: 'Birthdays, 30 days', value: birthdays.length },
+          ]}
+        />
         <div className="ppl-layout">
           <Card title="Check-ins">
             <div>
@@ -95,6 +104,7 @@ export default function People() {
             )}
           </Card>
         </div>
+        </>
       )}
       {adding && <PersonForm onClose={() => setAdding(false)} />}
       {openId != null && <PersonDetail personId={openId} onClose={() => setOpenId(null)} />}

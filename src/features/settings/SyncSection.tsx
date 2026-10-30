@@ -58,32 +58,26 @@ export function SyncSection() {
   const st = status ?? { state: 'off', lastSyncedAt: null, pending: 0 }
 
   return (
-    <Card title="Sync">
+    <Card title="Sync" className="set-sync">
       <p className="set-text">
-        Optional. Keeps this device and your other devices in step through your own Supabase project. Everything is encrypted on this device
-        with a key made from your passphrase before it is sent; Supabase only ever stores unreadable ciphertext. Northstar works fully
-        offline with sync off, which is the default.
+        Optional. Keeps your devices in step through your own Supabase project. Everything is encrypted on this device with a key made from
+        your passphrase before it is sent, so Supabase only stores ciphertext. Sync is off by default and Northstar works fully offline.
       </p>
       <dl className="set-kv">
-        <dt>Status</dt>
-        <dd>
-          <span className={st.state === 'error' ? 'warn' : st.state === 'up-to-date' ? 'good' : undefined}>{STATE_LABEL[st.state]}</span>
-          {st.error ? <span className="faint"> · {st.error}</span> : null}
-        </dd>
+        <div>
+          <dt>Status</dt>
+          <dd>
+            <span className={st.state === 'error' ? 'warn' : st.state === 'up-to-date' ? 'good' : undefined}>{STATE_LABEL[st.state]}</span>
+            {st.error ? <span className="faint"> · {st.error}</span> : null}
+          </dd>
+        </div>
         {st.state !== 'off' && (
           <>
-            <dt>Last synced</dt>
-            <dd>{st.lastSyncedAt ? fmtWhen(st.lastSyncedAt) : 'Not yet'}</dd>
-            <dt>Waiting to send</dt>
-            <dd>{st.pending.toLocaleString()} {st.pending === 1 ? 'change' : 'changes'}</dd>
+            <div><dt>Last synced</dt><dd>{st.lastSyncedAt ? fmtWhen(st.lastSyncedAt) : 'Not yet'}</dd></div>
+            <div><dt>Waiting to send</dt><dd>{st.pending.toLocaleString()} {st.pending === 1 ? 'change' : 'changes'}</dd></div>
           </>
         )}
-        {live.email && (
-          <>
-            <dt>Account</dt>
-            <dd>{live.email}</dd>
-          </>
-        )}
+        {live.email && <div><dt>Account</dt><dd>{live.email}</dd></div>}
       </dl>
 
       {restored && live.unlocked && <RestoreChoice busy={busy} run={run} />}

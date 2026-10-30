@@ -6,8 +6,8 @@
 }
 .ins-list li:last-child .ins-row { border-bottom: 0; }
 .ins-row:hover .ins-text { color: var(--ink); text-decoration: underline; text-decoration-color: var(--ink-3); text-underline-offset: 3px; }
-.ins-tag { flex: 0 0 44px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
-.ins-nudge .ins-tag { color: var(--accent); }
+.ins-tag { flex: 0 0 48px; font-size: 13px; color: var(--ink-2); }
+.ins-nudge .ins-tag { color: var(--ink); font-weight: 600; }
 .ins-win .ins-tag { color: var(--good); }
 .ins-text { min-width: 0; color: var(--ink); }
 

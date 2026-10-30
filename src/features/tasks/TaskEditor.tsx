@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { db, type Goal, type Task } from '../../db'
 import { Field, Modal } from '../../components/ui'
+import { useToast } from '../../components/toastContext'
 
-export function TaskEditor({ task, goals, onClose }: { task: Task; goals: Goal[]; onClose: () => void }) {
+/** The edit form on its own: used in the Tasks side panel and inside the modal. `onClose` fires after save, cancel or delete. */
+export function TaskForm({ task, goals, onClose, onDeleted, keepOpen = false }: { task: Task; goals: Goal[]; onClose: () => void; onDeleted?: (t: Task) => void; keepOpen?: boolean }) {
+  const toast = useToast()
   const [title, setTitle] = useState(task.title)
   const [notes, setNotes] = useState(task.notes ?? '')
   const [due, setDue] = useState(task.due ?? '')
@@ -20,20 +23,21 @@ export function TaskEditor({ task, goals, onClose }: { task: Task; goals: Goal[]
       recurrence,
       goalId: goalId === '' ? undefined : goalId,
     })
-    onClose()
+    if (keepOpen) toast({ message: 'Saved' })
+    else onClose()
   }
 
   async function remove() {
     if (task.id == null) return
-    if (!confirm(`Delete "${task.title}"?`)) return
     await db.tasks.delete(task.id)
-    onClose()
+    toast({ message: `Deleted "${task.title}"`, undo: async () => { await db.tasks.put(task) } })
+    if (onDeleted) onDeleted(task)
+    else onClose()
   }
 
   const selectable = goals.filter((g) => g.status !== 'done' || g.id === task.goalId)
 
   return (
-    <Modal title="Edit task" onClose={onClose}>
       <form
         className="stack"
         onSubmit={(e) => {
@@ -42,7 +46,7 @@ export function TaskEditor({ task, goals, onClose }: { task: Task; goals: Goal[]
         }}
       >
         <Field label="Title">
-          <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
+          <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus={!keepOpen} />
         </Field>
         <Field label="Notes">
           <textarea className="textarea" value={notes} onChange={(e) => setNotes(e.target.value)} />
@@ -91,6 +95,13 @@ export function TaskEditor({ task, goals, onClose }: { task: Task; goals: Goal[]
           </div>
         </div>
       </form>
+  )
+}
+
+export function TaskEditor({ task, goals, onClose }: { task: Task; goals: Goal[]; onClose: () => void }) {
+  return (
+    <Modal title="Edit task" onClose={onClose}>
+      <TaskForm task={task} goals={goals} onClose={onClose} />
     </Modal>
   )
 }

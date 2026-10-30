@@ -4,6 +4,9 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { toISODate } from '../lib/dates'
 import { PageHeader } from '../components/ui'
+import DataTable from '../components/DataTable'
+import SidePanel from '../components/SidePanel'
+import { PHONE_QUERY, useMedia } from '../components/useMedia'
 import { REGISTRY, resolveLinks, timelineFor, TYPE_LIST, type Row, type TypeDef, type TypeKey } from '../ontology/registry'
 import '../features/ops/ops.css'
 
@@ -189,6 +192,8 @@ export default function Ontology() {
   const type = (TYPE_LIST.some((t) => t.key === params.get('t')) ? params.get('t') : 'Task') as TypeKey
   const selId = params.get('id') ? Number(params.get('id')) : null
   const [q, setQ] = useState('')
+  const phone = useMedia(PHONE_QUERY)
+  const [showModel, setShowModel] = useState(false)
   const def = REGISTRY[type]
 
   const counts = useLiveQuery(async () => Object.fromEntries(await Promise.all(TYPE_LIST.map(async (t) => [t.key, await db.table(t.table).count()] as const))), [], {} as Record<string, number>)
@@ -206,10 +211,17 @@ export default function Ontology() {
     <>
       <PageHeader title="Ontology" sub="The object types Northstar models, how they link, and what each can do. Counts are live." />
 
-      <section className="ops-panel" aria-label="Object model">
-        <div className="ops-panel-head"><span className="ops-label">Object model</span><span className="ops-label">Scroll sideways inside this box</span></div>
-        <Diagram counts={counts} active={type} onPick={(t) => { setQ(''); go(t) }} />
-      </section>
+      {phone && !showModel ? (
+        <button className="btn" onClick={() => setShowModel(true)}>View model diagram</button>
+      ) : (
+        <section className="ops-panel" aria-label="Object model">
+          <div className="ops-panel-head">
+            <span className="ops-label">Object model</span>
+            {phone ? <button className="btn btn-ghost btn-sm" onClick={() => setShowModel(false)}>Hide</button> : <span className="small faint">Scroll sideways inside this box</span>}
+          </div>
+          <Diagram counts={counts} active={type} onPick={(t) => { setQ(''); go(t) }} />
+        </section>
+      )}
 
       <div className="onto-grid" style={{ marginTop: 12 }}>
         <section className="ops-panel" aria-label="Object explorer">
@@ -222,28 +234,35 @@ export default function Ontology() {
           {shown.length === 0 ? (
             <div className="ops-panel-body" style={{ fontSize: 13, color: 'var(--ink-3)' }}>{rows ? `No ${def.label.toLowerCase()} rows match.` : 'Loading'}</div>
           ) : (
-            <div className="table-wrap" style={{ maxHeight: 440, overflowY: 'auto' }}>
-              <table className="ops-table">
-                <thead><tr><th>ID</th><th>Title</th><th>Detail</th></tr></thead>
-                <tbody>
-                  {shown.map((r) => (
-                    <tr key={r.id} tabIndex={0} aria-selected={r.id === selId} onClick={() => go(type, r.id)} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), go(type, r.id))}>
-                      <td className="ops-mono">{r.id}</td>
-                      <td><div className="ops-clip">{def.title(r)}</div></td>
-                      <td><div className="ops-clip" style={{ color: 'var(--ink-2)' }}>{def.subtitle(r)}</div></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div>
+              <DataTable
+                label={`${def.label} objects`}
+                rows={shown}
+                rowKey={(r) => r.id!}
+                activeKey={selId}
+                onRow={(r) => go(type, r.id)}
+                columns={[
+                  { key: 'title', header: 'Title', primary: true, render: (r) => <span className="ops-clip">{def.title(r)}</span> },
+                  { key: 'detail', header: 'Detail', render: (r) => <span className="ops-clip" style={{ color: 'var(--ink-2)' }}>{def.subtitle(r)}</span> },
+                  { key: 'id', header: 'ID', value: true, render: (r) => <span className="ops-mono">#{r.id}</span> },
+                ]}
+              />
             </div>
           )}
         </section>
 
-        <section className="ops-panel" aria-label="Object detail">
-          <div className="ops-panel-head"><span className="ops-label">Object</span></div>
-          {selected ? <Panel type={type} row={selected} onGo={go} /> : <div className="ops-panel-body" style={{ fontSize: 13, color: 'var(--ink-3)' }}>Select a row to see its properties, links, actions and timeline.</div>}
-        </section>
+        {!phone && (
+          <section className="ops-panel" aria-label="Object detail">
+            <div className="ops-panel-head"><span className="ops-label">Object</span></div>
+            {selected ? <Panel type={type} row={selected} onGo={go} /> : <div className="ops-panel-body" style={{ fontSize: 13, color: 'var(--ink-3)' }}>Select a row to see its properties, links, actions and timeline.</div>}
+          </section>
+        )}
       </div>
+      {phone && selected && (
+        <SidePanel title={`${def.label} #${selected.id}`} onClose={() => go(type)}>
+          <Panel type={type} row={selected} onGo={go} />
+        </SidePanel>
+      )}
     </>
   )
 }

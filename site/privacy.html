@@ -18,22 +18,22 @@
 <nav aria-label="Main"><ul><li><a href="platform.html">Platform</a></li><li><a href="privacy.html" aria-current="page">Privacy</a></li><li><a href="get-started.html">Get started</a></li><li><a class="nav-cta" href="app/">Open app</a></li></ul></nav>
 </div></header>
 <main id="main">
-<section class="page-hero dark"><div class="wrap"><p class="label">Privacy</p><h1>Your data stays where you put it.</h1><p class="lede mute">Northstar is local-first by design, not by policy. There is no backend that could receive your data.</p></div></section>
-<section class="light"><div class="wrap"><div class="prose">
+<section class="page-hero"><div class="wrap"><p class="label">Privacy</p><h1>Your data stays where you put it.</h1><p class="lede mute">Northstar is local-first by design, not by policy. There is no backend that could receive your data.</p></div></section>
+<section><div class="wrap"><div class="prose">
 <h2 style="margin-top:0">How data stays on your device</h2>
-<p>The app is a set of static files. Once loaded, it reads and writes a database inside your browser (IndexedDB). With sync off it makes no network requests carrying your records. With sync on, the only place your (encrypted) records go is your own Supabase project. A strict content security policy limits what the app can connect to, and fonts are self-hosted.</p>
+<p>The app is a set of static files. Once loaded, it reads and writes a database inside your browser (IndexedDB). With sync off it makes no network requests carrying your records. With sync on, the only place your (encrypted) records go is your own Supabase project. Two other features are opt-in and never carry your stored records: online food search and the read-only Google Calendar import (described below). A strict content security policy limits what the app can connect to, and fonts are self-hosted. This website itself makes no requests to any other site.</p>
 <h2>What is stored</h2>
 <table class="plain"><thead><tr><th scope="col">Area</th><th scope="col">Examples</th></tr></thead><tbody>
 <tr><td>Tasks and goals</td><td>Titles, due dates, progress, recurrence</td></tr>
 <tr><td>Finance</td><td>Transactions from CSV files you import, budgets</td></tr>
-<tr><td>Food and learning</td><td>Meals you log, courses and lessons</td></tr>
+<tr><td>Planner and habits</td><td>Events, time blocks, habits and check-ins</td></tr><tr><td>Journal</td><td>Entries and mood you write</td></tr><tr><td>Food and learning</td><td>Meals you log, courses and lessons</td></tr>
 <tr><td>People</td><td>Names and contact notes you enter</td></tr>
 <tr><td>History</td><td>A timeline of events and milestones</td></tr>
 <tr><td>Settings</td><td>Preferences on this device</td></tr>
 </tbody></table>
 <p class="mute" style="margin-top:16px">Bank credentials are never asked for or stored. Bank data enters only through a CSV file you pick.</p>
 <h2>What is not collected</h2>
-<ul><li>No accounts, sign-ins or email addresses, unless you turn on sync (below).</li><li>No analytics, advertising or tracking scripts.</li><li>No cloud storage by default.</li><li>No third-party fonts, CDNs or embeds.</li></ul>
+<ul><li>No accounts, sign-ins or email addresses, unless you turn on sync (below).</li><li>No analytics, advertising or tracking scripts.</li><li>No cloud storage by default.</li><li>No third-party requests from this website.</li><li>No third-party fonts, CDNs or embeds.</li></ul>
 <h2>Optional encrypted sync</h2>
 <p>Sync is off unless you turn it on in Settings. When on, it copies your records between your own devices through a Supabase project you create. Before anything is sent, each record is encrypted on your device (AES-256-GCM) with a key that is itself protected by your passphrase (PBKDF2-SHA256, 600,000 rounds) and by a one-time recovery code. Your passphrase, recovery code and keys never leave your devices. The app talks only to your Supabase project&rsquo;s address, and the database only lets your signed-in account read or write your own rows.</p>
 <table class="plain"><thead><tr><th scope="col">Supabase can see</th><th scope="col">Supabase cannot see</th></tr></thead><tbody>
@@ -42,6 +42,8 @@
 <tr><td>When records are created, changed or deleted, and the size of each encrypted record</td><td>Your passphrase, recovery code or encryption keys</td></tr>
 </tbody></table>
 <p class="mute" style="margin-top:16px">If you lose both your passphrase and your recovery code, nobody can decrypt the cloud copy, including you, Supabase or Northstar. The readable data on each device is unaffected. You can delete every encrypted record from the cloud in Settings at any time; erasing data on a device never deletes the cloud copy by itself.</p>
+<h2>Optional lookups and calendar</h2>
+<p><b>Open Food Facts search</b> is off by default. When you turn it on and search, the text you typed is sent to world.openfoodfacts.org, nothing else. <b>Google Calendar</b> is connected from the Data Hub with your own Google client ID. It is read-only, the access token is kept in memory only, and Google&rsquo;s script loads only when you press Connect. Events are copied into your local database; none of your Northstar records are sent to Google.</p>
 <h2>Backups</h2>
 <p>In Settings you can export a JSON backup of everything, and import one later. The file is created and saved by your browser on your device. Treat it like any personal document: it holds your data in plain form. Importing a backup runs as a single step so a failed import cannot leave things half-written.</p>
 <h2>Offline and the service worker</h2>

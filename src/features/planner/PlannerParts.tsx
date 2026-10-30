@@ -11,7 +11,7 @@ export function EventButton({ e, onOpen }: { e: CalendarEvent; onOpen: (e: Calen
   const allDay = e.allDay || !e.start
   return (
     <button className={`pl-ev ${allDay ? 'allday' : ''}`} onClick={() => onOpen(e)}>
-      {e.title}
+      <span className="pl-ev-title">{e.title}</span>
       <small>{[timeLabel(e), e.location].filter(Boolean).join(' · ')}</small>
     </button>
   )
@@ -71,7 +71,7 @@ export function DayGrid({ date, events, isToday, nowMin, onOpen, onNew }: { date
           style={{ top: y(p.start), height: Math.max(22, y(p.end) - y(p.start) - 2), left: `${(p.col / p.cols) * 100}%`, width: `calc(${100 / p.cols}% - 3px)` }}
           onClick={() => onOpen(p.event)}
         >
-          {p.event.title}
+          <span className="pl-ev-title">{p.event.title}</span>
           <small>{p.continued ? `Until ${fmtTime(p.end)}` : timeLabel(p.event)}</small>
         </button>
       ))}

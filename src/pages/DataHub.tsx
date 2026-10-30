@@ -1,6 +1,9 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
 import { Card, Empty, PageHeader } from '../components/ui'
+import DataTable from '../components/DataTable'
+import KpiStrip from '../components/KpiStrip'
+import StatusChip from '../components/StatusChip'
 import { db } from '../db'
 import { DATA_IMPORTS_KEY, undoDataImport, type DataImportRecord } from '../features/data/dataActions'
 import { CalendarImport, ContactsImport } from '../features/data/Importers'
@@ -8,6 +11,7 @@ import { OFF_OPTIN_KEY } from '../features/data/offSearch'
 import { undoImport } from '../features/finance/importActions'
 import { IMPORTS_KEY, type ImportRecord } from '../features/finance/model'
 import GoogleCalendarCard from '../features/gcal/GoogleCalendarCard'
+import '../features/data/data.css'
 
 interface Status {
   state?: string
@@ -79,49 +83,34 @@ export default function DataHub() {
     <>
       <PageHeader title="Data" sub="Every way data gets into Northstar, and where it goes." />
 
-      <Card title="Sources">
-        <div className="table-wrap">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Source</th>
-                <th>Feeds</th>
-                <th>Status</th>
-                <th>Last import</th>
-                <th>Rows</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.name}>
-                  <td>
-                    <div>{r.name}</div>
-                    <div className="tiny faint">{r.brings}</div>
-                  </td>
-                  <td className="small">
-                    <Feeds types={r.feeds} />
-                  </td>
-                  <td className={`small nowrap ${r.tone ?? ''}`}>{r.status}</td>
-                  <td className="small muted nowrap">{r.last || '—'}</td>
-                  <td className="small muted">{r.rows || '—'}</td>
-                  <td className="nowrap">
-                    {'to' in r.action ? (
-                      <Link className="btn btn-sm" to={r.action.to}>
-                        {r.action.label}
-                      </Link>
-                    ) : (
-                      <button className="btn btn-sm" onClick={() => document.querySelector((r.action as { href: string }).href)?.scrollIntoView({ block: 'start' })}>
-                        {r.action.label}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="small muted" style={{ margin: '12px 0 0' }}>
+      <KpiStrip
+        items={[
+          { label: 'Sources in use', value: rows.filter((r) => r.tone === 'good').length, note: `of ${rows.length}` },
+          { label: 'Import batches', value: history.length, note: history.length ? 'each can be undone' : 'none yet' },
+          { label: 'Last import', value: history[0] ? when(history[0].at) : '—' },
+        ]}
+      />
+
+      <Card title="Sources" flush>
+        <DataTable
+          label="Sources"
+          rows={rows}
+          rowKey={(r) => r.name}
+          columns={[
+            { key: 'src', header: 'Source', primary: true, render: (r) => (<span><span>{r.name}</span><span className="tiny faint"> · {r.brings}</span></span>) },
+            { key: 'feeds', header: 'Feeds', render: (r) => <span className="small dh-feeds"><Feeds types={r.feeds} /></span> },
+            { key: 'last', header: 'Last import', render: (r) => <span className="small muted nowrap">{r.last || '—'}</span> },
+            { key: 'rows', header: 'Rows', render: (r) => <span className="small muted">{r.rows || '—'}</span> },
+            { key: 'act', header: '', render: (r) =>
+              'to' in r.action ? (
+                <Link className="btn btn-sm" to={r.action.to}>{r.action.label}</Link>
+              ) : (
+                <button className="btn btn-sm" onClick={() => document.querySelector((r.action as { href: string }).href)?.scrollIntoView({ block: 'start' })}>{r.action.label}</button>
+              ) },
+            { key: 'status', header: 'Status', value: true, render: (r) => <StatusChip status={r.tone === 'good' ? 'good' : r.tone === 'warn' ? 'warn' : 'neutral'}>{r.status}</StatusChip> },
+          ]}
+        />
+        <p className="small muted" style={{ margin: 0, padding: 16 }}>
           Where it goes: everything is stored in this browser on this device. Nothing leaves it except two things you turn on yourself: the food search, which sends only your search text to world.openfoodfacts.org, and optional sync / Google Calendar. Imported files are read locally and never uploaded.
         </p>
       </Card>

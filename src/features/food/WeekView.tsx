@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Stat } from '../../components/ui'
+import KpiStrip from '../../components/KpiStrip'
 import { db, type ISODate } from '../../db'
 import { addDays, formatDate, today } from '../../lib/dates'
 import MiniBars, { type BarDatum } from './MiniBars'
@@ -34,16 +34,14 @@ export default function WeekView({ end, targets }: { end: ISODate; targets: Food
       <p className="muted small" style={{ margin: 0 }}>
         {formatDate(start)} – {formatDate(end)}
       </p>
-      <div className="ns-stats">
-        <Stat label="Days logged" value={`${logged.length}/7`} note="in this range" />
-        <Stat label="Logging streak" value={streak} note={streak === 1 ? 'day in a row' : 'days in a row'} />
-        <Stat label="Avg calories" value={avg('calories').toLocaleString()} note={targets.calories ? `target ${targets.calories.toLocaleString()}` : 'per logged day'} />
-        <Stat
-          label="Avg protein"
-          value={`${avg('protein')} g`}
-          note={targets.protein ? `target hit ${proteinHits}/7 days` : 'per logged day'}
-        />
-      </div>
+      <KpiStrip
+        items={[
+          { label: 'Days logged', value: `${logged.length}/7`, note: 'in this range' },
+          { label: 'Logging streak', value: streak, note: streak === 1 ? 'day in a row' : 'days in a row' },
+          { label: 'Avg calories', value: avg('calories').toLocaleString(), note: targets.calories ? `target ${targets.calories.toLocaleString()}` : 'per logged day' },
+          { label: 'Avg protein', value: `${avg('protein')} g`, note: targets.protein ? `target hit ${proteinHits}/7 days` : 'per logged day' },
+        ]}
+      />
       <div className="grid grid-2">
         <MiniBars title="Calories per day" data={toBars('calories')} unit="kcal" target={targets.calories} />
         <MiniBars title="Protein per day" data={toBars('protein')} unit="g" target={targets.protein} />

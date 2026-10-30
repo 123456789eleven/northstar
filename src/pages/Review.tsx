@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { Card, PageHeader } from '../components/ui'
+import KpiStrip from '../components/KpiStrip'
 import { addDays, formatDate, parseISODate, startOfWeek, today } from '../lib/dates'
 import { avgRating, reviewStreak } from '../features/review/summary'
 import { Digest, ReviewForm } from '../features/review/ReviewParts'
@@ -51,6 +52,16 @@ export default function Review() {
           <span>It’s early in the week. Review last week ({weekRange(lastWeek)}) instead?</span>
           <button className="btn btn-sm btn-primary" onClick={() => setWeekOf(lastWeek)}>Review last week</button>
         </div>
+      )}
+
+      {reviews !== undefined && (
+        <KpiStrip
+          items={[
+            { label: 'Review streak', value: streak, note: streak === 1 ? 'week' : 'weeks' },
+            { label: 'Reviews', value: reviews.length, note: 'in total' },
+            { label: 'This week', value: have.has(thisWeek) ? 'Done' : 'Open', note: weekRange(thisWeek) },
+          ]}
+        />
       )}
 
       <InsightsWeek />

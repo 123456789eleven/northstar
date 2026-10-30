@@ -1,0 +1,2 @@
+/* Data hub: make inline source links 32px tall tap targets. */
+.dh-feeds a { display: inline-flex; align-items: center; min-height: 32px; }

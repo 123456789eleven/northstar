@@ -40,7 +40,7 @@
 .ach-areas b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
 .ach-month { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .ach-month:last-child { border-bottom: 0; }
-.ach-month-name { color: var(--ink-3); font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; }
+.ach-month-name { color: var(--ink-3); font-size: 13px; padding-top: 2px; }
 .ach-list { display: flex; flex-direction: column; gap: 10px; }
 .ach-entry { display: flex; gap: 12px; align-items: baseline; }
 .ach-entry-title { flex: 1; min-width: 0; font-size: 15px; overflow-wrap: anywhere; }

@@ -4,6 +4,7 @@ import { AREA_LABEL, Progress } from '../../components/ui'
 import { formatDate } from '../../lib/dates'
 import { TaskRow } from '../tasks/TaskRow'
 import { CHILD_HORIZON, HORIZON_LABEL, goalProgress, progressLabel } from './progress'
+import { RowMenu } from './GoalMenu'
 import { addMilestone, completeGoal, removeMilestone, reopenGoal, setPaused, toggleMilestone } from './goalActions'
 
 function XIcon() {
@@ -56,9 +57,6 @@ export function GoalCard({
             </div>
           </div>
           <div className="goal-actions">
-            <button className="btn btn-ghost btn-sm" onClick={() => onEdit(goal)}>
-              Edit
-            </button>
             {done ? (
               <button className="btn btn-sm" onClick={() => void reopenGoal(goal)}>
                 Reopen
@@ -68,15 +66,27 @@ export function GoalCard({
                 Complete
               </button>
             )}
+            <RowMenu
+              label={`More actions for ${goal.title}`}
+              items={[
+                { label: 'Edit', onSelect: () => onEdit(goal) },
+                ...(!done ? [{ label: 'Add milestone', onSelect: () => setAdding(true) }] : []),
+                ...(child && !done ? [{ label: `Add ${HORIZON_LABEL[child].toLowerCase()} goal`, onSelect: () => onAddChild(goal) }] : []),
+                ...(openLinked.length ? [{ label: showTasks ? 'Hide linked tasks' : `Show linked tasks (${openLinked.length} open)`, onSelect: () => setShowTasks((v) => !v) }] : []),
+                ...(!done ? [{ label: goal.status === 'paused' ? 'Resume' : 'Pause', onSelect: () => void setPaused(goal, goal.status !== 'paused') }] : []),
+              ]}
+            />
           </div>
         </div>
 
         {goal.why && <div className="goal-why">{goal.why}</div>}
 
-        <div className="goal-progress">
-          <Progress value={p.pct} />
-          <span className="goal-progress-label">{progressLabel(p)}</span>
-        </div>
+        {p.basis !== 'none' && (
+          <div className="goal-progress">
+            <Progress value={p.pct} />
+            <span className="goal-progress-label">{progressLabel(p)}</span>
+          </div>
+        )}
 
         {goal.milestones.length > 0 && (
           <div className="ms-list">
@@ -122,34 +132,21 @@ export function GoalCard({
           </div>
         )}
 
-        <div className="goal-foot">
-          {!done && (
-            <button className="link-btn" onClick={() => setAdding(true)}>
-              + Milestone
-            </button>
-          )}
-          {child && !done && (
-            <button className="link-btn" onClick={() => onAddChild(goal)}>
-              + {HORIZON_LABEL[child]} goal
-            </button>
-          )}
-          {linked.length > 0 && (
-            <button className="link-btn" onClick={() => setShowTasks((v) => !v)} aria-expanded={showTasks} disabled={!openLinked.length}>
-              {linked.length} task{linked.length === 1 ? '' : 's'}
-              {openLinked.length ? ` (${openLinked.length} open)` : ''}
-            </button>
-          )}
-          {learnCount > 0 && (
-            <span className="tiny faint">
-              {learnCount} learning item{learnCount === 1 ? '' : 's'}
-            </span>
-          )}
-          {!done && (
-            <button className="link-btn" onClick={() => void setPaused(goal, goal.status !== 'paused')}>
-              {goal.status === 'paused' ? 'Resume' : 'Pause'}
-            </button>
-          )}
-        </div>
+        {(linked.length > 0 || learnCount > 0) && (
+          <div className="goal-foot">
+            {linked.length > 0 && (
+              <span className="tiny faint">
+                {linked.length} task{linked.length === 1 ? '' : 's'}
+                {openLinked.length ? `, ${openLinked.length} open` : ''}
+              </span>
+            )}
+            {learnCount > 0 && (
+              <span className="tiny faint">
+                {learnCount} learning item{learnCount === 1 ? '' : 's'}
+              </span>
+            )}
+          </div>
+        )}
       </article>
       {children}
     </div>

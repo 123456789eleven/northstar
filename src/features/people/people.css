@@ -28,7 +28,7 @@
 .ppl-seg .btn[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 
 .ppl-notes { white-space: pre-wrap; font-size: 14px; color: var(--ink-2); margin: 0 0 14px; }
-.ppl-section { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-2); font-weight: 600; margin: 16px 0 6px; }
+.ppl-section { font-size: 12px; color: var(--ink-2); font-weight: 600; margin: 16px 0 6px; }
 .ppl-hist { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
 .ppl-hist:last-child { border-bottom: 0; }
 .ppl-hist-date { color: var(--ink-3); font-size: 13px; flex: 0 0 76px; font-variant-numeric: tabular-nums; }

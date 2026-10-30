@@ -45,7 +45,7 @@ export function ProfileSection() {
         <Field label="Display name">
           <input className="input" value={value} placeholder="What should Northstar call you?" onChange={(e) => setName(e.target.value)} maxLength={60} />
         </Field>
-        <button className="btn btn-primary" type="submit" disabled={!dirty}>Save</button>
+        <button className="btn" type="submit" disabled={!dirty}>Save</button>
       </form>
       <p className="set-text tiny faint" style={{ marginTop: 8 }}>{saved ? 'Saved.' : 'Used for the greeting on Today.'}</p>
     </Card>
@@ -113,7 +113,7 @@ export function BackupSection() {
       {overdue && (
         <div className="set-notice" style={{ marginBottom: 14 }}>
           <span>{ageDays === null ? 'You have never made a backup.' : `Last backup was ${ageDays} days ago.`}</span>
-          <button className="btn btn-sm btn-primary" onClick={onExport} disabled={busy}>Back up now</button>
+          <button className="btn btn-sm" onClick={onExport} disabled={busy}>Back up now</button>
         </div>
       )}
       <p className="set-text">

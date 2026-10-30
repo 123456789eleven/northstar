@@ -39,6 +39,7 @@ export default function Planner() {
   const tasksOn = (d: ISODate) => (tasks ?? []).filter((x) => x.due === d)
   const birthdaysOn = (d: ISODate) => (people ?? []).filter((p) => p.birthday === d.slice(5))
   const dailyHabits = (habits ?? []).filter((h) => h.perWeek >= 7)
+  const habitsOpenToday = dailyHabits.filter((h) => !logSet.has(`${h.id}|${t}`)).length
   const openNew = (date: ISODate, start?: string) => setEditing({ event: null, date, start })
 
   const dayBody = (d: ISODate) => {
@@ -53,9 +54,6 @@ export default function Planner() {
         {timed.map((s) => <EventButton key={`${s.event.id}-${s.continued}`} e={s.event} onOpen={(x) => setEditing({ event: x, date: x.date })} />)}
         {dt.map((x) => <TaskLine key={x.id} t={x} />)}
         {bd.map((p) => <div key={p.id} className="pl-note">Birthday: {p.name}</div>)}
-        {d >= t && dailyHabits.length > 0 && (
-          <div className="pl-note">{dailyHabits.filter((h) => !logSet.has(`${h.id}|${d}`)).length} of {dailyHabits.length} daily habits open</div>
-        )}
         {empty && events !== undefined && <div className="pl-empty">Free</div>}
       </>
     )
@@ -63,7 +61,10 @@ export default function Planner() {
 
   return (
     <>
-      <PageHeader title="Planner" sub={events === undefined ? ' ' : `${evs.filter((e) => days.includes(e.date)).length} events in view`}actions={<button className="btn btn-primary" onClick={() => openNew(view === 'day' ? anchor : t)}>New event</button>} />
+      <PageHeader
+        title="Planner" sub={events === undefined ? ' ' : `${evs.filter((e) => days.includes(e.date)).length} events in view${habitsOpenToday ? ` · ${habitsOpenToday} daily ${habitsOpenToday === 1 ? 'habit' : 'habits'} open today` : ''}`}
+        actions={<button className="btn btn-primary" onClick={() => openNew(view === 'day' ? anchor : t)}>New event</button>}
+      />
 
       <div className="pl-bar">
         <button className="btn btn-sm" onClick={() => setAnchor(addDays(anchor, -step))} aria-label="Previous">Prev</button>
@@ -80,7 +81,7 @@ export default function Planner() {
         </div>
       </div>
 
-      <div className="pl-main">
+      <div className={`pl-main ${view}`}>
         <div style={{ minWidth: 0 }}>
           {view === 'week' ? (
             <div className="pl-week">
@@ -90,7 +91,7 @@ export default function Planner() {
                     <b>{formatDate(d, { weekday: 'short' })}</b>
                     <span>{formatDate(d, { month: 'short', day: 'numeric' })}</span>
                   </button>
-                  {dayBody(d)}
+                  <div className="pl-day-body">{dayBody(d)}</div>
                 </section>
               ))}
             </div>

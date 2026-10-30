@@ -1,6 +1,9 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { type FormEvent, useState } from 'react'
-import { Card, Empty, Stat } from '../../components/ui'
+import { Card, Empty } from '../../components/ui'
+import ChartFrame from '../../components/ChartFrame'
+import DataTable from '../../components/DataTable'
+import KpiStrip from '../../components/KpiStrip'
 import { db, logEvent, type BalanceSnapshot } from '../../db'
 import { formatDate, money, today } from '../../lib/dates'
 import { NetWorthChart } from './charts'
@@ -62,11 +65,13 @@ export default function NetWorth() {
   return (
     <div className="stack" style={{ gap: 16 }}>
       {current && (
-        <div className="grid grid-3">
-          <Stat label="Net worth" value={money(current.net)} note={`As of ${formatDate(current.date, { month: 'short', day: 'numeric', year: 'numeric' })}`} />
-          <Stat label="Assets" value={money(assets)} />
-          <Stat label="Liabilities" value={money(liabilities)} />
-        </div>
+        <KpiStrip
+          items={[
+            { label: 'Net worth', value: money(current.net), note: `As of ${formatDate(current.date, { month: 'short', day: 'numeric', year: 'numeric' })}` },
+            { label: 'Assets', value: money(assets) },
+            { label: 'Liabilities', value: money(liabilities) },
+          ]}
+        />
       )}
       {flash && <div className="small good">{flash}</div>}
 
@@ -98,59 +103,48 @@ export default function NetWorth() {
         </Card>
       ) : (
         <>
-          <Card title="Net worth over time">
-            {series.length >= 2 ? <NetWorthChart data={series} /> : <Empty>Add another balance on a later date to see the trend.</Empty>}
-          </Card>
-          <Card title="Accounts · latest balance">
-            <div className="table-wrap">
+          <ChartFrame
+            title="Net worth over time"
+            hasData={series.length >= 2}
+            table={
               <table className="table">
-                <thead>
-                  <tr>
-                    <th>Account</th>
-                    <th>Type</th>
-                    <th style={{ textAlign: 'right' }}>Balance</th>
-                    <th>As of</th>
-                    <th>Update today</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {accounts.map((a) => (
-                    <tr key={a.name}>
-                      <td>{a.name}</td>
-                      <td className="muted small">{a.kind === 'asset' ? 'Asset' : 'Liability'}</td>
-                      <td className={`mono nowrap ${a.kind === 'liability' ? 'warn' : ''}`} style={{ textAlign: 'right' }}>
-                        {a.kind === 'liability' ? '−' : ''}
-                        {money(a.balance)}
-                      </td>
-                      <td className="muted small nowrap">{formatDate(a.date, { month: 'short', day: 'numeric', year: '2-digit' })}</td>
-                      <td>
-                        <form
-                          className="row"
-                          style={{ gap: 4 }}
-                          onSubmit={(e) => {
-                            e.preventDefault()
-                            quickUpdate(a)
-                          }}
-                        >
-                          <input
-                            className="input mono"
-                            style={{ width: 110, height: 32 }}
-                            inputMode="decimal"
-                            placeholder={String(a.balance)}
-                            value={updating[a.name] ?? ''}
-                            onChange={(e) => setUpdating((u) => ({ ...u, [a.name]: e.target.value }))}
-                            aria-label={`New balance for ${a.name}`}
-                          />
-                          <button className="btn btn-sm" disabled={!updating[a.name]?.trim()}>
-                            Save
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+                <thead><tr><th>Date</th><th style={{ textAlign: 'right' }}>Net worth</th></tr></thead>
+                <tbody>{[...series].reverse().map((p) => <tr key={p.date}><td>{formatDate(p.date, { month: 'short', day: 'numeric', year: '2-digit' })}</td><td className="mono" style={{ textAlign: 'right' }}>{money(p.net)}</td></tr>)}</tbody>
               </table>
-            </div>
+            }
+          >
+            <NetWorthChart data={series} />
+          </ChartFrame>
+          <Card title="Accounts · latest balance" flush>
+            <DataTable
+              label="Accounts"
+              rows={accounts}
+              rowKey={(a) => a.name}
+              columns={[
+                { key: 'name', header: 'Account', primary: true, render: (a) => a.name },
+                { key: 'kind', header: 'Type', render: (a) => <span className="muted small">{a.kind === 'asset' ? 'Asset' : 'Liability'}</span> },
+                { key: 'asof', header: 'As of', render: (a) => <span className="muted small nowrap">{formatDate(a.date, { month: 'short', day: 'numeric', year: '2-digit' })}</span> },
+                {
+                  key: 'upd',
+                  header: 'Update today',
+                  render: (a) => (
+                    <form className="row" style={{ gap: 4 }} onSubmit={(e) => { e.preventDefault(); quickUpdate(a) }}>
+                      <input
+                        className="input mono"
+                        style={{ width: 110, height: 32 }}
+                        inputMode="decimal"
+                        placeholder={String(a.balance)}
+                        value={updating[a.name] ?? ''}
+                        onChange={(e) => setUpdating((u) => ({ ...u, [a.name]: e.target.value }))}
+                        aria-label={`New balance for ${a.name}`}
+                      />
+                      <button className="btn btn-sm" disabled={!updating[a.name]?.trim()}>Save</button>
+                    </form>
+                  ),
+                },
+                { key: 'bal', header: 'Balance', align: 'right', value: true, render: (a) => <span className={`mono nowrap ${a.kind === 'liability' ? 'warn' : ''}`}>{a.kind === 'liability' ? '−' : ''}{money(a.balance)}</span> },
+              ]}
+            />
           </Card>
         </>
       )}

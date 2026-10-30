@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { type FormEvent, useMemo, useState } from 'react'
 import { Card, Empty, Modal } from '../../components/ui'
+import DataTable from '../../components/DataTable'
 import { db, type Transaction } from '../../db'
 import { formatDate, money, today } from '../../lib/dates'
 import { addMerchantRule, CATEGORIES, categorize, INCOME, merchantKey, merchantLabel, UNCATEGORIZED } from './categories'
@@ -119,7 +120,7 @@ export default function Transactions({ month, category, setCategory, onImport }:
         </div>
       )}
 
-      <Card title={`${shown.length} transaction${shown.length === 1 ? '' : 's'}${allTime ? '' : ` · ${monthLabel(month)}`}`}>
+      <Card flush={shown.length > 0} title={`${shown.length} transaction${shown.length === 1 ? '' : 's'}${allTime ? '' : ` · ${monthLabel(month)}`}`}>
         {total === 0 ? (
           <Empty>
             <p style={{ margin: '0 0 12px' }}>Nothing here yet. Add one with the row above, or download a CSV from your bank's website and import it.</p>
@@ -130,49 +131,27 @@ export default function Transactions({ month, category, setCategory, onImport }:
         ) : shown.length === 0 ? (
           <Empty>No transactions match{allTime ? '' : ` in ${monthLabel(month)}`}. Try another month, clear the filters, or tick “All months”.</Empty>
         ) : (
-          <div className="table-wrap">
-            <table className="table fin-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Description</th>
-                  <th>Category</th>
-                  <th style={{ textAlign: 'right' }}>Amount</th>
-                  <th aria-label="Actions" />
-                </tr>
-              </thead>
-              <tbody>
-                {shown.map((t) => (
-                  <tr key={t.id}>
-                    <td className="mono muted nowrap">{formatDate(t.date, allTime ? { month: 'short', day: 'numeric', year: '2-digit' } : undefined)}</td>
-                    <td className="fin-desc">
-                      <div>{t.description}</div>
-                      {t.account && <div className="tiny faint">{t.account}</div>}
-                    </td>
-                    <td>
-                      <select className={`select fin-cat ${t.category === UNCATEGORIZED ? 'fin-cat-un' : ''}`} value={t.category} onChange={(e) => recategorize(t, e.target.value)} aria-label="Category">
-                        {CATEGORIES.map((c) => (
-                          <option key={c} value={c}>
-                            {c}
-                          </option>
-                        ))}
-                        {!CATEGORIES.includes(t.category as (typeof CATEGORIES)[number]) && <option value={t.category}>{t.category}</option>}
-                      </select>
-                    </td>
-                    <td className={`mono nowrap ${t.amount > 0 ? 'good' : ''}`} style={{ textAlign: 'right' }}>
-                      {t.amount > 0 ? '+' : ''}
-                      {money(t.amount)}
-                    </td>
-                    <td>
-                      <button className="btn btn-ghost btn-sm fin-x" onClick={() => remove(t)} aria-label={`Delete ${t.description}`} title="Delete">
-                        ×
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            label="Transactions"
+            rows={shown}
+            rowKey={(t) => t.id!}
+            columns={[
+              { key: 'desc', header: 'Description', primary: true, render: (t) => (
+                <span className="fin-desc"><span>{t.description}</span>{t.account && <span className="tiny faint"> · {t.account}</span>}</span>
+              ) },
+              { key: 'date', header: 'Date', render: (t) => <span className="mono muted nowrap">{formatDate(t.date, allTime ? { month: 'short', day: 'numeric', year: '2-digit' } : undefined)}</span> },
+              { key: 'cat', header: 'Category', render: (t) => (
+                <select className={`select fin-cat ${t.category === UNCATEGORIZED ? 'fin-cat-un' : ''}`} value={t.category} onChange={(e) => recategorize(t, e.target.value)} onClick={(e) => e.stopPropagation()} aria-label="Category">
+                  {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  {!CATEGORIES.includes(t.category as (typeof CATEGORIES)[number]) && <option value={t.category}>{t.category}</option>}
+                </select>
+              ) },
+              { key: 'amt', header: 'Amount', align: 'right', value: true, render: (t) => <span className={`mono nowrap ${t.amount > 0 ? 'good' : ''}`}>{t.amount > 0 ? '+' : ''}{money(t.amount)}</span> },
+              { key: 'x', header: '', render: (t) => (
+                <button className="btn btn-ghost btn-sm fin-x" onClick={(e) => { e.stopPropagation(); remove(t) }} aria-label={`Delete ${t.description}`} title="Delete">×</button>
+              ) },
+            ]}
+          />
         )}
       </Card>
 

@@ -4,9 +4,9 @@ import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Too
 import { formatDate, money } from '../../lib/dates'
 import { compactMoney } from './model'
 
-const SERIES = { income: '#3987e5', spending: '#d95926', net: '#3987e5' }
+const SERIES = { income: '#3987e5', spending: '#d95926', net: '#3987e5', bars: '#3987e5' }
 const GRID = '#262a33'
-const AXIS = '#6f6d68'
+const AXIS = '#a6a49d'
 
 interface TipRow {
   name?: string | number
@@ -31,6 +31,8 @@ function ChartTip({ active, payload, label, labelFmt }: { active?: boolean; payl
   )
 }
 
+export const TREND_LEGEND = [{ label: 'Income', color: SERIES.income }, { label: 'Spending', color: SERIES.spending }]
+
 export function Legend({ items }: { items: { label: string; color: string; line?: boolean }[] }) {
   return (
     <div className="fin-legend">
@@ -47,7 +49,6 @@ export function Legend({ items }: { items: { label: string; color: string; line?
 export function TrendChart({ data }: { data: { label: string; income: number; spending: number }[] }) {
   return (
     <>
-      <Legend items={[{ label: 'Income', color: SERIES.income }, { label: 'Spending', color: SERIES.spending }]} />
       <div style={{ width: '100%', height: 220 }}>
         <ResponsiveContainer>
           <BarChart data={data} barGap={2} barCategoryGap="28%" margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
@@ -99,7 +100,7 @@ export function CategoryBars({ rows, onPick }: { rows: { category: string; amoun
         <button key={r.category} type="button" className="fin-hbar" onClick={() => onPick?.(r.category)} title={`${r.category}: ${money(r.amount)}`}>
           <span className="fin-hbar-label">{r.category}</span>
           <span className="fin-hbar-track">
-            <span className="fin-hbar-fill" style={{ width: `${Math.max(1.5, (r.amount / max) * 100)}%`, background: SERIES.spending }} />
+            <span className="fin-hbar-fill" style={{ width: `${Math.max(1.5, (r.amount / max) * 100)}%`, background: SERIES.bars }} />
           </span>
           <span className="fin-hbar-value mono">{money(r.amount)}</span>
         </button>

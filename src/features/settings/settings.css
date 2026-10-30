@@ -19,3 +19,14 @@
 .set-profile-row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
 .set-profile-row .field { flex: 1; min-width: 200px; }
 .set-code { font-size: 17px; letter-spacing: 0.06em; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; margin: 0; overflow-wrap: anywhere; user-select: all; }
+
+/* Layout: two columns on wide screens; Sync and Danger zone span the full row. */
+.set-page { max-width: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.set-page > .set-sync, .set-page > .set-danger { grid-column: 1 / -1; }
+.set-sync form.stack, .set-sync .set-text { max-width: 560px; }
+.set-sync .set-kv { display: flex; flex-wrap: wrap; gap: 8px 32px; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.set-sync .set-kv > div { display: flex; flex-direction: column; min-width: 0; }
+.set-sync .set-kv dt { font-size: 12px; }
+.set-sync .set-kv dd { overflow-wrap: anywhere; }
+.set-helper, .set-text.faint { color: var(--ink-2); }
+@media (max-width: 819px) { .set-page { grid-template-columns: minmax(0, 1fr); } }

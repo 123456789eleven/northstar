@@ -179,3 +179,20 @@ describe('applying, auto-apply and undo (db)', () => {
     expect(await db.tasks.count()).toBe(0)
   })
 })
+
+describe('seeded overdue tasks reach the Command queue', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-10-29T15:00:00.000Z'))
+  })
+  afterEach(() => vi.useRealTimers())
+
+  it('every overdue open task gets a proposal, and a snapshot taken after a later insert includes it', async () => {
+    const mk = (title: string, due: string) => db.tasks.add({ title, priority: 2, status: 'open', recurrence: 'none', due, createdAt: '2026-01-01T00:00:00.000Z' })
+    await mk('A', '2026-10-01')
+    await mk('B', '2026-10-15')
+    expect(generateProposals(await loadOpsSnapshot()).map((p) => p.rule)).toEqual(['overdue-task', 'overdue-task'])
+    await mk('C', '2026-10-28')
+    expect(generateProposals(await loadOpsSnapshot())).toHaveLength(3)
+  })
+})

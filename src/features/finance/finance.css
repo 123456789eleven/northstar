@@ -65,3 +65,4 @@
 .fin-hbar-fill { display: block; height: 100%; border-radius: 0 4px 4px 0; }
 .fin-hbar:hover .fin-hbar-fill { filter: brightness(1.15); }
 .fin-hbar-value { font-size: 13px; color: var(--ink); min-width: 72px; text-align: right; }
+@media (max-width: 860px) { .fin-add-amt { grid-column: 1 / -1; } .fin-add-amt .input { flex: 1; min-width: 0; } }

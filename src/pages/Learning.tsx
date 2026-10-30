@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Card, Empty, PageHeader, Tabs } from '../components/ui'
+import KpiStrip from '../components/KpiStrip'
 import { db, type LearningItem } from '../db'
 import { startOfWeek, today } from '../lib/dates'
 import ItemModal from '../features/learning/ItemModal'
@@ -51,6 +52,16 @@ export default function Learning() {
           </button>
         }
       />
+      {loaded && (
+        <KpiStrip
+          items={[
+            { label: 'Active', value: active.length },
+            { label: 'Planned', value: planned.length },
+            { label: 'Completed', value: done.length },
+            { label: 'Study this week', value: fmtMinutes(weekTotal) },
+          ]}
+        />
+      )}
       <Tabs
         value={view}
         onChange={setView}
@@ -67,7 +78,7 @@ export default function Learning() {
         (active.length === 0 ? (
           <Card>
             <Empty>
-              <div className="stack" style={{ alignItems: 'center' }}>
+              <div className="stack">
                 <span>
                   {all.length === 0
                     ? 'Add one concrete thing you’re learning right now — a course you’re enrolled in, a certification you’re studying for, or the book on your nightstand.'
@@ -91,7 +102,7 @@ export default function Learning() {
         <Card>
           {planned.length === 0 ? (
             <Empty>
-              <div className="stack" style={{ alignItems: 'center' }}>
+              <div className="stack">
                 <span>Keep a short list of what’s next — the course after this one, a certification you want by year end.</span>
                 <button className="btn" onClick={addFor('planned')}>
                   Add a planned item

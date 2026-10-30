@@ -2,7 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
-import { PageHeader } from '../components/ui'
+import { Card, PageHeader } from '../components/ui'
+import KpiStrip from '../components/KpiStrip'
+import DataTable, { type Column } from '../components/DataTable'
+import SidePanel from '../components/SidePanel'
+import StatusChip from '../components/StatusChip'
+import { useMedia, PHONE_QUERY } from '../components/useMedia'
 import { NetworkGraph } from '../features/ops/NetworkGraph'
 import { applyProposal, canUndo, decide, getAuto, getAutoLog, loadOpsSnapshot, runAutoApply, setAuto, undoApplied } from '../features/ops/opsActions'
 import { generateProposals, needsApproval, RULE_IDS, RULE_META, type Proposal } from '../features/ops/proposals'
@@ -15,8 +20,9 @@ function typeOf(p: Proposal): TypeKey {
   return (typeForTable(p.objectRef.table)?.key ?? 'Task') as TypeKey
 }
 
-function ReviewPanel({ p, onDone }: { p: Proposal; onDone: () => void }) {
-  const [mode, setMode] = useState<'explain' | 'logic' | 'modify' | null>(null)
+type Mode = 'explain' | 'logic' | 'modify' | null
+
+function ReviewPanel({ p, mode, setMode, onDone }: { p: Proposal; mode: Mode; setMode: (m: Mode) => void; onDone: () => void }) {
   const [title, setTitle] = useState(typeof p.action.params.title === 'string' ? p.action.params.title : '')
   const [due, setDue] = useState(typeof p.action.params.due === 'string' ? p.action.params.due : '')
   const [err, setErr] = useState('')
@@ -40,17 +46,24 @@ function ReviewPanel({ p, onDone }: { p: Proposal; onDone: () => void }) {
   const toggle = (m: 'explain' | 'logic' | 'modify') => setMode(mode === m ? null : m)
 
   return (
-    <div className="ops-panel-body">
-      <div className="ops-label">{RULE_META[p.rule].label} / {p.risk} risk</div>
-      <div style={{ marginTop: 4, fontWeight: 600 }}>{p.title}</div>
+    <div className="cmd-review">
+      <div className="cmd-review-meta">
+        <StatusChip status={p.risk === 'low' ? 'info' : 'warn'}>{p.risk === 'low' ? 'Low risk' : 'Medium risk'}</StatusChip>
+        <span className="faint small">{RULE_META[p.rule].label}</span>
+      </div>
+      <div className="cmd-review-title">{p.title}</div>
+      <p className="cmd-why">{p.rationale}</p>
       <div className="ops-actions">
         <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => accept(false)}>{p.action.label === 'Mark reviewed' ? 'Accept: mark reviewed' : 'Accept'}</button>
         {canModify && <button className="btn btn-sm" aria-pressed={mode === 'modify'} onClick={() => toggle('modify')}>Modify</button>}
         <button className="btn btn-sm" onClick={async () => { await decide(p.id, 'dismissed'); onDone() }}>Dismiss</button>
-        <button className="btn btn-sm btn-ghost" onClick={async () => { await decide(p.id, 'snoozed', { days: 1 }); onDone() }}>Snooze 1d</button>
-        <button className="btn btn-sm btn-ghost" aria-pressed={mode === 'explain'} onClick={() => toggle('explain')}>Explain</button>
+        <button className="btn btn-sm btn-ghost" onClick={async () => { await decide(p.id, 'snoozed', { days: 1 }); onDone() }}>Snooze 1 day</button>
+      </div>
+      <div className="ops-actions">
+        <button className="btn btn-sm btn-ghost" aria-pressed={mode === 'explain'} onClick={() => toggle('explain')}>Evidence</button>
         <button className="btn btn-sm btn-ghost" aria-pressed={mode === 'logic'} onClick={() => toggle('logic')}>Show logic</button>
       </div>
+      <div className="faint tiny cmd-keys">Keys: j and k move, a accepts, e shows evidence.</div>
       {err && <div className="ops-error" role="alert">{err}</div>}
       {mode === 'modify' && (
         <div className="ops-edit">
@@ -61,16 +74,15 @@ function ReviewPanel({ p, onDone }: { p: Proposal; onDone: () => void }) {
       )}
       {mode === 'explain' && (
         <div className="ops-block">
-          <div>{p.rationale}</div>
-          <div className="ops-label" style={{ marginTop: 10 }}>Evidence</div>
+          <div className="cmd-sub">Evidence</div>
           <ul>{p.evidence.map((e, i) => <li key={i} className="ops-mono">{e}</li>)}</ul>
         </div>
       )}
       {mode === 'logic' && (
         <div className="ops-block">
-          <div className="ops-label">Predicate</div>
+          <div className="cmd-sub">Predicate</div>
           <pre className="ops-pre">{p.logic}</pre>
-          <div className="ops-label" style={{ marginTop: 10 }}>Rule</div>
+          <div className="cmd-sub" style={{ marginTop: 10 }}>Rule</div>
           <div className="ops-mono">{p.rule}</div>
         </div>
       )}
@@ -80,8 +92,11 @@ function ReviewPanel({ p, onDone }: { p: Proposal; onDone: () => void }) {
 
 export default function Ops() {
   const navigate = useNavigate()
+  const phone = useMedia(PHONE_QUERY)
   const [hidden, setHidden] = useState<Set<TypeKey>>(new Set())
   const [selId, setSelId] = useState<string | null>(null)
+  const [closed, setClosed] = useState(false)
+  const [mode, setMode] = useState<Mode>(null)
 
   useEffect(() => { void runAutoApply() }, [])
 
@@ -89,11 +104,16 @@ export default function Ops() {
     const snap = await loadOpsSnapshot()
     return { proposals: generateProposals(snap), auto: await getAuto(), log: await getAutoLog() }
   }, [])
-  const counts = useLiveQuery(async () => Object.fromEntries(await Promise.all(TYPE_LIST.map(async (t) => [t.key, await db.table(t.table).count()] as const))) as Record<TypeKey, number>, [])
 
   const proposals = state?.proposals
+  const facetCounts = useMemo(() => {
+    const m = new Map<TypeKey, number>()
+    for (const p of proposals ?? []) m.set(typeOf(p), (m.get(typeOf(p)) ?? 0) + 1)
+    return m
+  }, [proposals])
+  const facets = TYPE_LIST.filter((t) => facetCounts.has(t.key))
   const visible = useMemo(() => (proposals ?? []).filter((p) => !hidden.has(typeOf(p))), [proposals, hidden])
-  const sel = visible.find((p) => p.id === selId) ?? visible[0] ?? null
+  const sel = closed ? null : visible.find((p) => p.id === selId) ?? (phone ? null : visible[0] ?? null)
 
   const graph = useLiveQuery(async () => {
     if (!sel) return null
@@ -108,110 +128,130 @@ export default function Ops() {
   const autoWeek = log.filter((e) => e.auto && !e.undone && new Date(e.at).getTime() >= weekAgo).length
   const needs = (proposals ?? []).filter((p) => needsApproval(p, auto)).length
 
+  const select = (id: string | null) => { setSelId(id); setClosed(false); setMode(null) }
   const next = (id: string) => {
     const i = visible.findIndex((p) => p.id === id)
-    setSelId(visible[i + 1]?.id ?? visible[i - 1]?.id ?? null)
+    if (phone) { setClosed(true); return }
+    select(visible[i + 1]?.id ?? visible[i - 1]?.id ?? null)
   }
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement
+      if (e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(t.tagName) || t.isContentEditable) return
+      const i = sel ? visible.findIndex((p) => p.id === sel.id) : -1
+      if (e.key === 'j' && visible[i + 1]) select(visible[i + 1].id)
+      else if (e.key === 'k' && i > 0) select(visible[i - 1].id)
+      else if (e.key === 'e' && sel) setMode((m) => (m === 'explain' ? null : 'explain'))
+      else if (e.key === 'a' && sel) { const s = sel; void applyProposal(s).then(() => next(s.id)).catch(() => {}) }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  })
+
+  const columns: Column<Proposal>[] = [
+    { key: 'p', header: 'Proposal', primary: true, render: (p) => <span className="ops-clip">{p.title}</span> },
+    { key: 'o', header: 'Object', render: (p) => <span className="faint">{REGISTRY[typeOf(p)].label} #{p.objectRef.id}</span> },
+    // Rule name is shown in the review panel.
+    { key: 'k', header: 'Risk', value: true, render: (p) => <StatusChip status={p.risk === 'low' ? 'info' : 'warn'}>{p.risk === 'low' ? 'Low' : 'Medium'}</StatusChip> },
+  ]
 
   return (
     <>
       <PageHeader title="Command" sub="Proposals from your own data. Nothing changes until you approve it, unless you opt a low-risk rule into auto-apply." />
 
-      <div className="ops-kpis">
-        <div className="ops-kpi"><div className="ops-label">Open proposals</div><div className="ops-kpi-value">{proposals?.length ?? 0}</div></div>
-        <div className="ops-kpi"><div className="ops-label">Auto-applied this week</div><div className="ops-kpi-value">{autoWeek}</div></div>
-        <div className="ops-kpi"><div className="ops-label">Needs approval</div><div className="ops-kpi-value">{needs}</div></div>
-      </div>
+      <KpiStrip
+        items={[
+          { label: 'Open proposals', value: proposals?.length ?? 0 },
+          { label: 'Needs approval', value: needs, note: needs ? 'Waiting on you' : 'All clear' },
+          { label: 'Auto-applied this week', value: autoWeek, note: 'Undo within 24 hours' },
+        ]}
+      />
 
-      <div className="ops-grid">
-        <section className="ops-panel" aria-label="Objects">
-          <div className="ops-panel-head"><span className="ops-label">Objects</span></div>
-          {TYPE_LIST.map((t) => (
-            <button key={t.key} className="ops-legend-row" aria-pressed={!hidden.has(t.key)} onClick={() => setHidden((h) => { const n = new Set(h); if (n.has(t.key)) n.delete(t.key); else n.add(t.key); return n })}>
-              <span className="ops-check" />
-              {t.label}
-              <span className="ops-count">{counts?.[t.key] ?? 0}</span>
+      <div className="cmd">
+        <nav className="cmd-facets" aria-label="Filter by object type">
+          <div className="cmd-sub">Object type</div>
+          {facets.map((t) => (
+            <button key={t.key} className="cmd-facet" aria-pressed={!hidden.has(t.key)} onClick={() => setHidden((h) => { const n = new Set(h); if (n.has(t.key)) n.delete(t.key); else n.add(t.key); return n })}>
+              <span>{t.label}</span>
+              <span className="ops-count">{facetCounts.get(t.key) ?? 0}</span>
             </button>
           ))}
-        </section>
+          {facets.length === 0 && <div className="faint small">No proposals yet.</div>}
+        </nav>
 
-        <section className="ops-panel" aria-label="Proposals">
-          <div className="ops-panel-head"><span className="ops-label">Proposals</span><span className="ops-count">{visible.length}</span></div>
+        <section className="cmd-queue" aria-label="Proposals">
           {visible.length === 0 ? (
-            <div className="ops-panel-body" style={{ fontSize: 13, color: 'var(--ink-2)' }}>
-              {proposals?.length ? 'Every open proposal is hidden by the object filters.' : (
+            <Card>
+              {proposals?.length ? (
+                <p className="muted small" style={{ margin: 0 }}>Every open proposal is hidden by the object filters.</p>
+              ) : (
                 <>
-                  <div style={{ color: 'var(--ink)', marginBottom: 6 }}>Nothing to review.</div>
-                  Proposals are generated on this device from your data by fixed rules: an overdue task, a quarter goal with no progress in 14 days, a person past their contact cadence,
-                  uncategorized transactions that match a merchant rule, a budget on pace to go over, or a study streak about to lapse. Add tasks, goals, people or import transactions and they will appear here.
+                  <div style={{ fontWeight: 600, marginBottom: 6 }}>Nothing to review.</div>
+                  <p className="muted small" style={{ margin: 0 }}>
+                    Proposals are generated on this device from your data by fixed rules: an overdue task, a quarter goal with no progress in 14 days, a person past their contact cadence,
+                    uncategorized transactions that match a merchant rule, a budget on pace to go over, or a study streak about to lapse. Add tasks, goals, people or import transactions and they will appear here.
+                  </p>
                 </>
               )}
-            </div>
+            </Card>
           ) : (
-            <div className="table-wrap">
-              <table className="ops-table">
-                <thead><tr><th>Object</th><th>Proposal</th><th className="col-rule">Rule</th><th>Risk</th></tr></thead>
-                <tbody>
-                  {visible.map((p) => (
-                    <tr key={p.id} tabIndex={0} aria-selected={sel?.id === p.id} onClick={() => setSelId(p.id)} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setSelId(p.id))}>
-                      <td><span className="ops-label">{REGISTRY[typeOf(p)].label}</span> <span className="ops-mono">#{p.objectRef.id}</span></td>
-                      <td><div className="ops-clip">{p.title}</div></td>
-                      <td className="col-rule ops-mono">{p.rule}</td>
-                      <td className={`ops-mono ops-risk-${p.risk}`}>{p.risk}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="card card-flush">
+              <DataTable label="Proposals" columns={columns} rows={visible} rowKey={(p) => p.id} onRow={(p) => select(p.id)} activeKey={sel?.id ?? null} />
             </div>
           )}
         </section>
 
-        <section className="ops-panel" aria-label="Review proposal">
-          <div className="ops-panel-head"><span className="ops-label">Review proposal</span></div>
-          {sel ? <ReviewPanel key={sel.id} p={sel} onDone={() => next(sel.id)} /> : <div className="ops-panel-body" style={{ fontSize: 13, color: 'var(--ink-3)' }}>Select a proposal to review it.</div>}
-        </section>
+        {sel ? (
+          <SidePanel inline title="Review proposal" onClose={() => setClosed(true)}>
+            <ReviewPanel key={sel.id} p={sel} mode={mode} setMode={setMode} onDone={() => next(sel.id)} />
+          </SidePanel>
+        ) : (
+          !phone && (
+            <aside className="side-panel cmd-empty-panel" aria-label="Review proposal">
+              <div className="sheet-head"><h3>Review proposal</h3></div>
+              <div className="sheet-body faint small">Select a proposal to review it.</div>
+            </aside>
+          )
+        )}
       </div>
 
-      <section className="ops-panel" style={{ marginTop: 12 }} aria-label="Network view">
-        <div className="ops-panel-head">
-          <span className="ops-label">Network view</span>
-          {graph && <span className="ops-mono">{REGISTRY[graph.type].title(graph.obj)}</span>}
-        </div>
-        <div className="ops-panel-body">
+      <details className="card cmd-network">
+        <summary>Network view{graph ? <span className="faint"> · {REGISTRY[graph.type].title(graph.obj)}</span> : null}</summary>
+        <div style={{ marginTop: 12 }}>
           {graph ? (
             <NetworkGraph type={graph.type} obj={graph.obj} groups={graph.groups} onOpen={(t, id) => navigate(`/ontology?t=${t}&id=${id}`)} />
           ) : (
-            <div style={{ fontSize: 13, color: 'var(--ink-3)' }}>Select a proposal to see the object and what it links to.</div>
+            <div className="faint small">Select a proposal to see the object and what it links to.</div>
           )}
         </div>
-      </section>
+      </details>
 
-      <section className="ops-panel" style={{ marginTop: 12 }} aria-label="Auto-apply">
-        <div className="ops-panel-head"><span className="ops-label">Auto-apply (off by default)</span></div>
-        <div className="ops-panel-body">
-          <div style={{ fontSize: 13, color: 'var(--ink-2)', marginBottom: 8 }}>
-            Low-risk rules you switch on are applied automatically, logged on the timeline, and can be undone for 24 hours. Medium-risk proposals always wait for you.
-          </div>
-          {RULE_IDS.map((r) => (
-            <label key={r} className="ops-toggle" title={RULE_META[r].description}>
-              <input
-                type="checkbox"
-                checked={!!auto[r] && RULE_META[r].autoEligible}
-                disabled={!RULE_META[r].autoEligible}
-                onChange={async (e) => { await setAuto(r, e.target.checked); if (e.target.checked) void runAutoApply() }}
-              />
+      <Card title="Auto-apply" className="cmd-auto">
+        <p className="muted small" style={{ marginTop: 0 }}>
+          Off by default. Low-risk rules you switch on are applied automatically, logged on the timeline, and can be undone for 24 hours. Medium-risk proposals always wait for you.
+        </p>
+        {RULE_IDS.map((r) => (
+          <label key={r} className="ops-toggle cmd-toggle">
+            <input
+              type="checkbox"
+              checked={!!auto[r] && RULE_META[r].autoEligible}
+              disabled={!RULE_META[r].autoEligible}
+              onChange={async (e) => { await setAuto(r, e.target.checked); if (e.target.checked) void runAutoApply() }}
+            />
+            <span className="cmd-toggle-text">
               <span>{RULE_META[r].label}</span>
-              <span className="ops-label">{RULE_META[r].autoEligible ? RULE_META[r].description : 'review only'}</span>
-            </label>
-          ))}
-          {log.filter((e) => e.auto).slice(-5).reverse().map((e) => (
-            <div key={e.proposalId + e.at} className="ops-log-row">
-              <span className="ops-clip">{e.undone ? 'Undone: ' : ''}{e.title} <span className="ops-label">{e.at.slice(0, 16).replace('T', ' ')}</span></span>
-              {canUndo(e) && <button className="btn btn-sm" onClick={() => undoApplied(e.proposalId)}>Undo</button>}
-            </div>
-          ))}
-        </div>
-      </section>
+              <span className="faint small">{RULE_META[r].autoEligible ? RULE_META[r].description : 'Review only. Never applied automatically.'}</span>
+            </span>
+          </label>
+        ))}
+        {log.filter((e) => e.auto).slice(-5).reverse().map((e) => (
+          <div key={e.proposalId + e.at} className="ops-log-row">
+            <span className="ops-clip">{e.undone ? 'Undone: ' : ''}{e.title} <span className="faint small">{e.at.slice(0, 16).replace('T', ' ')}</span></span>
+            {canUndo(e) && <button className="btn btn-sm" onClick={() => undoApplied(e.proposalId)}>Undo</button>}
+          </div>
+        ))}
+      </Card>
     </>
   )
 }

@@ -1,13 +1,13 @@
 // Single-series column chart used by Food (week) and Learning (weekly minutes).
-// Dataviz rules: one hue (the app accent), <=24px columns with 4px rounded caps,
+// Dataviz rules: one hue (data slot 1, blue; amber is UI only), <=24px columns with 4px rounded caps,
 // hairline solid horizontal grid, per-column hover tooltip, optional target line,
 // and a table view so values are never chart-only.
-import { useState } from 'react'
 import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import ChartFrame from '../../components/ChartFrame'
 import './food.css'
 
 // SVG presentation attributes don't resolve CSS custom properties reliably, so mirror the tokens here.
-const C = { accent: '#e3b261', grid: '#262a33', ink2: '#a6a49d', ink3: '#6f6d68', cursor: '#1c1f26' }
+const C = { series: '#3987e5', grid: '#262a33', ink2: '#a6a49d', ink3: '#a6a49d', cursor: '#1c1f26' }
 
 export interface BarDatum {
   key: string
@@ -49,17 +49,12 @@ export default function MiniBars({
   target?: number
   height?: number
 }) {
-  const [table, setTable] = useState(false)
   const max = Math.max(0, ...data.map((d) => d.value), target ?? 0)
   return (
-    <section className="card">
-      <div className="card-title">
-        <span>{title}</span>
-        <button className="btn btn-ghost btn-sm" onClick={() => setTable((t) => !t)} aria-pressed={table}>
-          {table ? 'Chart' : 'Table'}
-        </button>
-      </div>
-      {table ? (
+    <ChartFrame
+      title={title}
+      hasData={data.some((d) => d.value > 0)}
+      table={
         <div className="table-wrap">
           <table className="table">
             <thead>
@@ -80,7 +75,8 @@ export default function MiniBars({
             </tbody>
           </table>
         </div>
-      ) : (
+      }
+    >
         <div style={{ width: '100%', height }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: 0 }} barCategoryGap="20%">
@@ -105,11 +101,10 @@ export default function MiniBars({
                   label={{ value: 'Target', position: 'insideTopRight', fill: C.ink2, fontSize: 11 }}
                 />
               ) : null}
-              <Bar dataKey="value" fill={C.accent} maxBarSize={24} radius={[4, 4, 0, 0]} isAnimationActive={false} />
+              <Bar dataKey="value" fill={C.series} maxBarSize={24} radius={[4, 4, 0, 0]} isAnimationActive={false} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-      )}
-    </section>
+    </ChartFrame>
   )
 }
