@@ -21,6 +21,7 @@ async function seedEverything() {
   await db.reviews.add({ weekOf: '2026-02-23', wins: 'w', struggles: 's', focusNext: 'f', ratings: { career: 4 }, createdAt: T })
   const habitId = (await db.habits.add({ name: 'Walk', area: 'health', perWeek: 5, createdAt: T })) as number
   await db.habitLogs.add({ habitId, date: '2026-03-02' })
+  await db.calendar.add({ title: 'Dentist', date: '2026-03-03', start: '09:00', end: '10:00', allDay: false, uid: 'u1' })
   await db.journal.add({ date: '2026-03-02', mood: 4, text: 'ok day', tags: ['a'], createdAt: T })
   await db.settings.put({ key: 'food.targets', value: { protein: 120 } })
   await db.settings.put({ key: BACKUP_LAST_KEY, value: T })

@@ -191,6 +191,22 @@ export interface JournalEntry {
   createdAt: ISOTime
 }
 
+export interface CalendarEvent {
+  id?: number
+  title: string
+  date: ISODate
+  /** HH:MM 24h; omitted for all-day. */
+  start?: string
+  end?: string
+  allDay: boolean
+  location?: string
+  notes?: string
+  /** External UID (e.g. from .ics) used for de-duplication. */
+  uid?: string
+  /** Import batch id, for undo. */
+  importBatch?: string
+}
+
 export interface Setting {
   key: string
   value: unknown
@@ -214,6 +230,7 @@ export const db = new Dexie('northstar') as Dexie & {
   habits: EntityTable<Habit, 'id'>
   habitLogs: EntityTable<HabitLog, 'id'>
   journal: EntityTable<JournalEntry, 'id'>
+  calendar: EntityTable<CalendarEvent, 'id'>
 }
 
 db.version(1).stores({
@@ -251,9 +268,10 @@ db.version(2).stores({
   events: '++id, at, area',
 })
 
-// v3: habits, habit check-ins (one per habit per day), journal.
+// v3: habits, habit check-ins (one per habit per day), journal, calendar events.
 db.version(3).stores({
   habits: '++id, archived, goalId',
   habitLogs: '++id, habitId, date, &[habitId+date]',
   journal: '++id, date',
+  calendar: '++id, date, uid, importBatch',
 })
