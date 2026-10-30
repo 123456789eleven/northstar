@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
-    "verify": "npm run typecheck && npm run lint && npm test && npm run build"
+    "verify": "npm run typecheck && npm run lint && npm test && npm run build",
+    "build:pages": "npm run build && node -e \"const fs=require('fs');fs.rmSync('pages-dist',{recursive:true,force:true});fs.cpSync('site','pages-dist',{recursive:true});fs.cpSync('dist','pages-dist/app',{recursive:true})\""
   },
   "dependencies": {
     "dexie": "^4.4.7",

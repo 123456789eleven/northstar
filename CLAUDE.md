@@ -38,3 +38,6 @@ Design every module so the common action takes ≤ 2 taps or one line of typing 
 - Test-first for bugs and new logic: keep parsers/math in pure functions (e.g. `lib/capture.ts`, `finance/csv.ts`) so they are testable; use `vi.useFakeTimers({ toFake: ['Date'] })` + `vi.setSystemTime` to pin "today" for DB-backed code.
 - Schema changes need a migration test in `src/db.migration.test.ts` (frozen v1 fixture -> open current version -> data intact). `backup.test.ts` round-trips every table; add a seed row there for any new table.
 - Monthly recurring tasks store `recurDay` so a 31st task survives short months; undoing a CSV import (`finance/importActions.ts`) also removes its History event (`refKey` = batch id).
+
+## Model efficiency (cost vs quality)
+Default to sonnet; opus only for architecture, schema/migrations, privacy audits, strategy, or after two failed fixes; haiku (`northstar-scout`) for searching and mechanical edits. Don't spawn agents for 1-3 tool-call jobs; give each disjoint files and the context up front; reports under ~300 words. Quality is enforced by `npm run verify` and the definition-of-done gates, never by model size. Full rules: the `northstar-model-efficiency` skill.

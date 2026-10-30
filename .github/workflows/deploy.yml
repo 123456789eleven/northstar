@@ -21,9 +21,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run verify
+      - run: npm run build:pages
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: pages-dist
   deploy:
     needs: build
     runs-on: ubuntu-latest

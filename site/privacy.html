@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="description" content="How Northstar keeps your data on your device: what is stored, what is not collected, and how backups work.">
+<meta name="theme-color" content="#0c0d10">
+<title>Privacy | Northstar</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="stylesheet" href="style.css">
+<script src="site.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a>
+<nav aria-label="Main"><ul><li><a href="platform.html">Platform</a></li><li><a href="privacy.html" aria-current="page">Privacy</a></li><li><a href="get-started.html">Get started</a></li><li><a class="nav-cta" href="app/">Open app</a></li></ul></nav>
+</div></header>
+<main id="main">
+<section class="page-hero dark"><div class="wrap"><p class="label">Privacy</p><h1>Your data stays where you put it.</h1><p class="lede mute">Northstar is local-first by design, not by policy. There is no backend that could receive your data.</p></div></section>
+<section class="light"><div class="wrap"><div class="prose">
+<h2 style="margin-top:0">How data stays on your device</h2>
+<p>The app is a set of static files. Once loaded, it reads and writes a database inside your browser (IndexedDB). It makes no network requests carrying your information. A strict content security policy limits the app and this site to loading resources from their own origin, and fonts are self-hosted.</p>
+<h2>What is stored</h2>
+<table class="plain"><thead><tr><th scope="col">Area</th><th scope="col">Examples</th></tr></thead><tbody>
+<tr><td>Tasks and goals</td><td>Titles, due dates, progress, recurrence</td></tr>
+<tr><td>Finance</td><td>Transactions from CSV files you import, budgets</td></tr>
+<tr><td>Food and learning</td><td>Meals you log, courses and lessons</td></tr>
+<tr><td>People</td><td>Names and contact notes you enter</td></tr>
+<tr><td>History</td><td>A timeline of events and milestones</td></tr>
+<tr><td>Settings</td><td>Preferences on this device</td></tr>
+</tbody></table>
+<p class="mute" style="margin-top:16px">Bank credentials are never asked for or stored. Bank data enters only through a CSV file you pick.</p>
+<h2>What is not collected</h2>
+<ul><li>No accounts, sign-ins or email addresses.</li><li>No analytics, advertising or tracking scripts.</li><li>No cloud storage or sync.</li><li>No third-party fonts, CDNs or embeds.</li></ul>
+<h2>Backups</h2>
+<p>In Settings you can export a JSON backup of everything, and import one later. The file is created and saved by your browser on your device. Treat it like any personal document: it holds your data in plain form. Importing a backup runs as a single step so a failed import cannot leave things half-written.</p>
+<h2>Offline and the service worker</h2>
+<p>A service worker caches the app&rsquo;s own files so it opens without a connection. It caches application code and assets only, never your data.</p>
+<h2>Clearing your data</h2>
+<p>Clearing this site&rsquo;s data in your browser settings erases your Northstar data from that device. Export a backup first if you want to keep it. Because there is no cloud copy, it cannot be recovered for you.</p>
+<p><a class="btn" href="app/">Open Northstar</a></p>
+</div></div></section>
+</main>
+<footer><div class="wrap">
+<div>Northstar. Personal software that keeps your data on your device.</div>
+<nav aria-label="Footer"><ul><li><a href="index.html">Home</a></li><li><a href="platform.html">Platform</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="get-started.html">Get started</a></li><li><a href="app/">Open the app</a></li></ul></nav>
+</div></footer>
+</body>
+</html>

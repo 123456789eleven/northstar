@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react'
 import { HashRouter, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import QuickCapture from './components/QuickCapture'
 import Today from './pages/Today'
+import Ops from './pages/Ops'
+import Ontology from './pages/Ontology'
 import Tasks from './pages/Tasks'
 import Goals from './pages/Goals'
 import Food from './pages/Food'
@@ -13,6 +15,7 @@ import Review from './pages/Review'
 import Settings from './pages/Settings'
 
 const NAV: { section?: string; to: string; label: string }[] = [
+  { to: '/ops', label: 'Command' },
   { to: '/', label: 'Today' },
   { to: '/tasks', label: 'Tasks' },
   { to: '/goals', label: 'Goals' },
@@ -22,6 +25,7 @@ const NAV: { section?: string; to: string; label: string }[] = [
   { to: '/people', label: 'People' },
   { section: 'Reflect', to: '/history', label: 'History' },
   { to: '/review', label: 'Review' },
+  { to: '/ontology', label: 'Ontology' },
   { to: '/settings', label: 'Settings' },
 ]
 
@@ -66,6 +70,8 @@ function Shell() {
           <QuickCapture />
           <Routes>
             <Route path="/" element={<Today />} />
+            <Route path="/ops" element={<Ops />} />
+            <Route path="/ontology" element={<Ontology />} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/goals" element={<Goals />} />
             <Route path="/food" element={<Food />} />
