@@ -3,6 +3,8 @@ import { db } from '../../db'
 import { Card } from '../../components/ui'
 import { toggleDone } from '../tasks/taskActions'
 import { toggleCheckIn } from '../habits/habitData'
+import { isGoogleEvent } from '../gcal/help'
+import '../gcal/gcal.css'
 import { DAY_MIN, daySegments, fmtTime, hourRange, layoutSegments, timeLabel } from './layout'
 
 const PX_PER_HOUR = 48
@@ -11,7 +13,7 @@ export function EventButton({ e, onOpen }: { e: CalendarEvent; onOpen: (e: Calen
   const allDay = e.allDay || !e.start
   return (
     <button className={`pl-ev ${allDay ? 'allday' : ''}`} onClick={() => onOpen(e)}>
-      <span className="pl-ev-title">{e.title}</span>
+      <span className="pl-ev-title">{e.title}{isGoogleEvent(e) && <span className="gcal-src" title="Imported from Google Calendar">Google</span>}</span>
       <small>{[timeLabel(e), e.location].filter(Boolean).join(' · ')}</small>
     </button>
   )
@@ -71,7 +73,7 @@ export function DayGrid({ date, events, isToday, nowMin, onOpen, onNew }: { date
           style={{ top: y(p.start), height: Math.max(22, y(p.end) - y(p.start) - 2), left: `${(p.col / p.cols) * 100}%`, width: `calc(${100 / p.cols}% - 3px)` }}
           onClick={() => onOpen(p.event)}
         >
-          <span className="pl-ev-title">{p.event.title}</span>
+          <span className="pl-ev-title">{p.event.title}{isGoogleEvent(p.event) && <span className="gcal-src" title="Imported from Google Calendar">Google</span>}</span>
           <small>{p.continued ? `Until ${fmtTime(p.end)}` : timeLabel(p.event)}</small>
         </button>
       ))}

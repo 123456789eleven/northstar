@@ -118,3 +118,12 @@
   .ops-clip { max-width: 180px; }
 }
 .cmd-queue .card-flush { overflow: visible; }
+
+/* Command: table and review panel sit side by side; the table truncates instead of spilling under the panel. */
+.cmd-queue .dt-table { table-layout: fixed; }
+.cmd-queue .dt-table th:nth-child(1) { width: 52%; }
+.cmd-queue .dt-table th:nth-child(3) { width: 88px; }
+.cmd-queue .dt-table td { overflow: hidden; }
+.cmd-queue .ops-clip { max-width: none; display: block; }
+.cmd .side-panel { z-index: 2; flex: none; }
+@media (min-width: 820px) { .cmd .side-panel { width: 360px; } }

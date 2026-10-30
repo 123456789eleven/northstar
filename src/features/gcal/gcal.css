@@ -6,3 +6,21 @@
 .gcal-origin { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .gcal-origin code { font-size: 12px; overflow-wrap: anywhere; }
 .gcal-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.gcal-stepper { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.gcal-step { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; }
+.gcal-last { margin-top: 10px; }
+.gcal-num { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); color: var(--ink-3); display: grid; place-items: center; font-size: 12px; margin-top: 1px; }
+.gcal-step.current .gcal-num { border-color: var(--accent); color: var(--accent); }
+.gcal-step.done .gcal-num { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.gcal-step.todo b { color: var(--ink-3); font-weight: 500; }
+.gcal-step-body { min-width: 0; flex: 1; }
+.gcal-step-body p { margin: 4px 0 6px; }
+.gcal-linkbtn { background: none; border: 0; color: var(--ink-3); font: inherit; font-size: 12px; padding: 0 0 0 8px; min-height: 32px; cursor: pointer; text-decoration: underline; }
+.gcal-how { margin-top: 10px; font-size: 13px; }
+.gcal-how summary { cursor: pointer; color: var(--ink-2); min-height: 32px; display: flex; align-items: center; }
+.gcal-facts { margin: 10px 0 0; display: grid; gap: 4px; font-size: 13px; }
+.gcal-facts div { display: flex; gap: 8px; }
+.gcal-facts dt { color: var(--ink-3); min-width: 90px; }
+.gcal-facts dd { margin: 0; overflow-wrap: anywhere; }
+.gcal-src { font-size: 10px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); margin-left: 6px; }
+.gcal-prompt { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); margin: 0 0 10px; }

@@ -1,12 +1,15 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db, type CalendarEvent, type ISODate } from '../db'
+import { db, getSetting, setSetting, type CalendarEvent, type ISODate } from '../db'
+import { Link } from 'react-router-dom'
 import { Card, PageHeader } from '../components/ui'
 import { useNow } from '../components/useNow'
 import { addDays, formatDate, today } from '../lib/dates'
 import { allDayOn, daySegments, weekDates } from '../features/planner/layout'
 import { EventModal } from '../features/planner/EventModal'
 import { DayGrid, EventButton, HabitLine, PlanPanel, TaskLine } from '../features/planner/PlannerParts'
+import { GCAL_DISMISS_KEY } from '../features/gcal/help'
+import '../features/gcal/gcal.css'
 import '../features/planner/planner.css'
 
 type View = 'week' | 'day'
@@ -18,6 +21,10 @@ export default function Planner() {
   const [anchor, setAnchor] = useState<ISODate>(t)
   const [editing, setEditing] = useState<Editing | null>(null)
 
+  const showGcalPrompt = useLiveQuery(async () => {
+    const [st, dismissed] = await Promise.all([getSetting<{ state?: string }>('gcal.status', { state: 'off' }), getSetting<boolean>(GCAL_DISMISS_KEY, false)])
+    return (st.state ?? 'off') === 'off' && !dismissed
+  }, [], false)
   const events = useLiveQuery(() => db.calendar.toArray(), [])
   const tasks = useLiveQuery(() => db.tasks.toArray(), [])
   const habits = useLiveQuery(() => db.habits.filter((h) => !h.archived).toArray(), [])
@@ -66,6 +73,14 @@ export default function Planner() {
         title="Planner" sub={events === undefined ? ' ' : `${evs.filter((e) => days.includes(e.date)).length} events in view${habitsOpenToday ? ` · ${habitsOpenToday} daily ${habitsOpenToday === 1 ? 'habit' : 'habits'} open today` : ''}`}
         actions={<button className="btn btn-primary" onClick={() => openNew(view === 'day' ? anchor : t)}>New event</button>}
       />
+
+      {showGcalPrompt && (
+        <div className="gcal-prompt">
+          <span>Want your Google Calendar here? Read-only, stays on this device.</span>
+          <Link className="btn btn-sm" to="/data#gcal">Connect Google Calendar</Link>
+          <button className="btn btn-sm btn-ghost" onClick={() => void setSetting(GCAL_DISMISS_KEY, true)}>Dismiss</button>
+        </div>
+      )}
 
       <div className="pl-bar">
         <button className="btn btn-sm" onClick={() => setAnchor(addDays(anchor, -step))} aria-label="Previous period">Previous</button>

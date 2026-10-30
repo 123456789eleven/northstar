@@ -29,5 +29,11 @@
 .card-link:hover { color: var(--ink); }
 .tile-empty { font-size: 13px; color: var(--ink-2); }
 
-.today-more > summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; font-size: 14px; color: var(--ink-2); }
+.today-more { padding: 0 var(--pad, 16px); }
+.today-more > summary { cursor: pointer; min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--ink); list-style: none; }
+.today-more > summary::-webkit-details-marker { display: none; }
+.today-more > summary .faint { font-size: 12px; flex: 1; text-align: right; min-width: 0; }
+.today-more > summary::after { content: '+'; flex: 0 0 20px; text-align: center; font-size: 18px; color: var(--ink-2); }
+.today-more[open] > summary::after { content: '2'; }
+.today-more-body { padding-bottom: 12px; }
 .today-more-body { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }

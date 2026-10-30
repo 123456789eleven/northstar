@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import type { Goal, LearningItem, Task } from '../../db'
 import { AREA_LABEL, Progress } from '../../components/ui'
+import { useMedia, PHONE_QUERY } from '../../components/useMedia'
 import { formatDate } from '../../lib/dates'
 import { TaskRow } from '../tasks/TaskRow'
 import { CHILD_HORIZON, HORIZON_LABEL, goalProgress, progressLabel } from './progress'
@@ -35,16 +36,21 @@ export function GoalCard({
   const [adding, setAdding] = useState(false)
   const [ms, setMs] = useState('')
   const [showTasks, setShowTasks] = useState(false)
+  const phone = useMedia(PHONE_QUERY)
+  const [msOpen, setMsOpen] = useState(false)
   const linked = tasks.filter((t) => t.goalId === goal.id)
   const openLinked = linked.filter((t) => t.status === 'open')
   const learnCount = learning.filter((l) => l.goalId === goal.id).length
   const p = goalProgress(goal, tasks)
   const child = CHILD_HORIZON[goal.horizon]
   const done = goal.status === 'done'
+  const hasMs = goal.milestones.length > 0
+  const collapsible = phone && hasMs
+  const showMs = !collapsible || msOpen || adding
 
   return (
     <div>
-      <article className={`goal ${goal.status}`}>
+      <article className={`goal goal-${goal.horizon} ${goal.status}`}>
         <div className="goal-head">
           <div className="grow">
             <div className="goal-title">{goal.title}</div>
@@ -81,14 +87,21 @@ export function GoalCard({
 
         {goal.why && <div className="goal-why">{goal.why}</div>}
 
-        {p.basis !== 'none' && (
-          <div className="goal-progress">
-            <Progress value={p.pct} label={`${goal.title} progress`} />
-            <span className="goal-progress-label">{progressLabel(p)}</span>
-          </div>
-        )}
+        {(p.basis !== 'none' || collapsible) &&
+          (collapsible ? (
+            <button type="button" className="goal-progress goal-progress-btn" aria-expanded={msOpen} onClick={() => setMsOpen((v) => !v)}>
+              {p.basis !== 'none' ? <Progress value={p.pct} label={`${goal.title} progress`} /> : <span className="grow" />}
+              <span className="goal-progress-label">{p.basis !== 'none' ? progressLabel(p) : `${goal.milestones.length} milestones`}</span>
+              <span className="goal-chev" aria-hidden>{msOpen ? '−' : '+'}</span>
+            </button>
+          ) : (
+            <div className="goal-progress">
+              <Progress value={p.pct} label={`${goal.title} progress`} />
+              <span className="goal-progress-label">{progressLabel(p)}</span>
+            </div>
+          ))}
 
-        {goal.milestones.length > 0 && (
+        {hasMs && showMs && (
           <div className="ms-list">
             {goal.milestones.map((m) => (
               <div key={m.id} className={`ms-row ${m.done ? 'done' : ''}`}>

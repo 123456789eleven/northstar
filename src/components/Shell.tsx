@@ -1,5 +1,5 @@
 // App shell parts: desktop rail, top bar (context, capture, sync, date), phone bottom bar + More sheet.
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { getSetting } from '../db'
@@ -9,6 +9,46 @@ import BottomSheet from './BottomSheet'
 import { Icon } from './Icons'
 import { NAV, NAV_GROUPS, PRIMARY_TABS } from './nav'
 import { useMedia, PHONE_QUERY } from './useMedia'
+
+const CommandPalette = lazy(() => import('./CommandPalette'))
+const OPEN_PALETTE = 'ns:palette'
+const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
+
+/** Owns Ctrl/Cmd+K and mounts the lazy-loaded palette only once it is first opened. */
+function PaletteHost() {
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.key === 'k' || e.key === 'K') && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey) {
+        e.preventDefault()
+        e.stopImmediatePropagation() // the capture bar also listens for Ctrl+K; the palette takes it over
+        setOpen((o) => !o)
+      }
+    }
+    const onOpen = () => setOpen(true)
+    window.addEventListener('keydown', onKey, true)
+    window.addEventListener(OPEN_PALETTE, onOpen)
+    return () => { window.removeEventListener('keydown', onKey, true); window.removeEventListener(OPEN_PALETTE, onOpen) }
+  }, [])
+  if (!open) return null
+  return <Suspense fallback={null}><CommandPalette onClose={() => setOpen(false)} /></Suspense>
+}
+
+function SearchButton({ compact }: { compact: boolean }) {
+  const open = () => window.dispatchEvent(new Event(OPEN_PALETTE))
+  const glass = (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden>
+      <circle cx="7" cy="7" r="4.5" /><path d="M10.5 10.5L14 14" />
+    </svg>
+  )
+  return compact ? (
+    <button className="icon-btn" onClick={open} aria-label="Search" aria-haspopup="dialog">{glass}</button>
+  ) : (
+    <button className="cp-trigger" onClick={open} aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K">
+      {glass}<span>Search</span><kbd>{isMac ? 'Cmd K' : 'Ctrl K'}</kbd>
+    </button>
+  )
+}
 
 export function Mark() {
   return (
@@ -89,6 +129,12 @@ export function TopBar() {
     navigate('/', { replace: true })
     setTimeout(() => (phone ? setOpen(true) : window.dispatchEvent(new KeyboardEvent('keydown', { key: '/' }))), 0)
   }, [search, phone, navigate])
+  // "New task" in the palette: focus the capture line (desktop) or open the capture sheet (phone).
+  useEffect(() => {
+    const onCapture = () => (phone ? setOpen(true) : window.dispatchEvent(new KeyboardEvent('keydown', { key: '/' })))
+    window.addEventListener('ns:capture', onCapture)
+    return () => window.removeEventListener('ns:capture', onCapture)
+  }, [phone])
   return (
     <header className="topbar">
       <div className="topbar-ctx">
@@ -97,6 +143,7 @@ export function TopBar() {
       </div>
       {!phone && <div className="topbar-capture"><QuickCapture /></div>}
       <div className="topbar-right">
+        <SearchButton compact={phone} />
         <SyncChip dotOnly={phone} />
         {!phone && <span className="topbar-date mono">{dateLabel()}</span>}
         {phone && (
@@ -105,6 +152,7 @@ export function TopBar() {
           </button>
         )}
       </div>
+      <PaletteHost />
       {phone && open && (
         <BottomSheet title="Capture" onClose={() => setOpen(false)}>
           <QuickCapture autoFocus />

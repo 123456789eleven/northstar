@@ -52,14 +52,14 @@ function ensureClient(clientId: string): TokenClient {
       const p = pending
       pending = null
       if (!p) return
-      if (r.error || !r.access_token) return p.reject(new Error(r.error_description || r.error || 'Google did not return an access token.'))
+      if (r.error || !r.access_token) return p.reject(new Error(r.error || r.error_description || 'Google did not return an access token.'))
       token = { value: r.access_token, expiresAt: Date.now() + (Number(r.expires_in) || 3600) * 1000 }
       p.resolve(r.access_token)
     },
     error_callback: (e) => {
       const p = pending
       pending = null
-      p?.reject(new Error(e.type === 'popup_closed' ? 'Sign-in window was closed.' : e.message || 'Sign-in failed.'))
+      p?.reject(new Error(e.type || e.message || 'Sign-in failed.'))
     },
   })
   clientFor = clientId

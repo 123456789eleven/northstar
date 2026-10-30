@@ -5,7 +5,9 @@ import { db, type Task } from '../db'
 import { Card, Empty, PageHeader, Progress } from '../components/ui'
 import KpiStrip from '../components/KpiStrip'
 import { useMedia, PHONE_QUERY } from '../components/useMedia'
-import { formatDate, today } from '../lib/dates'
+import { addDays, formatDate, today } from '../lib/dates'
+import { useNow } from '../components/useNow'
+import { fmtTime, sortedUpcoming, toMin } from '../features/planner/layout'
 import { TaskRow } from '../features/tasks/TaskRow'
 import { TaskEditor } from '../features/tasks/TaskEditor'
 import { MAX_FOCUS, togglePin } from '../features/tasks/taskActions'
@@ -27,6 +29,13 @@ export default function Today() {
   const habitLogs = useLiveQuery(() => db.habitLogs.where('date').equals(d).toArray(), [d])
   const [editing, setEditing] = useState<Task | null>(null)
   const [note, setNote] = useState('')
+
+  const events = useLiveQuery(() => db.calendar.where('date').between(d, addDays(d, 1), true, true).toArray(), [d])
+  const now = useNow()
+  const nextEvent = events ? sortedUpcoming(events, d, now.getHours() * 60 + now.getMinutes())[0] : undefined
+  const nextEv = nextEvent
+    ? `${nextEvent.title}, ${nextEvent.date === d ? 'today' : 'tomorrow'}${nextEvent.allDay || !nextEvent.start ? '' : ` ${fmtTime(toMin(nextEvent.start))}`}`
+    : ''
 
   const goalTitle = useMemo(() => new Map((goals ?? []).map((g) => [g.id!, g.title])), [goals])
   const v = useMemo(() => buildTodayView(tasks ?? [], d), [tasks, d])
@@ -53,13 +62,38 @@ export default function Today() {
     for (const t of v.suggestions) await togglePin(t)
   }
 
+  const quarterCard = (
+  <Card title="This quarter" action={<Link className="card-link" to="/goals">Goals</Link>}>
+    {quarter.length > 0 ? (
+      quarter.map((g) => {
+        const p = goalProgress(g, tasks ?? [])
+        return (
+          <Link key={g.id} to="/goals" className="qgoal">
+            <div className="qgoal-head">
+              <span>{g.title}</span>
+              <span className="faint">{progressLabel(p)}</span>
+            </div>
+            <Progress value={p.pct} label={`${g.title} progress`} />
+          </Link>
+        )
+      })
+    ) : (
+      goals !== undefined && (
+        <div className="tile-empty">
+          No quarter goals yet. <Link to="/goals">Set one on Goals</Link>: what would make this quarter a win?
+        </div>
+      )
+    )}
+  </Card>
+  )
+
   const listed = v.focus.length + v.suggestions.length + v.due.length + v.done.length
 
   return (
     <>
       <PageHeader
         title={formatDate(d, { weekday: 'long', month: 'long', day: 'numeric' })}
-        sub={loaded ? `${v.openCount} open${v.overdueCount ? ` · ${v.overdueCount} overdue` : ''}` : ' '}
+        sub={loaded ? `${v.openCount} open${v.overdueCount ? ` · ${v.overdueCount} overdue` : ' · none overdue'}${nextEv ? ` · Next: ${nextEv}` : ''}` : ' '}
       />
 
       <FirstRunCard />
@@ -115,6 +149,7 @@ export default function Today() {
                 {loaded && listed === 0 && <Empty>No open tasks. Press / and type one, e.g. "call dentist tmr !1".</Empty>}
                 {note && <div className="focus-note">{note}</div>}
               </Card>
+              {!phone && <HabitsTile />}
             </div>
 
             <div className="today-col">
@@ -123,30 +158,9 @@ export default function Today() {
                   <HabitsTile />
                   <NextUp />
                   <details className="card today-more">
-                    <summary>More: quarter goals, insights, across your life</summary>
+                    <summary><span>More</span><span className="faint">Quarter goals, insights, across your life</span></summary>
                     <div className="today-more-body">
-              <Card title="This quarter" action={<Link className="card-link" to="/goals">Goals</Link>}>
-                {quarter.length > 0 ? (
-                  quarter.map((g) => {
-                    const p = goalProgress(g, tasks ?? [])
-                    return (
-                      <Link key={g.id} to="/goals" className="qgoal">
-                        <div className="qgoal-head">
-                          <span>{g.title}</span>
-                          <span className="faint">{progressLabel(p)}</span>
-                        </div>
-                        <Progress value={p.pct} label={`${g.title} progress`} />
-                      </Link>
-                    )
-                  })
-                ) : (
-                  goals !== undefined && (
-                    <div className="tile-empty">
-                      No quarter goals yet. <Link to="/goals">Set one on Goals</Link>: what would make this quarter a win?
-                    </div>
-                  )
-                )}
-              </Card>
+                      {quarterCard}
                       <InsightsCard />
                       <GlanceTiles />
                     </div>
@@ -155,30 +169,8 @@ export default function Today() {
               )}
               {!phone && (
                 <>
-              <Card title="This quarter" action={<Link className="card-link" to="/goals">Goals</Link>}>
-                {quarter.length > 0 ? (
-                  quarter.map((g) => {
-                    const p = goalProgress(g, tasks ?? [])
-                    return (
-                      <Link key={g.id} to="/goals" className="qgoal">
-                        <div className="qgoal-head">
-                          <span>{g.title}</span>
-                          <span className="faint">{progressLabel(p)}</span>
-                        </div>
-                        <Progress value={p.pct} label={`${g.title} progress`} />
-                      </Link>
-                    )
-                  })
-                ) : (
-                  goals !== undefined && (
-                    <div className="tile-empty">
-                      No quarter goals yet. <Link to="/goals">Set one on Goals</Link>: what would make this quarter a win?
-                    </div>
-                  )
-                )}
-              </Card>
+                  {quarterCard}
                   <NextUp />
-                  <HabitsTile />
                   <InsightsCard />
                   <GlanceTiles />
                 </>
