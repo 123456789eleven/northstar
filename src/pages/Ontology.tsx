@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
+import { toISODate } from '../lib/dates'
 import { PageHeader } from '../components/ui'
 import { REGISTRY, resolveLinks, timelineFor, TYPE_LIST, type Row, type TypeDef, type TypeKey } from '../ontology/registry'
 import '../features/ops/ops.css'
@@ -83,7 +84,7 @@ function Diagram({ counts, active, onPick }: { counts: Record<string, number>; a
             <g key={t.key} className={`node ${active === t.key ? 'active' : ''}`} onClick={() => onPick(t.key)} role="button" aria-label={`${t.label}, ${counts[t.key] ?? 0} rows`}>
               <rect className="node-box" x={p.x} y={p.y} width={BOX_W} height={p.h} rx={3} />
               <text className="head" x={p.x + 10} y={p.y + 18}>{t.label}</text>
-              <text x={p.x + BOX_W - 10} y={p.y + 18} textAnchor="end">{counts[t.key] ?? 0} rows</text>
+              <text x={p.x + BOX_W - 10} y={p.y + 18} textAnchor="end">{counts[t.key] ?? 0} {(counts[t.key] ?? 0) === 1 ? 'row' : 'rows'}</text>
               {sections(t).map((s) => {
                 y += 8
                 const head = y + LINE - 3
@@ -172,7 +173,7 @@ function Panel({ type, row, onGo }: { type: TypeKey; row: Row; onGo: (t: TypeKey
         <div className="ops-label">Timeline</div>
         {extra?.events.length ? (
           <ul style={{ listStyle: 'none', padding: 0 }}>
-            {extra.events.slice(0, 20).map((e) => <li key={e.id} style={{ minHeight: 24 }}><span className="ops-mono" style={{ color: 'var(--ink-3)' }}>{e.at.slice(0, 10)}</span> {e.title}</li>)}
+            {extra.events.slice(0, 20).map((e) => <li key={e.id} style={{ minHeight: 24 }}><span className="ops-mono" style={{ color: 'var(--ink-3)' }}>{toISODate(new Date(e.at))}</span> {e.title}</li>)}
           </ul>
         ) : <div style={{ marginTop: 6 }}>No events logged for this object.</div>}
       </div>

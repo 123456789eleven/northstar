@@ -1,4 +1,5 @@
 // Small node graph: the selected object in the middle, what it points at on the left, what points at it on the right.
+import { useEffect, useRef } from 'react'
 import { REGISTRY, type LinkGroup, type Row, type TypeKey } from '../../ontology/registry'
 
 const W = 640
@@ -20,6 +21,8 @@ export function NetworkGraph({ type, obj, groups, onOpen }: { type: TypeKey; obj
   const cx = W / 2
   const y = (i: number, n: number) => (H - n * ROW) / 2 + i * ROW + ROW / 2
   const def = REGISTRY[type]
+  const box = useRef<HTMLDivElement>(null)
+  useEffect(() => { const el = box.current; if (el) el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2 }, [type, obj.id])
 
   const node = (x: number, yy: number, t: TypeKey, o: Row, cls = '') => (
     <g className={`node ${cls}`} key={`${t}${o.id}${x}`} onClick={() => cls || o.id == null || onOpen(t, o.id)} role={cls ? undefined : 'link'} aria-label={`${REGISTRY[t].label} ${REGISTRY[t].title(o)}`}>
@@ -30,7 +33,7 @@ export function NetworkGraph({ type, obj, groups, onOpen }: { type: TypeKey; obj
   )
 
   return (
-    <div className="ops-graph">
+    <div className="ops-graph" ref={box}>
       <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Links of ${def.title(obj)}`}>
         {lShow.map((x, i) => {
           const yy = y(i, lShow.length)

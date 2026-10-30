@@ -79,7 +79,7 @@ code, .mono { font-family: var(--mono); font-size: .9em; }
 
 /* diagram */
 .diagram { overflow-x: auto; margin-top: 48px; border: 1px solid var(--light-line); background: var(--light); padding: 8px; }
-.diagram svg { display: block; width: 100%; min-width: 760px; height: auto; }
+.diagram svg { display: block; width: 100%; min-width: 700px; height: auto; }
 .diagram text { font-family: var(--sans); }
 .diagram .m { font-family: var(--mono); }
 .diagram-note { font-size: 14px; margin-top: 12px; }
@@ -115,7 +115,7 @@ code, .mono { font-family: var(--mono); font-size: .9em; }
 table.ptable { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 460px; }
 .ptable th { text-align: left; font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dark-mute); padding: 12px 20px; border-bottom: 1px solid var(--dark-line); }
 .ptable td { padding: 12px 20px; border-bottom: 1px solid var(--dark-line); vertical-align: top; }
-.ptable tr.sel td { background: #1a1d24; box-shadow: inset 2px 0 0 var(--accent); }
+.ptable tr.sel td { background: #1a1d24; }
 .ptable tr.sel td:first-child { box-shadow: inset 2px 0 0 var(--accent); }
 .ptable .o { font-family: var(--mono); font-size: 12px; color: var(--dark-mute); }
 .tag { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; border: 1px solid var(--dark-line); padding: 2px 6px; white-space: nowrap; }
