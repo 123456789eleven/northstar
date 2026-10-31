@@ -1,7 +1,7 @@
 // "Add many": load what already exists (for duplicate detection), insert parsed rows in ONE transaction, and undo exactly that.
 // Inserts mirror the real pages: tasks/people/habits/meals add rows directly, goals go through createGoal, and transactions go
 // through commitImport (batch id + History event), so Finance's import history and undoImport keep working.
-import { db, getSetting } from '../../db'
+import { db, getSetting, logEvent } from '../../db'
 import type { CaptureGoal } from '../../lib/capture'
 import { createGoal } from '../goals/goalActions'
 import { RULES_KEY, allRules, type Rule } from '../finance/categories'
@@ -25,6 +25,8 @@ export async function loadBulkContext(kind: BulkKind): Promise<Pick<BulkContext,
     for (const h of await db.habits.toArray()) if (!h.archived) existing.habits.add(h.name.trim().toLowerCase())
   } else if (kind === 'meals') {
     for (const m of await db.meals.toArray()) existing.meals.add(`${m.date}|${m.slot}|${m.name.trim().toLowerCase()}`)
+  } else if (kind === 'balances') {
+    for (const s of await db.balances.toArray()) existing.balances.add(`${s.name.trim().toLowerCase()}|${s.date}|${s.kind}`)
   } else {
     rules = allRules(await getSetting<Rule[]>(RULES_KEY, []))
     for (const t of await db.transactions.toArray()) existing.transactions.add(`${t.date}|${t.amount.toFixed(2)}|${t.description.trim().toLowerCase()}`)
@@ -94,6 +96,15 @@ export async function addBulk(kind: BulkKind, items: BulkItem[]): Promise<BulkAd
         db.meals.bulkAdd(rows.map((m) => ({ date: m.date, slot: m.slot, name: m.name, calories: m.calories })), { allKeys: true }),
       )
       return done(() => db.transaction('rw', db.meals, () => db.meals.bulkDelete(ids)))
+    }
+    case 'balances': {
+      const rows = items.flatMap((i) => (i.kind === 'balances' ? [i] : []))
+      const { ids, eventId } = await db.transaction('rw', db.balances, db.events, async () => {
+        const ids = await db.balances.bulkAdd(rows.map((s) => ({ date: s.date, name: s.name, kind: s.accountKind, balance: s.balance })), { allKeys: true })
+        const eventId = await logEvent({ area: 'finance', kind: 'finance.balances-added', title: `Added ${rows.length} account balance${rows.length === 1 ? '' : 's'}`, refTable: 'balances', refId: ids[0] })
+        return { ids, eventId }
+      })
+      return done(() => db.transaction('rw', db.balances, db.events, async () => { await db.balances.bulkDelete(ids); await db.events.delete(eventId) }))
     }
     case 'transactions': {
       const rows = items.flatMap((i) => (i.kind === 'transactions' ? [i] : []))

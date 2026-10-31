@@ -34,6 +34,10 @@ const HELP: Record<BulkKind, { hint: string; placeholder: string }> = {
     hint: 'Description and amount. Unsigned is money out, +500 is money in. Add a date if it was not today.',
     placeholder: 'Kroger 42.50\n$12.50 chipotle\nPaycheck +1200\n2026-10-01, Rent, 1450',
   },
+  balances: {
+    hint: 'Name, asset or liability, amount, date (optional, default today). Dates: 2026-09-30 or 09/30/2026.',
+    placeholder: 'Marcus Savings (HYSA), asset, 14490.94, 2026-09-30\nVisa Card, liability, 1250.00\nCar loan, debt, $8,400',
+  },
 }
 
 const STATUS_LABEL = { ok: 'Ready', duplicate: 'Duplicate', error: 'Error' } as const

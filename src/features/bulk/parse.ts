@@ -7,7 +7,7 @@ import { formatDate, toISODate } from '../../lib/dates'
 import { CATEGORIES, allRules, categorize, type Rule } from '../finance/categories'
 import { parseQuickAdd } from '../finance/quickAdd'
 
-export type BulkKind = 'tasks' | 'people' | 'goals' | 'habits' | 'meals' | 'transactions'
+export type BulkKind = 'tasks' | 'people' | 'goals' | 'habits' | 'meals' | 'transactions' | 'balances'
 
 export const BULK_KINDS: { value: BulkKind; label: string; noun: string }[] = [
   { value: 'tasks', label: 'Tasks', noun: 'task' },
@@ -16,6 +16,7 @@ export const BULK_KINDS: { value: BulkKind; label: string; noun: string }[] = [
   { value: 'habits', label: 'Habits', noun: 'habit' },
   { value: 'meals', label: 'Meals', noun: 'meal' },
   { value: 'transactions', label: 'Transactions', noun: 'transaction' },
+  { value: 'balances', label: 'Balances', noun: 'balance' },
 ]
 
 export type BulkItem =
@@ -25,6 +26,7 @@ export type BulkItem =
   | { kind: 'habits'; name: string; area: Area; perWeek: number }
   | { kind: 'meals'; name: string; slot: MealSlot; date: ISODate; calories?: number }
   | { kind: 'transactions'; date: ISODate; amount: number; description: string; category: string; account?: string }
+  | { kind: 'balances'; name: string; accountKind: 'asset' | 'liability'; balance: number; date: ISODate }
 
 export type RowStatus = 'ok' | 'duplicate' | 'error'
 
@@ -51,7 +53,7 @@ export interface BulkResult {
 
 export type ExistingKeys = Record<BulkKind, Set<string>>
 export const emptyExisting = (): ExistingKeys => ({
-  tasks: new Set(), people: new Set(), goals: new Set(), habits: new Set(), meals: new Set(), transactions: new Set(),
+  tasks: new Set(), people: new Set(), goals: new Set(), habits: new Set(), meals: new Set(), transactions: new Set(), balances: new Set(),
 })
 
 export interface BulkContext {
@@ -245,6 +247,12 @@ const ALIASES: Record<BulkKind, Record<Field, string[]>> = {
     credit: ['credit', 'deposit', 'money in'],
     category: ['category'],
     account: ['account'],
+  },
+  balances: {
+    name: ['name', 'account', 'account name'],
+    type: ['type', 'kind', 'asset or liability'],
+    amount: ['balance', 'amount', 'value'],
+    date: ['date', 'as of'],
   },
 }
 
@@ -533,6 +541,32 @@ function buildTransaction(r: RawRow, ctx: BulkContext, todayISO: ISODate): Built
   return fail('Needs an amount, e.g. "Kroger 42.50" or "$12 lunch"')
 }
 
+function parseBalanceKind(s: string): 'asset' | 'liability' | undefined {
+  const t = s.trim().toLowerCase()
+  if (['asset', 'assets', 'a'].includes(t)) return 'asset'
+  if (['liability', 'liabilities', 'l', 'debt', 'owe'].includes(t)) return 'liability'
+  return undefined
+}
+
+function buildBalance(r: RawRow, todayISO: ISODate): Built {
+  const n = r.named
+  const [pName, pKind, pAmt, pDate] = r.parts.map((p) => p.trim())
+  const name = ((n ? n.name : pName) ?? '').replace(/\s+/g, ' ').trim()
+  const kindText = ((n ? n.type : pKind) ?? '').trim()
+  const amtText = ((n ? n.amount : pAmt) ?? '').trim()
+  const dateText = ((n ? n.date : pDate) ?? '').trim()
+  if (!name) return fail('No account name')
+  if (!kindText) return fail('Needs asset or liability')
+  const accountKind = parseBalanceKind(kindText)
+  if (!accountKind) return fail(`"${kindText}" should be asset or liability`)
+  if (!amtText) return fail('No balance amount')
+  const amount = parseAmount(amtText)
+  if (amount == null) return fail(`Can't read the amount "${amtText}"`)
+  const date = dateText ? parseLooseDate(dateText, todayISO, 'past') : todayISO
+  if (!date) return fail(`Can't read the date "${dateText}"`)
+  return { item: { kind: 'balances', name, accountKind, balance: Math.round(Math.abs(amount) * 100) / 100, date } }
+}
+
 // ---------- description + keys ----------
 
 const money = (n: number) => Math.abs(n).toLocaleString('en-US', { style: 'currency', currency: 'USD' })
@@ -565,6 +599,8 @@ export function describeItem(item: BulkItem): { title: string; chips: string[] }
       return { title: item.name, chips: [cap(item.area), item.perWeek === 7 ? 'Daily' : `${item.perWeek}x a week`] }
     case 'meals':
       return { title: item.name, chips: [cap(item.slot), item.calories != null ? `${item.calories} cal` : undefined, formatDate(item.date)].filter((x): x is string => !!x) }
+    case 'balances':
+      return { title: item.name, chips: [item.accountKind === 'asset' ? 'Asset' : 'Liability', money(item.balance), formatDate(item.date)] }
     case 'transactions':
       return { title: item.description, chips: [item.amount < 0 ? `Out ${money(item.amount)}` : `In ${money(item.amount)}`, formatDate(item.date), item.category] }
   }
@@ -578,6 +614,7 @@ export function itemKey(item: BulkItem): string {
     case 'habits': return item.name.toLowerCase()
     case 'meals': return `${item.date}|${item.slot}|${item.name.toLowerCase()}`
     case 'transactions': return `${item.date}|${item.amount.toFixed(2)}|${item.description.toLowerCase()}`
+    case 'balances': return `${item.name.toLowerCase()}|${item.date}|${item.accountKind}`
   }
 }
 
@@ -588,6 +625,7 @@ const DUP_REASON: Record<BulkKind, string> = {
   habits: 'Already a habit',
   meals: 'Already logged',
   transactions: 'Already recorded',
+  balances: 'Already recorded for that date',
 }
 
 // ---------- entry point ----------
@@ -639,6 +677,7 @@ export function parseBulk(kind: BulkKind, text: string, ctx: BulkContext = {}): 
       : kind === 'goals' ? buildGoal(rr, todayISO)
       : kind === 'habits' ? buildHabit(rr)
       : kind === 'meals' ? buildMeal(rr, ctx, todayISO)
+      : kind === 'balances' ? buildBalance(rr, todayISO)
       : buildTransaction(rr, ctx, todayISO)
     if ('error' in built) {
       rows.push({ line, raw, status: 'error', reason: built.error, title: raw.trim().replace(/\t/g, '  '), chips: [] })

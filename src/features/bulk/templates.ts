@@ -2,7 +2,7 @@
 import { addDays, today } from '../../lib/dates'
 import type { BulkKind } from './parse'
 
-export const TEMPLATE_KINDS: BulkKind[] = ['transactions', 'people', 'tasks']
+export const TEMPLATE_KINDS: BulkKind[] = ['transactions', 'people', 'tasks', 'balances']
 
 export function csvCell(v: string): string {
   return /[",\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v
@@ -27,6 +27,12 @@ export function templateRows(kind: BulkKind, now: string = today()): string[][] 
         ['Task', 'Due', 'Priority', 'Repeat', 'Notes'],
         ['Renew passport', addDays(now, 14), 'high', '', 'Needs a new photo'],
         ['Water the plants', '', 'low', 'weekly', ''],
+      ]
+    case 'balances':
+      return [
+        ['Name', 'Type', 'Balance', 'Date'],
+        ['Marcus Savings (HYSA)', 'asset', '14490.94', now],
+        ['Visa Card', 'liability', '1250.00', now],
       ]
     default:
       return null
