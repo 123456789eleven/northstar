@@ -5,6 +5,7 @@ import { Card, Field, Modal } from '../../components/ui'
 import { demoCounts, removeDemo } from '../../lib/demo'
 import { loadDemoWithConfirm } from '../onboarding/demoActions'
 import { BACKUP_LAST_KEY, BACKUP_REMIND_DAYS, eraseAll, exportBackup, importBackup, parseBackup, type ParsedBackup } from '../../lib/backup'
+import AddFromFile from './AddFromFile'
 import { openSetup } from '../onboarding/setupLogic'
 import * as sync from '../../sync/manager'
 import { eraseLocalWithoutSync, restoreWithoutSync } from '../../sync/manager'
@@ -136,7 +137,9 @@ export function BackupSection() {
         <button className="btn btn-primary" onClick={onExport} disabled={busy}>Export backup</button>
         <button className="btn" onClick={() => fileRef.current?.click()} disabled={busy}>Import backup…</button>
         <input ref={fileRef} className="set-file" type="file" accept="application/json,.json" onChange={onPick} tabIndex={-1} aria-hidden />
+        <AddFromFile disabled={busy} onError={setError} />
       </div>
+      <p className="set-text small">Adds transactions, balances and budgets from a file. Nothing you already have is replaced.</p>
       {error && <p className="set-error" role="alert">{error}</p>}
       {done && <p className="set-ok" role="status">{done}</p>}
 
