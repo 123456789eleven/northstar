@@ -142,7 +142,7 @@ export interface Interaction {
 export interface LifeEvent {
   id?: number
   at: ISOTime
-  area: Area | 'tasks' | 'food'
+  area: Area | 'tasks' | 'food' | 'body'
   kind: string
   title: string
   refTable?: string
@@ -210,6 +210,15 @@ export interface CalendarEvent {
   importBatch?: string
 }
 
+export interface WeightEntry {
+  id?: number
+  /** One row per date. */
+  date: ISODate
+  /** Pounds. */
+  weight: number
+  note?: string
+}
+
 export interface Setting {
   key: string
   value: unknown
@@ -234,6 +243,7 @@ export const db = new Dexie('northstar') as Dexie & {
   habitLogs: EntityTable<HabitLog, 'id'>
   journal: EntityTable<JournalEntry, 'id'>
   calendar: EntityTable<CalendarEvent, 'id'>
+  weights: EntityTable<WeightEntry, 'id'>
 }
 
 db.version(1).stores({
@@ -284,5 +294,10 @@ db.version(3).stores({
 db.version(4).stores({
   outbox: '[table+key], at',
   syncMeta: '[table+key], &[table+syncId]',
+})
+
+// v5: body weight log (Body module). One row per date, so date is unique; no foreign keys.
+db.version(5).stores({
+  weights: '++id, &date',
 })
 installOutbox(db, { autoStart: true })

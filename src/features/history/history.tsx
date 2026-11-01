@@ -6,7 +6,7 @@ import { formatDate, parseISODate, today } from '../../lib/dates'
 import { countByArea, dayOf, groupByWeek, weekLabel } from './group'
 
 const PAGE = 100
-const EVENT_AREAS: LifeEvent['area'][] = [...AREAS, 'tasks', 'food']
+const EVENT_AREAS: LifeEvent['area'][] = [...AREAS, 'tasks', 'food', 'body']
 
 const timeOf = (e: LifeEvent) => new Date(e.at).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
 

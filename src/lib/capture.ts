@@ -30,6 +30,7 @@ export type Capture =
   | TaskCapture
   | { kind: 'transaction'; amount: number; description: string; date: ISODate }
   | { kind: 'meal'; name: string; calories?: number; slot: MealSlot; date: ISODate }
+  | { kind: 'weight'; weight: number; date: ISODate }
   | { kind: 'win'; title: string; area: Area }
   | { kind: 'journal'; text: string }
   | { kind: 'empty' }
@@ -261,6 +262,14 @@ export function parseCapture(input: string, ctx: CaptureContext = {}): Capture {
     return { kind: 'win', title: title || 'Win', area }
   }
 
+  // Weight: "weight 136.4", "w 136.4", "weighed 136.4 lb yesterday"
+  const wt = /^(?:weight|weighed|w)\s+(\d{2,3}(?:\.\d)?)\s*(?:lbs?)?(?:\s+(today|yesterday|yday|\d{4}-\d{2}-\d{2}))?$/i.exec(text)
+  if (wt && Number(wt[1]) >= 50 && Number(wt[1]) <= 700) {
+    const when = wt[2]?.toLowerCase()
+    const date = !when || when === 'today' ? todayISO : when === 'yesterday' || when === 'yday' ? addDays(todayISO, -1) : when
+    return { kind: 'weight', weight: Number(wt[1]), date }
+  }
+
   // Meal: "ate oatmeal 350cal", "had chicken salad for lunch 520 kcal"
   const meal = /^(?:ate|had)\s+(?!to\b)(.+)$/i.exec(text)
   if (meal) {
@@ -316,6 +325,8 @@ export function describeCapture(c: Capture, ctx: { now?: Date } = {}): string[] 
       )
     case 'journal':
       return ['Journal entry']
+    case 'weight':
+      return ['Weight', `${c.weight} lb`, c.date === todayISO ? undefined : dueLabel(c.date, todayISO)].filter((x): x is string => !!x)
     case 'win':
       return ['Win',c.area[0].toUpperCase() + c.area.slice(1)]
   }

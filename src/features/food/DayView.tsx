@@ -1,39 +1,24 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Empty, Progress } from '../../components/ui'
-import { db, type ISODate } from '../../db'
+import { Empty } from '../../components/ui'
+import { useToast } from '../../components/toastContext'
+import { db, type ISODate, type MealSlot } from '../../db'
 import { addDays, formatDate, relativeDay, today } from '../../lib/dates'
+import LeftToday from './LeftToday'
+import QuickAdd from './QuickAdd'
 import SlotCard, { type Suggestion } from './SlotCard'
-import { copyYesterday, SLOTS, sumMeals, type FoodTargets } from './foodData'
+import Suggestions from './Suggestions'
+import { useTemplates } from './useTemplates'
+import { copyYesterdayIds, removeMeals, SLOTS, sumMeals, type FoodTargets } from './foodData'
+import { defaultSlot, leftToday, type Candidate } from './foodLogic'
 
 const LIST_ID = 'food-recent-names'
 
-function TotalLine({ label, value, unit, target, onSetTarget }: { label: string; value: number; unit: string; target?: number; onSetTarget?: () => void }) {
-  const left = target ? target - value : 0
-  return (
-    <div className="food-total">
-      <span className="stat-label">{label}</span>
-      <div className="food-total-value">
-        <span className="stat-value">{value.toLocaleString()}</span>
-        <span className="muted small">
-          {target ? ` / ${target.toLocaleString()}` : ''} {unit}
-        </span>
-      </div>
-      {target ? (
-        <>
-          <Progress value={(value / target) * 100} label={label} />
-          <span className={`tiny ${left < 0 ? 'muted' : 'faint'}`}>{left >= 0 ? `${left.toLocaleString()} ${unit} left` : `${(-left).toLocaleString()} ${unit} over`}</span>
-        </>
-      ) : onSetTarget ? (
-        <button className="btn btn-ghost btn-sm food-set-target" onClick={onSetTarget}>
-          Set a target
-        </button>
-      ) : null}
-    </div>
-  )
-}
-
 export default function DayView({ date, setDate, targets, onTargets }: { date: ISODate; setDate: (d: ISODate) => void; targets: FoodTargets; onTargets: () => void }) {
+  const toast = useToast()
+  const templates = useTemplates()
+  const [hour] = useState(() => new Date().getHours())
+  const [slot, setSlot] = useState<MealSlot>(() => defaultSlot(hour))
   const picker = useRef<HTMLInputElement>(null)
   const yesterday = addDays(date, -1)
   const meals = useLiveQuery(() => db.meals.where('date').equals(date).toArray(), [date])
@@ -52,6 +37,21 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
     return map
   }, [favorites, recent])
 
+  const counts = useMemo(() => {
+    const c = new Map<string, number>()
+    for (const m of recent ?? []) {
+      const k = m.name.trim().toLowerCase()
+      c.set(k, (c.get(k) ?? 0) + 1)
+    }
+    return c
+  }, [recent])
+
+  const own = useMemo(() => {
+    const out: Candidate[] = []
+    for (const [k, s] of suggestions) if (s.calories != null && s.protein != null) out.push({ name: s.name, calories: s.calories, protein: s.protein, own: true, uses: counts.get(k) ?? 0 })
+    return out
+  }, [suggestions, counts])
+
   const recentBySlot = useMemo(() => {
     const favNames = new Set((favorites ?? []).map((f) => f.name.trim().toLowerCase()))
     const out = new Map<string, Suggestion[]>()
@@ -61,14 +61,24 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
       if (m.date === date || seen.has(k) || favNames.has(m.name.trim().toLowerCase())) continue
       seen.add(k)
       const list = out.get(m.slot) ?? []
-      if (list.length < 3) list.push({ name: m.name, calories: m.calories, protein: m.protein })
+      list.push({ name: m.name, calories: m.calories, protein: m.protein })
       out.set(m.slot, list)
     }
+    for (const [k, list] of out) {
+      list.sort((a, b) => (counts.get(b.name.trim().toLowerCase()) ?? 0) - (counts.get(a.name.trim().toLowerCase()) ?? 0))
+      out.set(k, list.slice(0, 3))
+    }
     return out
-  }, [favorites, recent, date])
+  }, [favorites, recent, date, counts])
 
   const totals = sumMeals(meals ?? [])
   const isToday = date === today()
+  const left = leftToday(targets, totals)
+  const remaining = useMemo(() => ({ kcal: left?.kcal ?? 0, protein: left?.protein ?? 0 }), [left?.kcal, left?.protein])
+  const copyDay = async () => {
+    const ids = await copyYesterdayIds(date)
+    toast({ message: ids.length ? `Copied ${ids.length} items from yesterday` : 'Nothing to copy', undo: ids.length ? () => removeMeals(ids) : undefined })
+  }
 
   return (
     <div className="stack food-day">
@@ -93,16 +103,15 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
         )}
         <span className="grow" />
         {(prevMeals?.length ?? 0) > 0 && (
-          <button className="btn" onClick={() => copyYesterday(date)} title="Copy every meal from the previous day">
+          <button className="btn" onClick={() => void copyDay()} title="Copy every meal from the previous day">
             Copy yesterday
           </button>
         )}
       </div>
 
-      <section className="card food-totals">
-        <TotalLine label="Calories" value={totals.calories} unit="kcal" target={targets.calories} onSetTarget={onTargets} />
-        <TotalLine label="Protein" value={totals.protein} unit="g" target={targets.protein} onSetTarget={onTargets} />
-      </section>
+      <LeftToday targets={targets} totals={totals} isToday={isToday} hour={hour} onTargets={onTargets} />
+      <QuickAdd date={date} slot={slot} setSlot={setSlot} />
+      {left && (left.kcal > 0 || left.protein > 0) && <Suggestions remaining={remaining} own={own} date={date} slot={slot} />}
 
       {meals && meals.length === 0 && (favorites?.length ?? 0) === 0 && (
         <Empty>Type what you ate into a slot below — numbers are optional. Tick “Fav” on meals you repeat and they become one-tap chips.</Empty>
@@ -127,6 +136,7 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
             recents={recentBySlot.get(s.value) ?? []}
             hasYesterday={(prevMeals ?? []).some((m) => m.slot === s.value)}
             listId={LIST_ID}
+            templates={templates}
           />
         ))}
       </div>

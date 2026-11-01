@@ -11,6 +11,7 @@ const Ontology = lazy(() => import('./pages/Ontology'))
 const Tasks = lazy(() => import('./pages/Tasks'))
 const Goals = lazy(() => import('./pages/Goals'))
 const Food = lazy(() => import('./pages/Food'))
+const Body = lazy(() => import('./pages/Body'))
 const Finance = lazy(() => import('./pages/Finance'))
 const Learning = lazy(() => import('./pages/Learning'))
 const People = lazy(() => import('./pages/People'))
@@ -50,6 +51,7 @@ function Shell() {
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/goals" element={<Goals />} />
             <Route path="/food" element={<Food />} />
+            <Route path="/body" element={<Body />} />
             <Route path="/finance" element={<Finance />} />
             <Route path="/learning" element={<Learning />} />
             <Route path="/people" element={<People />} />

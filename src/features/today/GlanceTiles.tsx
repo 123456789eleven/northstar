@@ -5,6 +5,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../../db'
 import { isSpend } from '../finance/categories'
 import { Progress } from '../../components/ui'
+import { averageAt } from '../body/model'
 import { addDays, monthKey, money, startOfWeek, today } from '../../lib/dates'
 
 function Row({ to, label, value, note, children }: { to: string; label: string; value: ReactNode; note?: ReactNode; children?: ReactNode }) {
@@ -52,6 +53,16 @@ function FoodRow() {
   return <Row to="/food" label="Food today" value={cal > 0 ? `${cal.toLocaleString()} cal` : `${meals.length} ${meals.length === 1 ? 'meal' : 'meals'}`} note={meals.map((m) => m.name).slice(-2).join(', ')} />
 }
 
+function WeightRow() {
+  const w = useLiveQuery(() => db.weights.orderBy('date').toArray(), [])
+  if (!w || w.length === 0) return null
+  const t = today()
+  const cur = averageAt(w, t) ?? w[w.length - 1].weight
+  const prev = averageAt(w, addDays(t, -7))
+  const d = prev != null ? cur - prev : null
+  return <Row to="/body" label="Weight" value={`${cur.toFixed(1)} lb`} note={d != null ? `${d > 0 ? '+' : d < 0 ? '-' : ''}${Math.abs(d).toFixed(1)} lb over 7 days` : `Last ${w[w.length - 1].weight} lb`} />
+}
+
 function LearningRow() {
   const mins = useLiveQuery(async () => {
     const s = await db.studySessions.where('date').between(startOfWeek(), today(), true, true).toArray()
@@ -88,6 +99,7 @@ export function GlanceTiles() {
       <div className="card-title"><span>Across your life</span></div>
       <MoneyRow />
       <FoodRow />
+      <WeightRow />
       <LearningRow />
       <PeopleRow />
     </section>

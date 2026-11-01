@@ -299,3 +299,22 @@ describe('parseTask: names that look like date words', () => {
     expect(t.title).toBe('Call Tom')
   })
 })
+
+describe('weight capture', () => {
+  it('parses weight / w / weighed', () => {
+    expect(parseCapture('weight 136.4', ctx)).toEqual({ kind: 'weight', weight: 136.4, date: '2026-05-06' })
+    expect(parseCapture('w 136', ctx)).toEqual({ kind: 'weight', weight: 136, date: '2026-05-06' })
+    expect(parseCapture('weighed 136.4 lbs yesterday', ctx)).toEqual({ kind: 'weight', weight: 136.4, date: '2026-05-05' })
+    expect(parseCapture('Weight 140 2026-05-01', ctx)).toEqual({ kind: 'weight', weight: 140, date: '2026-05-01' })
+  })
+  it('leaves ordinary tasks alone', () => {
+    expect(parseCapture('weigh the dog', ctx).kind).toBe('task')
+    expect(parseCapture('w 5', ctx).kind).toBe('task')
+    expect(parseCapture('weight 12 boxes', ctx).kind).toBe('task')
+    expect(parseCapture('weight 1360', ctx).kind).toBe('task')
+  })
+  it('describes', () => {
+    expect(describeCapture(parseCapture('w 136.4', ctx), ctx)).toEqual(['Weight', '136.4 lb'])
+    expect(describeCapture(parseCapture('w 136.4 yesterday', ctx), ctx)).toEqual(['Weight', '136.4 lb', 'May 5'])
+  })
+})

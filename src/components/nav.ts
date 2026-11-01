@@ -13,6 +13,7 @@ export const NAV: NavItem[] = [
   { to: '/habits', label: 'Habits', icon: 'habits', group: 'Plan' },
   { to: '/finance', label: 'Finance', icon: 'finance', group: 'Life' },
   { to: '/food', label: 'Food', icon: 'food', group: 'Life' },
+  { to: '/body', label: 'Body', icon: 'body', group: 'Life' },
   { to: '/learning', label: 'Learning', icon: 'learning', group: 'Life' },
   { to: '/people', label: 'People', icon: 'people', group: 'Life' },
   { to: '/journal', label: 'Journal', icon: 'journal', group: 'Reflect' },

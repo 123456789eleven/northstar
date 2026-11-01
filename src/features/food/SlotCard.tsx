@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import type { FavoriteMeal, ISODate, Meal, MealSlot } from '../../db'
 import FoodLookup from './FoodLookup'
-import { addMeal, copyYesterday, logFavorite, optNum, removeMeal, sumMeals } from './foodData'
+import { useToast } from '../../components/toastContext'
+import { addMeal, applyTemplate, copyYesterdayIds, createTemplate, logFavorite, optNum, removeMeal, removeMeals, sumMeals } from './foodData'
+import { parseQuickEntry, scaleItem, type MealTemplate } from './foodLogic'
 
 export interface Suggestion {
   name: string
@@ -19,6 +21,7 @@ export default function SlotCard({
   recents,
   hasYesterday,
   listId,
+  templates,
 }: {
   slot: MealSlot
   label: string
@@ -32,12 +35,21 @@ export default function SlotCard({
   hasYesterday: boolean
   /** id of the shared recent-names datalist */
   listId: string
+  templates: MealTemplate[]
 }) {
   const [name, setName] = useState('')
   const [kcal, setKcal] = useState('')
   const [protein, setProtein] = useState('')
   const [fav, setFav] = useState(false)
+  const [mult, setMult] = useState(1)
+  const [tplName, setTplName] = useState<string | null>(null)
+  const toast = useToast()
   const totals = sumMeals(meals)
+
+  const undoable = async (message: string, ids: (number | undefined)[]) => {
+    const real = ids.filter((x): x is number => x != null)
+    toast({ message, undo: () => removeMeals(real) })
+  }
 
   const onName = (v: string) => {
     setName(v)
@@ -50,7 +62,10 @@ export default function SlotCard({
 
   const submit = async () => {
     if (!name.trim()) return
-    await addMeal({ date, slot, name, calories: optNum(kcal), protein: optNum(protein) }, { saveFavorite: fav })
+    // "3 eggs 210" or "shake 600cal 40p" typed into the name box fills blank number fields.
+    const p = parseQuickEntry(name)
+    const id = await addMeal({ date, slot, name: p.name, calories: optNum(kcal) ?? p.calories, protein: optNum(protein) ?? p.protein }, { saveFavorite: fav })
+    void undoable(`Added ${p.name}`, [id])
     setName('')
     setKcal('')
     setProtein('')
@@ -68,12 +83,65 @@ export default function SlotCard({
             </span>
           )}
         </span>
-        {hasYesterday && (
-          <button className="btn btn-ghost btn-sm" onClick={() => copyYesterday(date, slot)} title={`Copy yesterday's ${label.toLowerCase()}`}>
-            Copy yesterday
-          </button>
-        )}
+        <span className="row" style={{ gap: 4 }}>
+          {meals.length > 0 && tplName == null && (
+            <button className="btn btn-ghost btn-sm" onClick={() => setTplName(label === 'Snack' ? 'Usual snack' : `Usual ${label.toLowerCase()}`)}>
+              Save as template
+            </button>
+          )}
+          {hasYesterday && (
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={async () => {
+                const ids = await copyYesterdayIds(date, slot)
+                toast({ message: `Copied ${ids.length} from yesterday's ${label.toLowerCase()}`, undo: () => removeMeals(ids) })
+              }}
+              title={`Copy yesterday's ${label.toLowerCase()}`}
+            >
+              Copy yesterday
+            </button>
+          )}
+        </span>
       </div>
+
+      {tplName != null && (
+        <form
+          className="row food-tpl-save"
+          onSubmit={async (e) => {
+            e.preventDefault()
+            const ok = await createTemplate(tplName, meals)
+            toast({ message: ok ? `Saved template “${tplName.trim()}”` : 'Could not save template (name needed, max 20)' })
+            setTplName(null)
+          }}
+        >
+          <input className="input grow" value={tplName} onChange={(e) => setTplName(e.target.value)} aria-label="Template name" autoFocus />
+          <button className="btn btn-primary btn-sm" type="submit">
+            Save
+          </button>
+          <button className="btn btn-ghost btn-sm" type="button" onClick={() => setTplName(null)}>
+            Cancel
+          </button>
+        </form>
+      )}
+
+      {templates.length > 0 && (
+        <div className="food-favs" aria-label={`Templates for ${label}`}>
+          {templates.map((t) => (
+            <button
+              key={t.id}
+              className="food-fav food-tpl-chip"
+              title={t.items.map((i) => i.name).join(', ')}
+              onClick={async () => {
+                const ids = await applyTemplate(t, date, slot)
+                toast({ message: `Added ${t.name}`, undo: () => removeMeals(ids) })
+              }}
+            >
+              <span>+ {t.name}</span>
+              <span className="faint mono">{t.items.length}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {meals.length > 0 && (
         <div className="list">
@@ -95,14 +163,17 @@ export default function SlotCard({
 
       {(favorites.length > 0 || recents.length > 0) && (
         <div className="food-favs" aria-label={`Favorites and recent for ${label}`}>
+          <button className="food-fav food-mult" onClick={() => setMult(mult >= 3 ? 1 : mult + 1)} title="Quantity multiplier for the chips" aria-label={`Quantity multiplier x${mult}`}>
+            x{mult}
+          </button>
           {favorites.map((f) => (
-            <button key={f.id} className="food-fav" onClick={() => logFavorite(f, date, slot)} title={`Log ${f.name}`}>
+            <button key={f.id} className="food-fav" onClick={async () => { const id = await logFavorite(f, date, slot, mult); void undoable(`Added ${f.name}${mult > 1 ? ` x${mult}` : ''}`, [id]) }} title={`Log ${f.name}`}>
               <span>+ {f.name}</span>
               {f.calories != null && <span className="faint mono">{f.calories}</span>}
             </button>
           ))}
           {recents.map((r) => (
-            <button key={r.name} className="food-fav food-recent" onClick={() => void addMeal({ date, slot, name: r.name, calories: r.calories, protein: r.protein })} title={`Log ${r.name} again`}>
+            <button key={r.name} className="food-fav food-recent" onClick={async () => { const id = await addMeal({ date, slot, ...scaleItem(r, mult) }); void undoable(`Added ${r.name}${mult > 1 ? ` x${mult}` : ''}`, [id]) }} title={`Log ${r.name} again`}>
               <span>+ {r.name}</span>
               {r.calories != null && <span className="faint mono">{r.calories}</span>}
             </button>

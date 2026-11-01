@@ -6,11 +6,18 @@ import ChartFrame from '../components/ChartFrame'
 import { addDays, formatDate, today } from '../lib/dates'
 import { EntryEditor } from '../features/journal/EntryEditor'
 import { MoodChart } from '../features/journal/MoodChart'
-import { groupByMonth, matchesSearch, moodSeries, onThisDay, wordCount, wordStreak } from '../features/journal/stats'
+import { groupByMonth, matchesSearch, moodSeries, wordCount, wordStreak } from '../features/journal/stats'
+import { highlight, lookback, snippet, tagCounts } from '../features/journal/insights'
+import { MonthMap } from '../features/journal/MonthMap'
+import { useJournalPrefs } from '../features/journal/prefs'
 import '../features/journal/journal.css'
 
-function EntryRow({ e, hidePreview, onOpen }: { e: JournalEntry; hidePreview: boolean; onOpen: (d: string) => void }) {
-  const first = e.text.trim().split('\n')[0]
+function Hl({ text, q }: { text: string; q: string }) {
+  return <>{highlight(text, q).map((s, i) => (s.hit ? <mark key={i} className="jr-hit">{s.text}</mark> : <span key={i}>{s.text}</span>))}</>
+}
+
+function EntryRow({ e, hidePreview, q, onOpen }: { e: JournalEntry; hidePreview: boolean; q: string; onOpen: (d: string) => void }) {
+  const first = snippet(e.text, q)
   return (
     <button className="jr-entry" onClick={() => onOpen(e.date)} aria-label={`Open ${formatDate(e.date)}`}>
       <span className="jr-entry-head">
@@ -19,8 +26,21 @@ function EntryRow({ e, hidePreview, onOpen }: { e: JournalEntry; hidePreview: bo
           {[e.mood ? `Mood ${e.mood}` : '', e.energy ? `Energy ${e.energy}` : '', `${wordCount(e.text)} words`].filter(Boolean).join(' · ')}
         </span>
       </span>
-      {first && !hidePreview && <span className="jr-entry-body clamp">{first}</span>}
+      {first && !hidePreview && <span className="jr-entry-body clamp"><Hl text={first} q={q} /></span>}
     </button>
+  )
+}
+
+function ReadingView({ entry, onEdit }: { entry: JournalEntry; onEdit: () => void }) {
+  return (
+    <div className="stack">
+      <article className="jr-read" aria-label="Entry">{entry.text}</article>
+      <div className="jr-foot">
+        <span>{[entry.mood ? `Mood ${entry.mood}` : '', entry.energy ? `Energy ${entry.energy}` : '', (entry.tags ?? []).map((x) => `#${x}`).join(' ')].filter(Boolean).join(' · ') || 'No mood or tags'}</span>
+        <span>{wordCount(entry.text)} words</span>
+      </div>
+      <div><button className="btn btn-sm" onClick={onEdit}>Edit</button></div>
+    </div>
   )
 }
 
@@ -31,6 +51,10 @@ export default function Journal() {
   const entries = useLiveQuery(() => db.journal.toArray(), [])
   const [date, setDate] = useState(t)
   const [q, setQ] = useState('')
+  const [tag, setTag] = useState<string | null>(null)
+  const [editing, setEditing] = useState(false)
+  const [prefs, setPrefs] = useJournalPrefs()
+  const open = (d: string) => { setDate(d); setEditing(false) }
   const [hidePreview, setHidePreview] = useState(() => {
     try { return localStorage.getItem(HIDE_KEY) === '1' } catch { return false }
   })
@@ -42,11 +66,12 @@ export default function Journal() {
   const written = (entries ?? []).filter((e) => e.text.trim()).length
 
   const current = entries?.find((e) => e.date === date)
+  const reading = date !== t && !editing && !!current?.text.trim()
   const stats = useMemo(() => {
     const all = entries ?? []
-    return { streak: wordStreak(all, t), series: moodSeries(all, t, 90), then: onThisDay(all, t), hasMood: all.some((e) => e.mood) }
+    return { streak: wordStreak(all, t), series: moodSeries(all, t, 90), then: lookback(all, t), tags: tagCounts(all).slice(0, 8), hasMood: all.some((e) => e.mood) }
   }, [entries, t])
-  const groups = useMemo(() => groupByMonth((entries ?? []).filter((e) => e.date !== date && (e.text.trim() || e.mood) && matchesSearch(e, q))), [entries, date, q])
+  const groups = useMemo(() => groupByMonth((entries ?? []).filter((e) => e.date !== date && (e.text.trim() || e.mood) && matchesSearch(e, q) && (!tag || (e.tags ?? []).includes(tag)))), [entries, date, q, tag])
 
   return (
     <>
@@ -60,19 +85,28 @@ export default function Journal() {
             title={date === t ? `Today · ${formatDate(date, { weekday: 'long', month: 'short', day: 'numeric' })}` : formatDate(date, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
             action={
               <span className="row jr-nav">
-                <button className="btn btn-ghost btn-sm" onClick={() => setDate(addDays(date, -1))} aria-label="Previous day">‹</button>
-                {date !== t && <button className="btn btn-ghost btn-sm" onClick={() => setDate(t)}>Today</button>}
-                <button className="btn btn-ghost btn-sm" disabled={date >= t} onClick={() => setDate(addDays(date, 1))} aria-label="Next day">›</button>
-                <input className="jr-date" type="date" value={date} max={t} onChange={(e) => setDate(e.target.value || t)} aria-label="Jump to date" />
+                <button className="btn btn-ghost btn-sm" onClick={() => open(addDays(date, -1))} aria-label="Previous day">‹</button>
+                {date !== t && <button className="btn btn-ghost btn-sm" onClick={() => open(t)}>Today</button>}
+                <button className="btn btn-ghost btn-sm" disabled={date >= t} onClick={() => open(addDays(date, 1))} aria-label="Next day">›</button>
+                <input className="jr-date" type="date" value={date} max={t} onChange={(e) => open(e.target.value || t)} aria-label="Jump to date" />
               </span>
             }
           >
-            {entries !== undefined && <EntryEditor key={date} date={date} entry={current} />}
+            {entries !== undefined && (reading && current
+              ? <ReadingView entry={current} onEdit={() => setEditing(true)} />
+              : <EntryEditor key={date} date={date} entry={current} entries={entries} prefs={prefs} onPref={setPrefs} />)}
           </Card>
           <Card title="Earlier" action={<button className="btn btn-ghost btn-sm" onClick={togglePreview} aria-pressed={hidePreview}>{hidePreview ? 'Show previews' : 'Hide previews'}</button>}>
-            <input className="input" style={{ marginBottom: 14 }} type="search" placeholder="Search entries or #tags" aria-label="Search journal" value={q} onChange={(e) => setQ(e.target.value)} />
+            <input className="input" style={{ marginBottom: 10 }} type="search" placeholder="Search entries or #tags (stays on this device)" aria-label="Search journal" value={q} onChange={(e) => setQ(e.target.value)} />
+            {stats.tags.length > 0 && (
+              <div className="row wrap" style={{ marginBottom: 12 }} role="group" aria-label="Filter by tag">
+                {stats.tags.map((x) => (
+                  <button key={x.tag} type="button" className={`chip jr-chip ${tag === x.tag ? 'chip-accent' : ''}`} aria-pressed={tag === x.tag} onClick={() => setTag(tag === x.tag ? null : x.tag)}>#{x.tag} <span className="muted">{x.n}</span></button>
+                ))}
+              </div>
+            )}
             {groups.length === 0 ? (
-              <Empty>{q ? 'Nothing matches.' : 'Past entries will collect here, grouped by month.'}</Empty>
+              <Empty>{q || tag ? 'Nothing matches.' : 'Past entries will collect here, grouped by month.'}</Empty>
             ) : (
               groups.map((g) => (
                 <div key={g.month}>
@@ -82,8 +116,9 @@ export default function Journal() {
                       key={e.id}
                       e={e}
                       hidePreview={hidePreview}
+                      q={q}
                       onOpen={(d) => {
-                        setDate(d)
+                        open(d)
                         window.scrollTo({ top: 0 })
                       }}
                     />
@@ -94,6 +129,7 @@ export default function Journal() {
           </Card>
         </div>
         <div className="jr-col">
+          <MonthMap entries={entries ?? []} goal={prefs.goal} selected={date} onOpen={(d) => { open(d); window.scrollTo({ top: 0 }) }} />
           <ChartFrame
             title="Mood, 90 days"
             hasData={stats.hasMood}
@@ -108,11 +144,11 @@ export default function Journal() {
           </ChartFrame>
           {stats.then.length > 0 && (
             <Card title="On this day">
-              {stats.then.map((e) => (
-                <div key={e.id} className="jr-then">
-                  <div className="jr-entry-meta">{e.date.slice(0, 4)}</div>
-                  <div className="jr-entry-body clamp">{hidePreview ? 'Hidden' : e.text}</div>
-                </div>
+              {stats.then.map(({ entry: e, label }) => (
+                <button key={e.id} className="jr-then jr-entry" onClick={() => { open(e.date); window.scrollTo({ top: 0 }) }} aria-label={`Open ${label}, ${formatDate(e.date)}`}>
+                  <span className="jr-entry-meta">{label} · {formatDate(e.date, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  <span className="jr-entry-body clamp">{hidePreview ? 'Hidden' : e.text}</span>
+                </button>
               ))}
             </Card>
           )}

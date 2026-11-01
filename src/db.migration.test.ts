@@ -84,3 +84,43 @@ describe('schema migrations', () => {
     expect(db.events.schema.idxByName.area).toBeDefined()
   })
 })
+
+// The schema exactly as shipped in v4 (v1 + v2 events + v3 habits/journal/calendar + v4 sync). Frozen: never edit.
+const V4_STORES = {
+  ...V1_STORES,
+  events: '++id, at, area',
+  habits: '++id, archived, goalId',
+  habitLogs: '++id, habitId, date, &[habitId+date]',
+  journal: '++id, date',
+  calendar: '++id, date, uid, importBatch',
+  outbox: '[table+key], at',
+  syncMeta: '[table+key], &[table+syncId]',
+}
+
+describe('v4 -> v5 (weights)', () => {
+  it('v4 data survives and the new weights table works', async () => {
+    await db.delete()
+    const old = new Dexie('northstar')
+    old.version(4).stores(V4_STORES)
+    await old.open()
+    await old.table('meals').add({ date: '2026-03-01', slot: 'lunch', name: 'Salad', calories: 400 })
+    await old.table('habits').add({ name: 'Lift', area: 'health', perWeek: 4, createdAt: '2026-01-01T00:00:00Z' })
+    await old.table('habitLogs').add({ habitId: 1, date: '2026-03-02' })
+    await old.table('journal').add({ date: '2026-03-02', text: 'ok', createdAt: '2026-03-02T00:00:00Z' })
+    await old.table('settings').put({ key: 'food.targets', value: { calories: 2400 } })
+    old.close()
+
+    await db.open()
+    expect(db.verno).toBeGreaterThanOrEqual(5)
+    expect(await db.meals.count()).toBe(1)
+    expect((await db.habits.toArray())[0].name).toBe('Lift')
+    expect(await db.habitLogs.where('[habitId+date]').equals([1, '2026-03-02']).count()).toBe(1)
+    expect(await db.journal.where('date').equals('2026-03-02').count()).toBe(1)
+    expect((await db.settings.get('food.targets'))!.value).toEqual({ calories: 2400 })
+
+    expect(await db.weights.count()).toBe(0)
+    await db.weights.add({ date: '2026-03-01', weight: 135.2 })
+    expect((await db.weights.where('date').equals('2026-03-01').first())!.weight).toBe(135.2)
+    await expect(db.weights.add({ date: '2026-03-01', weight: 136 })).rejects.toThrow()
+  })
+})

@@ -72,3 +72,47 @@
   .food-add-name { grid-column: 1 / -1; flex: none; }
   .food-add-num { width: auto; flex: none; }
 }
+
+/* Left today, quick add, suggestions, templates, week strip */
+.food-left-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.food-left-row { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.food-left-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.food-behind { margin: 10px 0 0; color: var(--accent); }
+.food-left .card-title { display: flex; justify-content: space-between; align-items: center; }
+.food-suggest .card-title { display: flex; justify-content: space-between; align-items: baseline; }
+.food-suggest .food-favs { margin: 4px 0 0; }
+
+.food-quick { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.food-quick-text { flex: 1 1 220px; min-width: 0; width: auto; }
+.food-quick-slot { flex: 0 0 auto; width: auto; min-height: 36px; }
+.food-quick-preview { flex: 1 0 100%; }
+.food-mult { min-width: 40px; justify-content: center; color: var(--accent); }
+.food-tpl-save { margin: 8px 0 0; gap: 6px; }
+.food-tpl { padding: 8px 0; border-top: 1px solid var(--line); }
+.food-tpl:first-child { border-top: 0; }
+.food-tpl-item { gap: 6px; flex-wrap: wrap; }
+.food-tpl-item .input.grow { flex: 1 1 140px; min-width: 0; }
+
+.food-strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.food-strip-day {
+  display: flex; flex-direction: column; gap: 4px; align-items: stretch; min-height: 32px; padding: 8px 6px; text-align: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); color: var(--ink); cursor: pointer; min-width: 0;
+}
+.food-strip-day:hover { border-color: var(--accent); }
+.food-st { display: flex; flex-direction: column; border-top: 1px solid var(--line); padding-top: 4px; color: var(--ink-3); }
+.food-st-met { color: var(--good); }
+.food-st-close { color: var(--accent); }
+.food-st-missed { color: var(--warn); }
+
+@media (max-width: 620px) {
+  .food-left-grid { gap: 12px; }
+  .food-strip { gap: 3px; }
+  .food-strip-day { padding: 6px 2px; }
+  .food-strip-day .mono { font-size: 11px; }
+  .food-strip-day .tiny { font-size: 10px; }
+}
+.food-slot .card-title { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; row-gap: 4px; }
+@media (max-width: 620px) {
+  .food-quick-text { flex: 1 1 100%; }
+  .food-quick-slot { flex: 1 1 0; }
+}

@@ -163,3 +163,25 @@ describe('checkProteinStreak', () => {
     expect(await streakEvents()).toHaveLength(1)
   })
 })
+
+describe('templates and undoable copies', () => {
+  it('creates, applies and deletes a template; copy ids can be removed', async () => {
+    const { createTemplate, applyTemplate, loadTemplates, saveTemplates, copyYesterdayIds, removeMeals } = await import('./foodData')
+    await db.meals.bulkAdd([
+      { date: d(-1), slot: 'lunch', name: 'Rice', calories: 200, protein: 4 },
+      { date: d(-1), slot: 'lunch', name: 'Chicken', calories: 330, protein: 60 },
+    ])
+    const prev = await db.meals.where('date').equals(d(-1)).toArray()
+    expect(await createTemplate('Usual lunch', prev)).toBe(true)
+    const [t] = await loadTemplates()
+    expect(t.items).toHaveLength(2)
+    const ids = await applyTemplate(t, TODAY, 'dinner')
+    expect(await db.meals.where('date').equals(TODAY).count()).toBe(2)
+    await removeMeals(ids)
+    expect(await db.meals.where('date').equals(TODAY).count()).toBe(0)
+    const copied = await copyYesterdayIds(TODAY)
+    expect(copied).toHaveLength(2)
+    await saveTemplates([])
+    expect(await loadTemplates()).toEqual([])
+  })
+})

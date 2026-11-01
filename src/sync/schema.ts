@@ -45,6 +45,8 @@ export async function naturalKey(table: string, record: Record<string, unknown>,
       return typeof record.category === 'string' ? record.category : null
     case 'reviews':
       return typeof record.weekOf === 'string' ? record.weekOf : null
+    case 'weights':
+      return typeof record.date === 'string' ? record.date : null
     case 'habitLogs': {
       const habit = await refSyncId('habits', record.habitId)
       return habit && typeof record.date === 'string' ? `${habit}|${record.date}` : null
@@ -61,6 +63,8 @@ export function uniqueLookup(table: string, record: Record<string, unknown>): { 
       return record.category != null ? { index: 'category', value: record.category } : null
     case 'reviews':
       return record.weekOf != null ? { index: 'weekOf', value: record.weekOf } : null
+    case 'weights':
+      return record.date != null ? { index: 'date', value: record.date } : null
     case 'habitLogs':
       return record.habitId != null && record.date != null ? { index: '[habitId+date]', value: [record.habitId, record.date] } : null
     default:

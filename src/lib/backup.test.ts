@@ -23,6 +23,7 @@ async function seedEverything() {
   await db.habitLogs.add({ habitId, date: '2026-03-02' })
   await db.calendar.add({ title: 'Dentist', date: '2026-03-03', start: '09:00', end: '10:00', allDay: false, uid: 'u1' })
   await db.journal.add({ date: '2026-03-02', mood: 4, text: 'ok day', tags: ['a'], createdAt: T })
+  await db.weights.add({ date: '2026-03-01', weight: 135.4, note: 'morning' })
   await db.settings.put({ key: 'food.targets', value: { protein: 120 } })
   await db.settings.put({ key: BACKUP_LAST_KEY, value: T })
   // v4 sync bookkeeping (device-local, no user content).

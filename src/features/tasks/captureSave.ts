@@ -1,6 +1,7 @@
 // Persists a parsed Capture. Returns a label for the confirmation and an undo function.
 import { db, logEvent } from '../../db'
 import type { Capture } from '../../lib/capture'
+import { logWeight } from '../body/bodyData'
 import { appendToToday } from '../journal/journalData'
 
 export interface Saved {
@@ -37,6 +38,11 @@ export async function saveCapture(c: Capture): Promise<Saved | null> {
     case 'journal': {
       const undo = await appendToToday(c.text)
       return { label: 'Added to journal', undo }
+    }
+    case 'weight': {
+      const r = await logWeight(c.date, c.weight)
+      if (!r) return null
+      return { label: r.updated ? 'Weight updated' : 'Weight logged', undo: r.undo }
     }
     case 'win': {
       const id = await logEvent({ area: c.area, kind: 'win', title: c.title, milestone: true })

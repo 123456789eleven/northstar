@@ -8,4 +8,5 @@ export const AREA_LABEL: Record<string, string> = {
   personal: 'Personal',
   tasks: 'Tasks',
   food: 'Food',
+  body: 'Body',
 }

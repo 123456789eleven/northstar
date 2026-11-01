@@ -4,8 +4,11 @@ import { db, type ISODate } from '../../db'
 import { addDays, formatDate, today } from '../../lib/dates'
 import MiniBars, { type BarDatum } from './MiniBars'
 import { dayStreak, sumMeals, type FoodTargets } from './foodData'
+import { dayState, weekSummary, type DayState } from './foodLogic'
 
-export default function WeekView({ end, targets }: { end: ISODate; targets: FoodTargets }) {
+const STATE_LABEL: Record<DayState, string> = { met: 'met', close: 'close', missed: 'missed', none: '', empty: '-' }
+
+export default function WeekView({ end, targets, onOpen }: { end: ISODate; targets: FoodTargets; onOpen: (d: ISODate) => void }) {
   const start = addDays(end, -6)
   const meals = useLiveQuery(() => db.meals.where('date').between(start, end, true, true).toArray(), [start, end])
   const allDates = useLiveQuery(async () => new Set((await db.meals.orderBy('date').uniqueKeys()) as string[]), [])
@@ -15,9 +18,7 @@ export default function WeekView({ end, targets }: { end: ISODate; targets: Food
     const ms = (meals ?? []).filter((m) => m.date === d)
     return { date: d, logged: ms.length > 0, ...sumMeals(ms) }
   })
-  const logged = byDay.filter((d) => d.logged)
-  const avg = (k: 'calories' | 'protein') => (logged.length ? Math.round(logged.reduce((a, d) => a + d[k], 0) / logged.length) : 0)
-  const proteinHits = targets.protein ? byDay.filter((d) => d.protein >= targets.protein!).length : 0
+  const sum = weekSummary(byDay, targets)
 
   const toBars = (k: 'calories' | 'protein'): BarDatum[] =>
     byDay.map((d) => ({
@@ -34,14 +35,39 @@ export default function WeekView({ end, targets }: { end: ISODate; targets: Food
       <p className="muted small" style={{ margin: 0 }}>
         {formatDate(start)} – {formatDate(end)}
       </p>
+      <div className="food-strip" role="list">
+        {byDay.map((d) => {
+          const cs = dayState(d.calories, targets.calories, d.logged)
+          const ps = dayState(d.protein, targets.protein, d.logged)
+          return (
+            <button key={d.date} role="listitem" className="food-strip-day" onClick={() => onOpen(d.date)} aria-label={`Open ${formatDate(d.date, { weekday: 'long', month: 'short', day: 'numeric' })}`}>
+              <span className="tiny faint">{formatDate(d.date, { weekday: 'short' })}</span>
+              <span className="small">{formatDate(d.date, { day: 'numeric' })}</span>
+              <span className={`food-st food-st-${cs}`}>
+                <span className="mono tiny">{d.logged ? d.calories.toLocaleString() : '-'}</span>
+                <span className="tiny">kcal {STATE_LABEL[cs]}</span>
+              </span>
+              <span className={`food-st food-st-${ps}`}>
+                <span className="mono tiny">{d.logged ? `${d.protein} g` : '-'}</span>
+                <span className="tiny">prot {STATE_LABEL[ps]}</span>
+              </span>
+            </button>
+          )
+        })}
+      </div>
       <KpiStrip
         items={[
-          { label: 'Days logged', value: `${logged.length}/7`, note: 'in this range' },
-          { label: 'Logging streak', value: streak, note: streak === 1 ? 'day in a row' : 'days in a row' },
-          { label: 'Avg calories', value: avg('calories').toLocaleString(), note: targets.calories ? `target ${targets.calories.toLocaleString()}` : 'per logged day' },
-          { label: 'Avg protein', value: `${avg('protein')} g`, note: targets.protein ? `target hit ${proteinHits}/7 days` : 'per logged day' },
+          { label: 'Avg calories', value: sum.avgCalories.toLocaleString(), note: targets.calories ? `target ${targets.calories.toLocaleString()}` : 'per logged day' },
+          { label: 'Avg protein', value: `${sum.avgProtein} g`, note: targets.protein ? `target ${targets.protein} g` : 'per logged day' },
+          { label: 'Adherence', value: targets.calories || targets.protein ? `${sum.calHits}/7 · ${sum.proteinHits}/7` : '-', note: targets.calories || targets.protein ? 'days hit calories · protein' : 'set targets to track' },
+          { label: 'Logging streak', value: streak, note: `${sum.loggedDays}/7 days logged` },
         ]}
       />
+      {(targets.calories || targets.protein) && (
+        <p className="small" style={{ margin: 0 }}>
+          {[targets.calories && `${sum.calHits} of 7 days hit calories`, targets.protein && `${sum.proteinHits} of 7 days hit protein`].filter(Boolean).join(', ')}.
+        </p>
+      )}
       <div className="grid grid-2">
         <MiniBars title="Calories per day" data={toBars('calories')} unit="kcal" target={targets.calories} />
         <MiniBars title="Protein per day" data={toBars('protein')} unit="g" target={targets.protein} />

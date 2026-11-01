@@ -1,0 +1,16 @@
+/* Body module. Uses tokens from index.css. */
+.body-log { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 12px; align-items: center; }
+.body-log .input { min-width: 0; font-size: 16px; }
+.body-log-big { height: 44px; font-family: var(--serif); font-size: 20px; }
+.body-log-more { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.body-log-more .input { width: 160px; }
+.body-goalgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.body-adv { padding: 8px 12px; border-left: 2px solid var(--line-strong); font-size: 14px; }
+.body-adv-warn { border-left-color: var(--warn); }
+.body-adv-good { border-left-color: var(--good); }
+.body-targets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.body-targets .input { width: 100%; }
+.body-slider { width: 100%; accent-color: var(--accent); min-height: 32px; }
+.body-ms { display: flex; flex-wrap: wrap; gap: 6px; }
+.body-tbl-x { width: 32px; height: 32px; padding: 0; color: var(--ink-3); }
+@media (max-width: 560px) { .body-targets { grid-template-columns: 1fr; } }
