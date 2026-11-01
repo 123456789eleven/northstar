@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<title>Security: how Northstar encrypted sync works</title>
+<meta name="description" content="A plain-language explanation of Northstar sync: a passphrase-derived key, per-record AES-GCM encryption, and what the server can and cannot see.">
+<meta name="theme-color" content="#0c0d10">
+<link rel="canonical" href="%BASE%security.html">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Northstar">
+<meta property="og:title" content="Security: how Northstar encrypted sync works">
+<meta property="og:description" content="A plain-language explanation of Northstar sync: a passphrase-derived key, per-record AES-GCM encryption, and what the server can and cannot see.">
+<meta property="og:url" content="%BASE%security.html">
+<meta property="og:image" content="%BASE%img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Northstar: your whole life, on your device. Product screenshot on a dark background.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Security: how Northstar encrypted sync works">
+<meta name="twitter:description" content="A plain-language explanation of Northstar sync: a passphrase-derived key, per-record AES-GCM encryption, and what the server can and cannot see.">
+<meta name="twitter:image" content="%BASE%img/og.jpg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a>
+<nav aria-label="Main"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html" aria-current="page">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
+<a class="btn" href="app/">Open the app</a>
+</div></header>
+<main id="main">
+<section class="page-hero"><div class="wrap"><p class="label">Security</p><h1>How encrypted sync keeps your data unreadable to the server.</h1><p class="lede">You only need this page if you turn sync on. Without sync, your data never leaves your device.</p></div></section>
+<section><div class="wrap"><div class="prose">
+<h2>The idea in one paragraph</h2>
+<p>When you turn on sync, your device locks every record in a box before sending it, and only you have the key. The server stores locked boxes. It can count them and see when they changed, but it cannot open them. Your passphrase is what unlocks your key, and your passphrase never leaves your devices.</p>
+<h2>Step by step</h2>
+<ol class="steps">
+<li><b>You choose a passphrase.</b> Northstar stretches it into a key with PBKDF2-SHA256 using 600,000 rounds. The deliberate slowness makes guessing passphrases expensive.</li>
+<li><b>A data key protects your records.</b> A random data key does the real encryption. It is stored, wrapped (encrypted) by your passphrase-derived key, and also wrapped by a one-time recovery code you are shown once.</li>
+<li><b>Each record is encrypted separately.</b> Every task, entry or transaction becomes its own ciphertext using AES-256-GCM, with a fresh random value each time. GCM also detects tampering: a modified box fails to open.</li>
+<li><b>Each box is bound to its place.</b> The table name and record id are mixed in as authenticated data, so a record cannot be swapped into a different slot unnoticed.</li>
+<li><b>Only ciphertext is uploaded.</b> Other devices download the boxes and open them with the same key, which they get by entering your passphrase.</li>
+</ol>
+<h2>What the server can and cannot see</h2>
+</div>
+<div class="tablewrap"><table class="plain"><thead><tr><th scope="col">The server can see</th><th scope="col">The server cannot see</th></tr></thead><tbody>
+<tr><td>Your account email and sign-in times</td><td>The text, amounts, dates or names inside any record</td></tr>
+<tr><td>Which tables exist and how many records each has</td><td>Your passphrase, recovery code or encryption keys</td></tr>
+<tr><td>When records were created, changed or deleted</td><td>Which task, goal, transaction or journal entry a box is</td></tr>
+<tr><td>The size of each encrypted record</td><td>Anything in device-only settings, which never sync</td></tr>
+</tbody></table></div>
+<div class="prose">
+<p class="mute">Sizes and counts are a real leak of metadata: a very long journal entry makes a bigger box. If that matters to you, keep sync off.</p>
+<h2>Who holds which key</h2>
+<ul><li>Your passphrase and recovery code live in your head or your password manager. Northstar cannot recover them.</li><li>Row-level security in your Supabase project means your signed-in account can only read and write its own rows. The app never contains a service-role key.</li><li>Conflicts are resolved by the newest change, using a timestamp inside the ciphertext, so the server cannot reorder your edits.</li></ul>
+<div class="note"><p><b>Lose both and the cloud copy is gone.</b> If you lose your passphrase and your recovery code, nobody can decrypt the cloud copy, including you, Supabase and Northstar. The readable copy on each device is unaffected, so export a backup.</p></div>
+<h2>What this does not protect against</h2>
+<ul><li>Someone with access to your unlocked device or browser profile, since the local database is readable by the app. Use your device&rsquo;s screen lock and disk encryption.</li><li>Malware on your device, or a weak passphrase. Choose a long one.</li><li>Backup files you export: they are plain JSON. Store them carefully.</li></ul>
+<p>The exact network paths for every opt-in feature are on the <a href="privacy.html">Privacy page</a>. Setup instructions for sync are in the repository under <code>supabase/README.md</code>.</p>
+</div></div></section>
+</main>
+<footer><div class="wrap">
+<div><p>Northstar. A private, local-first life operations app.<br>Source is viewable; license not yet chosen.</p></div>
+<nav aria-label="Footer"><ul><li><a href="index.html">Home</a></li><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li><li><a href="app/">Open the app</a></li><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Source</a></li></ul></nav>
+</div></footer>
+</body>
+</html>

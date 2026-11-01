@@ -18,6 +18,10 @@ Your data lives in your browser (IndexedDB) and stays there by default. There ar
 
 Backups are JSON files you export and import yourself. Details: `site/privacy.html`.
 
+## Website
+
+The marketing site is plain static HTML in `site/` (pages: home, features, privacy, security, install, roadmap, FAQ, 404). Its base URL is one value in `site/site.config.json`, substituted for `%BASE%` by `npm run build:pages` (`scripts/build-pages.cjs`). All screenshots come from the built-in demo dataset. To move it to your own domain see `docs/custom-domain.md`.
+
 ## Develop
 
 ```

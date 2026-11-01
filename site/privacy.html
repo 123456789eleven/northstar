@@ -3,61 +3,67 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
-<meta name="description" content="How Northstar keeps your data on your device: what is stored, what is not collected, and how backups work.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<title>Privacy: what stays on your device and what leaves</title>
+<meta name="description" content="Northstar keeps your data on your device. See exactly what each opt-in feature sends: encrypted sync, Google Calendar, Open Food Facts and SimpleFIN.">
 <meta name="theme-color" content="#0c0d10">
-<title>Privacy | Northstar</title>
+<link rel="canonical" href="%BASE%privacy.html">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Northstar">
+<meta property="og:title" content="Privacy: what stays on your device and what leaves">
+<meta property="og:description" content="Northstar keeps your data on your device. See exactly what each opt-in feature sends: encrypted sync, Google Calendar, Open Food Facts and SimpleFIN.">
+<meta property="og:url" content="%BASE%privacy.html">
+<meta property="og:image" content="%BASE%img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Northstar: your whole life, on your device. Product screenshot on a dark background.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Privacy: what stays on your device and what leaves">
+<meta name="twitter:description" content="Northstar keeps your data on your device. See exactly what each opt-in feature sends: encrypted sync, Google Calendar, Open Food Facts and SimpleFIN.">
+<meta name="twitter:image" content="%BASE%img/og.jpg">
 <link rel="stylesheet" href="style.css">
-<script src="site.js"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-head"><div class="wrap">
 <a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a>
-<nav aria-label="Main"><ul><li><a href="platform.html">Platform</a></li><li><a href="privacy.html" aria-current="page">Privacy</a></li><li><a href="get-started.html">Get started</a></li><li><a class="nav-cta" href="app/">Open app</a></li></ul></nav>
+<nav aria-label="Main"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html" aria-current="page">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
+<a class="btn" href="app/">Open the app</a>
 </div></header>
 <main id="main">
-<section class="page-hero"><div class="wrap"><p class="label">Privacy</p><h1>Your data stays where you put it.</h1><p class="lede mute">Northstar is local-first by design, not by policy. There is no backend that could receive your data.</p></div></section>
+<section class="page-hero"><div class="wrap"><p class="label">Privacy</p><h1>Your data stays where you put it.</h1><p class="lede">Northstar is local-first by design, not by policy. There is no Northstar server that receives your data.</p></div></section>
 <section><div class="wrap"><div class="prose">
-<h2 style="margin-top:0">How data stays on your device</h2>
-<p>The app is a set of static files. Once loaded, it reads and writes a database inside your browser (IndexedDB). With sync off it makes no network requests carrying your records. With sync on, the only place your (encrypted) records go is your own Supabase project. Two other features are opt-in and never carry your stored records: online food search and the read-only Google Calendar import (described below). One more opt-in feature, the live bank feed, brings bank data in and is described below. A strict content security policy limits what the app can connect to, and fonts are self-hosted. This website itself makes no requests to any other site.</p>
-<h2>What is stored</h2>
-<table class="plain"><thead><tr><th scope="col">Area</th><th scope="col">Examples</th></tr></thead><tbody>
-<tr><td>Tasks and goals</td><td>Titles, due dates, progress, recurrence</td></tr>
-<tr><td>Finance</td><td>Transactions from CSV files you import, budgets</td></tr>
-<tr><td>Planner and habits</td><td>Events, time blocks, habits and check-ins</td></tr><tr><td>Journal</td><td>Entries and mood you write</td></tr><tr><td>Food and learning</td><td>Meals you log, courses and lessons</td></tr>
-<tr><td>People</td><td>Names and contact notes you enter</td></tr>
-<tr><td>History</td><td>A timeline of events and milestones</td></tr>
-<tr><td>Settings</td><td>Preferences on this device</td></tr>
-</tbody></table>
-<p class="mute" style="margin-top:16px">Bank credentials are never asked for or stored. Bank data enters only through a CSV file you pick.</p>
+<h2>The short version</h2>
+<p>The app is a set of static files. Once loaded, it reads and writes a database inside your browser (IndexedDB). By default it makes no network requests that carry your records. There are four optional connections, each off until you turn it on. A strict content security policy limits what the app can connect to, and fonts are self-hosted. This website makes no requests to any other site.</p>
+<h2>Exactly what leaves your device</h2>
+</div>
+<div class="tablewrap"><table class="plain stack"><thead><tr><th scope="col">Feature</th><th scope="col">Default</th><th scope="col">What is sent, and where</th><th scope="col">Who can see it</th></tr></thead><tbody>
+<tr><td data-l="Feature">Everything else (tasks, goals, journal, finance, food, body, people, history, settings)</td><td data-l="Default">On device only</td><td data-l="What is sent, and where">Nothing. Stored in IndexedDB in your browser.</td><td data-l="Who can see it">You</td></tr>
+<tr><td data-l="Feature">Encrypted sync</td><td data-l="Default">Off</td><td data-l="What is sent, and where">Each record, encrypted on your device with AES-256-GCM, plus metadata, to a Supabase project you create. Your passphrase, recovery code and keys never leave your devices.</td><td data-l="Who can see it">Supabase sees your account email, table names, opaque ids, row counts, timestamps and ciphertext sizes. It cannot read any record.</td></tr>
+<tr><td data-l="Feature">Google Calendar (read-only)</td><td data-l="Default">Off</td><td data-l="What is sent, and where">Nothing of yours. Google&rsquo;s script loads only when you press Connect; events are fetched into your browser and copied into your local database. The access token stays in memory only.</td><td data-l="Who can see it">Google knows you signed in and read your calendar.</td></tr>
+<tr><td data-l="Feature">Open Food Facts search</td><td data-l="Default">Off</td><td data-l="What is sent, and where">The text you type into the food search, sent to world.openfoodfacts.org. Nothing else.</td><td data-l="Who can see it">Open Food Facts sees the search text and your IP address.</td></tr>
+<tr><td data-l="Feature">Live bank feed (SimpleFIN)</td><td data-l="Default">Off</td><td data-l="What is sent, and where">Your SimpleFIN Setup Token (once), then your access URL and a date range, sent to a small relay in your own Supabase project, which forwards them to SimpleFIN. Transactions come back through the relay.</td><td data-l="Who can see it">SimpleFIN sees the transactions. The relay stores nothing and logs only the action name and a status code. The access URL stays on this device and is never synced or backed up.</td></tr></tbody></table></div>
+<div class="prose">
+<p class="mute">Bank credentials are never asked for or stored. Without the optional bank feed, bank data enters only through a CSV or OFX file you pick yourself.</p>
 <h2>What is not collected</h2>
-<ul><li>No accounts, sign-ins or email addresses, unless you turn on sync (below).</li><li>No analytics, advertising or tracking scripts.</li><li>No cloud storage by default.</li><li>No third-party requests from this website.</li><li>No third-party fonts, CDNs or embeds.</li></ul>
-<h2>Optional encrypted sync</h2>
-<p>Sync is off unless you turn it on in Settings. When on, it copies your records between your own devices through a Supabase project you create. Before anything is sent, each record is encrypted on your device (AES-256-GCM) with a key that is itself protected by your passphrase (PBKDF2-SHA256, 600,000 rounds) and by a one-time recovery code. Your passphrase, recovery code and keys never leave your devices. The app talks only to your Supabase project&rsquo;s address, and the database only lets your signed-in account read or write your own rows.</p>
-<table class="plain"><thead><tr><th scope="col">Supabase can see</th><th scope="col">Supabase cannot see</th></tr></thead><tbody>
-<tr><td>Your account email and sign-in times</td><td>Any task, goal, transaction, journal entry, person, note or setting</td></tr>
-<tr><td>How many records each section has (for example, the number of journal rows)</td><td>Names, amounts, dates or text inside a record</td></tr>
-<tr><td>When records are created, changed or deleted, and the size of each encrypted record</td><td>Your passphrase, recovery code or encryption keys</td></tr>
-</tbody></table>
-<p class="mute" style="margin-top:16px">If you lose both your passphrase and your recovery code, nobody can decrypt the cloud copy, including you, Supabase or Northstar. The readable data on each device is unaffected. You can delete every encrypted record from the cloud in Settings at any time; erasing data on a device never deletes the cloud copy by itself.</p>
-<h2>Optional lookups and calendar</h2>
-<p><b>Open Food Facts search</b> is off by default. When you turn it on and search, the text you typed is sent to world.openfoodfacts.org, nothing else. <b>Google Calendar</b> is connected from the Data Hub with your own Google client ID. It is read-only, the access token is kept in memory only, and Google&rsquo;s script loads only when you press Connect. Events are copied into your local database; none of your Northstar records are sent to Google.</p>
-<h2>Live bank feed (SimpleFIN)</h2>
-<p>This is <b>off by default</b>. Normally bank data enters only through files you pick. If you choose to turn on the live feed, you sign up with SimpleFIN yourself and run a small relay in your own Supabase project (browsers cannot call SimpleFIN directly). Your SimpleFIN Setup Token (once), later your access URL, and the date range you request are sent to that relay, which forwards them to SimpleFIN; your bank transactions come back through the relay, and SimpleFIN can see them. The relay accepts only your signed-in account, stores nothing and logs only the action name and a status code. The access URL is kept only on your device: it is never synced, never included in a backup file and never displayed. Northstar never receives your bank username or password, and none of your existing Northstar records are sent. Disconnecting deletes the access URL from the device.</p>
-<h2>Backups</h2>
-<p>In Settings you can export a JSON backup of everything, and import one later. The file is created and saved by your browser on your device. Treat it like any personal document: it holds your data in plain form. Importing a backup runs as a single step so a failed import cannot leave things half-written.</p>
+<ul><li>No accounts or sign-ins, unless you turn on sync.</li><li>No analytics, advertising or tracking scripts.</li><li>No cloud storage by default.</li><li>No third-party requests from this website or the app at rest.</li><li>No third-party fonts, CDNs or embeds.</li></ul>
+<h2>What is stored on your device</h2>
+<p>Tasks and goals, finance transactions and budgets, planner events, habits, journal entries and mood, meals and weights, learning items, people and contact notes, your history timeline, and settings. Backups are JSON files that you export and import yourself; treat one like any personal document, because it holds your data in readable form.</p>
 <h2>Offline and the service worker</h2>
 <p>A service worker caches the app&rsquo;s own files so it opens without a connection. It caches application code and assets only, never your data.</p>
 <h2>Clearing your data</h2>
-<p>Clearing this site&rsquo;s data in your browser settings erases your Northstar data from that device. Export a backup first if you want to keep it. Without sync there is no cloud copy, so it cannot be recovered for you. With sync on, your other devices and the encrypted cloud copy still have it.</p>
-<p><a class="btn" href="app/">Open Northstar</a></p>
+<p>Clearing this site&rsquo;s data in your browser erases your Northstar data from that device. Export a backup first if you want to keep it. Without sync there is no cloud copy that could restore it. With sync on, your other devices and the encrypted cloud copy still have it.</p>
+<p>How the encryption works is explained on the <a href="security.html">Security page</a>.</p>
+<p><a class="btn" href="app/">Open the app</a></p>
 </div></div></section>
 </main>
 <footer><div class="wrap">
-<div>Northstar. Personal software that keeps your data on your device.</div>
-<nav aria-label="Footer"><ul><li><a href="index.html">Home</a></li><li><a href="platform.html">Platform</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="get-started.html">Get started</a></li><li><a href="app/">Open the app</a></li></ul></nav>
+<div><p>Northstar. A private, local-first life operations app.<br>Source is viewable; license not yet chosen.</p></div>
+<nav aria-label="Footer"><ul><li><a href="index.html">Home</a></li><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li><li><a href="app/">Open the app</a></li><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Source</a></li></ul></nav>
 </div></footer>
 </body>
 </html>

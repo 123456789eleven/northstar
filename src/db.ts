@@ -219,6 +219,27 @@ export interface WeightEntry {
   note?: string
 }
 
+export interface Holding {
+  id?: number
+  /** Matches a Net worth account name (string, no foreign key). */
+  account: string
+  ticker: string
+  shares?: number
+  price?: number
+  priceDate?: ISODate
+  costBasis?: number
+  note?: string
+}
+
+export interface Contribution {
+  id?: number
+  date: ISODate
+  /** Always > 0; `kind` says the direction. */
+  amount: number
+  account: string
+  kind: 'contribution' | 'withdrawal'
+}
+
 export interface Setting {
   key: string
   value: unknown
@@ -244,6 +265,8 @@ export const db = new Dexie('northstar') as Dexie & {
   journal: EntityTable<JournalEntry, 'id'>
   calendar: EntityTable<CalendarEvent, 'id'>
   weights: EntityTable<WeightEntry, 'id'>
+  holdings: EntityTable<Holding, 'id'>
+  contributions: EntityTable<Contribution, 'id'>
 }
 
 db.version(1).stores({
@@ -299,5 +322,10 @@ db.version(4).stores({
 // v5: body weight log (Body module). One row per date, so date is unique; no foreign keys.
 db.version(5).stores({
   weights: '++id, &date',
+})
+// v6: investments (holdings per account, IRA contributions). Accounts are referenced by name string; no foreign keys.
+db.version(6).stores({
+  holdings: '++id, account, ticker',
+  contributions: '++id, date, account',
 })
 installOutbox(db, { autoStart: true })

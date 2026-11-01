@@ -12,7 +12,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
     "verify": "npm run typecheck && npm run lint && npm test && npm run build",
-    "build:pages": "npm run build && node -e \"const fs=require('fs');fs.rmSync('pages-dist',{recursive:true,force:true});fs.cpSync('site','pages-dist',{recursive:true});fs.cpSync('dist','pages-dist/app',{recursive:true})\""
+    "build:pages": "npm run build && node scripts/build-pages.cjs"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.3.0",

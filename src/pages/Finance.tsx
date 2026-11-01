@@ -6,13 +6,14 @@ import { monthKey } from '../lib/dates'
 import Budgets from '../features/finance/Budgets'
 import Import from '../features/finance/Import'
 import NetWorth from '../features/finance/NetWorth'
+import Investments from '../features/investments/Investments'
 import Overview from '../features/finance/Overview'
 import Transactions from '../features/finance/Transactions'
 import { UNCATEGORIZED } from '../features/finance/categories'
 import { monthLabel, shiftMonth } from '../features/finance/model'
 import '../features/finance/finance.css'
 
-type Tab = 'overview' | 'transactions' | 'budgets' | 'networth' | 'import'
+type Tab = 'overview' | 'transactions' | 'budgets' | 'networth' | 'investments' | 'import'
 
 export default function Finance() {
   const [tab, setTab] = useState<Tab>('overview')
@@ -67,6 +68,7 @@ export default function Finance() {
           { value: 'transactions', label: uncategorized > 0 ? `Transactions · ${uncategorized}` : 'Transactions' },
           { value: 'budgets', label: 'Budgets' },
           { value: 'networth', label: 'Net worth' },
+          { value: 'investments', label: 'Investments' },
           { value: 'import', label: 'Import' },
         ]}
       />
@@ -74,6 +76,7 @@ export default function Finance() {
       {tab === 'transactions' && <Transactions month={month} category={category} setCategory={setCategory} onImport={() => setTab('import')} />}
       {tab === 'budgets' && <Budgets month={month} />}
       {tab === 'networth' && <NetWorth />}
+      {tab === 'investments' && <Investments />}
       {tab === 'import' && <Import
           onDone={(c, m) => {
             if (m) setMonth(m)

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<title>FAQ: questions about Northstar</title>
+<meta name="description" content="Answers about data loss, backups, forgotten passphrases, multiple devices, bank connections, pricing, who built Northstar and its source status.">
+<meta name="theme-color" content="#0c0d10">
+<link rel="canonical" href="%BASE%faq.html">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Northstar">
+<meta property="og:title" content="FAQ: questions about Northstar">
+<meta property="og:description" content="Answers about data loss, backups, forgotten passphrases, multiple devices, bank connections, pricing, who built Northstar and its source status.">
+<meta property="og:url" content="%BASE%faq.html">
+<meta property="og:image" content="%BASE%img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Northstar: your whole life, on your device. Product screenshot on a dark background.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FAQ: questions about Northstar">
+<meta name="twitter:description" content="Answers about data loss, backups, forgotten passphrases, multiple devices, bank connections, pricing, who built Northstar and its source status.">
+<meta name="twitter:image" content="%BASE%img/og.jpg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+<a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a>
+<nav aria-label="Main"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html" aria-current="page">FAQ</a></li></ul></nav>
+<a class="btn" href="app/">Open the app</a>
+</div></header>
+<main id="main">
+<section class="page-hero"><div class="wrap"><p class="label">FAQ</p><h1>Questions, answered plainly.</h1><p class="lede">If something is missing, the Privacy and Security pages go deeper.</p></div></section><section><div class="wrap"><div class="faq prose"><details><summary>Will I lose my data?</summary><p>Your data lives in your browser on your device. Clearing site data for Northstar, using a browser&rsquo;s &ldquo;clear everything&rdquo; option, or losing the device can erase it. Without sync or a backup there is no other copy, so export a JSON backup from Settings regularly. Northstar nudges you if you have never exported one.</p></details><details><summary>How do backups work?</summary><p>In Settings, Export backup downloads one JSON file of everything. Import restores it as a single step, so a failed import cannot leave things half-written. The file is readable, so store it like any personal document.</p></details><details><summary>What if I forget my sync passphrase?</summary><p>If you still have your one-time recovery code, you can use it to regain access. If you lose both the passphrase and the recovery code, nobody can decrypt the cloud copy, including Northstar and Supabase. Each device keeps its own readable copy, so export a backup and set sync up again.</p></details><details><summary>Can I use it on more than one device?</summary><p>Yes. Turn on encrypted sync in Settings on each device, with your own Supabase project and the same passphrase. Or skip sync and move data by exporting a backup on one device and importing it on another.</p></details><details><summary>How do bank connections work?</summary><p>By default they do not. You export a CSV or OFX/QFX file from your bank and import it; Northstar never asks for bank credentials. There is an optional live feed through SimpleFIN, off by default, which uses a small relay in your own Supabase project. See the <a href="privacy.html">Privacy page</a> for exactly what it sends.</p></details><details><summary>How much does it cost?</summary><p>Nothing. It is free to use, with no ads and no accounts. Sync uses a Supabase project that you create, which has its own plan and limits.</p></details><details><summary>Who built it?</summary><p>One person, mainly for their own use, and then made available to anyone. There is no company behind it and no data collection to fund.</p></details><details><summary>Is it open source?</summary><p>The source code is in a public repository, so it is viewable. A license has not been chosen yet, so please treat it as viewable but not yet licensed for reuse. Source is viewable; license not yet chosen.</p></details><details><summary>Does it work offline?</summary><p>Yes. After the first load, the app opens without a connection and everything that works on local data keeps working. Sync, Google Calendar and food search wait until you are online. See <a href="install.html">Install</a>.</p></details><details><summary>Does it send my data anywhere or track me?</summary><p>No tracking or analytics. Only four opt-in connections can send anything: encrypted sync, read-only Google Calendar, Open Food Facts search and the SimpleFIN bank feed. The <a href="privacy.html">Privacy page</a> lists exactly what each one sends.</p></details></div></div></section>
+</main>
+<footer><div class="wrap">
+<div><p>Northstar. A private, local-first life operations app.<br>Source is viewable; license not yet chosen.</p></div>
+<nav aria-label="Footer"><ul><li><a href="index.html">Home</a></li><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li><li><a href="app/">Open the app</a></li><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Source</a></li></ul></nav>
+</div></footer>
+</body>
+</html>

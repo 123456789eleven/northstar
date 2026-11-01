@@ -74,3 +74,7 @@
 
 /* Recurring card: let long merchant lines wrap on phones */
 .fin-rec .grow { overflow-wrap: anywhere; min-width: 0; }
+
+/* Bills */
+.fin-bill-name { background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; text-align: left; min-height: 32px; }
+.fin-bill-name:hover { color: var(--accent); }

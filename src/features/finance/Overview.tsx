@@ -5,6 +5,8 @@ import KpiStrip from '../../components/KpiStrip'
 import { db } from '../../db'
 import { formatDate, money, today } from '../../lib/dates'
 import { useMemo } from 'react'
+import { budgetSpend, cadenceText } from './bills'
+import { useBills } from './billsData'
 import { detectRecurring, monthlyTotal } from './recurring'
 import { merchantLabel, UNCATEGORIZED } from './categories'
 import { CategoryBars, TrendChart } from './charts'
@@ -16,12 +18,13 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
   const budgets = useLiveQuery(() => db.budgets.toArray(), [])
   const first = shiftMonth(month, -5)
   const trendTx = useLiveQuery(() => db.transactions.where('date').between(monthRange(first)[0], monthRange(month)[1], true, true).toArray(), [first, month])
+  const bills = useBills()
   const anyTx = useLiveQuery(() => db.transactions.count(), [])
 
   const allTx = useLiveQuery(() => db.transactions.toArray(), [])
   const recurring = useMemo(() => (allTx ? detectRecurring(allTx, today()) : []), [allTx])
 
-  if (!txs || !budgets || !trendTx || anyTx === undefined) return null
+  if (!txs || !budgets || !trendTx || anyTx === undefined || !bills) return null
 
   if (anyTx === 0) {
     return (
@@ -45,12 +48,13 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
     return { label: monthLabel(m, true), income: Math.round(sm.income), spending: Math.round(Math.max(0, sm.spending)) }
   })
   const merchants = topMerchants(txs)
+  const bs = budgetSpend(txs, bills)
   const warnings = budgets
-    .map((b) => ({ ...b, spent: s.byCategory.get(b.category) ?? 0 }))
+    .map((b) => ({ ...b, spent: bs.spent.get(b.category) ?? 0, bill: bs.billInfo.get(b.category) }))
     .filter((b) => b.monthlyLimit > 0 && b.spent / b.monthlyLimit > 0.9)
     .sort((a, b) => b.spent / b.monthlyLimit - a.spent / a.monthlyLimit)
   const budgeted = budgets.filter((b) => b.monthlyLimit > 0)
-  const budgetLeft = budgeted.reduce((sum, b) => sum + b.monthlyLimit - Math.max(0, s.byCategory.get(b.category) ?? 0), 0)
+  const budgetLeft = budgeted.reduce((sum, b) => sum + b.monthlyLimit - Math.max(0, bs.spent.get(b.category) ?? 0), 0)
   const budgetNote = budgeted.length ? (budgetLeft >= 0 ? `${money(budgetLeft)} left in budgets` : `${money(-budgetLeft)} over budgets`) : undefined
   const uncategorized = txs.filter((t) => t.category === UNCATEGORIZED).length
 
@@ -81,7 +85,10 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
           <div className="list">
             {warnings.map((w) => (
               <div key={w.category} className="list-item small">
-                <span className="grow">{w.category}</span>
+                <span className="grow">
+                  {w.category}
+                  {w.bill && <span className="tiny faint"> · Bill: {money(w.bill.monthly)}/mo set aside (paid {w.bill.bills.map((b) => cadenceText(b, money)).join(' + ')})</span>}
+                </span>
                 <span className="mono muted">
                   {moneyExact(w.spent)} of {moneyExact(w.monthlyLimit)}
                 </span>

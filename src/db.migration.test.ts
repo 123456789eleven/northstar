@@ -124,3 +124,31 @@ describe('v4 -> v5 (weights)', () => {
     await expect(db.weights.add({ date: '2026-03-01', weight: 136 })).rejects.toThrow()
   })
 })
+
+// The schema exactly as shipped in v5 (v4 + weights). Frozen: never edit.
+const V5_STORES = { ...V4_STORES, weights: '++id, &date' }
+
+describe('v5 -> v6 (holdings, contributions)', () => {
+  it('v5 data survives and the new investment tables work', async () => {
+    await db.delete()
+    const old = new Dexie('northstar')
+    old.version(5).stores(V5_STORES)
+    await old.open()
+    await old.table('weights').add({ date: '2026-03-01', weight: 135.2 })
+    await old.table('balances').add({ date: '2026-03-01', name: 'Schwab Roth IRA (VTI)', kind: 'asset', balance: 33700 })
+    await old.table('settings').put({ key: 'food.targets', value: { calories: 2400 } })
+    old.close()
+
+    await db.open()
+    expect(db.verno).toBeGreaterThanOrEqual(6)
+    expect(await db.weights.count()).toBe(1)
+    expect((await db.balances.toArray())[0].balance).toBe(33700)
+    expect((await db.settings.get('food.targets'))!.value).toEqual({ calories: 2400 })
+
+    expect(await db.holdings.count()).toBe(0)
+    await db.holdings.add({ account: 'Schwab Roth IRA (VTI)', ticker: 'VTI' })
+    await db.contributions.add({ date: '2026-03-02', amount: 500, account: 'Schwab Roth IRA (VTI)', kind: 'contribution' })
+    expect(await db.holdings.where('account').equals('Schwab Roth IRA (VTI)').count()).toBe(1)
+    expect(await db.contributions.where('date').equals('2026-03-02').count()).toBe(1)
+  })
+})

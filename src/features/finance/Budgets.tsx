@@ -4,8 +4,11 @@ import { Card, Empty, Progress } from '../../components/ui'
 import { db, logEvent } from '../../db'
 import { money } from '../../lib/dates'
 import { EXPENSE_CATEGORIES } from './categories'
-import { monthLabel, monthRange, moneyExact, shiftMonth, summarize, useMonthTx } from './model'
+import { monthLabel, monthRange, moneyExact, shiftMonth, useMonthTx } from './model'
 import { budgetStatus } from './quickAdd'
+import BillsSection from './BillsSection'
+import { budgetSpend, cadenceText, type BillInfo } from './bills'
+import { useBills } from './billsData'
 
 async function saveBudget(category: string, limit: number) {
   const before = await db.budgets.count()
@@ -24,12 +27,13 @@ export default function Budgets({ month }: { month: string }) {
   const prev = shiftMonth(month, -1)
   const [pa, pb] = monthRange(prev)
   const prevTx = useLiveQuery(() => db.transactions.where('date').between(pa, pb, true, true).toArray(), [pa, pb])
+  const bills = useBills()
   const [msg, setMsg] = useState('')
 
-  if (!budgets || !txs || !prevTx) return null
+  if (!budgets || !txs || !prevTx || !bills) return null
 
-  const spent = summarize(txs).byCategory
-  const prevSpent = summarize(prevTx).byCategory
+  const { spent, billInfo } = budgetSpend(txs, bills)
+  const prevSpent = budgetSpend(prevTx, bills).spent
   const limitOf = new Map(budgets.map((b) => [b.category, b.monthlyLimit]))
   const totalLimit = budgets.reduce((s, b) => s + b.monthlyLimit, 0)
   const totalSpent = budgets.reduce((s, b) => s + Math.max(0, spent.get(b.category) ?? 0), 0)
@@ -86,10 +90,12 @@ export default function Budgets({ month }: { month: string }) {
       >
         <div className="list">
           {ordered.map((c) => (
-            <BudgetRow key={c} category={c} limit={limitOf.get(c)} spent={Math.max(0, spent.get(c) ?? 0)} lastMonth={prevSpent.get(c) ?? 0} />
+            <BudgetRow key={c} category={c} limit={limitOf.get(c)} spent={Math.max(0, spent.get(c) ?? 0)} lastMonth={prevSpent.get(c) ?? 0} bill={billInfo.get(c)} />
           ))}
         </div>
       </Card>
+
+      <BillsSection bills={bills} />
     </div>
   )
 }
@@ -116,7 +122,7 @@ function BudgetBar({ spent, limit }: { spent: number; limit: number }) {
   )
 }
 
-function BudgetRow({ category, limit, spent, lastMonth }: { category: string; limit?: number; spent: number; lastMonth: number }) {
+function BudgetRow({ category, limit, spent, lastMonth, bill }: { category: string; limit?: number; spent: number; lastMonth: number; bill?: BillInfo }) {
   const [draft, setDraft] = useState<string | null>(null)
   const value = draft ?? (limit ? String(limit) : '')
 
@@ -143,6 +149,11 @@ function BudgetRow({ category, limit, spent, lastMonth }: { category: string; li
         {limit ? (
           <div style={{ marginTop: 6 }}>
             <BudgetBar spent={spent} limit={limit} />
+            {bill && (
+              <div className="tiny muted" style={{ marginTop: 4 }}>
+                Bill: {money(bill.monthly)}/mo set aside (paid {bill.bills.map((b) => cadenceText(b, money)).join(' + ')})
+              </div>
+            )}
           </div>
         ) : (
           <div className="tiny faint">{lastMonth > 0 ? `Last month ${money(lastMonth)}` : 'No budget'}</div>
