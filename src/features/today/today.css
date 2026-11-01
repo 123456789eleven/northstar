@@ -34,6 +34,23 @@
 .today-more > summary::-webkit-details-marker { display: none; }
 .today-more > summary .faint { font-size: 12px; flex: 1; text-align: right; min-width: 0; }
 .today-more > summary::after { content: '+'; flex: 0 0 20px; text-align: center; font-size: 18px; color: var(--ink-2); }
-.today-more[open] > summary::after { content: '2'; }
+.today-more[open] > summary::after { content: '\2212'; }
 .today-more-body { padding-bottom: 12px; }
 .today-more-body { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+
+/* v2 polish */
+.card-title + .sub-head { padding-top: 0; }
+.sub-head { display: flex; align-items: center; min-height: 32px; padding: 12px 0 0; }
+.sub-head.row-between { justify-content: space-between; }
+.focus-suggest { margin: 0 0 4px; }
+.kpi-skel { margin-bottom: 16px; }
+.qgoal { transition: background-color var(--dur-fast) var(--ease-out); margin: 0 calc(var(--pad) * -1); padding-left: var(--pad); padding-right: var(--pad); }
+.qgoal:hover { background: var(--surface-2); }
+.qgoal:hover .qgoal-head > span:first-child { color: var(--ink); }
+.glance-row { margin: 0 calc(var(--pad) * -1); padding-left: var(--pad); padding-right: var(--pad); transition: background-color var(--dur-fast) var(--ease-out); }
+.glance-row:hover { background: var(--surface-2); }
+.glance-row:hover .glance-main > span:first-child { text-decoration: none; }
+.glance-value { letter-spacing: var(--track-display); font-variant-numeric: tabular-nums; }
+.habit-tile-row { border-bottom: 1px solid var(--line); }
+.habit-tile-row:last-child { border-bottom: 0; }
+.today-more > summary::after { transition: transform var(--dur-fast) var(--ease-out); }

@@ -4,10 +4,12 @@
 // and a table view so values are never chart-only.
 import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import ChartFrame from '../../components/ChartFrame'
+import { CHART, GRID_PROPS, X_AXIS, Y_AXIS, tooltipProps } from '../../components/chartTheme'
+import { ChartTip } from '../../components/ChartTip'
 import './food.css'
 
 // SVG presentation attributes don't resolve CSS custom properties reliably, so mirror the tokens here.
-const C = { series: '#3987e5', grid: '#262a33', ink2: '#a6a49d', ink3: '#a6a49d', cursor: '#1c1f26' }
+const C = { series: CHART.data[0], ink2: CHART.axis }
 
 export interface BarDatum {
   key: string
@@ -15,25 +17,6 @@ export interface BarDatum {
   /** Longer label for tooltip / table. */
   full?: string
   value: number
-}
-
-interface TipProps {
-  active?: boolean
-  payload?: { payload: BarDatum }[]
-  unit: string
-}
-
-function Tip({ active, payload, unit }: TipProps) {
-  if (!active || !payload?.length) return null
-  const d = payload[0].payload
-  return (
-    <div className="ns-tip">
-      <div className="faint tiny">{d.full ?? d.label}</div>
-      <div className="mono">
-        {d.value.toLocaleString()} {unit}
-      </div>
-    </div>
-  )
 }
 
 export default function MiniBars({
@@ -77,28 +60,26 @@ export default function MiniBars({
         </div>
       }
     >
-        <div style={{ width: '100%', height }}>
+        <div style={{ width: '100%', height }} role="img" aria-label={`${title}: ${data.length} periods${target ? `, target ${target.toLocaleString()} ${unit}` : ''}`}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: 0 }} barCategoryGap="20%">
-              <CartesianGrid vertical={false} stroke={C.grid} strokeWidth={1} />
-              <XAxis dataKey="label" tickLine={false} axisLine={{ stroke: C.grid }} tick={{ fill: C.ink3, fontSize: 11 }} interval="preserveStartEnd" minTickGap={4} />
+              <CartesianGrid {...GRID_PROPS} />
+              <XAxis {...X_AXIS} dataKey="label" interval="preserveStartEnd" minTickGap={4} />
               <YAxis
-                tickLine={false}
-                axisLine={false}
-                tick={{ fill: C.ink3, fontSize: 11 }}
+                {...Y_AXIS}
                 width={max >= 1000 ? 46 : 34}
                 allowDecimals={false}
                 domain={[0, max === 0 ? 10 : 'auto']}
                 tickFormatter={(v: number) => v.toLocaleString()}
               />
-              <Tooltip cursor={{ fill: C.cursor }} content={<Tip unit={unit} />} isAnimationActive={false} />
+              <Tooltip {...tooltipProps(<ChartTip rows={(p) => { const d = p[0]?.payload as BarDatum | undefined; return d ? [{ key: d.key, value: `${d.value.toLocaleString()} ${unit}`, name: d.full ?? d.label }] : [] }} />, 'bar')} />
               {target ? (
                 <ReferenceLine
                   y={target}
                   stroke={C.ink2}
                   strokeWidth={1}
                   ifOverflow="extendDomain"
-                  label={{ value: 'Target', position: 'insideTopRight', fill: C.ink2, fontSize: 11 }}
+                  label={{ value: 'Target', position: 'insideTopRight', fill: C.ink2, fontSize: 12 }}
                 />
               ) : null}
               <Bar dataKey="value" fill={C.series} maxBarSize={24} radius={[4, 4, 0, 0]} isAnimationActive={false} />

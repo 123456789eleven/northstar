@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { db, type Task } from '../../db'
 import { relativeDay, today } from '../../lib/dates'
 import { useToast } from '../../components/toastContext'
 import { isPinned, reopenTask, completeTask, togglePin } from './taskActions'
+import { DUR, prefersReducedMotion } from '../../components/motion'
 
 export function PinIcon() {
   return (
@@ -30,19 +32,25 @@ export function TaskRow({
   selected?: boolean
 }) {
   const toast = useToast()
-  const done = task.status === 'done'
+  // Optimistic completion: the box fills and the title strikes through first, then the row leaves its group.
+  const [completing, setCompleting] = useState(false)
+  const done = task.status === 'done' || completing
   const overdue = !done && !!task.due && task.due < today()
   const pinned = isPinned(task)
   async function toggle() {
-    if (done) {
+    if (task.status === 'done') {
       await reopenTask(task)
       return
     }
+    if (completing) return
+    setCompleting(true)
+    if (!prefersReducedMotion()) await new Promise((r) => window.setTimeout(r, DUR.slow))
     await completeTask(task)
+    setCompleting(false)
     toast({ message: `Completed "${task.title}"`, undo: async () => { const fresh = await db.tasks.get(task.id!); if (fresh) await reopenTask(fresh) } })
   }
   return (
-    <div className={`task-row ${done ? 'done' : ''} ${selected ? 'selected' : ''}`} data-task-id={task.id}>
+    <div className={`task-row ${done ? 'done' : ''} ${completing ? 'completing' : ''} ${selected ? 'selected' : ''}`} data-task-id={task.id}>
       <span className={`task-flag ${task.priority === 1 && !done ? 'p1' : ''}`} aria-hidden />
       <label className="check-hit">
         <input

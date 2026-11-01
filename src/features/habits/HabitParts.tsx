@@ -9,7 +9,7 @@ export function HeatStrip({ dates, today }: { dates: Set<ISODate>; today: ISODat
   const grid = heatGrid(dates, today, 12)
   const gap = 3
   const cw = 36
-  const ch = 11
+  const ch = 9
   const top = 14
   const w = 12 * (cw + gap) - gap
   const h = top + 7 * (ch + gap) - gap
@@ -23,7 +23,7 @@ export function HeatStrip({ dates, today }: { dates: Set<ISODate>; today: ISODat
             {label && <text className="heat-month" x={x * (cw + gap)} y={10}>{label}</text>}
             {col.map((c, y) =>
               c.future ? null : (
-                <rect key={c.date} x={x * (cw + gap)} y={top + y * (ch + gap)} width={cw} height={ch} rx={2} opacity={c.done ? 1 : 0.1}>
+                <rect key={c.date} className={c.done ? 'on' : ''} x={x * (cw + gap)} y={top + y * (ch + gap)} width={cw} height={ch} rx={2}>
                   <title>{`${formatDate(c.date)}${c.done ? ': done' : ''}`}</title>
                 </rect>
               ),

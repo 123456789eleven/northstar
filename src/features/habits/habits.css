@@ -4,10 +4,10 @@
 .habit { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .habit.archived { opacity: 0.6; }
 .habit-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.habit-name { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+.habit-name { font-size: 16px; line-height: 22px; font-weight: 600; overflow-wrap: anywhere; }
 .habit-meta { font-size: 12px; color: var(--ink-3); margin-top: 2px; display: flex; flex-wrap: wrap; gap: 4px 10px; }
 .habit-streak { text-align: right; white-space: nowrap; }
-.habit-streak strong { font-family: var(--serif); font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.habit-streak strong { font-family: var(--serif); font-size: 24px; line-height: 28px; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: var(--track-display); }
 .habit-streak span { display: block; font-size: 12px; color: var(--ink-3); }
 
 .habit-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
@@ -16,15 +16,22 @@
   color: var(--ink-2); font: inherit; font-size: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
 }
 .habit-day b { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.habit-day { transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
 .habit-day:hover { border-color: var(--ink-3); }
-.habit-day.today { border-color: var(--ink-3); color: var(--ink); }
-.habit-day.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.habit-day:active { transform: scale(0.96); }
+.habit-day.today { border-color: var(--ink-2); color: var(--ink); }
+/* Done = soft amber with an amber check line; calmer than a solid fill across 7 x N tiles. */
+.habit-day.on { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
+.habit-day.on b { color: var(--ink); }
+.habit-day.on.today { border-color: var(--accent); }
+.habit-day.on:focus { animation: check-pop var(--dur-slow) var(--ease-out); }
 
 .habit-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .habit-week { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .heat { display: block; width: 100%; height: auto; }
 .heat-month { fill: var(--ink-3); font-size: 10px; }
-.heat rect { fill: var(--accent); }
+.heat rect { fill: var(--surface-3); }
+.heat rect.on { fill: var(--accent); fill-opacity: 0.85; }
 
 .seg { display: flex; gap: 4px; flex-wrap: wrap; }
 .seg button {
@@ -38,3 +45,6 @@
 .habit-tile-row .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .habit-tile-row .streak { font-size: 12px; color: var(--ink-3); }
 .hb-check { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex: 0 0 32px; cursor: pointer; }
+
+.habit-tile-row .hb-check + .name { cursor: default; }
+.habit-foot { margin-top: -4px; }

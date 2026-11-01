@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Habit, type ISODate } from '../db'
-import { Empty, PageHeader } from '../components/ui'
+import { Card, Empty, PageHeader, Skeleton } from '../components/ui'
 import { today } from '../lib/dates'
 import { HabitCard, HabitModal } from '../features/habits/HabitParts'
 import '../features/habits/habits.css'
@@ -38,8 +38,21 @@ export default function Habits() {
         sub={habits === undefined ? ' ' : active.length ? `${doneToday} of ${active.length} done today` : 'Small things, repeated'}
         actions={<button className="btn btn-primary" onClick={() => setEditing('new')}>New habit</button>}
       />
+      {habits === undefined && (
+        <div className="habit-list" aria-busy="true">
+          <Card><Skeleton lines={4} label="Loading habits" /></Card>
+          <Card><Skeleton lines={4} label="Loading habits" /></Card>
+        </div>
+      )}
       {habits !== undefined && active.length === 0 && (
-        <Empty>No habits yet. Tap New habit and start with one you can do in two minutes.</Empty>
+        <Card>
+          <Empty
+            title="No habits yet"
+            action={<button className="btn btn-primary" onClick={() => setEditing('new')}>New habit</button>}
+          >
+            Start with one you can finish in two minutes, like a 10-minute walk. Check it off here or on Today.
+          </Empty>
+        </Card>
       )}
       <div className="habit-list">{active.map(card)}</div>
       {archived.length > 0 && (

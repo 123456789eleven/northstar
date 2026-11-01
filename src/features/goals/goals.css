@@ -49,3 +49,15 @@
 .goal-start ol { margin: 10px 0 18px; padding-left: 20px; color: var(--ink-2); font-size: 14px; }
 .goal-start li + li { margin-top: 6px; }
 .goal-hint { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--ink-2); }
+
+/* v2: each life goal and its children sit on one surface, so the tree reads as a set of plans, not a flat list. */
+.goal-tree { gap: var(--gap); }
+.goal-tree > div { padding: 4px var(--pad) 8px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.goal-tree > div > .goal { border-top: 0; }
+.goal-life .goal-title { font-size: var(--text-md); line-height: 24px; letter-spacing: var(--track-tight); }
+.goal-actions .btn-sm { background: transparent; border-color: transparent; color: var(--ink-2); }
+.goal-actions .btn-sm:hover { background: var(--surface-2); color: var(--ink); }
+.goal-progress-btn { border-radius: var(--radius-sm); }
+.goal-progress-btn:hover .goal-chev { color: var(--ink); }
+.ms-title { transition: color var(--dur-base) var(--ease-out); }
+.goal-children { border-left-color: var(--line); }

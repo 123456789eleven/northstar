@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Empty } from '../../components/ui'
+import { Card, Empty, Skeleton } from '../../components/ui'
 import { useToast } from '../../components/toastContext'
 import { db, type ISODate, type MealSlot } from '../../db'
 import { addDays, formatDate, relativeDay, today } from '../../lib/dates'
@@ -87,9 +87,10 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
           ‹
         </button>
         <div className="food-stepper-pick">
-        <button className="food-stepper-label" onClick={() => picker.current?.showPicker?.()} aria-label="Pick a date">
+        <button className="food-stepper-label" onClick={() => picker.current?.showPicker?.()}>
           <strong>{relativeDay(date)}</strong>
           <span className="faint small">{formatDate(date, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+          <span className="sr-only">, pick a date</span>
         </button>
           <input ref={picker} className="food-date-input" type="date" value={date} onChange={(e) => e.target.value && setDate(e.target.value)} tabIndex={-1} aria-hidden="true" />
         </div>
@@ -114,7 +115,9 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
       {left && (left.kcal > 0 || left.protein > 0) && <Suggestions remaining={remaining} own={own} date={date} slot={slot} />}
 
       {meals && meals.length === 0 && (favorites?.length ?? 0) === 0 && (
-        <Empty>Type what you ate into a slot below — numbers are optional. Tick “Fav” on meals you repeat and they become one-tap chips.</Empty>
+        <Card>
+          <Empty title="Nothing logged yet">Type what you ate into a slot below; numbers are optional. Tick “Fav” on meals you repeat and they become one-tap chips.</Empty>
+        </Card>
       )}
 
       <datalist id={LIST_ID}>
@@ -123,7 +126,12 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
         ))}
       </datalist>
 
-      <div className="grid grid-2">
+      {meals === undefined && (
+        <div className="grid grid-2" aria-busy="true">
+          {SLOTS.map((s) => <Card key={s.value} title={s.label}><Skeleton lines={3} label={`Loading ${s.label}`} /></Card>)}
+        </div>
+      )}
+      {meals !== undefined && <div className="grid grid-2">
         {SLOTS.map((s) => (
           <SlotCard
             key={s.value}
@@ -139,7 +147,7 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
             templates={templates}
           />
         ))}
-      </div>
+      </div>}
     </div>
   )
 }

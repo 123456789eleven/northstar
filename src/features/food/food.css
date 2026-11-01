@@ -1,9 +1,5 @@
-/* Food module + shared MiniBars tooltip. Uses only tokens from index.css. */
+/* Food module. Uses only tokens from index.css. */
 
-.ns-tip {
-  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm);
-  padding: 6px 10px; font-size: 13px; color: var(--ink);
-}
 
 /* Compact stat row shared by Food week + Learning log: stays 2-up on phones instead of stacking tall cards. */
 .ns-stats { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }

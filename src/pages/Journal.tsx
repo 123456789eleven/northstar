@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type JournalEntry } from '../db'
-import { Card, Empty, PageHeader } from '../components/ui'
+import { Card, Empty, PageHeader, Skeleton } from '../components/ui'
 import ChartFrame from '../components/ChartFrame'
 import { addDays, formatDate, today } from '../lib/dates'
 import { EntryEditor } from '../features/journal/EntryEditor'
@@ -19,7 +19,7 @@ function Hl({ text, q }: { text: string; q: string }) {
 function EntryRow({ e, hidePreview, q, onOpen }: { e: JournalEntry; hidePreview: boolean; q: string; onOpen: (d: string) => void }) {
   const first = snippet(e.text, q)
   return (
-    <button className="jr-entry" onClick={() => onOpen(e.date)} aria-label={`Open ${formatDate(e.date)}`}>
+    <button className="jr-entry" onClick={() => onOpen(e.date)}>
       <span className="jr-entry-head">
         <span className="jr-entry-date">{formatDate(e.date, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
         <span className="jr-entry-meta">
@@ -92,6 +92,7 @@ export default function Journal() {
               </span>
             }
           >
+            {entries === undefined && <Skeleton lines={6} label="Loading journal" />}
             {entries !== undefined && (reading && current
               ? <ReadingView entry={current} onEdit={() => setEditing(true)} />
               : <EntryEditor key={date} date={date} entry={current} entries={entries} prefs={prefs} onPref={setPrefs} />)}
@@ -145,7 +146,7 @@ export default function Journal() {
           {stats.then.length > 0 && (
             <Card title="On this day">
               {stats.then.map(({ entry: e, label }) => (
-                <button key={e.id} className="jr-then jr-entry" onClick={() => { open(e.date); window.scrollTo({ top: 0 }) }} aria-label={`Open ${label}, ${formatDate(e.date)}`}>
+                <button key={e.id} className="jr-then jr-entry" onClick={() => { open(e.date); window.scrollTo({ top: 0 }) }}>
                   <span className="jr-entry-meta">{label} · {formatDate(e.date, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                   <span className="jr-entry-body clamp">{hidePreview ? 'Hidden' : e.text}</span>
                 </button>

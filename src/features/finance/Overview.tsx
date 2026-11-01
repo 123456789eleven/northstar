@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Card, Empty } from '../../components/ui'
+import { Card, Empty, PageSkeleton } from '../../components/ui'
 import ChartFrame from '../../components/ChartFrame'
 import KpiStrip from '../../components/KpiStrip'
 import { db } from '../../db'
@@ -24,17 +24,16 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
   const allTx = useLiveQuery(() => db.transactions.toArray(), [])
   const recurring = useMemo(() => (allTx ? detectRecurring(allTx, today()) : []), [allTx])
 
-  if (!txs || !budgets || !trendTx || anyTx === undefined || !bills) return null
+  if (!txs || !budgets || !trendTx || anyTx === undefined || !bills) return <PageSkeleton rows={5} />
 
   if (anyTx === 0) {
     return (
       <Card>
-        <Empty>
-          <p style={{ margin: '0 0 6px', color: 'var(--ink-2)' }}>No transactions yet.</p>
-          <p style={{ margin: '0 0 14px' }}>Log into your bank's website, download your recent transactions (OFX/QFX preferred, CSV works too), then import the file here. Everything stays on this device.</p>
-          <button className="btn btn-primary" onClick={() => goTo('import')}>
-            Import a file
-          </button>
+        <Empty
+          title="No transactions yet"
+          action={<button className="btn btn-primary" onClick={() => goTo('import')}>Import a file</button>}
+        >
+          Download recent transactions from your bank's website (OFX/QFX preferred, CSV works too), then import the file here. Everything stays on this device.
         </Empty>
       </Card>
     )
@@ -57,6 +56,28 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
   const budgetLeft = budgeted.reduce((sum, b) => sum + b.monthlyLimit - Math.max(0, bs.spent.get(b.category) ?? 0), 0)
   const budgetNote = budgeted.length ? (budgetLeft >= 0 ? `${money(budgetLeft)} left in budgets` : `${money(-budgetLeft)} over budgets`) : undefined
   const uncategorized = txs.filter((t) => t.category === UNCATEGORIZED).length
+
+  const topMerchantsCard = (
+    <Card title="Top merchants">
+      {merchants.length ? (
+        <div className="list">
+          {merchants.map(([k, v]) => (
+            <div key={k} className="list-item small">
+              <span className="grow">{merchantLabel(k)}</span>
+              <span className="faint tiny">
+                {v.count} {v.count === 1 ? 'purchase' : 'purchases'}
+              </span>
+              <span className="mono" style={{ minWidth: 80, textAlign: 'right' }}>
+                {moneyExact(v.total)}
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <Empty>No purchases this month.</Empty>
+      )}
+    </Card>
+  )
 
   return (
     <div className="stack" style={{ gap: 16 }}>
@@ -101,14 +122,18 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
         </Card>
       )}
 
-      <div className="grid grid-2">
+      <div className="fin-ov-grid">
+        <div className="fin-ov-col">
         <ChartFrame
           title={`Spending by category · ${monthLabel(month, true)}`}
+          empty="No spending this month yet."
           hasData={cats.length > 0}
           table={<MoneyTable head={['Category', 'Spent']} rows={cats.map((c) => [c.category, money(c.amount)])} />}
         >
           <CategoryBars rows={cats} onPick={(c) => goTo('transactions', c)} />
         </ChartFrame>
+        {topMerchantsCard}
+        </div>
         <ChartFrame
           title="Income vs spending · 6 months"
           legend={TREND_LEGEND}
@@ -135,25 +160,6 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
         </Card>
       )}
 
-      <Card title="Top merchants">
-        {merchants.length ? (
-          <div className="list">
-            {merchants.map(([k, v]) => (
-              <div key={k} className="list-item small">
-                <span className="grow">{merchantLabel(k)}</span>
-                <span className="faint tiny">
-                  {v.count} {v.count === 1 ? 'purchase' : 'purchases'}
-                </span>
-                <span className="mono" style={{ minWidth: 80, textAlign: 'right' }}>
-                  {moneyExact(v.total)}
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <Empty>No purchases this month.</Empty>
-        )}
-      </Card>
     </div>
   )
 }

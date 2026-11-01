@@ -2,8 +2,10 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { type FormEvent, useState } from 'react'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import ChartFrame from '../../components/ChartFrame'
+import { ACTIVE_DOT, CHART, GRID_PROPS, MARGIN, X_AXIS, Y_AXIS, tooltipProps } from '../../components/chartTheme'
+import { ChartTip } from '../../components/ChartTip'
 import StatusChip from '../../components/StatusChip'
-import { Card, Empty, Progress } from '../../components/ui'
+import { Card, Empty, PageSkeleton, Progress } from '../../components/ui'
 import { db, setSetting, type BalanceSnapshot, type Contribution, type Holding } from '../../db'
 import { formatDate, money, today } from '../../lib/dates'
 import { addNetWorthSnapshot, addContribution, deleteContribution, recordContributions, updatePrice } from './actions'
@@ -13,9 +15,7 @@ import {
 } from './model'
 import './investments.css'
 
-const AMBER = '#e3b261'
-const GRID = '#262a33'
-const AXIS = '#a6a49d'
+const AMBER = CHART.accent
 const num = (s: string) => Number(s.replace(/[$,\s]/g, ''))
 const okNum = (s: string) => s.trim() !== '' && Number.isFinite(num(s))
 const fmtShares = (n: number) => n.toLocaleString(undefined, { maximumFractionDigits: 3 })
@@ -25,7 +25,7 @@ export default function Investments() {
   const balances = useLiveQuery(() => db.balances.toArray(), [])
   const contribs = useLiveQuery(() => db.contributions.toArray(), [])
   const settings = useLiveQuery(() => db.settings.toArray(), [])
-  if (!holdings || !balances || !contribs || !settings) return null
+  if (!holdings || !balances || !contribs || !settings) return <PageSkeleton strip={false} rows={5} />
 
   const setting = <T,>(k: string, d: T) => (settings.find((s) => s.key === k)?.value as T | undefined) ?? d
   const limit = Number(setting('invest.iraLimit', DEFAULT_IRA_LIMIT))
@@ -313,12 +313,12 @@ function Growth({ account, snaps, contribs }: { account: string; snaps: BalanceS
       >
         <div style={{ width: '100%', height: 200 }} role="img" aria-label={`${account} balance by month, latest ${money(value)}`}>
           <ResponsiveContainer>
-            <LineChart data={series} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid vertical={false} stroke={GRID} />
-              <XAxis dataKey="date" tickLine={false} axisLine={{ stroke: GRID }} tick={{ fill: AXIS, fontSize: 12 }} tickFormatter={(d: string) => formatDate(d, { month: 'short', year: '2-digit' })} minTickGap={36} />
-              <YAxis tickLine={false} axisLine={false} tick={{ fill: AXIS, fontSize: 12 }} width={48} domain={['auto', 'auto']} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
-              <Tooltip isAnimationActive={false} cursor={{ stroke: GRID }} formatter={(v) => money(Number(v))} labelFormatter={(d) => formatDate(String(d), { month: 'short', day: 'numeric', year: 'numeric' })} contentStyle={{ background: '#1c1f26', border: '1px solid #262a33', fontSize: 12 }} />
-              <Line dataKey="value" name="Balance" stroke={AMBER} strokeWidth={2.5} dot={false} activeDot={{ r: 4 }} isAnimationActive={false} />
+            <LineChart data={series} margin={MARGIN}>
+              <CartesianGrid {...GRID_PROPS} />
+              <XAxis {...X_AXIS} dataKey="date" tickFormatter={(d: string) => formatDate(d, { month: 'short', year: '2-digit' })} minTickGap={36} />
+              <YAxis {...Y_AXIS} width={48} domain={['auto', 'auto']} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
+              <Tooltip {...tooltipProps(<ChartTip fmt={money} labelFmt={(d) => formatDate(d, { month: 'short', day: 'numeric', year: 'numeric' })} />)} />
+              <Line dataKey="value" name="Balance" stroke={AMBER} strokeWidth={2.5} dot={false} activeDot={ACTIVE_DOT(AMBER)} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

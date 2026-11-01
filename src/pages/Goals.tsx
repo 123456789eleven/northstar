@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { AREAS, db, type Area, type Goal, type Task } from '../db'
-import { AREA_LABEL, Card, Empty, PageHeader, Tabs } from '../components/ui'
+import { AREA_LABEL, Card, Empty, PageHeader, Skeleton, Tabs } from '../components/ui'
 import { GoalCard } from '../features/goals/GoalCard'
 import { GoalEditor } from '../features/goals/GoalEditor'
 import { CHILD_HORIZON } from '../features/goals/progress'
@@ -80,7 +80,9 @@ export default function Goals() {
         }
       />
 
-      {goals !== undefined && all.length === 0 ? (
+      {goals === undefined ? (
+        <Card><Skeleton rows={6} label="Loading goals" /></Card>
+      ) : all.length === 0 ? (
         <Card>
           <div className="goal-start">
             <div className="card-title">Start here</div>
@@ -135,7 +137,12 @@ export default function Goals() {
           {roots.length ? (
             <div className="goal-tree">{roots.map(render)}</div>
           ) : (
-            goals !== undefined && <Empty>No {status === 'all' ? '' : status} goals{area !== 'all' ? ` in ${AREA_LABEL[area]}` : ''}.</Empty>
+            <Card>
+              <Empty
+                title={`No ${status === 'all' ? '' : `${status} `}goals${area !== 'all' ? ` in ${AREA_LABEL[area]}` : ''}`}
+                action={status !== 'active' || area !== 'all' ? <button className="btn btn-sm" onClick={() => { setStatus('active'); setArea('all') }}>Show all active goals</button> : undefined}
+              />
+            </Card>
           )}
         </>
       )}

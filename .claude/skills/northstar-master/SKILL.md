@@ -29,11 +29,12 @@ Validate this index any time: `python "C:\Users\bearf\OneDrive\Desktop\The One\t
 | commit + deploy | northstar-ship |
 | set up / verify Supabase | northstar-supabase-ops |
 | choose a model / keep cost down | northstar-model-efficiency |
+| plan or run a multi-step request (who does what) | northstar-org-workflow |
 
 ## Catalog by type
 
 ### 1. Orchestration (how work gets organized)
-- **Planning:** brainstorming, writing-plans, executing-plans
+- **Planning:** brainstorming, writing-plans, executing-plans, northstar-org-workflow
 - **Delegation:** northstar-dispatch, northstar-parallel-build, subagent-driven-development, dispatching-parallel-agents
 - **Integration:** northstar-integrate, requesting-code-review, receiving-code-review, finishing-a-development-branch
 - **Cost control:** northstar-model-efficiency

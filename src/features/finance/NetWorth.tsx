@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { type FormEvent, useState } from 'react'
-import { Card, Empty } from '../../components/ui'
+import { Card, Empty, PageSkeleton } from '../../components/ui'
 import ChartFrame from '../../components/ChartFrame'
 import DataTable from '../../components/DataTable'
 import KpiStrip from '../../components/KpiStrip'
@@ -18,7 +18,7 @@ export default function NetWorth() {
   const [updating, setUpdating] = useState<Record<string, string>>({})
   const [flash, setFlash] = useState('')
 
-  if (!snaps) return null
+  if (!snaps) return <PageSkeleton rows={5} />
 
   const latest = new Map<string, BalanceSnapshot>()
   for (const s of [...snaps].sort((a, b) => a.date.localeCompare(b.date) || (a.id ?? 0) - (b.id ?? 0))) latest.set(s.name, s)

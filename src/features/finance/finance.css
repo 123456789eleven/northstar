@@ -44,15 +44,6 @@
 .fin-drop.is-drag { border-color: var(--accent); background: var(--surface-2); }
 
 /* Charts */
-.fin-legend { display: flex; gap: 16px; font-size: 12px; color: var(--ink-2); margin-bottom: 8px; }
-.fin-legend-box { width: 10px; height: 10px; border-radius: 2px; }
-.fin-legend-line { width: 14px; height: 2px; border-radius: 1px; }
-
-.fin-tip { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 10px; font-size: 12px; }
-.fin-tip-label { color: var(--ink-2); margin-bottom: 4px; }
-.fin-tip-row { display: flex; align-items: center; gap: 8px; }
-.fin-tip-row strong { color: var(--ink); font-weight: 600; }
-.fin-tip-key { width: 12px; height: 2px; border-radius: 1px; }
 
 .fin-hbars { display: flex; flex-direction: column; gap: 2px; }
 .fin-hbar {
@@ -78,3 +69,15 @@
 /* Bills */
 .fin-bill-name { background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; text-align: left; min-height: 32px; }
 .fin-bill-name:hover { color: var(--accent); }
+
+/* Overview v2: category + merchants stack on the left, trend on the right (no dead space under short bar lists). */
+.fin-ov-grid { display: grid; gap: var(--gap); grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.fin-ov-col { display: flex; flex-direction: column; gap: var(--gap); min-width: 0; }
+@media (max-width: 860px) { .fin-ov-grid { grid-template-columns: minmax(0, 1fr); } }
+.fin-ov-col .chart-plot { min-height: 0; }
+/* Category bars grow into place once (transform only). */
+.fin-hbar-fill { transform-origin: 0 50%; animation: bar-grow var(--dur-slow) var(--ease-out) both; }
+@keyframes bar-grow { from { transform: scaleX(0); } }
+.fin-hbar:hover .fin-hbar-fill { filter: none; opacity: 0.85; }
+.fin-hbar-track { background: var(--surface-2); border-radius: 0 4px 4px 0; }
+.fin-month-label { font-weight: 500; }

@@ -2,58 +2,34 @@
 // income = blue, spending = orange. Single-series charts use slot 1 (blue). Amber stays the UI accent, not a series color.
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { formatDate, money } from '../../lib/dates'
+import { ACTIVE_DOT, DOT, GRID_PROPS, MARGIN, X_AXIS, Y_AXIS, tooltipProps } from '../../components/chartTheme'
+import { ChartTip } from '../../components/ChartTip'
 import { compactMoney } from './model'
 import { SERIES } from './series'
 
-const GRID = '#262a33'
-const AXIS = '#a6a49d'
-
-interface TipRow {
-  name?: string | number
-  value?: number | string | (number | string)[]
-  color?: string
-  dataKey?: string | number | ((obj: unknown) => unknown)
-}
-
-function ChartTip({ active, payload, label, labelFmt }: { active?: boolean; payload?: TipRow[]; label?: string | number; labelFmt?: (l: string) => string }) {
-  if (!active || !payload?.length) return null
-  return (
-    <div className="fin-tip">
-      <div className="fin-tip-label">{labelFmt ? labelFmt(String(label)) : label}</div>
-      {payload.map((p) => (
-        <div key={String(p.name)} className="fin-tip-row">
-          <span className="fin-tip-key" style={{ background: p.color }} />
-          <strong className="mono">{money(Number(p.value))}</strong>
-          <span className="muted">{p.name}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 export function Legend({ items }: { items: { label: string; color: string; line?: boolean }[] }) {
   return (
-    <div className="fin-legend">
+    <ul className="legend">
       {items.map((i) => (
-        <span key={i.label} className="row" style={{ gap: 6 }}>
-          <span className={i.line ? 'fin-legend-line' : 'fin-legend-box'} style={{ background: i.color }} />
+        <li key={i.label}>
+          <span className={i.line ? 'legend-line' : 'legend-sw'} style={{ background: i.color }} aria-hidden />
           {i.label}
-        </span>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
 
 export function TrendChart({ data }: { data: { label: string; income: number; spending: number }[] }) {
   return (
     <>
-      <div style={{ width: '100%', height: 220 }}>
+      <div style={{ width: '100%', height: 220 }} role="img" aria-label={`Income and spending for the last ${data.length} months`}>
         <ResponsiveContainer>
-          <BarChart data={data} barGap={2} barCategoryGap="28%" margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
-            <CartesianGrid vertical={false} stroke={GRID} />
-            <XAxis dataKey="label" tickLine={false} axisLine={{ stroke: GRID }} tick={{ fill: AXIS, fontSize: 12 }} />
-            <YAxis tickLine={false} axisLine={false} tick={{ fill: AXIS, fontSize: 12 }} tickFormatter={(v: number) => compactMoney(v)} width={56} />
-            <Tooltip cursor={{ fill: 'rgba(255,255,255,0.04)' }} content={<ChartTip />} isAnimationActive={false} />
+          <BarChart data={data} barGap={2} barCategoryGap="28%" margin={MARGIN}>
+            <CartesianGrid {...GRID_PROPS} />
+            <XAxis {...X_AXIS} dataKey="label" />
+            <YAxis {...Y_AXIS} tickFormatter={(v: number) => compactMoney(v)} width={56} />
+            <Tooltip {...tooltipProps(<ChartTip fmt={money} />, 'bar')} />
             <Bar dataKey="income" name="Income" fill={SERIES.income} radius={[4, 4, 0, 0]} maxBarSize={22} isAnimationActive={false} />
             <Bar dataKey="spending" name="Spending" fill={SERIES.spending} radius={[4, 4, 0, 0]} maxBarSize={22} isAnimationActive={false} />
           </BarChart>
@@ -68,19 +44,19 @@ export function NetWorthChart({ data }: { data: { date: string; net: number }[] 
   return (
     <div style={{ width: '100%', height: 240 }}>
       <ResponsiveContainer>
-        <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-          <CartesianGrid vertical={false} stroke={GRID} />
-          <XAxis dataKey="date" tickLine={false} axisLine={{ stroke: GRID }} tick={{ fill: AXIS, fontSize: 12 }} tickFormatter={fmt} minTickGap={24} />
-          <YAxis tickLine={false} axisLine={false} tick={{ fill: AXIS, fontSize: 12 }} tickFormatter={(v: number) => compactMoney(v)} width={60} domain={['auto', 'auto']} />
-          <Tooltip cursor={{ stroke: AXIS, strokeWidth: 1 }} content={<ChartTip labelFmt={fmt} />} isAnimationActive={false} />
+        <LineChart data={data} margin={MARGIN}>
+          <CartesianGrid {...GRID_PROPS} />
+          <XAxis {...X_AXIS} dataKey="date" tickFormatter={fmt} minTickGap={24} />
+          <YAxis {...Y_AXIS} tickFormatter={(v: number) => compactMoney(v)} width={60} domain={['auto', 'auto']} />
+          <Tooltip {...tooltipProps(<ChartTip fmt={money} labelFmt={fmt} />)} />
           <Line
             type="monotone"
             dataKey="net"
             name="Net worth"
             stroke={SERIES.net}
             strokeWidth={2}
-            dot={data.length <= 24 ? { r: 4, fill: SERIES.net, stroke: '#15171c', strokeWidth: 2 } : false}
-            activeDot={{ r: 5, fill: SERIES.net, stroke: '#15171c', strokeWidth: 2 }}
+            dot={data.length <= 24 ? DOT(SERIES.net, 4) : false}
+            activeDot={ACTIVE_DOT(SERIES.net)}
             isAnimationActive={false}
           />
         </LineChart>

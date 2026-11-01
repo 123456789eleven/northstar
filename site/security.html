@@ -4,9 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>Security: how Northstar encrypted sync works</title>
-<meta name="description" content="A plain-language explanation of Northstar sync: a passphrase-derived key, per-record AES-GCM encryption, and what the server can and cannot see.">
+<title>Security: how encrypted sync works</title>
+<meta name="description" content="How Northstar end-to-end encrypts sync: passphrase-derived keys, AES-256-GCM per record, what the server can and cannot see, and what this does not protect against.">
 <meta name="theme-color" content="#0c0d10">
+<meta name="color-scheme" content="dark">
+<meta name="view-transition" content="same-origin">
 <link rel="canonical" href="%BASE%security.html">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -14,18 +16,21 @@
 <link rel="manifest" href="site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Northstar">
-<meta property="og:title" content="Security: how Northstar encrypted sync works">
-<meta property="og:description" content="A plain-language explanation of Northstar sync: a passphrase-derived key, per-record AES-GCM encryption, and what the server can and cannot see.">
+<meta property="og:title" content="Security: how encrypted sync works">
+<meta property="og:description" content="How Northstar end-to-end encrypts sync: passphrase-derived keys, AES-256-GCM per record, what the server can and cannot see, and what this does not protect against.">
 <meta property="og:url" content="%BASE%security.html">
 <meta property="og:image" content="%BASE%img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Northstar: your whole life, on your device. Product screenshot on a dark background.">
+<meta property="og:image:alt" content="Northstar: your whole life, run from one private place. The Today page in a window frame on a dark background.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Security: how Northstar encrypted sync works">
-<meta name="twitter:description" content="A plain-language explanation of Northstar sync: a passphrase-derived key, per-record AES-GCM encryption, and what the server can and cannot see.">
+<meta name="twitter:title" content="Security: how encrypted sync works">
+<meta name="twitter:description" content="How Northstar end-to-end encrypts sync: passphrase-derived keys, AES-256-GCM per record, what the server can and cannot see, and what this does not protect against.">
 <meta name="twitter:image" content="%BASE%img/og.jpg">
+<link rel="preload" href="fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
+<script src="site.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -35,11 +40,32 @@
 <a class="btn" href="app/">Open the app</a>
 </div></header>
 <main id="main">
-<section class="page-hero"><div class="wrap"><p class="label">Security</p><h1>How encrypted sync keeps your data unreadable to the server.</h1><p class="lede">You only need this page if you turn sync on. Without sync, your data never leaves your device.</p></div></section>
+<section class="page-hero"><div class="wrap"><p class="eyebrow ld">Security</p><h1 class="ld ld-2">How encrypted sync keeps your data unreadable to the server.</h1><p class="lede ld ld-3">You only need this page if you turn sync on. Without sync, your data never leaves your device.</p></div></section>
 <section><div class="wrap"><div class="prose">
 <h2>The idea in one paragraph</h2>
 <p>When you turn on sync, your device locks every record in a box before sending it, and only you have the key. The server stores locked boxes. It can count them and see when they changed, but it cannot open them. Your passphrase is what unlocks your key, and your passphrase never leaves your devices.</p>
 <h2>Step by step</h2>
+</div>
+<figure class="keymap draw-on rv"><svg class="km-desk" viewBox="0 0 1000 300" role="img" aria-label="Key wrapping: your passphrase is stretched with PBKDF2 into a wrapping key. The wrapping key and the recovery code each wrap the random data key. The data key encrypts every record with AES-256-GCM, and only the ciphertext leaves your devices.">
+<rect class="km-box" x="2" y="2" width="820" height="296" rx="12" fill="none"/><text class="km-s" x="18" y="26">ON YOUR DEVICES</text><text class="km-s" x="850" y="26">LEAVES THE DEVICE</text>
+<rect class="km-box" x="18" y="46" width="170" height="58" rx="8"/><text class="km-t" x="32" y="70">Passphrase</text><text class="km-s" x="32" y="88">in your head</text><rect class="km-box" x="222" y="46" width="180" height="58" rx="8"/><text class="km-t" x="236" y="70">PBKDF2-SHA256</text><text class="km-s" x="236" y="88">600,000 rounds</text><rect class="km-box" x="436" y="46" width="150" height="58" rx="8"/><text class="km-t" x="450" y="70">Wrapping key</text><text class="km-s" x="450" y="88">never stored</text>
+<rect class="km-box" x="436" y="214" width="150" height="58" rx="8"/><text class="km-t" x="450" y="238">Recovery code</text><text class="km-s" x="450" y="256">shown once</text><rect class="km-box acc" x="660" y="124" width="140" height="66" rx="8"/><text class="km-t" x="674" y="148">Data key</text><text class="km-s" x="674" y="166">random, wrapped</text><rect class="km-box acc" x="850" y="124" width="140" height="66" rx="8"/><text class="km-t" x="864" y="148">Records</text><text class="km-s" x="864" y="166">AES-256-GCM</text>
+<path class="km-w" pathLength="1" d="M188 75H222"/><path class="km-w k2" pathLength="1" d="M402 75H436"/>
+<path class="km-w k2" pathLength="1" d="M586 75 C 625 75, 625 146, 660 146"/><path class="km-w k2" pathLength="1" d="M586 243 C 625 243, 625 168, 660 168"/>
+<path class="km-w k3" pathLength="1" d="M800 157H850"/>
+<text class="km-s" x="640" y="100">wraps</text><text class="km-s" x="640" y="214">wraps</text><text class="km-s" x="825" y="112" text-anchor="middle">encrypts</text>
+<text class="km-s" x="850" y="214">+ table and record id</text><text class="km-s" x="850" y="230">bound in as AAD</text>
+</svg><svg class="km-mob" viewBox="0 0 340 470" role="img" aria-label="Key wrapping: passphrase, stretched by PBKDF2 into a wrapping key; the wrapping key and the recovery code each wrap the data key; the data key encrypts records, and only ciphertext leaves.">
+<rect class="km-box" x="2" y="2" width="336" height="350" rx="12" fill="none"/><text class="km-s" x="16" y="22">ON YOUR DEVICES</text>
+<rect class="km-box" x="18" y="34" width="304" height="50" rx="8"/><text class="km-t" x="32" y="58">Passphrase</text><text class="km-s" x="32" y="76">in your head</text><rect class="km-box" x="18" y="104" width="304" height="50" rx="8"/><text class="km-t" x="32" y="128">PBKDF2-SHA256</text><text class="km-s" x="32" y="146">600,000 rounds</text>
+<rect class="km-box" x="18" y="184" width="146" height="50" rx="8"/><text class="km-t" x="32" y="208">Wrapping key</text><text class="km-s" x="32" y="226">never stored</text><rect class="km-box" x="176" y="184" width="146" height="50" rx="8"/><text class="km-t" x="190" y="208">Recovery code</text><text class="km-s" x="190" y="226">shown once</text>
+<rect class="km-box acc" x="18" y="278" width="304" height="56" rx="8"/><text class="km-t" x="32" y="302">Data key</text><text class="km-s" x="32" y="320">random, wrapped twice</text>
+<text class="km-s" x="16" y="378">LEAVES THE DEVICE</text><rect class="km-box acc" x="18" y="392" width="304" height="56" rx="8"/><text class="km-t" x="32" y="416">Records</text><text class="km-s" x="32" y="434">AES-256-GCM per record</text>
+<path class="km-w" pathLength="1" d="M170 84V104"/><path class="km-w k2" pathLength="1" d="M170 154 C 170 170, 91 168, 91 184"/>
+<path class="km-w k2" pathLength="1" d="M91 234 C 91 256, 170 256, 170 278"/><path class="km-w k2" pathLength="1" d="M249 234 C 249 256, 170 256, 170 278"/>
+<path class="km-w k3" pathLength="1" d="M170 334V392"/>
+</svg><figcaption class="keymap-cap"><span><i></i>Key or data flow</span><span>Only the right-hand box is ever uploaded.</span></figcaption></figure>
+<div class="prose">
 <ol class="steps">
 <li><b>You choose a passphrase.</b> Northstar stretches it into a key with PBKDF2-SHA256 using 600,000 rounds. The deliberate slowness makes guessing passphrases expensive.</li>
 <li><b>A data key protects your records.</b> A random data key does the real encryption. It is stored, wrapped (encrypted) by your passphrase-derived key, and also wrapped by a one-time recovery code you are shown once.</li>
@@ -66,8 +92,14 @@
 </div></div></section>
 </main>
 <footer><div class="wrap">
-<div><p>Northstar. A private, local-first life operations app.<br>Source is viewable; license not yet chosen.</p></div>
-<nav aria-label="Footer"><ul><li><a href="index.html">Home</a></li><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li><li><a href="app/">Open the app</a></li><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Source</a></li></ul></nav>
+<div class="foot">
+<div><a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a><p>A private, local-first life operations app.<br>Free to use. Your data stays on your device.</p></div>
+<nav aria-labelledby="f-product"><h2 id="f-product">Product</h2><ul><li><a href="features.html">Features</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="app/">Open the app</a></li></ul></nav>
+<nav aria-labelledby="f-trust"><h2 id="f-trust">Trust</h2><ul><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
+<nav aria-labelledby="f-source"><h2 id="f-source">Source</h2><ul><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Repository</a></li><li><a href="faq.html#open-source">License status</a></li></ul></nav>
+</div>
+<div class="foot-base"><span>Source is viewable; license not yet chosen.</span><span>This site sets no cookies and makes no third-party requests.</span></div>
 </div></footer>
+<div id="live" class="sr-only" aria-live="polite"></div>
 </body>
 </html>

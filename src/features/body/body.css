@@ -14,3 +14,9 @@
 .body-ms { display: flex; flex-wrap: wrap; gap: 6px; }
 .body-tbl-x { width: 32px; height: 32px; padding: 0; color: var(--ink-3); }
 @media (max-width: 560px) { .body-targets { grid-template-columns: 1fr; } }
+
+/* v2: log line first, trend second, guidance/training/goal side by side below (no full-width form rows). */
+.body-log-big::placeholder { font-family: var(--font); font-size: 15px; }
+.body-split { display: grid; gap: var(--gap); grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
+@media (max-width: 980px) { .body-split { grid-template-columns: minmax(0, 1fr); } }
+.body-split .body-goalgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

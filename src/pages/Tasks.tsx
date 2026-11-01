@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
-import { Card, Empty, PageHeader } from '../components/ui'
+import { Card, Empty, PageHeader, Skeleton } from '../components/ui'
 import KpiStrip from '../components/KpiStrip'
 import SidePanel from '../components/SidePanel'
 import { useMedia, PHONE_QUERY } from '../components/useMedia'
@@ -108,6 +108,7 @@ export default function Tasks() {
     <>
       <PageHeader title="Tasks" sub={loaded ? `${order.length} open${overdueCount ? ` · ${overdueCount} overdue` : ''}` : ' '} />
 
+      {!loaded && <div className="skel skel-strip skel-pulse" style={{ marginBottom: 16 }} aria-hidden />}
       {loaded && order.length > 0 && (
         <KpiStrip
           items={[
@@ -145,7 +146,12 @@ export default function Tasks() {
             )}
             {note && <div className="focus-note" style={{ marginBottom: 10 }}>{note}</div>}
 
-            {loaded && order.length === 0 && <Empty>Nothing open. Type a task above, add a day like "fri" or "in 3d" and a priority like "!1".</Empty>}
+            {!loaded && <Skeleton rows={8} label="Loading tasks" />}
+            {loaded && order.length === 0 && (
+              <Empty title={done.length ? 'All clear' : 'No tasks yet'}>
+                Type a task above. Add a day like "fri" or "in 3d" and a priority like "!1"; it lands in the right group.
+              </Empty>
+            )}
 
             {groups.map((g) => (
               <div key={g.key} className="task-section">

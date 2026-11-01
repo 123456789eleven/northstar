@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
-import { Card, Empty, Progress } from '../../components/ui'
+import { Card, CountUp, Empty, PageSkeleton, Progress } from '../../components/ui'
 import { db, logEvent } from '../../db'
 import { money } from '../../lib/dates'
 import { EXPENSE_CATEGORIES } from './categories'
@@ -30,7 +30,7 @@ export default function Budgets({ month }: { month: string }) {
   const bills = useBills()
   const [msg, setMsg] = useState('')
 
-  if (!budgets || !txs || !prevTx || !bills) return null
+  if (!budgets || !txs || !prevTx || !bills) return <PageSkeleton strip={false} rows={8} />
 
   const { spent, billInfo } = budgetSpend(txs, bills)
   const prevSpent = budgetSpend(prevTx, bills).spent
@@ -53,8 +53,7 @@ export default function Budgets({ month }: { month: string }) {
         <Card title={`Total · ${monthLabel(month)}`}>
           <div className="row-between" style={{ alignItems: 'baseline' }}>
             <span className="stat-value" style={{ marginTop: 0 }}>
-              {money(totalSpent)}
-              
+              <CountUp value={money(totalSpent)} />
             </span>
             <LeftLabel spent={totalSpent} limit={totalLimit} />
           </div>
@@ -117,7 +116,7 @@ function BudgetBar({ spent, limit }: { spent: number; limit: number }) {
   const ratio = limit > 0 ? spent / limit : 0
   return (
     <div className={ratio > 1 ? 'fin-over' : ratio > 0.9 ? 'fin-near' : ''}>
-      <Progress value={ratio * 100} label="Budget used" />
+      <Progress value={ratio * 100} label="Budget used" tone={ratio > 1 ? 'warn' : undefined} />
     </div>
   )
 }

@@ -31,13 +31,13 @@
 .prio-high { color: var(--accent); }
 .task-flag { width: 3px; align-self: stretch; border-radius: 2px; margin: 6px 0; flex: 0 0 3px; background: transparent; }
 .task-flag.p1 { background: var(--accent); }
-.icon-btn {
+.task-row .icon-btn {
   display: grid; place-items: center; width: 32px; height: 32px; flex: 0 0 32px;
   border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--ink-3); cursor: pointer;
 }
-.icon-btn:hover { background: var(--surface-2); color: var(--ink); }
+.task-row .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
 .icon-btn.on { color: var(--accent); }
-.icon-btn svg { width: 16px; height: 16px; }
+.task-row .icon-btn svg { width: 16px; height: 16px; }
 
 .task-section + .task-section { margin-top: 18px; }
 .section-head { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); font-weight: 600; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
@@ -59,3 +59,18 @@
 .tq .side-panel { width: 360px; flex-basis: 360px; }
 .tq-keys { margin-top: 8px; }
 @media (max-width: 819px) { .tq { display: block; } }
+
+/* Completion moment: the strike draws across the title (transform), then the row leaves its group. */
+.task-title { display: inline-block; max-width: 100%; vertical-align: top; position: relative; }
+.task-row.completing .task-title { color: var(--ink-3); text-decoration: none; transition: color var(--dur-base) var(--ease-out); }
+.task-row.completing .task-title::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--ink-2); transform-origin: 0 50%; animation: strike var(--dur-slow) var(--ease-out) both; }
+@keyframes strike { from { transform: scaleX(0); } }
+.task-row { transition: background-color var(--dur-fast) var(--ease-out); }
+.task-main:hover .task-title { color: var(--ink); }
+.task-main:focus-visible { outline-offset: 2px; border-radius: var(--radius-xs); }
+.section-head { min-height: 32px; align-items: center; padding-bottom: 0; }
+.section-head .count { font-variant-numeric: tabular-nums; }
+.task-section + .task-section { margin-top: 20px; }
+.quick-add .input { height: 40px; }
+.quick-add .btn { height: 40px; }
+.task-row:hover:not(.selected) { background: var(--surface-2); }

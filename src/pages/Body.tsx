@@ -3,7 +3,7 @@ import { useMemo, useState, type FormEvent } from 'react'
 import ChartFrame from '../components/ChartFrame'
 import DataTable from '../components/DataTable'
 import KpiStrip from '../components/KpiStrip'
-import { Card, Empty, PageHeader } from '../components/ui'
+import { Card, Empty, PageHeader, PageSkeleton } from '../components/ui'
 import { useToast } from '../components/toastContext'
 import { db } from '../db'
 import BodyChart from '../features/body/BodyChart'
@@ -37,7 +37,14 @@ export default function Body() {
     return [...by.values()]
   }, [meals])
 
-  if (!weights || !settingRows || !habits || !logs || !meals) return null
+  if (!weights || !settingRows || !habits || !logs || !meals) {
+    return (
+      <div className="stack" style={{ gap: 16 }}>
+        <PageHeader title="Body" sub=" " />
+        <PageSkeleton rows={4} />
+      </div>
+    )
+  }
 
   const t = today()
   const latest = w.at(-1)
@@ -87,9 +94,15 @@ export default function Body() {
 
       {w.length === 0 ? (
         <>
-          <Card><Empty>No weigh-ins yet. Step 1: log today&apos;s weight above. Step 2: check your goal below ({s.goal} lb). A trend appears after about two weeks of logs.</Empty></Card>
-          <GoalPanel s={s} />
-          <GuidanceCard s={s} weights={w} rate={null} weight={null} intake={intake} remaining={0} goalDateRate={null} />
+          <Card>
+            <Empty title="No weigh-ins yet">
+              Log today&apos;s weight above, then check your goal ({s.goal} lb). A trend line appears after about two weeks of logs; weighing at the same time each morning keeps it honest.
+            </Empty>
+          </Card>
+          <div className="body-split">
+            <GoalPanel s={s} />
+            <GuidanceCard s={s} weights={w} rate={null} weight={null} intake={intake} remaining={0} goalDateRate={null} />
+          </div>
         </>
       ) : (
         <>
@@ -147,9 +160,13 @@ export default function Body() {
             </div>
           )}
 
-          <GuidanceCard s={s} weights={w} rate={rate} weight={current} intake={intake} remaining={toGo ?? 0} goalDateRate={goalDateRate} />
-          <TrainingCard habits={habits} logs={logs} target={s.trainDays} />
-          <GoalPanel s={s} firstWeight={w[0]?.weight} />
+          <div className="body-split">
+            <GuidanceCard s={s} weights={w} rate={rate} weight={current} intake={intake} remaining={toGo ?? 0} goalDateRate={goalDateRate} />
+            <div className="stack" style={{ gap: 'var(--gap)' }}>
+              <TrainingCard habits={habits} logs={logs} target={s.trainDays} />
+              <GoalPanel s={s} firstWeight={w[0]?.weight} />
+            </div>
+          </div>
         </>
       )}
     </div>

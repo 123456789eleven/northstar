@@ -4,9 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>Install Northstar on iPhone, Android or desktop</title>
-<meta name="description" content="How to install the Northstar PWA on iPhone Safari, Android Chrome and desktop Chrome or Edge, and how it behaves offline.">
+<title>Install Northstar on desktop, Android or iPhone</title>
+<meta name="description" content="How to install Northstar as an app on iPhone, iPad, Android and desktop, how it works offline, and your first steps.">
 <meta name="theme-color" content="#0c0d10">
+<meta name="color-scheme" content="dark">
+<meta name="view-transition" content="same-origin">
 <link rel="canonical" href="%BASE%install.html">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -14,18 +16,21 @@
 <link rel="manifest" href="site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Northstar">
-<meta property="og:title" content="Install Northstar on iPhone, Android or desktop">
-<meta property="og:description" content="How to install the Northstar PWA on iPhone Safari, Android Chrome and desktop Chrome or Edge, and how it behaves offline.">
+<meta property="og:title" content="Install Northstar on desktop, Android or iPhone">
+<meta property="og:description" content="How to install Northstar as an app on iPhone, iPad, Android and desktop, how it works offline, and your first steps.">
 <meta property="og:url" content="%BASE%install.html">
 <meta property="og:image" content="%BASE%img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Northstar: your whole life, on your device. Product screenshot on a dark background.">
+<meta property="og:image:alt" content="Northstar: your whole life, run from one private place. The Today page in a window frame on a dark background.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Install Northstar on iPhone, Android or desktop">
-<meta name="twitter:description" content="How to install the Northstar PWA on iPhone Safari, Android Chrome and desktop Chrome or Edge, and how it behaves offline.">
+<meta name="twitter:title" content="Install Northstar on desktop, Android or iPhone">
+<meta name="twitter:description" content="How to install Northstar as an app on iPhone, iPad, Android and desktop, how it works offline, and your first steps.">
 <meta name="twitter:image" content="%BASE%img/og.jpg">
+<link rel="preload" href="fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
+<script src="site.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -35,25 +40,38 @@
 <a class="btn" href="app/">Open the app</a>
 </div></header>
 <main id="main">
-<section class="page-hero"><div class="wrap"><p class="label">Install</p><h1>Install Northstar on desktop or phone.</h1><p class="lede">You can use it in a normal browser tab right away. Installing gives it its own window and an icon, and it works offline either way.</p><div class="actions"><a class="btn" href="app/">Open the app</a></div></div></section>
-<section><div class="wrap"><div class="prose">
-<h2>iPhone and iPad (Safari)</h2>
-<ol class="steps"><li>Open <a href="app/">the app</a> in Safari. It must be Safari, not another browser.</li><li>Tap the Share button.</li><li>Choose Add to Home Screen, then Add.</li><li>Open Northstar from your home screen.</li></ol>
-<h2>Android (Chrome)</h2>
-<ol class="steps"><li>Open <a href="app/">the app</a> in Chrome.</li><li>Open the menu with the three dots.</li><li>Tap Install app, or Add to Home screen.</li><li>Open Northstar from your home screen or app drawer.</li></ol>
-<h2>Desktop (Chrome or Edge)</h2>
-<ol class="steps"><li>Open <a href="app/">the app</a> and let it finish loading once.</li><li>Click the install icon at the right end of the address bar, or open the browser menu and choose Install Northstar (Chrome) or Apps, then Install this site as an app (Edge).</li><li>Confirm. Northstar opens in its own window and appears in your apps list.</li></ol>
+<section class="page-hero"><div class="wrap"><p class="eyebrow ld">Install</p><h1 class="ld ld-2">Install Northstar on desktop or phone.</h1><p class="lede ld ld-3">You can use it in a normal browser tab right away. Installing gives it its own window and an icon, and it works offline either way.</p><div class="actions ld ld-4"><a class="btn" href="app/">Open the app <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></div></section>
+<section><div class="wrap">
+<div class="sec-head rv"><p class="eyebrow">iPhone in three taps</p><h2>Add to Home Screen.</h2></div>
+<div class="a2hs rv-kids" role="group" aria-label="Add to Home Screen on iPhone, in three steps">
+<figure><svg viewBox="0 0 160 300" aria-hidden="true"><rect class="ph-body" x="4" y="4" width="152" height="292" rx="24"/><rect class="ph-ui" x="56" y="12" width="48" height="8" rx="4"/><rect class="ph-ui" x="16" y="34" width="128" height="16" rx="5"/><path class="ph-line" d="M22 70h90M22 84h110M22 98h70M22 124h100M22 138h80"/><rect class="ph-ui" x="12" y="250" width="136" height="34" rx="8"/><path class="ph-line" d="M30 267l-6-4 6-4M44 259l6 4-6 4M120 262h12M120 268h12"/><path class="ph-acc" d="M80 259v12M76 263l4-4 4 4"/><path class="ph-acc" d="M75 266h-2v9h14v-9h-2"/><circle class="ph-ring" cx="80" cy="267" r="15"/></svg><figcaption><b>1. Tap Share</b>In Safari&rsquo;s toolbar.</figcaption></figure>
+<figure><svg viewBox="0 0 160 300" aria-hidden="true"><rect class="ph-body" x="4" y="4" width="152" height="292" rx="24"/><rect class="ph-ui" x="56" y="12" width="48" height="8" rx="4"/><rect class="ph-ui" x="12" y="120" width="136" height="164" rx="10"/><path class="ph-line" d="M24 140h60M24 162h80M24 184h70"/><rect x="16" y="198" width="128" height="26" rx="6" class="ph-ui"/><rect x="16" y="198" width="128" height="26" rx="6" fill="none" stroke="#e3b261" stroke-width="1.5"/><text class="ph-t" x="24" y="215">Add to Home Screen</text><path class="ph-acc" d="M134 207v8M130 211h8"/><path class="ph-line" d="M24 244h50M24 264h66"/></svg><figcaption><b>2. Add to Home Screen</b>Then tap Add.</figcaption></figure>
+<figure><svg viewBox="0 0 160 300" aria-hidden="true"><rect class="ph-body" x="4" y="4" width="152" height="292" rx="24"/><rect class="ph-ui" x="56" y="12" width="48" height="8" rx="4"/><rect class="ph-ui" x="20" y="40" width="22" height="22" rx="6"/><rect class="ph-ui" x="52" y="40" width="22" height="22" rx="6"/><rect class="ph-ui" x="84" y="40" width="22" height="22" rx="6"/><rect class="ph-ui" x="116" y="40" width="22" height="22" rx="6"/><rect class="ph-ui" x="20" y="80" width="22" height="22" rx="6"/><rect class="ph-ui" x="52" y="80" width="22" height="22" rx="6"/><rect class="ph-ui" x="84" y="80" width="22" height="22" rx="6"/><rect class="ph-ui" x="116" y="80" width="22" height="22" rx="6"/><rect class="ph-ui" x="20" y="120" width="22" height="22" rx="6"/><rect class="ph-ui" x="84" y="120" width="22" height="22" rx="6"/><rect class="ph-ui" x="116" y="120" width="22" height="22" rx="6"/><rect class="ph-ui" x="20" y="160" width="22" height="22" rx="6"/><rect class="ph-ui" x="52" y="160" width="22" height="22" rx="6"/><rect class="ph-ui" x="84" y="160" width="22" height="22" rx="6"/><rect class="ph-ui" x="116" y="160" width="22" height="22" rx="6"/><rect x="52" y="120" width="22" height="22" rx="6" fill="#0c0d10" stroke="#e3b261" stroke-width="1.5"/><path d="M63 123.5l2 7.5-2 7.5-2-7.5z" fill="#e3b261"/><circle class="ph-ring" cx="63" cy="131" r="17"/><text class="ph-t" x="63" y="158" text-anchor="middle">Northstar</text></svg><figcaption><b>3. Open Northstar</b>From your Home Screen.</figcaption></figure>
+</div>
+<div class="platforms rv-kids">
+<div class="platform"><h2>iPhone and iPad</h2><ol class="steps"><li>Open <a href="app/">the app</a> in Safari. It must be Safari.</li><li>Tap the Share button.</li><li>Choose Add to Home Screen, then Add.</li><li>Open Northstar from your Home Screen.</li></ol></div>
+<div class="platform"><h2>Android</h2><ol class="steps"><li>Open <a href="app/">the app</a> in Chrome.</li><li>Open the menu with the three dots.</li><li>Tap Install app, or Add to Home screen.</li><li>Open Northstar from your home screen or app drawer.</li></ol></div>
+<div class="platform"><h2>Desktop</h2><ol class="steps"><li>Open <a href="app/">the app</a> in Chrome or Edge and let it load once.</li><li>Click the install icon at the right of the address bar, or choose Install from the browser menu.</li><li>Confirm. Northstar opens in its own window.</li></ol></div>
+</div>
+</div></section>
+<section class="band"><div class="wrap"><div class="prose">
 <h2>Offline behavior</h2>
-<ul><li>After the first load, the app&rsquo;s files are cached and Northstar opens with no connection.</li><li>Your data is already on the device, so everything works offline: capture, tasks, planner, journal, finance and the rest.</li><li>Features that need the network, such as encrypted sync, Google Calendar and food search, simply wait until you are back online.</li><li>When a new version is ready, the app offers to update; your data is not touched.</li></ul>
+<ul><li>After the first load, the app&rsquo;s files are cached and Northstar opens with no connection.</li><li>Your data is already on the device, so everything works offline: capture, tasks, planner, journal, finance and the rest.</li><li>Features that need the network, such as encrypted sync, Google Calendar and food search, wait until you are back online.</li><li>When a new version is ready, the app offers to update; your data is not touched.</li></ul>
 <div class="note"><p><b>Data is per device and per browser.</b> Your phone and laptop do not share data unless you turn on sync in Settings. Without sync, use Export backup on one device and Import on the other. On iPhone, a site that is only a browser tab can have its stored data cleared by the system after a long time unused, so add it to the Home Screen and export a backup now and then.</p></div>
 <h2>First steps</h2>
 <ol class="steps"><li>Open the app and choose Load demo to look around with fictional data, or start empty.</li><li>Add a task with one line in the capture bar, for example <code>call mom fri !1</code>.</li><li>Create a goal and link a task to it, then plan your day in the Planner.</li><li>Export a backup from Settings so you know how it works.</li></ol>
-<p><a class="btn" href="app/">Open the app</a></p>
+<p><a class="btn" href="app/">Open the app <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></p>
 </div></div></section>
 </main>
 <footer><div class="wrap">
-<div><p>Northstar. A private, local-first life operations app.<br>Source is viewable; license not yet chosen.</p></div>
-<nav aria-label="Footer"><ul><li><a href="index.html">Home</a></li><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li><li><a href="app/">Open the app</a></li><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Source</a></li></ul></nav>
+<div class="foot">
+<div><a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a><p>A private, local-first life operations app.<br>Free to use. Your data stays on your device.</p></div>
+<nav aria-labelledby="f-product"><h2 id="f-product">Product</h2><ul><li><a href="features.html">Features</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="app/">Open the app</a></li></ul></nav>
+<nav aria-labelledby="f-trust"><h2 id="f-trust">Trust</h2><ul><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
+<nav aria-labelledby="f-source"><h2 id="f-source">Source</h2><ul><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Repository</a></li><li><a href="faq.html#open-source">License status</a></li></ul></nav>
+</div>
+<div class="foot-base"><span>Source is viewable; license not yet chosen.</span><span>This site sets no cookies and makes no third-party requests.</span></div>
 </div></footer>
+<div id="live" class="sr-only" aria-live="polite"></div>
 </body>
 </html>

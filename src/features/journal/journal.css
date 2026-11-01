@@ -5,7 +5,7 @@
 .jr-text { width: 100%; min-height: max(240px, 38vh); line-height: 1.7; font-size: 16px; resize: vertical; background: transparent; border-color: transparent; padding: 4px 0; }
 .jr-text:focus { border-color: transparent; box-shadow: none; outline: none; }
 .jr-nav { gap: 2px; }
-.jr-date { width: 34px; height: 32px; padding: 0; background: transparent; border: 0; color: var(--ink-3); opacity: .8; }
+.jr-date { width: 34px; height: 32px; padding: 0; background: transparent; border: 0; color: var(--ink-2); }
 .jr-scale { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .jr-tags { overflow-wrap: anywhere; }
 .jr-scales { display: grid; gap: 8px 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -90,3 +90,13 @@ html[data-focus="1"] body { overflow: hidden; }
 .jr-goal { background: none; border: 0; color: inherit; font: inherit; text-decoration: underline; text-decoration-color: var(--ink-3); text-underline-offset: 3px; cursor: pointer; min-height: 32px; padding: 0 2px; }
 .jr-goal-in { width: 64px; height: 32px; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 4px; color: var(--ink); padding: 0 6px; font: inherit; }
 @media (max-width: 519px) { .jr-focus-text { font-size: 18px; } .jr-step-prompt { font-size: 20px; } }
+
+/* v2 polish */
+.jr-month { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); margin: 20px 0 0; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+.jr-entry { transition: background-color var(--dur-fast) var(--ease-out); padding-left: 8px; padding-right: 8px; margin: 0 -8px; width: calc(100% + 16px); border-radius: var(--radius-sm); }
+.jr-entry:hover { background: var(--surface-2); }
+.jr-entry:hover .jr-entry-date { text-decoration: none; }
+.jr-sq { transition: border-color var(--dur-fast) var(--ease-out); }
+.jr-sq:not(:disabled):hover { border-color: var(--ink-3); }
+.jr-big { font-variant-numeric: tabular-nums; letter-spacing: var(--track-display); }
+.jr-focus { animation: fade-in var(--dur-slow) var(--ease-out); }

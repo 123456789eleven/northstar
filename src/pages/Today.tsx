@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Task } from '../db'
-import { Card, Empty, PageHeader, Progress } from '../components/ui'
+import { Card, Empty, PageHeader, Progress, Skeleton } from '../components/ui'
 import KpiStrip from '../components/KpiStrip'
 import { useMedia, PHONE_QUERY } from '../components/useMedia'
 import { addDays, formatDate, today } from '../lib/dates'
@@ -100,6 +100,7 @@ export default function Today() {
 
       {(
         <>
+          {!loaded && <div className="skel skel-strip skel-pulse kpi-skel" aria-hidden />}
           {loaded && (
             <KpiStrip
               items={[
@@ -146,7 +147,15 @@ export default function Today() {
                     <div className="list">{v.done.map(row)}</div>
                   </>
                 )}
-                {loaded && listed === 0 && <Empty>No open tasks. Press / and type one, e.g. "call dentist tmr !1".</Empty>}
+                {!loaded && <Skeleton rows={5} label="Loading your day" />}
+                {loaded && listed === 0 && (
+                  <Empty
+                    title="Nothing open today"
+                    action={<button className="btn btn-sm" onClick={() => window.dispatchEvent(new Event('ns:capture'))}>Add a task</button>}
+                  >
+                    Type one into the capture line, e.g. "call dentist tmr !1". Press / to jump there.
+                  </Empty>
+                )}
                 {note && <div className="focus-note">{note}</div>}
               </Card>
               {!phone && <HabitsTile />}

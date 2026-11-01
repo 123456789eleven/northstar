@@ -4,18 +4,19 @@ import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YA
 import { AREAS, type Area, type Review } from '../../db'
 import { AREA_LABEL } from '../../components/ui'
 import { formatDate } from '../../lib/dates'
+import { ACTIVE_DOT, CHART, DOT, GRID_PROPS, Y_AXIS, tooltipProps } from '../../components/chartTheme'
 
 // Mirrors index.css tokens (SVG presentation attributes can't read CSS variables reliably).
-const C = { accent: '#3987e5', grid: '#262a33', axis: '#a6a49d', surface: '#15171c', ink: '#eceae4', ink2: '#a6a49d', line: '#262a33', surface2: '#1c1f26' }
+const C = { accent: CHART.data[0] }
 
 interface TipProps { active?: boolean; payload?: { payload: { weekOf: string; v?: number } }[]; area: Area }
 function Tip({ active, payload, area }: TipProps) {
   const p = payload?.[0]?.payload
   if (!active || !p) return null
   return (
-    <div style={{ background: C.surface2, border: `1px solid ${C.line}`, borderRadius: 6, padding: '6px 10px', fontSize: 12, color: C.ink }}>
-      <div style={{ color: C.ink2 }}>Week of {formatDate(p.weekOf)}</div>
-      <div>{AREA_LABEL[area]}: {p.v ?? 'not rated'}{p.v != null ? ' / 5' : ''}</div>
+    <div className="chart-tip">
+      <div className="chart-tip-label">Week of {formatDate(p.weekOf)}</div>
+      <div className="chart-tip-row"><strong>{p.v != null ? `${p.v} / 5` : 'not rated'}</strong><span className="muted">{AREA_LABEL[area]}</span></div>
     </div>
   )
 }
@@ -43,15 +44,15 @@ export function RatingsTrend({ reviews }: { reviews: Review[] }) {
               <div style={{ height: 84 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={data} margin={{ top: 6, right: 8, bottom: 2, left: 0 }}>
-                    <CartesianGrid stroke={C.grid} strokeWidth={1} vertical={false} />
+                    <CartesianGrid {...GRID_PROPS} />
                     <XAxis dataKey="weekOf" hide />
-                    <YAxis domain={[1, 5]} ticks={[1, 3, 5]} width={18} tickLine={false} axisLine={false} tick={{ fill: C.axis, fontSize: 11 }} />
-                    <Tooltip content={<Tip area={a} />} cursor={{ stroke: C.axis, strokeWidth: 1 }} isAnimationActive={false} />
+                    <YAxis {...Y_AXIS} domain={[1, 5]} ticks={[1, 3, 5]} width={18} tickMargin={2} />
+                    <Tooltip {...tooltipProps(<Tip area={a} />)} />
                     <Line
                       type="linear" dataKey="v" stroke={C.accent} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
                       connectNulls isAnimationActive={false}
-                      dot={{ r: 4, fill: C.accent, stroke: C.surface, strokeWidth: 2 }}
-                      activeDot={{ r: 5, fill: C.accent, stroke: C.surface, strokeWidth: 2 }}
+                      dot={DOT(C.accent, 4)}
+                      activeDot={ACTIVE_DOT(C.accent)}
                     />
                   </LineChart>
                 </ResponsiveContainer>

@@ -1,16 +1,17 @@
 // DataTable<T>: columns {key, header, render(row), align?, primary?, value?}, rows, rowKey(row).
 // selectable + selected(Set) + onSelectedChange => checkbox column. onRow + activeKey => click/Enter row, highlighted when active.
 // Keyboard: Up/Down move between rows, Enter activates. Phone (<=819px): renders as a ListRow-style stack (primary column = title,
-// `value` column on the right, remaining columns as meta). Never scrolls sideways.
+// `value` column on the right, remaining columns as meta). Never scrolls sideways. loading => skeleton rows (first paint).
 import type { KeyboardEvent, ReactNode } from 'react'
+import { Skeleton } from './ui'
 
 export interface Column<T> { key: string; header: string; render: (row: T) => ReactNode; align?: 'right'; primary?: boolean; value?: boolean }
 type Key = string | number
 
-export default function DataTable<T>({ columns, rows, rowKey, selectable, selected, onSelectedChange, onRow, activeKey, empty, label }: {
+export default function DataTable<T>({ columns, rows, rowKey, selectable, selected, onSelectedChange, onRow, activeKey, empty, label, loading }: {
   columns: Column<T>[]; rows: T[]; rowKey: (r: T) => Key
   selectable?: boolean; selected?: Set<Key>; onSelectedChange?: (s: Set<Key>) => void
-  onRow?: (r: T) => void; activeKey?: Key | null; empty?: ReactNode; label?: string
+  onRow?: (r: T) => void; activeKey?: Key | null; empty?: ReactNode; label?: string; loading?: boolean
 }) {
   const sel = selected ?? new Set<Key>()
   const toggle = (k: Key) => {
@@ -31,6 +32,7 @@ export default function DataTable<T>({ columns, rows, rowKey, selectable, select
       if (sib && sib.tabIndex === 0) { e.preventDefault(); sib.focus() }
     }
   }
+  if (loading) return <Skeleton rows={6} label={label ? `Loading ${label}` : 'Loading'} />
   if (rows.length === 0) return <div className="empty">{empty ?? 'Nothing here yet.'}</div>
 
   return (
