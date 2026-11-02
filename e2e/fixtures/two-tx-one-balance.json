@@ -1,0 +1,14 @@
+{
+  "app": "northstar",
+  "version": 1,
+  "exportedAt": "2026-01-01T00:00:00.000Z",
+  "tables": {
+    "transactions": [
+      { "date": "2026-01-05", "amount": -12.34, "description": "Fixture Coffee Shop", "category": "Dining" },
+      { "date": "2026-01-06", "amount": -45.67, "description": "Fixture Grocery Store", "category": "Groceries" }
+    ],
+    "balances": [
+      { "date": "2026-01-06", "name": "Fixture Checking", "kind": "asset", "balance": 1000 }
+    ]
+  }
+}
