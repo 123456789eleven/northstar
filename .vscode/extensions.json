@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "oxc.oxc-vscode",
+    "usernamehw.errorlens",
+    "yoavbls.pretty-ts-errors",
+    "vitest.explorer",
+    "eamodio.gitlens",
+    "ms-playwright.playwright"
+  ]
+}

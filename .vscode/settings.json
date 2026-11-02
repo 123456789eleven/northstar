@@ -1,0 +1,12 @@
+{
+  "search.exclude": {
+    "**/dist": true,
+    "**/pages-dist": true,
+    "**/.playwright-mcp": true
+  },
+  "files.watcherExclude": {
+    "**/dist/**": true,
+    "**/pages-dist/**": true,
+    "**/.playwright-mcp/**": true
+  }
+}

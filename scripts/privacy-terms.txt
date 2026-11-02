@@ -1,0 +1,6 @@
+# One pattern per line (case-insensitive, used by /ship-check). Generic patterns only.
+# Never add real names, emails or account numbers here: this file is committed.
+service_role
+sb_secret_
+passphrase
+recovery code

@@ -1,0 +1,19 @@
+#!/bin/sh
+# Northstar pre-commit: typecheck + lint must pass. Enable with: git config core.hooksPath .githooks
+# Bypass once (not recommended): git commit --no-verify
+
+echo "pre-commit: running typecheck and lint..."
+
+if ! npm run typecheck --silent; then
+  echo ""
+  echo "pre-commit FAILED: typecheck errors above. Fix them, then commit again."
+  exit 1
+fi
+
+if ! npm run lint --silent; then
+  echo ""
+  echo "pre-commit FAILED: lint errors above. Fix them, then commit again."
+  exit 1
+fi
+
+echo "pre-commit: ok"
