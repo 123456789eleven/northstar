@@ -151,6 +151,8 @@ export interface LifeEvent {
   refKey?: string
   /** Shown on the Achievements wall. */
   milestone: boolean
+  /** Optional JSON string with kind-specific detail (e.g. career.win tags and impact). Not indexed. */
+  meta?: string
 }
 
 export interface Review {

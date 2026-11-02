@@ -1,0 +1,47 @@
+/* Career workspace (car- prefix). Uses existing tokens only. */
+.car-quick { display: flex; flex-direction: column; gap: 10px; }
+.car-quick-row { display: flex; gap: 8px; }
+.car-quick-row .btn { flex: none; }
+.car-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.car-tag { min-height: 32px; cursor: pointer; font: inherit; font-size: 12px; }
+.car-month { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.car-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.car-win, .car-note { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.car-note { flex-direction: column; align-items: stretch; gap: 6px; }
+.car-win-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.car-win-title { overflow-wrap: anywhere; }
+.car-win-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.car-commit { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; }
+.car-h { margin: 0; font-size: 15px; font-weight: 600; }
+.car-sentence { margin: 0; font-weight: 600; }
+.car-project { display: flex; flex-direction: column; gap: 10px; }
+.car-ba { display: grid; grid-template-columns: 48px minmax(0, 1fr) 56px; align-items: center; gap: 6px 8px; font-size: 12px; }
+.car-ba-label { color: var(--ink-2); }
+.car-ba-val { text-align: right; font-variant-numeric: tabular-nums; }
+.car-ba-track { height: 10px; background: var(--surface-2); border-radius: 2px; overflow: hidden; }
+.car-ba-fill { display: block; height: 100%; border-radius: 2px; }
+.car-ba-before { background: var(--ink-3); }
+.car-ba-after { background: var(--accent); }
+.car-form-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.car-lead-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+.car-big { font-family: var(--font-display, inherit); font-size: 28px; line-height: 1.1; }
+.car-strip { width: 100%; border-collapse: collapse; font-size: 12px; }
+.car-strip th { text-align: left; font-weight: 500; color: var(--ink-2); padding: 4px 6px; }
+.car-strip td { padding: 4px 6px; position: relative; min-width: 56px; }
+.car-bar { display: inline-block; height: 8px; background: var(--accent); border-radius: 2px; vertical-align: middle; max-width: calc(100% - 20px); min-width: 0; }
+.car-bar-n { margin-left: 6px; font-variant-numeric: tabular-nums; }
+.car-case { margin: 0; padding: 12px; background: var(--page); border: 1px solid var(--line); border-radius: var(--radius-sm); white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/1.5 var(--font-body, inherit); max-height: 520px; overflow: auto; }
+
+@media (max-width: 640px) {
+  .car-quick-row { flex-direction: column; }
+  .car-form-grid { grid-template-columns: minmax(0, 1fr); }
+  .car-month { gap: 6px; }
+  .car-strip th, .car-strip td { padding: 4px 3px; }
+}
+
+@media print {
+  body * { visibility: hidden !important; }
+  .car-case, .car-case * { visibility: visible !important; }
+  .car-case { position: absolute; inset: 0 auto auto 0; width: 100%; max-height: none; overflow: visible; background: #fff; color: #000; border: 0; padding: 0; font-size: 12pt; }
+}
+.car-hint { margin: 0; }
