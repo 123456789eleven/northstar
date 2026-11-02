@@ -28,3 +28,6 @@ pages-dist
 .env
 .env.*
 !.env.example
+
+# Playwright MCP output
+.playwright-mcp/
