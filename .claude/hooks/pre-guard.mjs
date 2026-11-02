@@ -9,7 +9,7 @@ safe(() => {
   const base = p.split('/').pop() || '';
   let reason = '';
   if (/^\.env(\..*)?$/i.test(base) && base.toLowerCase() !== '.env.example') reason = 'env files hold secrets and are never edited by the agent';
-  else if (/northstar-private/i.test(p) || /passphrase/i.test(p)) reason = 'path is marked private (northstar-private / Passphrase)';
+  else if (/(^|\/)(northstar-private|passphrase)(\/|$)/i.test(p)) reason = 'path is inside a private folder (northstar-private / Passphrase)';
   else if (/(^|\/)\.git(\/|$)/.test(p)) reason = '.git internals are off limits';
   if (reason) {
     emit({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: `Blocked by project guard: ${reason}.` } });

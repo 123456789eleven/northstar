@@ -14,7 +14,8 @@ safe(() => {
 
   const notes = [];
 
-  if (/^src\/.+\.tsx?$/.test(rel)) {
+  // Only lint plain, expected paths: the command runs through a shell, so refuse anything with quotes, $, backticks, etc.
+  if (/^src\/.+\.tsx?$/.test(rel) && /^[\w@.\/: -]+$/.test(norm(abs))) {
     const r = spawnSync(`npx oxlint "${abs}"`, { cwd, shell: true, encoding: 'utf8', timeout: 20000, windowsHide: true });
     const out = `${r.stdout || ''}${r.stderr || ''}`.replace(/\x1b\[[0-9;]*m/g, '').trim();
     const clean = /Found 0 warnings and 0 errors/.test(out);
