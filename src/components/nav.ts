@@ -10,6 +10,7 @@ export const NAV: NavItem[] = [
   { to: '/planner', label: 'Planner', icon: 'planner', group: 'Operate' },
   { to: '/tasks', label: 'Tasks', icon: 'tasks', group: 'Operate' },
   { to: '/goals', label: 'Goals', icon: 'goals', group: 'Plan' },
+  { to: '/career', label: 'Career', icon: 'review', group: 'Plan' },
   { to: '/habits', label: 'Habits', icon: 'habits', group: 'Plan' },
   { to: '/finance', label: 'Finance', icon: 'finance', group: 'Life' },
   { to: '/food', label: 'Food', icon: 'food', group: 'Life' },

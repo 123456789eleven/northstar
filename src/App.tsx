@@ -26,6 +26,7 @@ const Habits = lazy(() => import('./pages/Habits'))
 const Journal = lazy(() => import('./pages/Journal'))
 const Planner = lazy(() => import('./pages/Planner'))
 const DataHub = lazy(() => import('./pages/DataHub'))
+const Career = lazy(() => import('./pages/Career'))
 
 type VTDoc = Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } }
 
@@ -98,6 +99,7 @@ function Shell() {
             <Route path="/journal" element={<Journal />} />
             <Route path="/planner" element={<Planner />} />
             <Route path="/data" element={<DataHub />} />
+            <Route path="/career" element={<Career />} />
           </Routes>
           </div>
           </Suspense>
