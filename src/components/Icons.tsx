@@ -21,6 +21,9 @@ const P = {
   settings: <><path d="M2 4.5h7M12 4.5h2M2 11.5h2M7 11.5h7" /><circle cx="10.5" cy="4.5" r="1.5" /><circle cx="5.5" cy="11.5" r="1.5" /></>,
   more: <><circle cx="3.5" cy="8" r="1" fill="currentColor" /><circle cx="8" cy="8" r="1" fill="currentColor" /><circle cx="12.5" cy="8" r="1" fill="currentColor" /></>,
   plus: <path d="M8 3v10M3 8h10" />,
+  arrowUp: <path d="M8 13V3M3.5 7.5L8 3l4.5 4.5" />,
+  arrowDown: <path d="M8 3v10M3.5 8.5L8 13l4.5-4.5" />,
+  flat: <path d="M3 8h10" />,
   capture: <path d="M2.5 13.5l1-3.5 7-7 2.5 2.5-7 7zM9 4.5l2.5 2.5" />,
 } satisfies Record<string, ReactNode>
 

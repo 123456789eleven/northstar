@@ -10,6 +10,8 @@ import KpiStrip from '../components/KpiStrip'
 import DataTable, { type Column } from '../components/DataTable'
 import SidePanel from '../components/SidePanel'
 import StatusChip from '../components/StatusChip'
+import ModuleTile from '../components/ModuleTile'
+import { TYPE_MODULE } from '../components/moduleHue'
 import { useMedia, PHONE_QUERY } from '../components/useMedia'
 import { NetworkGraph } from '../features/ops/NetworkGraph'
 import { applyProposal, canUndo, decide, getAuto, getAutoLog, loadOpsSnapshot, runAutoApply, setAuto, undoApplied } from '../features/ops/opsActions'
@@ -185,7 +187,7 @@ export default function Ops() {
           <div className="cmd-sub">Object type</div>
           {facets.map((t) => (
             <button key={t.key} className="cmd-facet" aria-pressed={!hidden.has(t.key)} onClick={() => setHidden((h) => { const n = new Set(h); if (n.has(t.key)) n.delete(t.key); else n.add(t.key); return n })}>
-              <span>{t.label}</span>
+              <span className="cmd-facet-name">{TYPE_MODULE[t.key] && <ModuleTile icon={TYPE_MODULE[t.key]} size="sm" />}{t.label}</span>
               <span className="ops-count">{facetCounts.get(t.key) ?? 0}</span>
             </button>
           ))}

@@ -2,9 +2,9 @@
 @font-face { font-family: 'Inter'; font-style: normal; font-weight: 100 900; font-display: swap; src: url(../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2) format('woff2-variations'); }
 @font-face { font-family: 'Fraunces'; font-style: normal; font-weight: 100 900; font-display: swap; src: url(../node_modules/@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2) format('woff2-variations'); }
 
-/* Northstar design system (see docs/design-system.md).
-   Restraint rules: one accent hue (amber). Color variety is reserved for data, never chrome.
-   No glow blobs, no glassmorphism, no gradients, no dashed "badge" borders, no per-card accent colors. */
+/* Northstar design system (docs/design/system.md) with the owner-approved "Aurora" layer (docs/design/aurora.md).
+   One amber accent. Gradients, the ambient glow and glass exist ONLY as the --aurora-* / --glass-* / --grad-* tokens below,
+   used where aurora.md allows. No ad-hoc gradients or blurs, no dashed badge borders, no per-card accent colors. */
 
 :root {
   /* surfaces: elevation = step + 1px line */
@@ -109,6 +109,32 @@
   --dur-slow: 320ms;
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  /* ---- Aurora (docs/design/aurora.md, owner-approved 2026-11-02). Names shared with site/style.css. ---- */
+  /* ambient layer: max 3 glows, alpha <= .14, static */
+  --aurora-amber: radial-gradient(60% 50% at 12% -5%, rgba(242, 196, 107, 0.14), transparent 70%);
+  --aurora-violet: radial-gradient(50% 45% at 92% 8%, rgba(124, 109, 240, 0.13), transparent 70%);
+  --aurora-teal: radial-gradient(55% 50% at 70% 105%, rgba(47, 191, 155, 0.1), transparent 70%);
+  /* glass */
+  --glass-bg: rgba(255, 255, 255, 0.045);
+  --glass-bg-hover: rgba(255, 255, 255, 0.065);
+  --glass-bg-strong: rgba(24, 26, 34, 0.72);
+  --glass-bg-bar: rgba(18, 19, 24, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-border-hover: rgba(255, 255, 255, 0.16);
+  --glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --glass-blur: blur(14px) saturate(120%);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.32);
+  /* gradients (fixed vocabulary) */
+  --grad-amber: linear-gradient(135deg, #f2c46b, #e58f55);
+  --grad-violet: linear-gradient(135deg, #7c6df0, #b46bf0);
+  --grad-teal: linear-gradient(135deg, #2fbf9b, #2aa9c4);
+  --grad-rose: linear-gradient(135deg, #ee6a8e, #f0876a);
+  --grad-sheen-hover: rgba(255, 255, 255, 0.12);
+  --grad-sheen-press: rgba(0, 0, 0, 0.1);
+  --grad-ink: #fff;
+  --radius-tile: 10px;
+  --ease-spring: cubic-bezier(0.3, 1.35, 0.5, 1);
 
   color-scheme: dark;
   font-family: var(--font);
@@ -279,6 +305,18 @@ tr:focus-visible { outline-offset: -2px; }
 .stat-label { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.08em; }
 .stat-value { font-family: var(--serif); font-size: 28px; line-height: 32px; font-weight: 500; font-variant-numeric: tabular-nums; margin-top: 4px; }
 .stat-note { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+.stat { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.stat-main { min-width: 0; flex: 1 1 auto; }
+.stat-icon { flex: 0 0 auto; width: 34px; height: 34px; display: grid; place-items: center; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); color: var(--ink-2); }
+.stat-int { width: 100%; text-align: left; font: inherit; color: inherit; text-decoration: none; cursor: pointer; transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+.stat-int:hover { transform: translateY(-1px); border-color: var(--line-strong); }
+.stat-int:active { transform: none; background: var(--surface-2); }
+@media (prefers-reduced-motion: reduce) { .stat-int:hover { transform: none; } }
+.trend { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; font-size: 12px; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.trend-fig { display: inline-flex; align-items: center; gap: 3px; font-weight: 500; }
+.trend-fig .icon { align-self: center; }
+.trend-label { color: var(--ink-2); }
+.trend-good .trend-fig { color: var(--good); } .trend-warn .trend-fig { color: var(--warn); } .trend-neutral .trend-fig { color: var(--ink-2); }
 
 /* KpiStrip */
 .kpi-strip { display: grid; grid-template-columns: repeat(var(--kpi-n, 4), minmax(0, 1fr)); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
@@ -660,4 +698,138 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
   .route-view { animation: none; }
   .print-only { display: revert !important; }
   @page { margin: 16mm; }
+}
+
+/* ================= Aurora layer (docs/design/aurora.md). Tokens only; appended last so it wins over the v1/v2 surface rules. =================
+   Blur never sits on a card itself: it lives on a ::before behind the content, so a card never becomes the containing block of a
+   fixed-position sheet or modal rendered inside it. Overlays blur their scrim (one full-screen layer) instead of the panel. */
+html { background: var(--bg); }
+body { background: transparent; }
+/* Ambient layer: one fixed, non-interactive layer of 3 low-alpha glows. Static. The 60s drift is opt-in ([data-aurora-drift] on <html>) and never runs for reduced motion. */
+body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--aurora-amber), var(--aurora-violet), var(--aurora-teal); }
+:root[data-aurora-drift] body::before { inset: -4%; animation: aurora-drift 60s ease-in-out infinite alternate; }
+@keyframes aurora-drift { to { transform: translate3d(1.5%, 1%, 0); } }
+@media (prefers-reduced-motion: reduce) { :root[data-aurora-drift] body::before { animation: none; } }
+
+/* Glass: top-level cards, panels, KPI strip. Rows, tables, list items and chart plots sit on the card's own surface (no glass). */
+.card, .kpi-strip, .side-panel { background: var(--glass-bg); border-color: var(--glass-border); box-shadow: var(--glass-edge); }
+.card, .kpi-strip { position: relative; }
+.card::before, .kpi-strip::before, .side-panel::before, .topbar::before, .tabbar::before {
+  content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; pointer-events: none;
+  -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+}
+/* Never glass inside glass: nested cards flatten onto their parent's surface. */
+:is(.card, .kpi-strip, .side-panel, .modal, .sheet, .cp) :is(.card, .kpi-strip) { background: transparent; box-shadow: none; }
+:is(.card, .kpi-strip, .side-panel, .modal, .sheet, .cp) :is(.card, .kpi-strip)::before { content: none; }
+.page-skel .skel { background: var(--glass-bg); border-color: var(--glass-border); }
+/* One hover behaviour, interactive cards only: lift 2px on a gentle spring, border brightens. Reduced motion: no lift. */
+.card-interactive, .stat-int { transition: transform var(--dur-base) var(--ease-spring), background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+.card-interactive:hover, .stat-int:hover { transform: translateY(-2px); background-color: var(--glass-bg-hover); border-color: var(--glass-border-hover); }
+.card-interactive:active, .stat-int:active { transform: translateY(0); background-color: var(--glass-bg-hover); transition-duration: var(--dur-fast); }
+@media (prefers-reduced-motion: reduce) { .card-interactive:hover, .stat-int:hover { transform: none; } }
+
+/* Chrome: the sidebar sits on the static ambient only (glass tint; blur would be a no-op there); the sticky top bar and the phone
+   tab bar float over scrolling content, so they use the denser bar tint (AA over any content, see system.md) plus blur. */
+.sidebar { background: var(--glass-bg); border-right-color: var(--glass-border); }
+.topbar { background: var(--glass-bg-bar); border-bottom-color: var(--glass-border); }
+.topbar::before { inset: 0; border-radius: 0; }
+.nav-link:hover { background: var(--glass-bg-hover); }
+.nav-link.active { background: var(--glass-bg-hover); box-shadow: var(--glass-edge); }
+.topbar .icon-btn:hover, .sync-chip:hover, .cp-trigger:hover { background: var(--glass-bg-hover); }
+.cp-trigger { border-color: var(--glass-border); }
+@media (max-width: 819px) {
+  :root { --glass-blur: blur(14px); } /* phones keep blur, drop saturate() */
+  .tabbar { background: var(--glass-bg-bar); border-top-color: var(--glass-border); }
+  .tabbar::before { inset: 0; border-radius: 0; }
+}
+
+/* Overlays: the scrim blurs the page once; the panel is strong glass on top. The toast floats over live content: bar tint + its own blur. */
+.modal-backdrop, .sheet-backdrop, .cp-backdrop { -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); }
+.modal, .sheet, .cp { background: var(--glass-bg-strong); border-color: var(--glass-border); box-shadow: var(--glass-edge), var(--glass-shadow); }
+.sheet-side { border-color: var(--glass-border); }
+.toast { background: var(--glass-bg-bar); border-color: var(--glass-border); box-shadow: var(--glass-edge), var(--glass-shadow); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); }
+.more-link { background: var(--glass-bg); border-color: var(--glass-border); }
+.tabs { border-bottom-color: var(--glass-border); }
+
+/* Primary button: amber gradient. States use a sheen layer (opacity only): hover lightens, pressed darkens, disabled is neutral, focus ring unchanged. */
+.btn-primary { position: relative; isolation: isolate; background: var(--grad-amber); background-origin: border-box; border-color: transparent; color: var(--accent-ink); }
+.btn-primary::after { content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; background: var(--grad-sheen-hover); opacity: 0; transition: opacity var(--dur-fast) var(--ease-out); pointer-events: none; }
+.btn-primary:hover:not(:disabled) { background: var(--grad-amber); background-origin: border-box; border-color: transparent; }
+.btn-primary:hover:not(:disabled)::after { opacity: 1; }
+.btn-primary:active:not(:disabled) { background: var(--grad-amber); background-origin: border-box; border-color: transparent; }
+.btn-primary:active:not(:disabled)::after { background: var(--grad-sheen-press); opacity: 1; }
+.btn-primary:disabled::after { content: none; }
+
+/* Progress fill: the gradient is sized to the visible part of the slid fill (--p), so a short bar still runs amber to copper.
+   Tone variants keep their semantic solid colour (their selectors are more specific). */
+.progress > div { background: var(--grad-amber) right / calc(var(--p, 100) * 1%) 100% no-repeat; }
+
+/* Brand mark: the amber gradient tile. */
+.brand-tile { display: inline-grid; place-items: center; width: 26px; height: 26px; flex: 0 0 26px; border-radius: var(--radius-sm); background: var(--grad-amber); box-shadow: var(--glass-edge); }
+.brand-tile .brand-mark { width: 18px; height: 18px; color: var(--accent-ink); }
+
+/* Module icon tile: 36px (24px compact, filter lists only) gradient square holding a line icon. Hue follows the module
+   (mapping in system.md, components/moduleHue.ts); amber carries dark ink like the primary button, the cooler hues carry white. */
+.tile { flex: 0 0 auto; display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: var(--radius-tile); background: var(--tile-grad, var(--grad-amber)); color: var(--tile-ink, var(--accent-ink)); box-shadow: var(--glass-edge); }
+.tile > svg { width: var(--icon-lg); height: var(--icon-lg); }
+.tile-sm { width: 24px; height: 24px; border-radius: var(--radius-sm); }
+.tile-sm > svg { width: var(--icon-sm); height: var(--icon-sm); }
+.hue-amber { --tile-grad: var(--grad-amber); --tile-ink: var(--accent-ink); }
+.hue-violet { --tile-grad: var(--grad-violet); --tile-ink: var(--grad-ink); }
+.hue-teal { --tile-grad: var(--grad-teal); --tile-ink: var(--grad-ink); }
+.hue-rose { --tile-grad: var(--grad-rose); --tile-ink: var(--grad-ink); }
+
+/* Where tiles appear: module header, titled empty states, stat cards, Command facets. Nav icons stay plain. */
+.page-head-main { display: flex; align-items: flex-start; gap: var(--sp-3); min-width: 0; }
+.page-head-text { min-width: 0; }
+.page-head-main > .tile { margin-top: -1px; }
+.empty-has-tile { display: flex; align-items: flex-start; gap: var(--sp-3); }
+.empty-main { min-width: 0; }
+.empty-has-tile > .tile { margin-top: 2px; }
+@media (max-width: 819px) { .page-head-main > .tile { width: 32px; height: 32px; } }
+
+/* KPI strip: each cell is its own glass tile (the reference stat card); linked cells lift like interactive cards. */
+.kpi-strip { background: none; border: 0; box-shadow: none; overflow: visible; gap: var(--gap); }
+.kpi-strip::before { content: none; }
+.kpi-strip[data-n] > .kpi-cell:nth-child(n) { position: relative; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius); box-shadow: var(--glass-edge); }
+.kpi-cell::before { content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; pointer-events: none; -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); }
+.kpi-link { transition: transform var(--dur-base) var(--ease-spring), background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+.kpi-strip[data-n] > .kpi-link:hover { transform: translateY(-2px); background: var(--glass-bg-hover); border-color: var(--glass-border-hover); }
+.kpi-strip[data-n] > .kpi-link:active { transform: translateY(0); background: var(--glass-bg-hover); }
+.kpi-link:focus-visible { outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .kpi-strip[data-n] > .kpi-link:hover { transform: none; } }
+@media (max-width: 819px) { .kpi-strip { gap: var(--sp-2); } }
+:is(.card, .side-panel, .modal, .sheet, .cp) .kpi-strip[data-n] > .kpi-cell:nth-child(n) { background: transparent; box-shadow: none; }
+:is(.card, .side-panel, .modal, .sheet, .cp) .kpi-cell::before { content: none; }
+
+/* Hero numeral: gradient text on at most one figure per screen; solid amber where background-clip:text is unsupported.
+   A semantic child colour (.warn) still wins because only `color` is made transparent. */
+.grad-text { color: var(--accent); }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .grad-text { background: var(--grad-amber); -webkit-background-clip: text; background-clip: text; color: transparent; }
+}
+
+/* Fallbacks: no backdrop-filter, or the user asked for less transparency -> solid surfaces, same borders. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card, .kpi-strip, .side-panel, .sidebar, .topbar, .tabbar, .more-link, .kpi-strip[data-n] > .kpi-cell:nth-child(n) { background: var(--surface-1); }
+  .modal, .sheet, .cp, .toast { background: var(--surface-3); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .card, .kpi-strip, .side-panel, .sidebar, .topbar, .tabbar, .more-link, .page-skel .skel, .kpi-strip[data-n] > .kpi-cell:nth-child(n) { background: var(--surface-1); }
+  .kpi-strip { background: none; }
+  .card-interactive:hover, .stat-int:hover, .nav-link:hover, .nav-link.active, .kpi-strip[data-n] > .kpi-link:hover { background: var(--surface-2); }
+  .modal, .sheet, .cp, .toast { background: var(--surface-3); }
+  .card::before, .kpi-strip::before, .kpi-cell::before, .side-panel::before, .topbar::before, .tabbar::before { content: none; }
+  .modal-backdrop, .sheet-backdrop, .cp-backdrop, .toast { -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (forced-colors: active) {
+  body::before, .card::before, .kpi-strip::before, .kpi-cell::before, .side-panel::before, .topbar::before, .tabbar::before, .btn-primary::after { content: none; }
+  .kpi-cell, .card, .side-panel, .modal, .sheet, .cp, .toast, .sidebar, .topbar, .tabbar, .tile, .brand-tile { border: 1px solid CanvasText; }
+  .btn-primary { border-color: ButtonText; }
+  .grad-text { background: none; color: CanvasText; }
+}
+@media print {
+  body::before, .card::before, .kpi-strip::before, .kpi-cell::before, .side-panel::before, .btn-primary::after { content: none; }
+  .card { background: none; }
+  .grad-text { background: none; color: inherit; }
 }

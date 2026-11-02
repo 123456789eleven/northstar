@@ -52,6 +52,11 @@ export default function Body() {
   const weekAgo = averageAt(w, addDays(t, -7))
   const change = current != null && weekAgo != null ? current - weekAgo : null
   const rate = weeklyRate(w, t)
+  const priorAvg = averageAt(w, addDays(t, -14))
+  const priorChange = weekAgo != null && priorAvg != null ? weekAgo - priorAvg : null
+  const priorRate = weeklyRate(w, addDays(t, -7))
+  const changeTrend = change != null && priorChange != null ? { delta: change - priorChange, unit: ' lb', goodDirection: 'up' as const, label: 'vs prior week' } : undefined
+  const rateTrend = rate != null && priorRate != null ? { delta: rate - priorRate, unit: ' lb/wk', goodDirection: 'up' as const, label: 'vs last week' } : undefined
   const start = s.startWeight ?? w[0]?.weight
   const toGo = current != null ? Math.max(0, s.goal - current) : null
   const projNow = current != null ? projectDate(current, s.goal, rate, t) : null
@@ -108,9 +113,9 @@ export default function Body() {
         <>
           <KpiStrip
             items={[
-              { label: 'Current (7-day avg)', value: `${current!.toFixed(1)} lb`, note: latest ? `Last weigh-in ${latest.weight} lb, ${formatDate(latest.date)}` : undefined },
-              { label: 'Change this week', value: change != null ? `${signed(change)} lb` : '--', note: change == null ? 'needs a week of logs' : undefined },
-              { label: 'Rate (4 weeks)', value: rate != null ? `${signed(rate)} lb/wk` : '--', note: rate == null ? 'needs 2 weeks of logs' : undefined },
+              { label: 'Current (7-day avg)', hero: true, value: `${current!.toFixed(1)} lb`, note: latest ? `Last weigh-in ${latest.weight} lb, ${formatDate(latest.date)}` : undefined },
+              { label: 'Change this week', value: change != null ? `${signed(change)} lb` : '--', trend: changeTrend, note: change == null ? 'needs a week of logs' : undefined },
+              { label: 'Rate (4 weeks)', value: rate != null ? `${signed(rate)} lb/wk` : '--', trend: rateTrend, note: rate == null ? 'needs 2 weeks of logs' : undefined },
               { label: 'To go', value: `${toGo!.toFixed(1)} lb`, note: `Goal ${s.goal} lb` },
               { label: 'Projected', value: projNow ? (projNow === t ? 'Reached' : fmtLong(projNow)) : '--', note: projNow ? `At ${signed(rate ?? 0)} lb/wk. At ${HEALTHY_RATE} lb/wk: ${projHealthy === t ? 'now' : projHealthy ? fmtLong(projHealthy) : '--'}` : `Needs a rising trend. At ${HEALTHY_RATE} lb/wk: ${projHealthy ? fmtLong(projHealthy) : '--'}` },
             ]}

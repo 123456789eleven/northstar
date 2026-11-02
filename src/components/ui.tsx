@@ -7,15 +7,26 @@
 // Motion: tokens --dur-fast/base/slow + --ease-out; helpers in motion.ts. Animate transform/opacity only; reduced motion is honoured.
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useFocusTrap } from './useFocusTrap'
+import { useLocation } from 'react-router-dom'
+import { Icon, type IconName } from './Icons'
+import ModuleTile from './ModuleTile'
+import { moduleForPath } from './moduleHue'
+import { formatDelta, trendAria, trendDirection, trendTone, type Trend } from './trend'
 import { formatNumeric, parseNumeric, prefersReducedMotion, useExit } from './motion'
 
-export function PageHeader({ title, sub, actions, tabs }: { title: string; sub?: ReactNode; actions?: ReactNode; tabs?: ReactNode }) {
+/** Page title row. The module's gradient tile (Aurora) comes from the route; pass icon={false} to omit it. */
+export function PageHeader({ title, sub, actions, tabs, icon }: { title: string; sub?: ReactNode; actions?: ReactNode; tabs?: ReactNode; icon?: IconName | false }) {
+  const { pathname } = useLocation()
+  const mod = icon === false ? undefined : (icon ?? moduleForPath(pathname))
   return (
     <>
     <div className="page-head">
-      <div>
-        <h1 className="page-title">{title}</h1>
-        {sub && <div className="page-sub">{sub}</div>}
+      <div className="page-head-main">
+        {mod && <ModuleTile icon={mod} />}
+        <div className="page-head-text">
+          <h1 className="page-title">{title}</h1>
+          {sub && <div className="page-sub">{sub}</div>}
+        </div>
       </div>
       {actions && <div className="row wrap">{actions}</div>}
     </div>
@@ -83,14 +94,40 @@ export function CountUp({ value }: { value: ReactNode }) {
   )
 }
 
-export function Stat({ label, value, note }: { label: string; value: ReactNode; note?: ReactNode }) {
+/** Inline movement indicator: arrow + signed delta + optional label. Arrow shape and sign carry the meaning; color only reinforces it. */
+export function TrendLine({ trend }: { trend: Trend }) {
+  const unit = trend.unit ?? '%'
+  const dir = trendDirection(trend.delta, unit)
+  const text = formatDelta(trend.delta, unit)
+  if (!text) return null
   return (
-    <div className="card">
-      <div className="stat-label">{label}</div>
-      <div className="stat-value"><CountUp value={value} /></div>
-      {note && <div className="stat-note">{note}</div>}
+    <div className={`trend trend-${trendTone(dir, trend.goodDirection)}`}>
+      <span className="trend-fig" aria-hidden>
+        <Icon name={dir === 'up' ? 'arrowUp' : dir === 'down' ? 'arrowDown' : 'flat'} size={12} />
+        <span className="trend-num">{text}</span>
+      </span>
+      {trend.label && <span className="trend-label" aria-hidden>{trend.label}</span>}
+      <span className="sr-only">{trendAria(trend)}</span>
     </div>
   )
+}
+
+/** Stat card. icon: a module IconName renders that module's gradient tile (moduleHue.ts); any other node sits in an amber tile. trend: optional movement line. onClick/href make it interactive (lift on hover, focus ring). */
+export function Stat({ label, value, note, icon, trend, onClick, href }: { label: string; value: ReactNode; note?: ReactNode; icon?: ReactNode; trend?: Trend; onClick?: () => void; href?: string }) {
+  const body = (
+    <>
+      <div className="stat-main">
+        <div className="stat-label">{label}</div>
+        <div className="stat-value"><CountUp value={value} /></div>
+        {trend && <TrendLine trend={trend} />}
+        {note && <div className="stat-note">{note}</div>}
+      </div>
+      {typeof icon === 'string' ? <ModuleTile icon={icon as IconName} /> : icon && <span className="stat-icon tile hue-amber" aria-hidden>{icon}</span>}
+    </>
+  )
+  if (href) return <a className="card stat stat-int" href={href}>{body}</a>
+  if (onClick) return <button type="button" className="card stat stat-int" onClick={onClick}>{body}</button>
+  return <div className="card stat">{body}</div>
 }
 
 /** Fill slides in from 0 on mount and glides on change (transform only). tone: warn = over a limit, muted = paused/neutral. */
@@ -109,12 +146,18 @@ export function Progress({ value, label = 'Progress', tone }: { value: number; l
 }
 
 /** Empty state: what is here (title), what to do first (children), and the action that does it. */
-export function Empty({ children, title, action }: { children?: ReactNode; title?: ReactNode; action?: ReactNode }) {
+export function Empty({ children, title, action, icon }: { children?: ReactNode; title?: ReactNode; action?: ReactNode; icon?: IconName | false }) {
+  // A titled empty state carries the current module's tile (Aurora); untitled one-liners stay plain.
+  const { pathname } = useLocation()
+  const mod = title && icon !== false ? (icon ?? moduleForPath(pathname)) : undefined
   return (
-    <div className="empty">
-      {title && <div className="empty-title">{title}</div>}
-      {children && <div className="empty-body">{children}</div>}
-      {action && <div className="empty-action">{action}</div>}
+    <div className={`empty ${mod ? 'empty-has-tile' : ''}`}>
+      {mod && <ModuleTile icon={mod} />}
+      <div className="empty-main">
+        {title && <div className="empty-title">{title}</div>}
+        {children && <div className="empty-body">{children}</div>}
+        {action && <div className="empty-action">{action}</div>}
+      </div>
     </div>
   )
 }

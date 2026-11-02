@@ -142,3 +142,7 @@
 /* Ontology: the detail panel follows you down a long object list (desktop). */
 @media (min-width: 981px) { .onto-detail { position: sticky; top: 64px; max-height: calc(100vh - 80px); overflow-y: auto; } }
 .onto-diagram .edge-label { font-variant-numeric: tabular-nums; }
+/* Aurora: object-type facets carry their module's compact gradient tile. */
+.cmd-facet-name { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.cmd-facet { min-height: 36px; }
+.cmd-facet[aria-pressed='false'] .tile { opacity: 0.45; }

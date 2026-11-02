@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { Card, Empty, PageSkeleton } from '../../components/ui'
 import ChartFrame from '../../components/ChartFrame'
 import KpiStrip from '../../components/KpiStrip'
+import { percentChange, type Trend } from '../../components/trend'
 import { db } from '../../db'
 import { formatDate, money, today } from '../../lib/dates'
 import { useMemo } from 'react'
@@ -79,14 +80,32 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
     </Card>
   )
 
+  // Previous month, from the 6-month window already loaded. No transactions there = no comparison (no trend shown).
+  // The month in progress is compared with the same days of the previous month (to date), so day 1 of November is never
+  // judged against all of October ("spending -98%").
+  const prevMonth = shiftMonth(month, -1)
+  const inProgress = month === today().slice(0, 7)
+  const cutoffDay = Number(today().slice(8, 10))
+  const prevTx = trendTx.filter((t) => t.date.startsWith(prevMonth) && (!inProgress || Number(t.date.slice(8, 10)) <= cutoffDay))
+  const prev = prevTx.length ? summarize(prevTx) : null
+  const vs = inProgress ? `vs ${monthLabel(prevMonth, true)} to date` : `vs ${monthLabel(prevMonth, true)}`
+  const pctTrend = (cur: number, before: number | undefined, goodDirection: 'up' | 'down'): Trend | undefined => {
+    const d = prev && before !== undefined ? percentChange(cur, before) : null
+    return d === null ? undefined : { delta: d, unit: '%', goodDirection, label: vs }
+  }
+  const rateTrend: Trend | undefined =
+    prev && prev.savingsRate !== null && s.savingsRate !== null
+      ? { delta: (s.savingsRate - prev.savingsRate) * 100, unit: ' pts', goodDirection: 'up', label: vs }
+      : undefined
+
   return (
     <div className="stack" style={{ gap: 16 }}>
       <KpiStrip
         items={[
-          { label: 'Income', value: money(s.income) },
-          { label: 'Spending', value: money(s.spending), note: budgetNote },
-          { label: 'Net', value: <span className={s.net >= 0 ? '' : 'warn'}>{money(s.net)}</span> },
-          { label: 'Savings rate', value: s.savingsRate === null ? '—' : pct(s.savingsRate), note: s.savingsRate === null ? 'No income this month' : 'Net ÷ income' },
+          { label: 'Income', value: money(s.income), trend: pctTrend(s.income, prev?.income, 'up') },
+          { label: 'Spending', value: money(s.spending), trend: pctTrend(s.spending, prev?.spending, 'down'), note: budgetNote },
+          { label: 'Net', hero: true, value: <span className={s.net >= 0 ? '' : 'warn'}>{money(s.net)}</span>, trend: pctTrend(s.net, prev?.net, 'up') },
+          { label: 'Savings rate', value: s.savingsRate === null ? '—' : pct(s.savingsRate), trend: rateTrend, note: s.savingsRate === null ? 'No income this month' : 'Net ÷ income' },
         ]}
       />
 

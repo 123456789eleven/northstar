@@ -54,10 +54,12 @@ function SearchButton({ compact }: { compact: boolean }) {
 
 export function Mark() {
   return (
-    <svg className="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
-      <path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19" strokeLinecap="round" opacity="0.35" />
-      <path d="M12 4l2 8-2 8-2-8z" fill="currentColor" stroke="none" />
-    </svg>
+    <span className="brand-tile" aria-hidden>
+      <svg className="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
+        <path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19" strokeLinecap="round" opacity="0.35" />
+        <path d="M12 4l2 8-2 8-2-8z" fill="currentColor" stroke="none" />
+      </svg>
+    </span>
   )
 }
 

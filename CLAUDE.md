@@ -19,8 +19,8 @@ Vite + React 19 + TypeScript, react-router-dom (HashRouter), Dexie + `dexie-reac
 - One page per route in `src/pages/`. Page-specific components go in `src/features/<module>/`.
 
 ## Design rules (owner is sensitive to "AI-generated / tacky" UI)
-- Dark only. One accent hue (`--accent`, amber). Color variety only for data in charts.
-- No glow blobs, gradients, glassmorphism, emoji icons, dashed badge borders, or a different accent per card.
+- Dark only. Brand accent is amber (`--accent`). **"Aurora" direction (owner-approved 2026-11-02): gradients, soft ambient glow and glass surfaces are wanted**, but only as tokens defined in `docs/design/aurora.md` (aurora layer, `--glass-*`, `--grad-*`); no ad-hoc gradients/blurs/colors in components. Guardrails there: alpha caps, AA contrast on worst-case glass, blur only on top-level cards/overlays (never rows or lists), reduced-motion/transparency fallbacks.
+- Still banned: emoji icons, dashed badge borders, a random accent per card (module hues follow the documented mapping), animated gradients on UI chrome.
 - Fraunces serif only for page titles and big numbers; Inter for everything else.
 - Dense, calm, legible. Cut decoration before adding polish.
 - Must work at phone width (≥360px): no horizontal page scroll, tap targets ≥ 32px.
