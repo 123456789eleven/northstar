@@ -1,40 +1,71 @@
-# Public site design system (site/)
+# Public site design system (site/), v3 "field manual" + Aurora
 
-The marketing site is static HTML + `site/style.css` + one deferred `site/site.js`. No build step, no dependencies, no third-party requests (CSP `default-src 'self'`, no inline styles or scripts).
+The marketing site is static HTML + `site/style.css` + one deferred `site/site.js`. No build step beyond `scripts/build-pages.cjs`, no dependencies, no third-party requests (CSP `default-src 'self'`, no inline styles or scripts). Critique of v2 and the art direction: `docs/design/site-v3-critique.md`. Screenshots: `docs/design/site-shots-v3/`.
+
+## Direction
+A precise instrument with its own manual. Strict 12-column grid whose outer edges are drawn as continuous hairlines (`.ruled`), a ruled annotation row (`.ann-row`: section mark, title, figure number) above every section, oversized Fraunces numerals, short declarative headlines, explanations drawn as SVG plates (one 1.25px stroke, mono labels), and the product demonstrated by working instruments instead of described. **Aurora** (owner-approved 2026-11-02, `docs/design/aurora.md`) adds the ambient light, glass containers, gradient tiles, the gradient primary button and one gradient numeral per page, using only Aurora tokens.
 
 ## Tokens
-Color, font and radius tokens use the **same names and values as `src/index.css`** (`--page`, `--surface`, `--surface-2/3`, `--line`, `--line-strong`, `--ink`, `--ink-2/3`, `--accent`, `--accent-ink`, `--accent-soft`, `--good/--warn/--info`, `--serif`, `--mono`, `--radius`, `--radius-sm`, `--radius-modal`, `--sp-1..7`). If the app changes one of these, change it here too.
-
-Also mirrored from the app's design system v2 block (same names and values): `--bg`, `--surface-1`, `--line-soft`, `--accent-hover #ebc17a`, `--accent-pressed #d6a24f`, `--accent-line`, `--accent-ring`, `--ink-disabled`, `--good-soft`, `--warn-soft`, `--radius-xs`, `--radius-pill`, `--shadow-pop`, `--icon-sm/md/lg`, `--track-label`, `--dur-fast/base/slow`, `--ease-out`, `--ease-in`.
+Color, font, radius and motion tokens use the **same names and values as `src/index.css`** (`--page/--bg`, `--surface(-1..3)`, `--line(-soft/-strong)`, `--ink(-2/-3)`, `--accent` + states, `--good/--warn/--info`, `--serif`, `--mono`, `--radius*`, `--sp-1..7`, `--dur-*`, `--ease*`). Aurora tokens are copied verbatim from `aurora.md`: `--aurora-amber/-violet/-teal`, `--glass-bg/-bg-hover(.065)/-bg-strong/-bg-bar(.88)/-border/-border-hover/-edge/-blur/-shadow`, `--grad-amber/-violet/-teal/-rose` (135deg), `--grad-sheen-hover/-press`, `--grad-ink`, `--radius-tile`, `--ease-spring`. If the app changes one, change it here too.
 
 Site-level additions:
 | Group | Tokens |
 |---|---|
-| Entrance easing | `--ease-enter cubic-bezier(0.16, 1, 0.3, 1)` (reveals and swaps only; UI state changes use the app's `--ease`) |
-| Space | `--sp-8 64`, `--sp-9 96`, `--sp-10 128` (section rhythm) |
-| Type | `--fs-xs 12` `--fs-sm 14` `--fs-base 16` `--fs-md 18` `--fs-lg 22` `--fs-xl clamp(28-42)` `--fs-2xl clamp(40-76)` `--fs-num` |
-| Depth | `--shadow-1`, `--shadow-frame` (product frames and the demo cards only), `--radius-frame 12`, `--radius-phone 34` |
-| Motion | `--dur-reveal 640`, `--rise 18px` (plus the app's `--dur-*` and easings) |
+| Layout | `--wrap 1320`, `--gut 48/32/20` (desktop/tablet/phone), `--head-h 64/60` |
+| Display type (Fraunces only) | `--fs-display clamp(42-168)` hero and end titles, `--fs-title clamp(44-112)` page titles, `--fs-h2 clamp(30-58)`, `--fs-numeral clamp(64-148)` section numerals, `--fs-lede` |
+| Numerals | `--numeral #6f6e69` decorative section numerals (always `aria-hidden`, large text) |
+| Space | `--sp-8 64`, `--sp-9 96`, `--sp-10 128` |
+| Aurora (site) | `--aurora-hero`: the amber and violet hues placed in the hero, each glow <= .14 (the "slightly stronger in the hero" layer) |
+| Motion | `--ease-enter`, `--dur-reveal 720` |
 
-Fraunces: headings and big numbers only. Inter: everything else. Mono: eyebrows, labels, code, kbd.
+Fraunces: titles and numerals only. Inter: everything else. Mono: annotations, labels, code, kbd.
+
+## Aurora on the site
+- **Ambient layer:** `body::before` fixed, the three app glows, static. Hero adds `.hero::before` with `--aurora-hero`. Page base stays `--bg`.
+- **Glass** (top-level containers only, never rows/lists, never nested): header and phone menu (`--glass-bg-bar`, floats over live content), palette dialog (`--glass-bg-strong`), product frames `.frame`, the miniature `.mini`, the story stage `.stage`, the hero capture bar `.filer-bar`, `.calc`, `.plate-scroll`, install illustrations `.ill`, read-next cards `.ncard`, ghost buttons, and the phone-width "what each side sees" cards. Inner regions use flat tints, not glass.
+- **Fallbacks:** no `backdrop-filter` support or `prefers-reduced-transparency: reduce` -> solid `--surface-1` / `--surface-3` and no aurora layer; `forced-colors` -> CanvasText borders, no blur, gradient text becomes CanvasText, tiles get a Canvas/CanvasText border. Phone drops `saturate()`.
+- **Gradient icon tiles** (`.tile` 36px, 32px in dense lists, `.tile.lg` 40px, `--radius-tile`; 1.75px line icon, `aria-hidden`; amber carries `--accent-ink`, violet/teal/rose carry `--grad-ink`). Module mapping mirrors the app's `src/components/moduleHue.ts`:
+
+| Hue | Token | Modules |
+|---|---|---|
+| Amber | `--grad-amber` | Command, Today, Planner, Tasks |
+| Violet | `--grad-violet` | Goals, Habits, Learning, Journal, History, Review |
+| Teal | `--grad-teal` | Finance |
+| Rose | `--grad-rose` | Food, Body, People |
+
+  Used in: hero lanes, the home module index, the features catalogue headers.
+- **Gradient primary button:** `.btn` fill `--grad-amber`, text `--accent-ink`; hover = `--grad-sheen-hover` overlay, press = `--grad-sheen-press` + scale .98 (opacity transitions).
+- **One gradient numeral per page** (`.gnum`, `background-clip: text`, solid `--accent` fallback): home "14" in the numbers ledger; features 14, privacy 4, security 600k, install 3, roadmap 30, FAQ 12 in the page hero (`.hnum`); 404 "404".
+- **Card hover lift:** interactive glass cards only (`.ncard` read-next cards): `translateY(-2px)` on `--ease-spring`, `--glass-bg-hover`, `--glass-border-hover`. No lift with reduced motion.
+
+### Contrast on glass (recorded 2026-11-02)
+Theoretical stack (both amber glows at full peak under one glass card, which the layout never produces): ink 8.56, ink-2 4.13, ink-3 3.57, accent 5.30 on glass. The real worst case is measured by `pixcontrast.mjs` (see `site-shots-v3/README.md`): every text box on every page at 1440 and 375 is compared with the 95th-percentile worst background pixel under it after hiding all text. Results are in the README. Accent-ink on the gradient button: 7.31 (worst end #e58f55), 8.37 hovered. Gradient numerals: 4.72-7.24 against the brightest page background (large text).
 
 ## Motion (each one has a job)
 | Motion | Job | Mechanism |
 |---|---|---|
 | Hero entrance (`.ld`) | Reading order on first paint | CSS keyframes, no JS |
-| Section/card reveal (`.rv`, `.rv-kids`) | Pace long pages | CSS scroll-driven `view()`; IntersectionObserver fallback adds `.in` only when JS ran (`.io`) |
-| Diagram draw-in (`.draw-on`) | Shows the direction data/keys flow | `stroke-dashoffset` on `pathLength=1` paths, scroll-driven |
-| Sync packets (`.pkt-g`) | Shows "locked boxes" travelling | transform only, 3 iterations, starts when in view |
-| Hero parallax | Depth between window and phone | `scroll()` timeline, transform only, >800px |
-| Header hairline / read progress | "You have scrolled" / position on long pages | `scroll()` timeline (JS fallback for the hairline) |
-| Count-ups | Real counts (14, 4, 600,000) | rAF, starts in view, final text restored |
-| Tabs, stepper, chips, toast | Explain state change | 200-320ms transform/opacity |
+| Live capture line + lane drop (`#filer`) | Shows one line being parsed and where it lands | JS typing, `transform` drop; pauses off-screen, on a hidden tab and with the Pause button; static with reduced motion |
+| Miniature (`#mini`) | Shows the real interactions: strike-through completion (same keyframes as `tasks.css`), row enter, budget bar `scaleX`, chart dot pop, number tick, rail count bump | CSS keyframes + transform/opacity |
+| Story stage (`#story`) | One day accumulating on one timeline | IntersectionObserver picks the step; the progress rail is a CSS scroll-driven animation (`timeline-scope` + `view-timeline`) with a JS step fallback |
+| Section reveal (`.rv`) | Pace long pages | CSS `view()` timeline; IntersectionObserver fallback adds `.in` only when JS ran (`.io`) |
+| Plate draw-in (`.draw`) | Direction of flow (modules -> History -> views; device -> transit -> server) | `stroke-dashoffset` on `pathLength=1` paths, scroll-driven, IO fallback |
+| Sync packets (`.arch .pkt`) | "Locked boxes" travelling | transform only, 3 iterations, starts in view |
+| Explorer wires, key-wrap highlight | What each switch/step involves | stroke draw + opacity |
+| Palette open, tabs, accordions, read-next lift | State change | 120-320ms transform/opacity |
 | Page transitions | Continuity between pages | `@view-transition { navigation: auto }`, header pinned |
 
-`prefers-reduced-motion: reduce` zeroes every animation/transition, hides packets, disables view transitions and smooth scroll. Without JS every section, panel and answer is visible (tabs collapse to stacked panels; switches hide; explorer lists every destination).
+`prefers-reduced-motion: reduce` zeroes every animation/transition, hides packets, stops the typing loop, disables view transitions and smooth scroll. Without JS every section, panel and answer is visible: the miniature shows all five panels stacked, install shows all three platforms, the explorer shows every destination, the story stage shows the finished day.
 
 ## Components
-Product frame (`.frame`, `.frame.adapt` swaps to a phone bezel and the phone screenshot under 600px via `<picture>`), phone (`.phone`), KPI strip, architecture diagram (`.arch`), tabs (`role=tablist`, roving tabindex, arrows/Home/End), capture playground (`#cap-in`, a faithful subset of `src/lib/capture.ts`), proposal stepper (`#prop`), comparison table (`.compare`, stacks under 600px), weight projection (`#calc`, same math as `features/body/model.ts`), privacy explorer (`#explore`, `role=switch`), key-wrapping diagram (`.keymap`), Add to Home Screen illustration (`.a2hs`), roadmap timeline (`.tl`), FAQ (`details` with ids, hash deep links, filter, expand all), numbered screenshot callouts (`.mk.pin`, positions generated from the demo screenshots between `@pins` markers in style.css).
+Ruled section header (`.sh`, `.ann-row`, `.sh-num`), page hero with numeral (`.phero`, `.ph-g`, `.hnum`), filer (`#filer`, `.lanes`), numbers ledger (`.nums`), miniature (`#mini`: capture form, tabbed rail, tasks/body/finance/food/journal panels, History aside), story (`#story`, `.stage`, `.step`), plates (`.fan`, `.arch-svg`, `.flowmap`, `.kw`), module index with hover preview (`#modlist`, `.modprev`), features catalogue (`.cat-g`, sticky `.cat-idx` with scroll-spy, `.mod`), weight projection (`#calc`), spec lists (`.spec`), ledger table (`.ledger-t`, stacks under 760px), can/cannot columns (`.cc`), install tabs + line illustrations (`.ptabs`, `.isteps`, `.ill`), roadmap filters (`.fchip`, `#rm`), FAQ groups (`.faq-g`, filter, expand all, deep links), read-next cards (`.ncard`), site search palette (`dialog.pal`).
+
+**Site search palette:** Ctrl/Cmd+K or `/` (when not typing). Searches a static index of pages, their sections and every FAQ answer, embedded in `site.js` between `/*@index*/` markers (regenerate it when page copy changes). Arrow keys, Enter, Esc; same-page results scroll and open the target. No network, no storage.
+
+**Privacy of the site itself:** no cookies, localStorage, sessionStorage, IndexedDB or service worker, so nothing on the site origin can touch the app's data under `/app/`. The demos use fictional data in memory only.
 
 ## Screenshots
-Only the built-in demo dataset plus fictional weights. WebP q80, 1280x900 desktop and 375x800 phone, explicit width/height, lazy below the fold, the hero window eager with `fetchpriority="high"`. Callout pins are measured from the same run, so re-shoot and regenerate pins together.
+Only the built-in demo dataset plus fictional weights, captured from a private build in a throwaway browser profile on a private localhost origin. WebP q80, 1280x900 desktop and 375x800 phone, explicit width/height, lazy below the fold; the first features shot is eager with `fetchpriority="high"` (the home hero is typographic and has no image). `img/og.jpg` is rendered from the site fonts and tokens.
+
+## Maintenance
+Pages share a header and footer written into each file. When editing navigation, update all 8 pages (and the 404 uses `%BASE%` absolute links). After changing any section heading or FAQ text, regenerate the palette index.

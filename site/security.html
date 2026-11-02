@@ -4,101 +4,153 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>Security: how encrypted sync works</title>
-<meta name="description" content="How Northstar end-to-end encrypts sync: passphrase-derived keys, AES-256-GCM per record, what the server can and cannot see, and what this does not protect against.">
+<title>Security: how encrypted sync keeps the server unable to read you | Northstar</title>
+<meta name="description" content="How Northstar's optional end-to-end encrypted sync works: PBKDF2 with 600,000 rounds, a wrapped master key, AES-256-GCM per record, and exactly what the server can and cannot see.">
 <meta name="theme-color" content="#0c0d10">
 <meta name="color-scheme" content="dark">
-<meta name="view-transition" content="same-origin">
 <link rel="canonical" href="%BASE%security.html">
-<link rel="icon" type="image/svg+xml" href="icon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="manifest" href="site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Northstar">
-<meta property="og:title" content="Security: how encrypted sync works">
-<meta property="og:description" content="How Northstar end-to-end encrypts sync: passphrase-derived keys, AES-256-GCM per record, what the server can and cannot see, and what this does not protect against.">
+<meta property="og:title" content="Security: how encrypted sync keeps the server unable to read you | Northstar">
+<meta property="og:description" content="How Northstar's optional end-to-end encrypted sync works: PBKDF2 with 600,000 rounds, a wrapped master key, AES-256-GCM per record, and exactly what the server can and cannot see.">
 <meta property="og:url" content="%BASE%security.html">
 <meta property="og:image" content="%BASE%img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Northstar: your whole life, run from one private place. The Today page in a window frame on a dark background.">
+<meta property="og:image:alt" content="Northstar. Write one line; Northstar files it. A private, local-first life operations app.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Security: how encrypted sync works">
-<meta name="twitter:description" content="How Northstar end-to-end encrypts sync: passphrase-derived keys, AES-256-GCM per record, what the server can and cannot see, and what this does not protect against.">
+<meta name="twitter:title" content="Security: how encrypted sync keeps the server unable to read you | Northstar">
+<meta name="twitter:description" content="How Northstar's optional end-to-end encrypted sync works: PBKDF2 with 600,000 rounds, a wrapped master key, AES-256-GCM per record, and exactly what the server can and cannot see.">
 <meta name="twitter:image" content="%BASE%img/og.jpg">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <script src="site.js" defer></script>
 </head>
-<body>
+<body class="pg-security">
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-head"><div class="wrap">
-<a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a>
-<nav aria-label="Main"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html" aria-current="page">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
-<a class="btn" href="app/">Open the app</a>
+<header class="site-head"><div class="wrap head-in">
+<a class="brand" href="index.html" aria-label="Northstar home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#e3b261"/><path d="M8 32h48" stroke="#e3b261" stroke-width="2.5"/></svg><span>Northstar</span></a>
+<nav class="nav-d" aria-label="Main"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html" aria-current="page">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
+<button type="button" class="pal-btn js-only" data-pal aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span class="pal-l">Search</span><kbd class="pal-k" aria-hidden="true">Ctrl K</kbd></button>
+<a class="btn sm head-cta" href="app/">Open the app</a>
+<details class="nav-m"><summary aria-label="Menu"><span class="nm-i" aria-hidden="true"><i></i><i></i></span></summary><nav aria-label="Main (mobile)"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html" aria-current="page">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li><li><a href="app/">Open the app</a></li></ul></nav></details>
 </div></header>
 <main id="main">
-<section class="page-hero"><div class="wrap"><p class="eyebrow ld">Security</p><h1 class="ld ld-2">How encrypted sync keeps your data unreadable to the server.</h1><p class="lede ld ld-3">You only need this page if you turn sync on. Without sync, your data never leaves your device.</p></div></section>
-<section><div class="wrap"><div class="prose">
-<h2>The idea in one paragraph</h2>
-<p>When you turn on sync, your device locks every record in a box before sending it, and only you have the key. The server stores locked boxes. It can count them and see when they changed, but it cannot open them. Your passphrase is what unlocks your key, and your passphrase never leaves your devices.</p>
-<h2>Step by step</h2>
-</div>
-<figure class="keymap draw-on rv"><svg class="km-desk" viewBox="0 0 1000 300" role="img" aria-label="Key wrapping: your passphrase is stretched with PBKDF2 into a wrapping key. The wrapping key and the recovery code each wrap the random data key. The data key encrypts every record with AES-256-GCM, and only the ciphertext leaves your devices.">
-<rect class="km-box" x="2" y="2" width="820" height="296" rx="12" fill="none"/><text class="km-s" x="18" y="26">ON YOUR DEVICES</text><text class="km-s" x="850" y="26">LEAVES THE DEVICE</text>
-<rect class="km-box" x="18" y="46" width="170" height="58" rx="8"/><text class="km-t" x="32" y="70">Passphrase</text><text class="km-s" x="32" y="88">in your head</text><rect class="km-box" x="222" y="46" width="180" height="58" rx="8"/><text class="km-t" x="236" y="70">PBKDF2-SHA256</text><text class="km-s" x="236" y="88">600,000 rounds</text><rect class="km-box" x="436" y="46" width="150" height="58" rx="8"/><text class="km-t" x="450" y="70">Wrapping key</text><text class="km-s" x="450" y="88">never stored</text>
-<rect class="km-box" x="436" y="214" width="150" height="58" rx="8"/><text class="km-t" x="450" y="238">Recovery code</text><text class="km-s" x="450" y="256">shown once</text><rect class="km-box acc" x="660" y="124" width="140" height="66" rx="8"/><text class="km-t" x="674" y="148">Data key</text><text class="km-s" x="674" y="166">random, wrapped</text><rect class="km-box acc" x="850" y="124" width="140" height="66" rx="8"/><text class="km-t" x="864" y="148">Records</text><text class="km-s" x="864" y="166">AES-256-GCM</text>
-<path class="km-w" pathLength="1" d="M188 75H222"/><path class="km-w k2" pathLength="1" d="M402 75H436"/>
-<path class="km-w k2" pathLength="1" d="M586 75 C 625 75, 625 146, 660 146"/><path class="km-w k2" pathLength="1" d="M586 243 C 625 243, 625 168, 660 168"/>
-<path class="km-w k3" pathLength="1" d="M800 157H850"/>
-<text class="km-s" x="640" y="100">wraps</text><text class="km-s" x="640" y="214">wraps</text><text class="km-s" x="825" y="112" text-anchor="middle">encrypts</text>
-<text class="km-s" x="850" y="214">+ table and record id</text><text class="km-s" x="850" y="230">bound in as AAD</text>
-</svg><svg class="km-mob" viewBox="0 0 340 470" role="img" aria-label="Key wrapping: passphrase, stretched by PBKDF2 into a wrapping key; the wrapping key and the recovery code each wrap the data key; the data key encrypts records, and only ciphertext leaves.">
-<rect class="km-box" x="2" y="2" width="336" height="350" rx="12" fill="none"/><text class="km-s" x="16" y="22">ON YOUR DEVICES</text>
-<rect class="km-box" x="18" y="34" width="304" height="50" rx="8"/><text class="km-t" x="32" y="58">Passphrase</text><text class="km-s" x="32" y="76">in your head</text><rect class="km-box" x="18" y="104" width="304" height="50" rx="8"/><text class="km-t" x="32" y="128">PBKDF2-SHA256</text><text class="km-s" x="32" y="146">600,000 rounds</text>
-<rect class="km-box" x="18" y="184" width="146" height="50" rx="8"/><text class="km-t" x="32" y="208">Wrapping key</text><text class="km-s" x="32" y="226">never stored</text><rect class="km-box" x="176" y="184" width="146" height="50" rx="8"/><text class="km-t" x="190" y="208">Recovery code</text><text class="km-s" x="190" y="226">shown once</text>
-<rect class="km-box acc" x="18" y="278" width="304" height="56" rx="8"/><text class="km-t" x="32" y="302">Data key</text><text class="km-s" x="32" y="320">random, wrapped twice</text>
-<text class="km-s" x="16" y="378">LEAVES THE DEVICE</text><rect class="km-box acc" x="18" y="392" width="304" height="56" rx="8"/><text class="km-t" x="32" y="416">Records</text><text class="km-s" x="32" y="434">AES-256-GCM per record</text>
-<path class="km-w" pathLength="1" d="M170 84V104"/><path class="km-w k2" pathLength="1" d="M170 154 C 170 170, 91 168, 91 184"/>
-<path class="km-w k2" pathLength="1" d="M91 234 C 91 256, 170 256, 170 278"/><path class="km-w k2" pathLength="1" d="M249 234 C 249 256, 170 256, 170 278"/>
-<path class="km-w k3" pathLength="1" d="M170 334V392"/>
-</svg><figcaption class="keymap-cap"><span><i></i>Key or data flow</span><span>Only the right-hand box is ever uploaded.</span></figcaption></figure>
-<div class="prose">
-<ol class="steps">
-<li><b>You choose a passphrase.</b> Northstar stretches it into a key with PBKDF2-SHA256 using 600,000 rounds. The deliberate slowness makes guessing passphrases expensive.</li>
-<li><b>A data key protects your records.</b> A random data key does the real encryption. It is stored, wrapped (encrypted) by your passphrase-derived key, and also wrapped by a one-time recovery code you are shown once.</li>
-<li><b>Each record is encrypted separately.</b> Every task, entry or transaction becomes its own ciphertext using AES-256-GCM, with a fresh random value each time. GCM also detects tampering: a modified box fails to open.</li>
-<li><b>Each box is bound to its place.</b> The table name and record id are mixed in as authenticated data, so a record cannot be swapped into a different slot unnoticed.</li>
-<li><b>Only ciphertext is uploaded.</b> Other devices download the boxes and open them with the same key, which they get by entering your passphrase.</li>
+<section class="phero" data-noindex><div class="wrap ruled">
+<div class="ann-row ld" aria-hidden="true"><span>N&nbsp;03</span><span>Security</span><span class="hide-s">Only relevant if you turn sync on</span></div>
+<div class="ph-g"><div><h1 class="ld ld-1">The server stores locked boxes. Only you hold the key.</h1>
+<p class="lede ld ld-2">You only need this page if you turn on encrypted sync. Without sync, your data never leaves your device.</p>
+</div><p class="hnum ld ld-2"><b class="gnum">600k</b><span class="ann">PBKDF2 rounds per passphrase</span></p></div>
+</div></section>
+
+<section class="sec" id="idea"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;01</span><span>The idea in one paragraph</span><span class="hide-s"></span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">01</span><div><h2>Every record is locked on your device before it leaves.</h2></div></div>
+</header>
+<p class="big-p">When you turn on sync, your device locks every record in its own box before sending it, and only you have the key. The server stores locked boxes. It can count them and see when they changed, but it cannot open them. Your passphrase is what unlocks the key, and your passphrase never leaves your devices.</p>
+</div></section>
+
+<section class="sec" id="keys"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;02</span><span>Key wrapping</span><span class="hide-s">Fig. 1</span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">02</span><div><h2>Step by step, from passphrase to ciphertext.</h2><p class="lede">Pick a step to highlight its part of the drawing. Everything left of the rule happens on your devices; only what crosses it is stored in your Supabase project.</p></div></div>
+</header>
+<div class="kw-g">
+<ol class="kw-steps" id="kw-steps">
+<li><button type="button" class="kw-b" data-s="1"><span class="sn">1</span><span><b>You choose a passphrase.</b> Northstar stretches it into a key with PBKDF2-SHA256 using 600,000 rounds and a random salt. The deliberate slowness makes guessing passphrases expensive. Passphrases are at least 12 characters.</span></button></li>
+<li><button type="button" class="kw-b" data-s="2"><span class="sn">2</span><span><b>A master key is wrapped twice.</b> A random master key is made on your first device. It is wrapped (AES-KW) by your passphrase-derived key, and again by a key from a one-time recovery code you are shown once. Only the wrapped copies and the salts are stored.</span></button></li>
+<li><button type="button" class="kw-b" data-s="3"><span class="sn">3</span><span><b>Each record is encrypted separately.</b> A data key derived from the master key (HKDF-SHA256) turns every task, entry or transaction into its own AES-256-GCM ciphertext, with a fresh random value each time. GCM also detects tampering: a modified box fails to open.</span></button></li>
+<li><button type="button" class="kw-b" data-s="4"><span class="sn">4</span><span><b>Each box is bound to its place.</b> The table name and record id are mixed in as authenticated data, so a record cannot be swapped into a different slot unnoticed.</span></button></li>
+<li><button type="button" class="kw-b" data-s="5"><span class="sn">5</span><span><b>Only ciphertext crosses the line.</b> Other devices download the boxes and open them with the same key, which they unwrap by entering your passphrase.</span></button></li>
 </ol>
-<h2>What the server can and cannot see</h2>
+<figure class="plate kw draw" id="kw" data-step="0">
+<div class="plate-scroll" tabindex="0" role="region" aria-label="Key wrapping diagram (scrolls sideways on small screens)">
+<svg viewBox="0 0 1000 470" role="img" aria-label="Diagram. On your devices: the passphrase goes through PBKDF2-SHA256 with 600,000 rounds to make a wrapping key that is never stored; the recovery code does the same with its own salt. Both wrapping keys wrap a random master key with AES-KW. HKDF-SHA256 derives a data key from the master key, which encrypts each record with AES-256-GCM, binding the table name and record id as authenticated data. Only the two wrapped master key copies, the salts and the record ciphertext are stored in your Supabase project.">
+<path class="zone" d="M752 34 V462"/>
+<text class="dim-l" x="8" y="18">ON YOUR DEVICES</text><text class="dim-l" x="770" y="18">STORED IN YOUR SUPABASE PROJECT</text>
+<g class="s1"><rect class="nd" x="8" y="40" width="160" height="60" rx="5"/><text class="t" x="22" y="66">Passphrase</text><text class="u" x="22" y="86">in your head</text></g>
+<g class="s1"><rect class="nd" x="212" y="40" width="190" height="60" rx="5"/><text class="t" x="226" y="66">PBKDF2-SHA256</text><text class="u" x="226" y="86">600,000 rounds, salt</text></g>
+<g class="s1 s2"><rect class="nd" x="446" y="40" width="170" height="60" rx="5"/><text class="t" x="460" y="66">Wrapping key</text><text class="u" x="460" y="86">never stored</text></g>
+<g class="s2"><rect class="nd" x="8" y="140" width="160" height="60" rx="5"/><text class="t" x="22" y="166">Recovery code</text><text class="u" x="22" y="186">shown once</text></g>
+<g class="s2"><rect class="nd" x="212" y="140" width="190" height="60" rx="5"/><text class="t" x="226" y="166">PBKDF2-SHA256</text><text class="u" x="226" y="186">own salt</text></g>
+<g class="s2"><rect class="nd" x="446" y="140" width="170" height="60" rx="5"/><text class="t" x="460" y="166">Recovery key</text><text class="u" x="460" y="186">never stored</text></g>
+<g class="s2 s3"><rect class="nd key" x="212" y="262" width="190" height="60" rx="5"/><text class="t" x="226" y="288">Master key</text><text class="u" x="226" y="308">random, 256-bit</text></g>
+<g class="s3"><rect class="nd" x="446" y="262" width="170" height="60" rx="5"/><text class="t" x="460" y="288">Data key</text><text class="u" x="460" y="308">AES-GCM-256</text></g>
+<g class="s3 s4"><rect class="nd" x="8" y="372" width="160" height="60" rx="5"/><text class="t" x="22" y="398">Each record</text><text class="u" x="22" y="418">task, entry, transaction</text></g>
+<g class="s2 op"><circle class="nd" cx="680" cy="70" r="22"/><text class="o" x="680" y="74" text-anchor="middle">wrap</text></g>
+<g class="s2 op"><circle class="nd" cx="680" cy="170" r="22"/><text class="o" x="680" y="174" text-anchor="middle">wrap</text></g>
+<g class="s3 s4 op"><circle class="nd" cx="680" cy="402" r="22"/><text class="o" x="680" y="406" text-anchor="middle">GCM</text></g>
+<g class="s2 s5"><rect class="nd cloud" x="790" y="56" width="202" height="128" rx="5"/><text class="t" x="806" y="84">Wrapped master key</text><text class="u" x="806" y="104">two copies, AES-KW</text><text class="u" x="806" y="124">plus both salts</text><text class="u" x="806" y="160">useless without the</text><text class="u" x="806" y="176">passphrase or code</text></g>
+<g class="s3 s5"><rect class="nd cloud" x="790" y="362" width="202" height="80" rx="5"/><text class="t" x="806" y="390">Ciphertext</text><text class="u" x="806" y="410">one box per record</text><text class="u" x="806" y="428">nonce, timestamps</text></g>
+<g class="w s1"><path pathLength="1" d="M168 70 H212"/><path pathLength="1" d="M402 70 H446"/><path pathLength="1" d="M616 70 H658"/></g>
+<g class="w s2"><path pathLength="1" d="M168 170 H212"/><path pathLength="1" d="M402 170 H446"/><path pathLength="1" d="M616 170 H658"/><path pathLength="1" d="M307 262 V236 H720 V92"/><path pathLength="1" d="M702 236 H720"/><path pathLength="1" d="M680 192 V236"/><path pathLength="1" d="M680 92 V148"/></g>
+<g class="w s2 s5 x"><path pathLength="1" d="M702 70 H790"/><path pathLength="1" d="M702 170 H790"/></g>
+<g class="w s3"><path pathLength="1" d="M402 292 H446"/><path pathLength="1" d="M616 292 H680 V380"/><path pathLength="1" d="M168 402 H658"/></g>
+<g class="w s3 s5 x"><path pathLength="1" d="M702 402 H790"/></g>
+<text class="lab s3" x="410" y="282">HKDF</text>
+<text class="lab s4 aad" x="300" y="392">+ table and record id, bound in as AAD</text>
+<text class="lab s3" x="300" y="426">fresh 96-bit nonce each time</text>
+</svg>
 </div>
-<div class="tablewrap"><table class="plain"><thead><tr><th scope="col">The server can see</th><th scope="col">The server cannot see</th></tr></thead><tbody>
-<tr><td>Your account email and sign-in times</td><td>The text, amounts, dates or names inside any record</td></tr>
-<tr><td>Which tables exist and how many records each has</td><td>Your passphrase, recovery code or encryption keys</td></tr>
-<tr><td>When records were created, changed or deleted</td><td>Which task, goal, transaction or journal entry a box is</td></tr>
-<tr><td>The size of each encrypted record</td><td>Anything in device-only settings, which never sync</td></tr>
-</tbody></table></div>
-<div class="prose">
-<p class="mute">Sizes and counts are a real leak of metadata: a very long journal entry makes a bigger box. If that matters to you, keep sync off.</p>
-<h2>Who holds which key</h2>
-<ul><li>Your passphrase and recovery code live in your head or your password manager. Northstar cannot recover them.</li><li>Row-level security in your Supabase project means your signed-in account can only read and write its own rows. The app never contains a service-role key.</li><li>Conflicts are resolved by the newest change, using a timestamp inside the ciphertext, so the server cannot reorder your edits.</li></ul>
-<div class="note"><p><b>Lose both and the cloud copy is gone.</b> If you lose your passphrase and your recovery code, nobody can decrypt the cloud copy, including you, Supabase and Northstar. The readable copy on each device is unaffected, so export a backup.</p></div>
-<h2>What this does not protect against</h2>
-<ul><li>Someone with access to your unlocked device or browser profile, since the local database is readable by the app. Use your device&rsquo;s screen lock and disk encryption.</li><li>Malware on your device, or a weak passphrase. Choose a long one.</li><li>Backup files you export: they are plain JSON. Store them carefully.</li></ul>
-<p>The exact network paths for every opt-in feature are on the <a href="privacy.html">Privacy page</a>. Setup instructions for sync are in the repository under <code>supabase/README.md</code>.</p>
-</div></div></section>
+<figcaption class="ann">Fig. 1&ensp;Key hierarchy of the optional sync, from <code>src/sync/crypto.ts</code>. Amber marks the selected step.</figcaption>
+</figure>
+</div>
+</div></section>
+
+<section class="sec" id="server"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;03</span><span>What the server sees</span><span class="hide-s">Table 1</span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">03</span><div><h2>What the server can and cannot see.</h2></div></div>
+</header>
+<div class="cc">
+<div class="cc-col"><h3 class="ann">The server can see</h3><ul><li>Your account email and sign-in times</li><li>Which tables exist and how many records each has</li><li>When records were created, changed or deleted</li><li>The size of each encrypted record</li><li>The wrapped master key and salts, which are useless without your passphrase or recovery code</li></ul></div>
+<div class="cc-col no"><h3 class="ann">The server cannot see</h3><ul><li>The text, amounts, dates or names inside any record</li><li>Your passphrase, recovery code or unwrapped keys</li><li>Which task, goal, transaction or journal entry a box is</li><li>Anything in device-only settings, which never sync</li></ul></div>
+</div>
+<p class="fine">Sizes and counts are a real leak of metadata: a very long journal entry makes a bigger box. If that matters to you, keep sync off.</p>
+</div></section>
+
+<section class="sec" id="who-holds"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;04</span><span>Who holds which key</span><span class="hide-s"></span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">04</span><div><h2>Nobody can recover your passphrase. That is the point.</h2></div></div>
+</header>
+<dl class="spec">
+<div><dt>Passphrase and recovery code</dt><dd>They live in your head or your password manager. Northstar cannot recover them.</dd></div>
+<div><dt>Row-level security</dt><dd>In your Supabase project, your signed-in account can only read and write its own rows. The app never contains a service-role key.</dd></div>
+<div><dt>Conflicts</dt><dd>Resolved by the newest change, using a timestamp inside the ciphertext, so the server cannot reorder your edits.</dd></div>
+<div class="warn-row"><dt>Lose both and the cloud copy is gone</dt><dd>If you lose your passphrase and your recovery code, nobody can decrypt the cloud copy, including you, Supabase and Northstar. The readable copy on each device is unaffected, so export a backup.</dd></div>
+</dl>
+</div></section>
+
+<section class="sec" id="limits"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;05</span><span>Limits</span><span class="hide-s"></span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">05</span><div><h2>What this does not protect against.</h2></div></div>
+</header>
+<ol class="limits">
+<li><b>Someone with your unlocked device or browser profile.</b> The local database is readable by the app. Use your device&rsquo;s screen lock and disk encryption.</li>
+<li><b>Malware on your device, or a weak passphrase.</b> Choose a long one.</li>
+<li><b>Backup files you export.</b> They are plain JSON. Store them carefully.</li>
+</ol>
+<p class="mute">The exact network paths for every opt-in feature are on the <a href="privacy.html">Privacy page</a>. Setup instructions for sync are in the repository under <a href="https://github.com/123456789eleven/northstar" rel="noopener">supabase/README.md</a>.</p>
+</div></section>
+<section class="next" aria-labelledby="next-h" data-noindex><div class="wrap ruled"><div class="ann-row"><span>&rarr;</span><span id="next-h">Read next</span><span class="hide-s"></span></div><div class="next-g"><a class="ncard" href="privacy.html"><span class="ann">privacy</span><span><b>Privacy</b><span class="d">Every connection, in one table.</span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="ncard" href="install.html"><span class="ann">install</span><span><b>Install</b><span class="d">Get Northstar on your phone and laptop.</span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></div></section>
 </main>
-<footer><div class="wrap">
-<div class="foot">
-<div><a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a><p>A private, local-first life operations app.<br>Free to use. Your data stays on your device.</p></div>
-<nav aria-labelledby="f-product"><h2 id="f-product">Product</h2><ul><li><a href="features.html">Features</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="app/">Open the app</a></li></ul></nav>
-<nav aria-labelledby="f-trust"><h2 id="f-trust">Trust</h2><ul><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
-<nav aria-labelledby="f-source"><h2 id="f-source">Source</h2><ul><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Repository</a></li><li><a href="faq.html#open-source">License status</a></li></ul></nav>
+<footer class="site-foot"><div class="wrap ruled">
+<div class="foot-top">
+<div class="foot-id"><a class="brand" href="index.html" aria-label="Northstar home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#e3b261"/><path d="M8 32h48" stroke="#e3b261" stroke-width="2.5"/></svg><span>Northstar</span></a><p>A private, local-first life operations app. Free to use. Your records stay on your device.</p></div>
+<nav aria-labelledby="f-p"><h2 id="f-p">Product</h2><ul><li><a href="features.html">Features</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="app/">Open the app</a></li></ul></nav>
+<nav aria-labelledby="f-t"><h2 id="f-t">Trust</h2><ul><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
+<nav aria-labelledby="f-s"><h2 id="f-s">Source</h2><ul><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Repository</a></li><li><a href="faq.html#open-source">License status</a></li></ul></nav>
 </div>
-<div class="foot-base"><span>Source is viewable; license not yet chosen.</span><span>This site sets no cookies and makes no third-party requests.</span></div>
+<svg class="foot-word" viewBox="0 0 1000 215" aria-hidden="true" focusable="false"><text x="0" y="178" textLength="1000" lengthAdjust="spacingAndGlyphs">Northstar</text></svg>
+<div class="foot-base"><span>Source is viewable; license not yet chosen.</span><span>Set in Fraunces and Inter, served from this site. No cookies, no storage, no third-party requests.</span></div>
 </div></footer>
 <div id="live" class="sr-only" aria-live="polite"></div>
 </body>

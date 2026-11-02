@@ -4,56 +4,123 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>Roadmap: what has shipped and what is next</title>
-<meta name="description" content="What Northstar does today, grouped by area, and what is planned next. Written plainly, with no dates or promises.">
+<title>Roadmap: what has shipped and what is next | Northstar</title>
+<meta name="description" content="What Northstar can do today, area by area, and what is being considered next. Written plainly, with no dates and no promises.">
 <meta name="theme-color" content="#0c0d10">
 <meta name="color-scheme" content="dark">
-<meta name="view-transition" content="same-origin">
 <link rel="canonical" href="%BASE%roadmap.html">
-<link rel="icon" type="image/svg+xml" href="icon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="manifest" href="site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Northstar">
-<meta property="og:title" content="Roadmap: what has shipped and what is next">
-<meta property="og:description" content="What Northstar does today, grouped by area, and what is planned next. Written plainly, with no dates or promises.">
+<meta property="og:title" content="Roadmap: what has shipped and what is next | Northstar">
+<meta property="og:description" content="What Northstar can do today, area by area, and what is being considered next. Written plainly, with no dates and no promises.">
 <meta property="og:url" content="%BASE%roadmap.html">
 <meta property="og:image" content="%BASE%img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Northstar: your whole life, run from one private place. The Today page in a window frame on a dark background.">
+<meta property="og:image:alt" content="Northstar. Write one line; Northstar files it. A private, local-first life operations app.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Roadmap: what has shipped and what is next">
-<meta name="twitter:description" content="What Northstar does today, grouped by area, and what is planned next. Written plainly, with no dates or promises.">
+<meta name="twitter:title" content="Roadmap: what has shipped and what is next | Northstar">
+<meta name="twitter:description" content="What Northstar can do today, area by area, and what is being considered next. Written plainly, with no dates and no promises.">
 <meta name="twitter:image" content="%BASE%img/og.jpg">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <script src="site.js" defer></script>
 </head>
-<body>
+<body class="pg-roadmap">
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-head"><div class="wrap">
-<a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a>
-<nav aria-label="Main"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html" aria-current="page">Roadmap</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
-<a class="btn" href="app/">Open the app</a>
+<header class="site-head"><div class="wrap head-in">
+<a class="brand" href="index.html" aria-label="Northstar home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#e3b261"/><path d="M8 32h48" stroke="#e3b261" stroke-width="2.5"/></svg><span>Northstar</span></a>
+<nav class="nav-d" aria-label="Main"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html" aria-current="page">Roadmap</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
+<button type="button" class="pal-btn js-only" data-pal aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span class="pal-l">Search</span><kbd class="pal-k" aria-hidden="true">Ctrl K</kbd></button>
+<a class="btn sm head-cta" href="app/">Open the app</a>
+<details class="nav-m"><summary aria-label="Menu"><span class="nm-i" aria-hidden="true"><i></i><i></i></span></summary><nav aria-label="Main (mobile)"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html" aria-current="page">Roadmap</a></li><li><a href="faq.html">FAQ</a></li><li><a href="app/">Open the app</a></li></ul></nav></details>
 </div></header>
 <main id="main">
-<section class="page-hero"><div class="wrap"><p class="eyebrow ld">Roadmap</p><h1 class="ld ld-2">What has shipped, and what is next.</h1><p class="lede ld ld-3">Written plainly. Nothing under &ldquo;Next&rdquo; is a promise or has a date.</p></div></section>
-<section><div class="wrap">
-<div class="tl-wrap"><div class="tl-fill" aria-hidden="true"></div><ol class="tl"><li><div><h2>Capture and search</h2><span class="tag">Shipped</span></div><ul><li>One-line capture for tasks, transactions, meals, weights, wins and journal entries</li><li>Bulk add for many lines at once</li><li>Search and command palette, on-device</li></ul></li><li><div><h2>Planning</h2><span class="tag">Shipped</span></div><ul><li>Planner with week and day views</li><li>Tasks with recurrence, priorities and goal links; keyboard queue</li><li>Goals with life, year and quarter horizons and milestones</li><li>Habits with streaks</li></ul></li><li><div><h2>Money</h2><span class="tag">Shipped</span></div><ul><li>CSV and OFX/QFX import with duplicate detection and undo</li><li>Budgets, net worth and merchant category rules</li><li>Optional SimpleFIN live bank feed (off by default)</li></ul></li><li><div><h2>Body and food</h2><span class="tag">Shipped</span></div><ul><li>Meal logging with left-today targets and meal templates</li><li>Optional Open Food Facts search</li><li>Body weight 7-day trend, rate and goal projection</li></ul></li><li><div><h2>Reflection</h2><span class="tag">Shipped</span></div><ul><li>Journal with prompts, templates, mood, month map and focus mode</li><li>Weekly review with digest, ratings trend and lock</li><li>History timeline and achievements</li></ul></li><li><div><h2>Command</h2><span class="tag">Shipped</span></div><ul><li>Proposals from six rules with evidence: accept, modify, dismiss and snooze</li><li>Optional low-risk auto-apply with 24-hour undo</li></ul></li><li><div><h2>Sync and data</h2><span class="tag">Shipped</span></div><ul><li>End-to-end encrypted sync (AES-256-GCM, passphrase and recovery code)</li><li>Read-only Google Calendar import</li><li>JSON backup and one-step restore; .ics and .vcf import</li></ul></li><li><div><h2>Platform</h2><span class="tag">Shipped</span></div><ul><li>Installable PWA with offline support</li><li>Demo dataset to explore with fictional data</li><li>This website, with interactive demos that run in the page</li></ul></li><li class="next"><div><h2>Next</h2><span class="tag">No dates, no promises</span></div><ul><li>Choose a license for the source code.</li><li>More testing on real phones, especially iOS storage and install behavior.</li><li>More import formats for bank and calendar data, as needed.</li><li>Refinements to Command rules based on which proposals turn out useful.</li><li>A custom domain for this site (<a href="app/">the app</a> keeps working at its current address).</li></ul></li></ol></div>
-<p class="mute prose">Northstar is built by one person for their own use first, so the order of work follows what is useful day to day. There is no changelog by version number yet.</p>
+<section class="phero" data-noindex><div class="wrap ruled">
+<div class="ann-row ld" aria-hidden="true"><span>N&nbsp;05</span><span>Roadmap</span><span class="hide-s">No dates, no promises</span></div>
+<div class="ph-g"><div><h1 class="ld ld-1">What has shipped, and what might be next.</h1>
+<p class="lede ld ld-2">Written plainly. Nothing under &ldquo;Next&rdquo; is a promise or has a date. Northstar is built by one person for their own use first, so the order of work follows what is useful day to day.</p>
+</div><p class="hnum ld ld-2"><b class="gnum">30</b><span class="ann">entries, shipped and next</span></p></div>
 </div></section>
-</main>
-<footer><div class="wrap">
-<div class="foot">
-<div><a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a><p>A private, local-first life operations app.<br>Free to use. Your data stays on your device.</p></div>
-<nav aria-labelledby="f-product"><h2 id="f-product">Product</h2><ul><li><a href="features.html">Features</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="app/">Open the app</a></li></ul></nav>
-<nav aria-labelledby="f-trust"><h2 id="f-trust">Trust</h2><ul><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
-<nav aria-labelledby="f-source"><h2 id="f-source">Source</h2><ul><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Repository</a></li><li><a href="faq.html#open-source">License status</a></li></ul></nav>
+
+<section class="sec" id="log"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;01</span><span>Log</span><span class="hide-s" id="rm-count-a">30 entries</span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">01</span><div><h2>Everything, by area.</h2><p class="lede">There is no changelog by version number yet. Filter by status or area.</p></div></div>
+</header>
+<div class="rm-filter js-only flex" role="group" aria-label="Filter the roadmap">
+<button type="button" class="fchip" data-f="all" aria-pressed="true">All</button>
+<button type="button" class="fchip" data-f="shipped" aria-pressed="false">Shipped</button>
+<button type="button" class="fchip" data-f="next" aria-pressed="false">Next</button>
+<span class="fsep" aria-hidden="true"></span>
+<button type="button" class="fchip" data-f="capture" aria-pressed="false">Capture</button>
+<button type="button" class="fchip" data-f="planning" aria-pressed="false">Planning</button>
+<button type="button" class="fchip" data-f="money" aria-pressed="false">Money</button>
+<button type="button" class="fchip" data-f="body" aria-pressed="false">Body and food</button>
+<button type="button" class="fchip" data-f="reflection" aria-pressed="false">Reflection</button>
+<button type="button" class="fchip" data-f="command" aria-pressed="false">Command</button>
+<button type="button" class="fchip" data-f="sync" aria-pressed="false">Sync and data</button>
+<button type="button" class="fchip" data-f="platform" aria-pressed="false">Platform</button>
+<span class="rm-count ann" id="rm-count" aria-live="polite">30 entries</span>
 </div>
-<div class="foot-base"><span>Source is viewable; license not yet chosen.</span><span>This site sets no cookies and makes no third-party requests.</span></div>
+<div class="rm" id="rm">
+<section class="rm-g" data-a="capture" data-noindex><h3><span class="ann">01</span>Capture and search</h3><ul>
+<li data-s="shipped"><span class="st on">Shipped</span>One-line capture for tasks, transactions, meals, weights, wins and journal entries</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Bulk add for many lines at once</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Search and command palette, on-device</li></ul></section>
+<section class="rm-g" data-a="planning" data-noindex><h3><span class="ann">02</span>Planning</h3><ul>
+<li data-s="shipped"><span class="st on">Shipped</span>Planner with week and day views</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Tasks with recurrence, priorities and goal links; keyboard queue</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Goals with life, year and quarter horizons and milestones</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Habits with streaks</li></ul></section>
+<section class="rm-g" data-a="money" data-noindex><h3><span class="ann">03</span>Money</h3><ul>
+<li data-s="shipped"><span class="st on">Shipped</span>CSV and OFX/QFX import with duplicate detection and undo</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Budgets, net worth and merchant category rules</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Optional SimpleFIN live bank feed (off by default)</li>
+<li data-s="next"><span class="st">Next</span>More import formats for bank data, as needed</li></ul></section>
+<section class="rm-g" data-a="body" data-noindex><h3><span class="ann">04</span>Body and food</h3><ul>
+<li data-s="shipped"><span class="st on">Shipped</span>Meal logging with left-today targets and meal templates</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Optional Open Food Facts search</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Body weight 7-day trend, rate and goal projection</li></ul></section>
+<section class="rm-g" data-a="reflection" data-noindex><h3><span class="ann">05</span>Reflection</h3><ul>
+<li data-s="shipped"><span class="st on">Shipped</span>Journal with prompts, templates, mood, month map and focus mode</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Weekly review with digest, ratings trend and lock</li>
+<li data-s="shipped"><span class="st on">Shipped</span>History timeline and achievements</li></ul></section>
+<section class="rm-g" data-a="command" data-noindex><h3><span class="ann">06</span>Command</h3><ul>
+<li data-s="shipped"><span class="st on">Shipped</span>Proposals from six rules with evidence: accept, modify, dismiss and snooze</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Optional low-risk auto-apply with 24-hour undo</li>
+<li data-s="next"><span class="st">Next</span>Refinements to Command rules based on which proposals turn out useful</li></ul></section>
+<section class="rm-g" data-a="sync" data-noindex><h3><span class="ann">07</span>Sync and data</h3><ul>
+<li data-s="shipped"><span class="st on">Shipped</span>End-to-end encrypted sync (AES-256-GCM, passphrase and recovery code)</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Read-only Google Calendar import</li>
+<li data-s="shipped"><span class="st on">Shipped</span>JSON backup and one-step restore; .ics and .vcf import</li>
+<li data-s="next"><span class="st">Next</span>More import formats for calendar data, as needed</li></ul></section>
+<section class="rm-g" data-a="platform" data-noindex><h3><span class="ann">08</span>Platform</h3><ul>
+<li data-s="shipped"><span class="st on">Shipped</span>Installable PWA with offline support</li>
+<li data-s="shipped"><span class="st on">Shipped</span>Demo dataset to explore with fictional data</li>
+<li data-s="shipped"><span class="st on">Shipped</span>This website, with interactive demos that run in the page</li>
+<li data-s="next"><span class="st">Next</span>Choose a license for the source code</li>
+<li data-s="next"><span class="st">Next</span>More testing on real phones, especially iOS storage and install behavior</li>
+<li data-s="next"><span class="st">Next</span>A custom domain for this site (the app keeps working at its current address)</li></ul></section>
+</div>
+<p class="rm-empty" id="rm-empty" hidden>Nothing matches that filter.</p>
+</div></section>
+<section class="next" aria-labelledby="next-h" data-noindex><div class="wrap ruled"><div class="ann-row"><span>&rarr;</span><span id="next-h">Read next</span><span class="hide-s"></span></div><div class="next-g"><a class="ncard" href="features.html"><span class="ann">features</span><span><b>Features</b><span class="d">What each module does today.</span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="ncard" href="faq.html"><span class="ann">faq</span><span><b>FAQ</b><span class="d">Questions, answered plainly.</span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></div></section>
+</main>
+<footer class="site-foot"><div class="wrap ruled">
+<div class="foot-top">
+<div class="foot-id"><a class="brand" href="index.html" aria-label="Northstar home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#e3b261"/><path d="M8 32h48" stroke="#e3b261" stroke-width="2.5"/></svg><span>Northstar</span></a><p>A private, local-first life operations app. Free to use. Your records stay on your device.</p></div>
+<nav aria-labelledby="f-p"><h2 id="f-p">Product</h2><ul><li><a href="features.html">Features</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="app/">Open the app</a></li></ul></nav>
+<nav aria-labelledby="f-t"><h2 id="f-t">Trust</h2><ul><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
+<nav aria-labelledby="f-s"><h2 id="f-s">Source</h2><ul><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Repository</a></li><li><a href="faq.html#open-source">License status</a></li></ul></nav>
+</div>
+<svg class="foot-word" viewBox="0 0 1000 215" aria-hidden="true" focusable="false"><text x="0" y="178" textLength="1000" lengthAdjust="spacingAndGlyphs">Northstar</text></svg>
+<div class="foot-base"><span>Source is viewable; license not yet chosen.</span><span>Set in Fraunces and Inter, served from this site. No cookies, no storage, no third-party requests.</span></div>
 </div></footer>
 <div id="live" class="sr-only" aria-live="polite"></div>
 </body>

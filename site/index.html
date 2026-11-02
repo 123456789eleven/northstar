@@ -4,171 +4,326 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>Northstar: your whole life, run from one private place</title>
-<meta name="description" content="Northstar is a private, local-first life operations app. Tasks, goals, money, food, body, journal and people in one app that keeps your data on your device. Free to use.">
+<title>Northstar: write one line, it files itself. A private life operations app</title>
+<meta name="description" content="Northstar is a private, local-first life operations app. Tasks, goals, money, food, body, journal and people in one app that keeps every record on your device. Free to use.">
 <meta name="theme-color" content="#0c0d10">
 <meta name="color-scheme" content="dark">
-<meta name="view-transition" content="same-origin">
 <link rel="canonical" href="%BASE%">
-<link rel="icon" type="image/svg+xml" href="icon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="manifest" href="site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Northstar">
-<meta property="og:title" content="Northstar: your whole life, run from one private place">
-<meta property="og:description" content="Northstar is a private, local-first life operations app. Tasks, goals, money, food, body, journal and people in one app that keeps your data on your device. Free to use.">
+<meta property="og:title" content="Northstar: write one line, it files itself. A private life operations app">
+<meta property="og:description" content="Northstar is a private, local-first life operations app. Tasks, goals, money, food, body, journal and people in one app that keeps every record on your device. Free to use.">
 <meta property="og:url" content="%BASE%">
 <meta property="og:image" content="%BASE%img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Northstar: your whole life, run from one private place. The Today page in a window frame on a dark background.">
+<meta property="og:image:alt" content="Northstar. Write one line; Northstar files it. A private, local-first life operations app.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Northstar: your whole life, run from one private place">
-<meta name="twitter:description" content="Northstar is a private, local-first life operations app. Tasks, goals, money, food, body, journal and people in one app that keeps your data on your device. Free to use.">
+<meta name="twitter:title" content="Northstar: write one line, it files itself. A private life operations app">
+<meta name="twitter:description" content="Northstar is a private, local-first life operations app. Tasks, goals, money, food, body, journal and people in one app that keeps every record on your device. Free to use.">
 <meta name="twitter:image" content="%BASE%img/og.jpg">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <script src="site.js" defer></script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Northstar","applicationCategory":"LifestyleApplication","operatingSystem":"Any modern web browser","url":"%BASE%","description":"Northstar is a private, local-first life operations app. Tasks, goals, money, food, body, journal and people in one app that keeps your data on your device. Free to use.","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"image":"%BASE%img/og.jpg"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Northstar","applicationCategory":"LifestyleApplication","operatingSystem":"Any modern web browser","url":"%BASE%","description":"Northstar is a private, local-first life operations app. Tasks, goals, money, food, body, journal and people in one app that keeps every record on your device. Free to use.","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"image":"%BASE%img/og.jpg"}</script>
 </head>
-<body>
+<body class="pg-index">
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-head"><div class="wrap">
-<a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a>
-<nav aria-label="Main"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
-<a class="btn" href="app/">Open the app</a>
+<header class="site-head"><div class="wrap head-in">
+<a class="brand" href="index.html" aria-label="Northstar home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#e3b261"/><path d="M8 32h48" stroke="#e3b261" stroke-width="2.5"/></svg><span>Northstar</span></a>
+<nav class="nav-d" aria-label="Main"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
+<button type="button" class="pal-btn js-only" data-pal aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span class="pal-l">Search</span><kbd class="pal-k" aria-hidden="true">Ctrl K</kbd></button>
+<a class="btn sm head-cta" href="app/">Open the app</a>
+<details class="nav-m"><summary aria-label="Menu"><span class="nm-i" aria-hidden="true"><i></i><i></i></span></summary><nav aria-label="Main (mobile)"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li><li><a href="app/">Open the app</a></li></ul></nav></details>
 </div></header>
 <main id="main">
-<section class="hero"><div class="wrap">
-<p class="eyebrow ld">Private, local-first life operations</p>
-<h1 class="ld ld-2">Your whole life, run from one private place.</h1>
-<p class="lede ld ld-3">Tasks, goals, money, food, body, journal and the people in your life, linked in one app that keeps every record on your device.</p>
-<div class="actions ld ld-4"><a class="btn" href="app/">Open the app <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="btn ghost" href="#how">See how it works</a></div>
-<ul class="hero-meta ld ld-4"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Free to use</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>No account needed</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Works offline</li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>No trackers</li></ul>
-<div class="stage ld ld-5">
-<div class="stage-win"><div class="frame"><div class="frame-bar" aria-hidden="true"><span class="frame-dots"><i></i><i></i><i></i></span><span class="frame-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Northstar &middot; Today</span><span class="sp"></span></div><img src="img/today-d.webp" width="1280" height="900" alt="Northstar on desktop: the Today page with due, overdue, done and habit counts, a suggested focus list, quarter goals and the next event, shown with demo data." decoding="async" fetchpriority="high"></div></div>
-<div class="stage-phone"><div class="stage-phone-in"><div class="phone"><img src="img/today-m.webp" width="375" height="800" alt="Northstar on a phone: the same Today page, sized for one hand." decoding="async"></div></div></div>
+<section class="hero" id="top" data-noindex><div class="wrap ruled">
+<div class="ann-row ld" aria-hidden="true"><span>N&nbsp;00</span><span>Private, local-first life operations</span><span class="hide-s">Free&ensp;/&ensp;No account&ensp;/&ensp;Offline&ensp;/&ensp;No trackers</span></div>
+<h1 class="hero-h"><span class="ld ld-1">Write one line.</span> <span class="ld ld-2 dim">Northstar files it.</span></h1>
+<div class="hero-sub">
+<p class="lede ld ld-3">Tasks, goals, money, food, body, journal and the people in your life, in one app. Every record lives in your browser, on your device. No account, no server that reads your data, no trackers.</p>
+<div class="actions ld ld-4"><a class="btn" href="app/">Open the app <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="btn ghost" href="#instrument">Try it on this page</a></div>
 </div>
-<p class="cap-note">Every screenshot on this site comes from the built-in demo dataset.</p>
-</div></section>
-<section class="kpis-sec" aria-label="Northstar in numbers"><div class="wrap"><ul class="kpis rv-kids"><li class="kpi"><span class="v"><span class="sr-only">14</span><span aria-hidden="true" data-count="14">14</span></span><span class="l">Modules</span><span class="n">One data model across all of them.</span></li><li class="kpi"><span class="v"><span class="sr-only">1</span><span aria-hidden="true">1</span></span><span class="l">Timeline</span><span class="n">Every meaningful action lands in one History.</span></li><li class="kpi"><span class="v"><span class="sr-only">0</span><span aria-hidden="true">0</span></span><span class="l">Trackers</span><span class="n">No analytics, ads or third-party scripts.</span></li><li class="kpi"><span class="v"><span class="sr-only">4</span><span aria-hidden="true" data-count="4">4</span></span><span class="l">Opt-in connections</span><span class="n">Each one off until you turn it on.</span></li><li class="kpi"><span class="v"><span class="sr-only">600,000</span><span aria-hidden="true" data-count="600000">600,000</span></span><span class="l">PBKDF2 rounds</span><span class="n">Stretching your sync passphrase into a key.</span></li></ul></div></section>
-<section id="how" class="band"><div class="wrap">
-<div class="sec-head rv"><p class="eyebrow"><span class="n">01</span>How it works</p><h2>Your device is the source of truth. Sync only carries locked boxes.</h2><p class="lede">Northstar works fully offline with no account. If you want the same data on a phone and a laptop, turn on end-to-end encrypted sync. Here is what each side can see.</p></div>
-<div class="arch draw-on rv">
-<div class="node home"><svg class="node-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="13" height="9" rx="1.5"/><path d="M1 17h16"/><rect x="17.5" y="8" width="5" height="10" rx="1.2"/></svg><h3>Your device</h3><p class="role">Source of truth</p><ul class="sees"><li class="y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Every record, readable</b>, in your browser&rsquo;s database</span></li><li class="y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Your passphrase and keys.</b> They never leave</span></li><li class="y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Search, charts and Command rules</b>, all computed here</span></li></ul></div>
-<div class="link" aria-hidden="true">
-<svg class="h" viewBox="0 0 120 60"><path class="wire" d="M0 30H120"/><path class="wire on" pathLength="1" d="M0 30H120"/><g class="pkt-g"><rect class="pkt-box" x="-6" y="24" width="12" height="12" rx="2.5"/></g><g class="pkt-g b"><rect class="pkt-box" x="-6" y="24" width="12" height="12" rx="2.5"/></g></svg>
-<svg class="v" viewBox="0 0 60 72"><path class="wire" d="M30 0V72"/><path class="wire on" pathLength="1" d="M30 0V72"/></svg>
-<span class="link-lbl">AES-256-GCM per record</span></div>
-<div class="node"><svg class="node-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="9" width="16" height="10" rx="2"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/><path d="M12 13v2.5"/></svg><h3>In transit</h3><p class="role">Only if sync is on</p><ul class="sees"><li class="y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>One locked box per record</b></span></li><li class="y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>A fresh random value for every encryption</span></li><li class="y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Table and record id bound in, so boxes cannot be swapped</span></li></ul></div>
-<div class="link" aria-hidden="true">
-<svg class="h" viewBox="0 0 120 60"><path class="wire" d="M0 30H120"/><path class="wire on" pathLength="1" d="M0 30H120"/><g class="pkt-g"><rect class="pkt-box" x="-6" y="24" width="12" height="12" rx="2.5"/></g><g class="pkt-g b"><rect class="pkt-box" x="-6" y="24" width="12" height="12" rx="2.5"/></g></svg>
-<svg class="v" viewBox="0 0 60 72"><path class="wire" d="M30 0V72"/><path class="wire on" pathLength="1" d="M30 0V72"/></svg>
-<span class="link-lbl">HTTPS, ciphertext only</span></div>
-<div class="node"><svg class="node-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6v12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/></svg><h3>Your Supabase project</h3><p class="role">You create it and own it</p><ul class="sees"><li class="y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Account email and sign-in times</span></li><li class="y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Table names, opaque ids and row counts</span></li><li class="y"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Timestamps and ciphertext sizes</span></li><li class="x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg><span><b>Cannot read any record</b></span></li></ul></div>
+<figure class="filer ld ld-5" id="filer" aria-labelledby="filer-cap">
+<div class="filer-bar">
+<span class="filer-plus" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+<span class="filer-line" aria-hidden="true"><span id="filer-text">buy milk tomorrow !1</span><i class="caret"></i></span>
+<button type="button" class="filer-pause js-only" aria-pressed="false" id="filer-pause">Pause</button>
+<kbd aria-hidden="true">Enter</kbd>
 </div>
-<div class="arch-foot"><span><i></i>Encrypted on your device before it leaves</span><span><i class="n"></i>Nothing is sent while sync is off</span><span><a href="security.html">How the encryption works</a></span></div>
-</div></section>
-<section id="modules"><div class="wrap">
-<div class="sec-head rv"><p class="eyebrow"><span class="n">02</span>Modules</p><h2>Fourteen areas of life. One connected model.</h2><p class="lede">Each area stands on its own and links to the others, so the weekly review, the timeline and the suggestions can see across all of them.</p></div>
-<div class="show rv">
-<div class="show-tabs js-only flex" role="tablist" aria-label="Modules" aria-orientation="vertical"><button class="show-tab" role="tab" id="t-planner" aria-controls="p-planner" aria-selected="true" tabindex="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>Planner<span class="k">01</span></button><button class="show-tab" role="tab" id="t-tasks" aria-controls="p-tasks" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="4.5" width="15" height="15" rx="3"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Tasks<span class="k">02</span></button><button class="show-tab" role="tab" id="t-goals" aria-controls="p-goals" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Goals<span class="k">03</span></button><button class="show-tab" role="tab" id="t-finance" aria-controls="p-finance" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19.5V11M10 19.5V5M15 19.5v-6M20 19.5V8.5"/></svg>Finance<span class="k">04</span></button><button class="show-tab" role="tab" id="t-food" aria-controls="p-food" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5v17M4.5 3.5v5a2.5 2.5 0 0 0 5 0v-5M16.5 20.5v-17c-2 1-3 3.5-3 7h3"/></svg>Food<span class="k">05</span></button><button class="show-tab" role="tab" id="t-body" aria-controls="p-body" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12h3l2-5 3.5 10 2.5-7 1.5 2h4.5"/></svg>Body<span class="k">06</span></button><button class="show-tab" role="tab" id="t-journal" aria-controls="p-journal" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h10.5A1.5 1.5 0 0 1 18 5v14a1.5 1.5 0 0 1-1.5 1.5H6zM9.5 8h5M9.5 11.5h5"/></svg>Journal<span class="k">07</span></button><button class="show-tab" role="tab" id="t-habits" aria-controls="p-habits" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v3.5H16"/></svg>Habits<span class="k">08</span></button></div>
-<div class="show-panels"><div class="show-panel" role="tabpanel" id="p-planner" aria-labelledby="t-planner" tabindex="0">
-<div class="frame adapt"><div class="frame-bar" aria-hidden="true"><span class="frame-dots"><i></i><i></i><i></i></span><span class="frame-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Northstar &middot; Planner</span><span class="sp"></span></div><picture><source media="(max-width: 600px)" srcset="img/planner-m.webp" width="375" height="800"><img src="img/planner-d.webp" width="1280" height="900" alt="Planner week view with events as time blocks beside the tasks due each day, from the demo dataset." decoding="async" loading="lazy"></picture></div>
-<div class="show-cap"><div><h3>Planner</h3><p>Week and day views for events and tasks.</p></div><ul><li>Week and day views with events and tasks together</li><li>Plan my day surfaces high-priority tasks with no date</li><li>Optional read-only Google Calendar, copied locally</li></ul></div>
-</div><div class="show-panel" role="tabpanel" id="p-tasks" aria-labelledby="t-tasks" tabindex="0">
-<div class="frame adapt"><div class="frame-bar" aria-hidden="true"><span class="frame-dots"><i></i><i></i><i></i></span><span class="frame-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Northstar &middot; Tasks</span><span class="sp"></span></div><picture><source media="(max-width: 600px)" srcset="img/tasks-m.webp" width="375" height="800"><img src="img/tasks-d.webp" width="1280" height="900" alt="Tasks page with counts, an open task queue with due dates and priorities, and a task detail panel, from the demo dataset." decoding="async" loading="lazy"></picture></div>
-<div class="show-cap"><div><h3>Tasks</h3><p>Capture in one line, work from a queue.</p></div><ul><li>One line sets due date, priority and goal link</li><li>Recurring tasks that keep their day in short months</li><li>Keyboard queue: j, k, x and Enter</li></ul></div>
-</div><div class="show-panel" role="tabpanel" id="p-goals" aria-labelledby="t-goals" tabindex="0">
-<div class="frame adapt"><div class="frame-bar" aria-hidden="true"><span class="frame-dots"><i></i><i></i><i></i></span><span class="frame-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Northstar &middot; Goals</span><span class="sp"></span></div><picture><source media="(max-width: 600px)" srcset="img/goals-m.webp" width="375" height="800"><img src="img/goals-d.webp" width="1280" height="900" alt="Goals page listing life, year and quarter goals with milestones, from the demo dataset." decoding="async" loading="lazy"></picture></div>
-<div class="show-cap"><div><h3>Goals</h3><p>Life, year and quarter goals with real progress.</p></div><ul><li>Life, year and quarter horizons with milestones</li><li>Progress follows the linked tasks you complete</li><li>Quiet goals become a proposal for a next step</li></ul></div>
-</div><div class="show-panel" role="tabpanel" id="p-finance" aria-labelledby="t-finance" tabindex="0">
-<div class="frame adapt"><div class="frame-bar" aria-hidden="true"><span class="frame-dots"><i></i><i></i><i></i></span><span class="frame-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Northstar &middot; Finance</span><span class="sp"></span></div><picture><source media="(max-width: 600px)" srcset="img/finance-m.webp" width="375" height="800"><img src="img/finance-d.webp" width="1280" height="900" alt="Finance overview with income, spending, net and savings rate, spending by category and a six-month chart, from the demo dataset." decoding="async" loading="lazy"></picture></div>
-<div class="show-cap"><div><h3>Finance</h3><p>Import, categorize, budget, see net worth.</p></div><ul><li>CSV and OFX/QFX import with duplicate detection and undo</li><li>Budgets, net worth and merchant rules</li><li>No bank login is ever asked for</li></ul></div>
-</div><div class="show-panel" role="tabpanel" id="p-food" aria-labelledby="t-food" tabindex="0">
-<div class="frame adapt"><div class="frame-bar" aria-hidden="true"><span class="frame-dots"><i></i><i></i><i></i></span><span class="frame-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Northstar &middot; Food</span><span class="sp"></span></div><picture><source media="(max-width: 600px)" srcset="img/food-m.webp" width="375" height="800"><img src="img/food-d.webp" width="1280" height="900" alt="Food day view with calories and protein left today and meal slots for breakfast, lunch, dinner and snacks, from the demo dataset." decoding="async" loading="lazy"></picture></div>
-<div class="show-cap"><div><h3>Food</h3><p>Meals, targets and what is left today.</p></div><ul><li>Meal slots, favorites and templates</li><li>Calories and protein left today against your targets</li><li>Optional food search, off until you enable it</li></ul></div>
-</div><div class="show-panel" role="tabpanel" id="p-body" aria-labelledby="t-body" tabindex="0">
-<div class="frame adapt"><div class="frame-bar" aria-hidden="true"><span class="frame-dots"><i></i><i></i><i></i></span><span class="frame-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Northstar &middot; Body</span><span class="sp"></span></div><picture><source media="(max-width: 600px)" srcset="img/body-m.webp" width="375" height="800"><img src="img/body-d.webp" width="1280" height="900" alt="Body page with current 7-day average, weekly change, rate, weight to go and projected date above a weight trend chart, using fictional weights." decoding="async" loading="lazy"></picture></div>
-<div class="show-cap"><div><h3>Body</h3><p>Weight trend and where it is heading.</p></div><ul><li>A 7-day average over faint daily weigh-ins</li><li>4-week rate and a projected goal date</li><li>Targets that feed the Food module</li></ul></div>
-</div><div class="show-panel" role="tabpanel" id="p-journal" aria-labelledby="t-journal" tabindex="0">
-<div class="frame adapt"><div class="frame-bar" aria-hidden="true"><span class="frame-dots"><i></i><i></i><i></i></span><span class="frame-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Northstar &middot; Journal</span><span class="sp"></span></div><picture><source media="(max-width: 600px)" srcset="img/journal-m.webp" width="375" height="800"><img src="img/journal-d.webp" width="1280" height="900" alt="Journal page with prompts and templates, a writing area, a month map of writing days and a mood chart, from the demo dataset." decoding="async" loading="lazy"></picture></div>
-<div class="show-cap"><div><h3>Journal</h3><p>Write privately, with an immersive focus mode.</p></div><ul><li>Prompts, templates, #tags, mood and energy</li><li>Focus mode hides everything but the page</li><li>Never leaves the device unless sync is on</li></ul></div>
-</div><div class="show-panel" role="tabpanel" id="p-habits" aria-labelledby="t-habits" tabindex="0">
-<div class="frame adapt"><div class="frame-bar" aria-hidden="true"><span class="frame-dots"><i></i><i></i><i></i></span><span class="frame-url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>Northstar &middot; Habits</span><span class="sp"></span></div><picture><source media="(max-width: 600px)" srcset="img/habits-m.webp" width="375" height="800"><img src="img/habits-d.webp" width="1280" height="900" alt="Habits page with a week of check-in cells for each habit, from the demo dataset." decoding="async" loading="lazy"></picture></div>
-<div class="show-cap"><div><h3>Habits</h3><p>Daily check-ins and streaks.</p></div><ul><li>One-tap check-ins here or from Today</li><li>Streaks and completion stats show the pattern</li><li>Each check-in is written to your History</li></ul></div>
-</div></div>
-</div>
-<p class="show-more"><a class="btn ghost" href="features.html">All 14 modules <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></p>
-</div></section>
-<section id="capture" class="band"><div class="wrap">
-<div class="sec-head rv"><p class="eyebrow"><span class="n">03</span>One line is enough</p><h2>Capture without friction. Try it here.</h2><p class="lede">The capture bar understands plain text and files each line where it belongs. Type below or pick an example.</p></div>
-<div class="play">
-<div class="rv">
-<div class="cap">
-<div class="cap-bar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><label class="sr-only" for="cap-in">Capture a line (demo)</label><input id="cap-in" type="text" value="buy milk tomorrow !1" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done"><kbd aria-hidden="true">Enter</kbd></div>
-<div class="cap-out" aria-label="How Northstar would file this line">
-<div class="cap-chips" id="cap-chips"><span class="cap-chip kind">Task</span><span class="cap-chip">Tomorrow</span><span class="cap-chip">High</span></div>
-<dl class="cap-fields" id="cap-fields"><dt>Title</dt><dd>buy milk</dd><dt>Due</dt><dd>Tomorrow</dd><dt>Priority</dt><dd>High</dd><dt>Repeats</dt><dd class="dim">No</dd><dt>Goal</dt><dd class="dim">None</dd></dl>
-<p class="cap-where"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span id="cap-where-t">Files into Tasks. Completing it is logged to History.</span></p>
-</div>
-</div>
-<p class="fine">Demo: a small re-implementation of the app&rsquo;s capture parser, running in this page. Goal tags match the demo dataset&rsquo;s goals. Nothing you type is sent or stored.</p>
-</div>
-<div class="rv"><h3 class="sr-only">Examples</h3><ul class="ex-list"><li><button type="button" class="ex-try js-only" data-line="buy milk tomorrow !1">buy milk tomorrow !1</button><span class="ex-try nojs-line">buy milk tomorrow !1</span><button type="button" class="copy js-only" data-copy="buy milk tomorrow !1" aria-label="Copy buy milk tomorrow !1"><span class="cp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg></span><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button><p class="becomes">A task due tomorrow, high priority.</p></li><li><button type="button" class="ex-try js-only" data-line="call mom fri #career">call mom fri #career</button><span class="ex-try nojs-line">call mom fri #career</span><button type="button" class="copy js-only" data-copy="call mom fri #career" aria-label="Copy call mom fri #career"><span class="cp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg></span><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button><p class="becomes">A task due Friday, linked to your quarter career goal.</p></li><li><button type="button" class="ex-try js-only" data-line="$12.50 chipotle">$12.50 chipotle</button><span class="ex-try nojs-line">$12.50 chipotle</span><button type="button" class="copy js-only" data-copy="$12.50 chipotle" aria-label="Copy $12.50 chipotle"><span class="cp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg></span><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button><p class="becomes">An expense of $12.50 in Finance.</p></li><li><button type="button" class="ex-try js-only" data-line="ate oatmeal 350cal">ate oatmeal 350cal</button><span class="ex-try nojs-line">ate oatmeal 350cal</span><button type="button" class="copy js-only" data-copy="ate oatmeal 350cal" aria-label="Copy ate oatmeal 350cal"><span class="cp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg></span><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button><p class="becomes">A 350-calorie meal, slotted by the time of day.</p></li><li><button type="button" class="ex-try js-only" data-line="weight 136.4">weight 136.4</button><span class="ex-try nojs-line">weight 136.4</span><button type="button" class="copy js-only" data-copy="weight 136.4" aria-label="Copy weight 136.4"><span class="cp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg></span><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button><p class="becomes">Today&rsquo;s weight in Body.</p></li><li><button type="button" class="ex-try js-only" data-line="journal: long walk, felt clear">journal: long walk, felt clear</button><span class="ex-try nojs-line">journal: long walk, felt clear</span><button type="button" class="copy js-only" data-copy="journal: long walk, felt clear" aria-label="Copy journal: long walk, felt clear"><span class="cp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg></span><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button><p class="becomes">Appended to today&rsquo;s journal entry.</p></li><li><button type="button" class="ex-try js-only" data-line="pay rent every month">pay rent every month</button><span class="ex-try nojs-line">pay rent every month</span><button type="button" class="copy js-only" data-copy="pay rent every month" aria-label="Copy pay rent every month"><span class="cp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg></span><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button><p class="becomes">A monthly recurring task.</p></li><li><button type="button" class="ex-try js-only" data-line="win: shipped the report #career">win: shipped the report #career</button><span class="ex-try nojs-line">win: shipped the report #career</span><button type="button" class="copy js-only" data-copy="win: shipped the report #career" aria-label="Copy win: shipped the report #career"><span class="cp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></svg></span><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button><p class="becomes">A career win on your timeline.</p></li></ul></div>
-</div>
-</div></section>
-<section id="command"><div class="wrap">
-<div class="sec-head rv"><p class="eyebrow"><span class="n">04</span>Command proposals</p><h2>Suggestions from your own data. Nothing changes until you say so.</h2><p class="lede">Rules notice overdue work, stalled goals, people you have not called and uncategorized spending, then propose one concrete fix with the evidence.</p></div>
-<div class="cmd">
-<div class="rv">
-<ol class="steps-nav" aria-label="Proposal lifecycle">
-<li><button type="button" class="step-btn" data-step="1" aria-current="step"><span class="sn">1</span><b>Propose</b><span class="d">A rule reads your data on this device and suggests one change, with the evidence and the logic.</span></button></li>
-<li><button type="button" class="step-btn" data-step="2"><span class="sn">2</span><b>Approve</b><span class="d">You accept, modify, dismiss or snooze. Only an accepted proposal touches your records.</span></button></li>
-<li><button type="button" class="step-btn" data-step="3"><span class="sn">3</span><b>Undo</b><span class="d">Applied changes are logged on your timeline and can be undone for 24 hours.</span></button></li>
+<ol class="lanes" aria-label="Example lines and where Northstar files each one">
+<li class="lane" data-lane="task"><span class="ln-wire" aria-hidden="true"><i></i></span><span class="ln-k"><span class="tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="4.5" width="15" height="15" rx="3"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>Tasks</span><code class="ln-in">buy milk tomorrow !1</code><span class="ln-out">Due tomorrow, high priority</span></li>
+<li class="lane" data-lane="transaction"><span class="ln-wire" aria-hidden="true"><i></i></span><span class="ln-k"><span class="tile h-teal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19.5V11M10 19.5V5M15 19.5v-6M20 19.5V8.5"/></svg></span>Finance</span><code class="ln-in">$12.50 chipotle</code><span class="ln-out">Expense, &minus;$12.50</span></li>
+<li class="lane" data-lane="meal"><span class="ln-wire" aria-hidden="true"><i></i></span><span class="ln-k"><span class="tile h-rose" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5v17M4.5 3.5v5a2.5 2.5 0 0 0 5 0v-5M16.5 20.5v-17c-2 1-3 3.5-3 7h3"/></svg></span>Food</span><code class="ln-in">ate oatmeal 350cal</code><span class="ln-out">Meal, 350 cal, slotted by time</span></li>
+<li class="lane" data-lane="weight"><span class="ln-wire" aria-hidden="true"><i></i></span><span class="ln-k"><span class="tile h-rose" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12h3l2-5 3.5 10 2.5-7 1.5 2h4.5"/></svg></span>Body</span><code class="ln-in">weight 136.4</code><span class="ln-out">Today&rsquo;s weight, 136.4 lb</span></li>
+<li class="lane" data-lane="journal"><span class="ln-wire" aria-hidden="true"><i></i></span><span class="ln-k"><span class="tile h-violet" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h10.5A1.5 1.5 0 0 1 18 5v14a1.5 1.5 0 0 1-1.5 1.5H6zM9.5 8h5M9.5 11.5h5"/></svg></span>Journal</span><code class="ln-in">journal: long walk, felt clear</code><span class="ln-out">Appended to today&rsquo;s entry</span></li>
+<li class="lane" data-lane="win"><span class="ln-wire" aria-hidden="true"><i></i></span><span class="ln-k"><span class="tile h-violet" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4.5v3.5h3.5M12 8v4.5l3 1.5"/></svg></span>History</span><code class="ln-in">win: shipped the report #career</code><span class="ln-out">A career win on the timeline</span></li>
 </ol>
-<div class="step-ctl js-only flex"><button type="button" class="btn ghost sm" id="step-prev" disabled>Previous</button><button type="button" class="btn sm" id="step-next">Next step</button></div>
+<figcaption id="filer-cap" class="ann">Fig. 1&ensp;One capture bar, six destinations. Each line is parsed the way the app parses it.</figcaption>
+</figure>
+</div></section>
+
+<section class="ledger" aria-label="Northstar in numbers" data-noindex><div class="wrap ruled">
+<dl class="nums">
+<div><dt>Modules</dt><dd><span class="big gnum">14</span><span>One data model across all of them.</span></dd></div>
+<div><dt>Timeline</dt><dd><span class="big">1</span><span>Every meaningful action lands in one History.</span></dd></div>
+<div><dt>Trackers</dt><dd><span class="big">0</span><span>No analytics, ads or third-party scripts.</span></dd></div>
+<div><dt>Opt-in connections</dt><dd><span class="big">4</span><span>Each one off until you turn it on.</span></dd></div>
+<div><dt>PBKDF2 rounds</dt><dd><span class="big">600,000</span><span>Stretching a sync passphrase into a key.</span></dd></div>
+</dl>
+</div></section>
+
+<section class="sec" id="instrument"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;01</span><span>The instrument</span><span class="hide-s">Fig. 2</span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">01</span><div><h2>A working miniature. Tick, type, spend, log.</h2><p class="lede">This is a small copy of the app&rsquo;s core interactions, built into this page with fictional data. File a line from the capture bar and watch it land in the right module and on the History timeline.</p></div></div>
+</header>
+<div class="mini" id="mini">
+<div class="mini-top">
+<span class="mini-brand" aria-hidden="true"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#e3b261"/><path d="M8 32h48" stroke="#e3b261" stroke-width="2.5"/></svg>Northstar</span>
+<form class="mini-cap" id="mini-cap" action="index.html#instrument">
+<label class="sr-only" for="mini-in">Capture a line (demo, nothing is saved)</label>
+<span class="mc-plus" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+<input id="mini-in" name="line" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="Capture: call mom fri #career">
+<button type="submit" class="btn sm">File</button>
+</form>
+<span class="mini-hint ann" id="mini-hint" aria-hidden="true">Parses as: <b id="mini-kind">nothing yet</b></span>
 </div>
-<div class="rv">
-<div class="prop" id="prop" data-step="1" aria-label="Example proposal">
-<div class="prop-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span>Command &middot; Proposal</span><span class="state"><i></i><span id="prop-state">Proposed</span></span></div>
-<div class="prop-body">
-<p class="prop-title">Categorize 3 transactions from Chipotle as Dining</p>
-<p class="prop-why">Merchant matches a built-in rule. Low risk.</p>
-<ul class="prop-rows" aria-label="Evidence">
-<li><span class="box" aria-hidden="true"></span><span>Oct 28 &middot; Chipotle &middot; &minus;$12.50</span><span><span class="old">Uncategorized</span><span class="new">Dining</span></span></li>
-<li><span class="box" aria-hidden="true"></span><span>Oct 21 &middot; Chipotle &middot; &minus;$11.85</span><span><span class="old">Uncategorized</span><span class="new">Dining</span></span></li>
-<li><span class="box" aria-hidden="true"></span><span>Oct 14 &middot; Chipotle &middot; &minus;$13.20</span><span><span class="old">Uncategorized</span><span class="new">Dining</span></span></li>
+<div class="mini-try" aria-label="Example lines"><span class="ann">Try</span><button type="button" class="tryb js-only" data-line="$14 chipotle">$14 chipotle</button><button type="button" class="tryb js-only" data-line="weight 137.2">weight 137.2</button><button type="button" class="tryb js-only" data-line="call mom fri #career">call mom fri #career</button><button type="button" class="tryb js-only" data-line="ate burrito bowl 650cal">ate burrito bowl 650cal</button><button type="button" class="tryb js-only" data-line="$86.40 groceries">$86.40 groceries</button><button type="button" class="tryb js-only" data-line="journal: long walk, felt clear">journal: long walk, felt clear</button><span class="nojs-note">Needs JavaScript; everything below is the static starting state.</span></div>
+<div class="mini-body">
+<div class="mini-rail js-only flex" role="tablist" aria-label="Demo modules" aria-orientation="vertical">
+<button type="button" role="tab" class="mr" id="mt-tasks" aria-controls="mp-tasks" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="4.5" width="15" height="15" rx="3"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>Tasks</span><b class="mr-n" id="mn-tasks">5</b></button>
+<button type="button" role="tab" class="mr" id="mt-body" aria-controls="mp-body" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12h3l2-5 3.5 10 2.5-7 1.5 2h4.5"/></svg><span>Body</span><b class="mr-n" id="mn-body"></b></button>
+<button type="button" role="tab" class="mr" id="mt-money" aria-controls="mp-money" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19.5V11M10 19.5V5M15 19.5v-6M20 19.5V8.5"/></svg><span>Finance</span><b class="mr-n" id="mn-money"></b></button>
+<button type="button" role="tab" class="mr" id="mt-food" aria-controls="mp-food" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3.5v17M4.5 3.5v5a2.5 2.5 0 0 0 5 0v-5M16.5 20.5v-17c-2 1-3 3.5-3 7h3"/></svg><span>Food</span><b class="mr-n" id="mn-food"></b></button>
+<button type="button" role="tab" class="mr" id="mt-journal" aria-controls="mp-journal" aria-selected="false" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h10.5A1.5 1.5 0 0 1 18 5v14a1.5 1.5 0 0 1-1.5 1.5H6zM9.5 8h5M9.5 11.5h5"/></svg><span>Journal</span><b class="mr-n" id="mn-journal"></b></button>
+</div>
+<div class="mini-main">
+<section class="mp" id="mp-tasks" role="tabpanel" aria-labelledby="mt-tasks" tabindex="0" data-noindex>
+<header class="mp-h"><h3>Tasks</h3><span class="ann" id="tk-meta">5 open &middot; 1 done today</span></header>
+<ul class="tl" id="tk-open">
+<li class="tr" data-id="1"><label class="tr-l"><input type="checkbox" class="check"><span class="tt">Reconcile open election notices</span></label><span class="chips"><span class="chip warn">3 days late</span><span class="chip hi">High</span></span></li>
+<li class="tr" data-id="2"><label class="tr-l"><input type="checkbox" class="check"><span class="tt">Study session: election timelines</span></label><span class="chips"><span class="chip">Today</span><span class="chip goal">Compliance certification</span></span></li>
+<li class="tr" data-id="3"><label class="tr-l"><input type="checkbox" class="check"><span class="tt">Send the monthly status report</span></label><span class="chips"><span class="chip">Today</span><span class="chip hi">High</span><span class="chip">Monthly</span></span></li>
+<li class="tr" data-id="4"><label class="tr-l"><input type="checkbox" class="check"><span class="tt">Water the plants</span></label><span class="chips"><span class="chip">Today</span><span class="chip">Weekly</span></span></li>
+<li class="tr" data-id="5"><label class="tr-l"><input type="checkbox" class="check"><span class="tt">Run, easy 5k</span></label><span class="chips"><span class="chip">Tomorrow</span><span class="chip goal">Run three times a week</span></span></li>
 </ul>
-<div class="prop-acts" aria-hidden="true"><span class="acc">Accept</span><span>Modify</span><span>Dismiss</span><span>Snooze 1 day</span></div>
+<h4 class="mp-sub ann">Done today</h4>
+<ul class="tl done" id="tk-done">
+<li class="tr is-done" data-id="6"><label class="tr-l"><input type="checkbox" class="check" checked><span class="tt">Submit quarterly audit sample</span></label><span class="chips"><span class="chip goal">Compliance certification</span></span></li>
+</ul>
+</section>
+<section class="mp" id="mp-body" role="tabpanel" aria-labelledby="mt-body" tabindex="0" data-noindex>
+<header class="mp-h"><h3>Body</h3><span class="ann">Fictional weights</span></header>
+<div class="kv3"><div><span class="ann">7-day average</span><b class="fig" id="bd-avg">136.1</b><span class="u">lb</span></div><div><span class="ann">4-week rate</span><b class="fig" id="bd-rate">+0.6</b><span class="u">lb/wk</span></div><div><span class="ann">Last weigh-in</span><b class="fig" id="bd-last">136.4</b><span class="u">lb</span></div></div>
+<svg class="wchart" id="wchart" viewBox="0 0 600 200" role="img" aria-label="Weight over the last 21 days with a 7-day average line."><g id="wc-grid"></g><path id="wc-avg" class="wc-avg" d=""/><g id="wc-dots"></g></svg>
+<form class="inline-f" id="bd-f" action="index.html#instrument"><label for="bd-in">Log a weight</label><input id="bd-in" type="number" inputmode="decimal" step="0.1" min="50" max="700" placeholder="136.8"><span class="u">lb</span><button class="btn ghost sm" type="submit">Log</button></form>
+</section>
+<section class="mp" id="mp-money" role="tabpanel" aria-labelledby="mt-money" tabindex="0" data-noindex>
+<header class="mp-h"><h3>Finance</h3><span class="ann">This month&rsquo;s budgets</span></header>
+<div class="budgets">
+<div class="bud" id="bud-dining"><div class="bud-h"><span>Dining</span><span class="bud-v"><b id="bd-dining-s">$168.40</b> of $250</span></div><div class="bar"><i id="bar-dining"></i></div><span class="bud-st" id="bd-dining-st">$81.60 left</span></div>
+<div class="bud" id="bud-groc"><div class="bud-h"><span>Groceries</span><span class="bud-v"><b id="bd-groc-s">$301.12</b> of $450</span></div><div class="bar"><i id="bar-groc"></i></div><span class="bud-st" id="bd-groc-st">$148.88 left</span></div>
 </div>
-<div class="prop-toast" aria-hidden="true"><span class="t1">Waiting for you. Nothing has changed yet.</span><span class="t2">Categorized 3 transactions.</span><span class="t3">Undone. 3 transactions restored.</span><b><span class="t2">Undo &middot; 24h</span><span class="t3">Logged</span></b></div>
+<ul class="tx" id="tx-list">
+<li><span class="tx-d">Oct 31</span><span class="tx-n">Trader Joe&rsquo;s</span><span class="tx-c">Groceries</span><span class="tx-a">&minus;$54.20</span></li>
+<li><span class="tx-d">Oct 30</span><span class="tx-n">Blue Bottle Coffee</span><span class="tx-c">Dining</span><span class="tx-a">&minus;$6.75</span></li>
+<li><span class="tx-d">Oct 29</span><span class="tx-n">Pizzeria Uno</span><span class="tx-c">Dining</span><span class="tx-a">&minus;$31.80</span></li>
+</ul>
+<form class="inline-f" id="tx-f" action="index.html#instrument"><label for="tx-amt">Add an expense</label><input id="tx-amt" type="number" inputmode="decimal" step="0.01" min="0.01" placeholder="18.00"><label class="sr-only" for="tx-what">Merchant</label><input id="tx-what" type="text" placeholder="sushi" autocomplete="off"><button class="btn ghost sm" type="submit">Add</button></form>
+</section>
+<section class="mp" id="mp-food" role="tabpanel" aria-labelledby="mt-food" tabindex="0" data-noindex>
+<header class="mp-h"><h3>Food</h3><span class="ann">Target 2,450 cal</span></header>
+<div class="left"><b class="fig xl" id="fd-left">1,620</b><span>cal left today</span></div>
+<div class="bar"><i id="bar-food"></i></div>
+<ul class="meals" id="fd-list">
+<li><span class="ann">Breakfast</span><span>Oatmeal with berries</span><span class="fig">350</span></li>
+<li><span class="ann">Lunch</span><span>Turkey sandwich</span><span class="fig">480</span></li>
+</ul>
+</section>
+<section class="mp" id="mp-journal" role="tabpanel" aria-labelledby="mt-journal" tabindex="0" data-noindex>
+<header class="mp-h"><h3>Journal</h3><span class="ann">Today&rsquo;s entry</span></header>
+<div class="jr" id="jr-body"><p>Quiet morning. Finished the audit sample before ten.</p></div>
+<p class="fine">In the app, an entry never leaves the device unless you turn on encrypted sync.</p>
+</section>
 </div>
-<p class="fine">Illustration with demo merchants and amounts.</p>
+<aside class="mini-hist" aria-labelledby="mh-h">
+<h3 id="mh-h">History</h3>
+<ol class="hist" id="mh-list">
+<li><time>09:52</time><span class="tag">Tasks</span><span>Completed: Submit quarterly audit sample</span></li>
+<li><time>07:15</time><span class="tag">Body</span><span>Weighed in: 136.4 lb</span></li>
+</ol>
+</aside>
 </div>
+</div>
+<p class="fine mini-note">A small re-implementation of the app&rsquo;s capture parser and module math, running in this page. Nothing you type is sent or stored, and this page cannot see the app&rsquo;s data. Reload to reset.</p>
+</div></section>
+
+<section class="sec" id="day"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;02</span><span>A day, filed</span><span class="hide-s">Fig. 3</span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">02</span><div><h2>Seven lines on a Tuesday. One timeline at the end of it.</h2><p class="lede">Each module keeps its own records and also writes one event to History. Scroll through a day and watch the timeline fill.</p></div></div>
+</header>
+<div class="story" id="story">
+<div class="story-stage" aria-hidden="true">
+<div class="stage" id="stage" data-step="7">
+<div class="stage-h"><span class="ann">History &middot; Tuesday</span><span class="stage-clock fig" id="stage-clock">Sun 19:00</span></div>
+<div class="stage-rail"><i id="stage-prog"></i></div>
+<ol class="stage-ev">
+<li data-s="1"><time>07:12</time><span class="tag">Body</span><span>Weighed in: 136.4 lb</span></li>
+<li data-s="2"><time>08:40</time><span class="tag">Tasks</span><span>Completed: Study session</span></li>
+<li data-s="3"><time>12:35</time><span class="tag">Finance</span><span>Expense: Chipotle &minus;$12.50</span></li>
+<li data-s="4"><time>12:41</time><span class="tag">Food</span><span>Lunch: burrito bowl, 650 cal</span></li>
+<li data-s="5"><time>18:05</time><span class="tag">Command</span><span>Applied: 3 transactions to Dining</span></li>
+<li data-s="6"><time>21:30</time><span class="tag">Journal</span><span>Entry: long walk, felt clear</span></li>
+<li data-s="7"><time>Sun</time><span class="tag">Review</span><span>Week locked: rated 4 of 5</span></li>
+</ol>
+<dl class="stage-m">
+<div><dt>Body avg</dt><dd class="fig" data-v="135.9|136.1|136.1|136.1|136.1|136.1|136.1|136.1">136.1</dd></div>
+<div><dt>Tasks done</dt><dd class="fig" data-v="0|0|1|1|1|1|1|6">6</dd></div>
+<div><dt>Cal left</dt><dd class="fig" data-v="2,450|2,450|2,450|2,450|1,800|1,800|1,800|0">0</dd></div>
+<div><dt>Dining</dt><dd class="fig" data-v="$168|$168|$168|$180|$180|$180|$180|$212">$212</dd></div>
+</dl>
+</div>
+</div>
+<ol class="story-steps">
+<li class="step" data-step="1"><span class="step-t fig">07:12</span><h3>Step on the scale, type one line.</h3><p><code>weight 136.4</code> files into Body. The 7-day average and the 4-week rate update; there is no chart to open first.</p></li>
+<li class="step" data-step="2"><span class="step-t fig">08:40</span><h3>Work from Today, not from a list of lists.</h3><p>Suggested focus is chosen by priority and due date. Tick <em>Study session: election timelines</em> and the linked quarter goal moves with it.</p></li>
+<li class="step" data-step="3"><span class="step-t fig">12:35</span><h3>Lunch costs one line.</h3><p><code>$12.50 chipotle</code> becomes an expense in Finance, dated today.</p></li>
+<li class="step" data-step="4"><span class="step-t fig">12:41</span><h3>So does what you ate.</h3><p><code>ate burrito bowl 650cal</code> lands in the lunch slot by the time of day, and calories left today drop.</p></li>
+<li class="step" data-step="5"><span class="step-t fig">18:05</span><h3>Command notices, you decide.</h3><p>A rule sees three uncategorized Chipotle charges and proposes Dining, with the evidence. Accept, modify, dismiss or snooze. Applied changes can be undone for 24 hours.</p></li>
+<li class="step" data-step="6"><span class="step-t fig">21:30</span><h3>Write it down before bed.</h3><p><code>journal: long walk, felt clear</code> appends to today&rsquo;s entry, which stays on the device.</p></li>
+<li class="step" data-step="7"><span class="step-t fig">Sunday</span><h3>The week writes its own review.</h3><p>The weekly review builds a digest from History: tasks done, goals, spending, meals, study and people, plus what slipped. Rate the week and lock it.</p></li>
+</ol>
 </div>
 </div></section>
-<section id="privacy" class="band"><div class="wrap">
-<div class="sec-head rv"><p class="eyebrow"><span class="n">05</span>Private by design</p><h2>Private by architecture, not by promise.</h2><p class="lede">There is no Northstar server that receives your data. Four optional connections exist, each off until you turn it on, and each one is listed with exactly what it sends.</p></div>
-<div class="rv"><table class="compare"><caption class="sr-only">Northstar compared with a typical cloud app</caption><thead><tr><th scope="col"><span class="sr-only">Question</span></th><th scope="col" class="us">Northstar</th><th scope="col">Typical cloud app</th></tr></thead><tbody><tr><th scope="row">Where your records live</th><td class="us" data-l="Northstar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your device, in your browser</td><td class="them" data-l="Typical cloud app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h12"/></svg>On the provider&rsquo;s servers</td></tr><tr><th scope="row">Account needed</th><td class="us" data-l="Northstar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>No. Only if you turn on sync</td><td class="them" data-l="Typical cloud app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h12"/></svg>Usually</td></tr><tr><th scope="row">Who can read records on a server</th><td class="us" data-l="Northstar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Nobody. Sync uploads ciphertext only</td><td class="them" data-l="Typical cloud app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h12"/></svg>Usually the provider, under its policy</td></tr><tr><th scope="row">Analytics and tracking scripts</th><td class="us" data-l="Northstar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>None</td><td class="them" data-l="Typical cloud app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h12"/></svg>Common</td></tr><tr><th scope="row">Works with no connection</th><td class="us" data-l="Northstar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Fully</td><td class="them" data-l="Typical cloud app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h12"/></svg>Often limited</td></tr><tr><th scope="row">Getting all your data out</th><td class="us" data-l="Northstar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>One JSON export of everything</td><td class="them" data-l="Typical cloud app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h12"/></svg>Varies</td></tr></tbody></table>
-<p class="fine">&ldquo;Typical cloud app&rdquo; describes a common pattern, not any specific product.</p>
-<div class="actions"><a class="btn ghost" href="privacy.html">See exactly what leaves your device <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></div>
+
+<section class="sec" id="timeline"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;03</span><span>One timeline</span><span class="hide-s">Fig. 4</span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">03</span><div><h2>The modules write to one History. Three views read it back.</h2><p class="lede">Because every meaningful action is logged once, in order, the History page, the Achievements wall and the weekly review all see across your whole life instead of one app at a time.</p></div></div>
+</header>
+<figure class="plate draw" aria-labelledby="fig4">
+<svg class="fan wide" viewBox="0 0 1160 420" role="img" aria-label="Diagram: Tasks, Goals, Habits, Finance, Food, Body, Learning, People and Journal each send events into one History timeline, which feeds the History page, the Achievements wall and the Weekly review.">
+<g class="lbl-l">
+<text x="0" y="44">Tasks</text><text x="0" y="86">Goals</text><text x="0" y="128">Habits</text><text x="0" y="170">Finance</text><text x="0" y="212">Food</text><text x="0" y="254">Body</text><text x="0" y="296">Learning</text><text x="0" y="338">People</text><text x="0" y="380">Journal</text>
+</g>
+<g class="wires">
+<path pathLength="1" d="M92 40 H200 C280 40 300 210 380 210"/><path pathLength="1" d="M92 82 H200 C280 82 300 210 380 210"/><path pathLength="1" d="M92 124 H200 C280 124 300 210 380 210"/><path pathLength="1" d="M92 166 H200 C280 166 300 210 380 210"/><path pathLength="1" d="M92 208 H380"/><path pathLength="1" d="M92 250 H200 C280 250 300 210 380 210"/><path pathLength="1" d="M92 292 H200 C280 292 300 210 380 210"/><path pathLength="1" d="M92 334 H200 C280 334 300 210 380 210"/><path pathLength="1" d="M92 376 H200 C280 376 300 210 380 210"/>
+</g>
+<g class="bus"><rect x="380" y="186" width="380" height="48" rx="4"/><path class="bus-on" pathLength="1" d="M392 210 H748"/></g>
+<g class="ticks"><path d="M420 196v28M470 196v28M510 196v28M575 196v28M600 196v28M660 196v28M700 196v28M730 196v28"/></g>
+<text class="bus-l" x="570" y="176" text-anchor="middle">HISTORY &middot; ONE TABLE, IN ORDER</text>
+<text class="bus-s" x="570" y="262" text-anchor="middle">area &middot; kind &middot; title &middot; link to the record &middot; milestone?</text>
+<g class="wires out">
+<path pathLength="1" d="M760 210 C840 210 850 90 930 90 H960"/><path pathLength="1" d="M760 210 H960"/><path pathLength="1" d="M760 210 C840 210 850 330 930 330 H960"/>
+</g>
+<g class="outs">
+<rect x="960" y="66" width="200" height="48" rx="4"/><text x="976" y="95">History page</text>
+<rect x="960" y="186" width="200" height="48" rx="4"/><text x="976" y="215">Achievements wall</text>
+<rect x="960" y="306" width="200" height="48" rx="4"/><text x="976" y="335">Weekly review</text>
+</g>
+<text class="note" x="976" y="130">filter by area, search</text><text class="note" x="976" y="250">milestones only</text><text class="note" x="976" y="370">a digest of the week</text>
+</svg>
+<svg class="fan tall" viewBox="0 0 340 620" role="img" aria-label="Diagram: nine modules send events into one History timeline, which feeds the History page, the Achievements wall and the Weekly review.">
+<g class="lbl-l small"><text x="0" y="24">Tasks</text><text x="0" y="52">Goals</text><text x="0" y="80">Habits</text><text x="0" y="108">Finance</text><text x="0" y="136">Food</text><text x="0" y="164">Body</text><text x="0" y="192">Learning</text><text x="0" y="220">People</text><text x="0" y="248">Journal</text></g>
+<g class="wires"><path pathLength="1" d="M80 20 H130 C180 20 170 300 170 320"/><path pathLength="1" d="M80 48 H130 C175 48 170 300 170 320"/><path pathLength="1" d="M80 76 H130 C172 76 170 300 170 320"/><path pathLength="1" d="M80 104 H130 C170 104 170 300 170 320"/><path pathLength="1" d="M80 132 H130 C170 132 170 300 170 320"/><path pathLength="1" d="M80 160 H130 C170 160 170 300 170 320"/><path pathLength="1" d="M80 188 H130 C170 188 170 300 170 320"/><path pathLength="1" d="M80 216 H130 C170 216 170 300 170 320"/><path pathLength="1" d="M80 244 H130 C170 244 170 300 170 320"/></g>
+<g class="bus"><rect x="40" y="320" width="260" height="48" rx="4"/><path class="bus-on" pathLength="1" d="M52 344 H288"/></g>
+<text class="bus-l" x="170" y="392" text-anchor="middle">HISTORY &middot; ONE TABLE</text>
+<g class="wires out"><path pathLength="1" d="M170 400 V430 C170 450 60 450 60 470 V490"/><path pathLength="1" d="M170 400 V490"/><path pathLength="1" d="M170 400 V430 C170 450 280 450 280 470 V490"/></g>
+<g class="outs small"><rect x="0" y="490" width="110" height="56" rx="4"/><text x="10" y="514">History</text><text x="10" y="532">page</text><rect x="118" y="490" width="104" height="56" rx="4"/><text x="128" y="514">Achieve-</text><text x="128" y="532">ments</text><rect x="230" y="490" width="110" height="56" rx="4"/><text x="240" y="514">Weekly</text><text x="240" y="532">review</text></g>
+</svg>
+<figcaption class="ann" id="fig4">Fig. 4&ensp;Modules write records to their own tables and one event to History. Nothing reads across modules except through it.</figcaption>
+</figure>
 </div></section>
-<section class="cta"><div class="wrap"><div class="cta-box rv">
-<div><svg class="cta-mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg><h2>Start with one line.</h2><p class="lede">Open the app, load the demo to look around, or start empty. It installs on your phone and laptop and works offline.</p></div>
+
+<section class="sec" id="where"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;04</span><span>Where your data lives</span><span class="hide-s">Fig. 5</span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">04</span><div><h2>Your device is the source of truth. Sync carries locked boxes.</h2><p class="lede">Northstar works fully offline with no account. Turn on end-to-end encrypted sync only if you want the same data on a phone and a laptop. This is what each side can see.</p></div></div>
+</header>
+<figure class="plate draw arch" aria-labelledby="fig5">
+<svg class="arch-svg wide" viewBox="0 0 1160 230" aria-hidden="true">
+<g class="box"><rect x="1" y="40" width="300" height="150" rx="6"/><rect class="on" x="1" y="40" width="300" height="150" rx="6" pathLength="1"/></g>
+<g class="box"><rect x="430" y="40" width="300" height="150" rx="6"/></g>
+<g class="box"><rect x="859" y="40" width="300" height="150" rx="6"/></g>
+<path class="wire" d="M301 115 H430"/><path class="wire on" pathLength="1" d="M301 115 H430"/>
+<path class="wire" d="M730 115 H859"/><path class="wire on" pathLength="1" d="M730 115 H859"/>
+<g class="pkt"><rect x="-7" y="108" width="14" height="14" rx="2"/></g><g class="pkt p2"><rect x="-7" y="108" width="14" height="14" rx="2"/></g>
+<text class="dim-l" x="365" y="100" text-anchor="middle">AES-256-GCM</text><text class="dim-l" x="365" y="140" text-anchor="middle">per record</text>
+<text class="dim-l" x="794" y="100" text-anchor="middle">HTTPS</text><text class="dim-l" x="794" y="140" text-anchor="middle">ciphertext only</text>
+<text class="h" x="24" y="84">Your device</text><text class="s" x="24" y="108">Source of truth</text>
+<text class="h" x="453" y="84">In transit</text><text class="s" x="453" y="108">Only if sync is on</text>
+<text class="h" x="882" y="84">Your Supabase project</text><text class="s" x="882" y="108">You create it and own it</text>
+<g class="key"><circle cx="40" cy="152" r="7"/><path d="M47 152 H70 M62 152 v6 M68 152 v5"/></g><text class="s" x="80" y="157">keys stay here</text>
+<g class="lock"><rect x="453" y="146" width="16" height="12" rx="2"/><path d="M456 146 v-4 a5 5 0 0 1 10 0 v4"/></g><text class="s" x="478" y="157">one box per record</text>
+<g class="lock"><rect x="882" y="146" width="16" height="12" rx="2"/><path d="M885 146 v-4 a5 5 0 0 1 10 0 v4"/></g><text class="s" x="907" y="157">cannot open the boxes</text>
+<path class="dim" d="M1 20 H301 M1 14 v12 M301 14 v12"/><text class="dim-l" x="151" y="12" text-anchor="middle">PLAINTEXT</text>
+<path class="dim" d="M430 20 H1159 M430 14 v12 M1159 14 v12"/><text class="dim-l" x="794" y="12" text-anchor="middle">CIPHERTEXT + METADATA</text>
+</svg>
+<div class="sees">
+<div class="see"><h3>Your device</h3><ul><li><b>Every record, readable</b>, in your browser&rsquo;s database</li><li><b>Your passphrase and keys.</b> They never leave</li><li><b>Search, charts and Command rules</b>, all computed here</li></ul></div>
+<p class="hop" aria-hidden="true">AES-256-GCM per record</p>
+<div class="see"><h3>In transit</h3><ul><li><b>One locked box per record</b></li><li>A fresh random value for every encryption</li><li>Table and record id bound in, so boxes cannot be swapped</li></ul></div>
+<p class="hop" aria-hidden="true">HTTPS, ciphertext only</p>
+<div class="see"><h3>Your Supabase project</h3><ul><li>Account email and sign-in times</li><li>Table names, opaque ids and row counts</li><li>Timestamps and ciphertext sizes</li><li class="no"><b>Cannot read any record</b></li></ul></div>
+</div>
+<figcaption class="ann" id="fig5">Fig. 5&ensp;Nothing is sent while sync is off. Four opt-in connections exist; the <a href="privacy.html">Privacy page</a> lists what each one sends.</figcaption>
+</figure>
+<div class="actions"><a class="btn ghost" href="privacy.html">See exactly what leaves your device <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="btn ghost" href="security.html">How the encryption works <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</div></section>
+
+<section class="sec" id="modules"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;05</span><span>Index of modules</span><span class="hide-s">14 entries</span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">05</span><div><h2>Fourteen modules, each one a page you can open.</h2><p class="lede">Hover or focus an entry to preview it, shown with the built-in demo dataset.</p></div></div>
+</header>
+<div class="modx">
+<ol class="modlist" id="modlist">
+<li><a href="features.html#today" data-shot="today"><span class="tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg></span><span class="mi-n">01</span><span class="mi-t">Today</span><span class="mi-d">Your day on one screen</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#planner" data-shot="planner"><span class="tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg></span><span class="mi-n">02</span><span class="mi-t">Planner</span><span class="mi-d">Week and day views for events and tasks</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#tasks" data-shot="tasks"><span class="tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="4.5" width="15" height="15" rx="3"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span><span class="mi-n">03</span><span class="mi-t">Tasks</span><span class="mi-d">Capture in one line, work from a queue</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#goals" data-shot="goals"><span class="tile h-violet" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg></span><span class="mi-n">04</span><span class="mi-t">Goals</span><span class="mi-d">Life, year and quarter, with real progress</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#habits" data-shot="habits"><span class="tile h-violet" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v3.5H16"/></svg></span><span class="mi-n">05</span><span class="mi-t">Habits</span><span class="mi-d">Daily check-ins and streaks</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#finance" data-shot="finance"><span class="tile h-teal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19.5V11M10 19.5V5M15 19.5v-6M20 19.5V8.5"/></svg></span><span class="mi-n">06</span><span class="mi-t">Finance</span><span class="mi-d">Import, categorize, budget, net worth</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#food" data-shot="food"><span class="tile h-rose" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5v17M4.5 3.5v5a2.5 2.5 0 0 0 5 0v-5M16.5 20.5v-17c-2 1-3 3.5-3 7h3"/></svg></span><span class="mi-n">07</span><span class="mi-t">Food</span><span class="mi-d">Meals, targets and what is left today</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#body" data-shot="body"><span class="tile h-rose" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12h3l2-5 3.5 10 2.5-7 1.5 2h4.5"/></svg></span><span class="mi-n">08</span><span class="mi-t">Body</span><span class="mi-d">Weight trend and where it is heading</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#learning" data-shot="learning"><span class="tile h-violet" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9L12 5l8.5 4L12 13z"/><path d="M7 11v4.5c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5V11"/></svg></span><span class="mi-n">09</span><span class="mi-t">Learning</span><span class="mi-d">Courses, books and study time</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#people" data-shot="people"><span class="tile h-rose" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5"/><path d="M15.5 6.2a3 3 0 0 1 0 5.6M17.5 14.8c1.6.6 2.6 2 3 4.2"/></svg></span><span class="mi-n">10</span><span class="mi-t">People</span><span class="mi-d">Keep up with the people who matter</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#journal" data-shot="journal"><span class="tile h-violet" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h10.5A1.5 1.5 0 0 1 18 5v14a1.5 1.5 0 0 1-1.5 1.5H6zM9.5 8h5M9.5 11.5h5"/></svg></span><span class="mi-n">11</span><span class="mi-t">Journal</span><span class="mi-d">Write privately, with a focus mode</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#history" data-shot="history"><span class="tile h-violet" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4.5v3.5h3.5M12 8v4.5l3 1.5"/></svg></span><span class="mi-n">12</span><span class="mi-t">History</span><span class="mi-d">One timeline for your whole life</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#review" data-shot="review"><span class="tile h-violet" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h14v15H5z"/><path d="M8.5 9h7M8.5 12.5h7M8.5 16h4"/></svg></span><span class="mi-n">13</span><span class="mi-t">Review</span><span class="mi-d">A weekly review you can lock</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+<li><a href="features.html#command" data-shot="command"><span class="tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span><span class="mi-n">14</span><span class="mi-t">Command</span><span class="mi-d">Proposals from your data; you approve</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+</ol>
+<div class="modprev" aria-hidden="true"><div class="frame"><div class="frame-bar"><span class="frame-dots"><i></i><i></i><i></i></span><span class="frame-url" id="modprev-l">Northstar &middot; Today</span></div><img id="modprev-img" src="img/today-d.webp" width="1280" height="900" alt="" decoding="async" loading="lazy"></div><p class="ann">Demo dataset. Every screenshot on this site comes from it.</p></div>
+</div>
+</div></section>
+
+<section class="end" data-noindex><div class="wrap ruled">
+<div class="ann-row" aria-hidden="true"><span>&sect;&nbsp;06</span><span>Begin</span><span class="hide-s">N&nbsp;00</span></div>
+<h2 class="end-h">Start with one line.</h2>
+<div class="end-g">
+<p class="lede">Open the app and load the demo to look around, or start empty. It installs on a phone or a laptop and works offline.</p>
 <div class="actions"><a class="btn" href="app/">Open the app <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="btn ghost" href="install.html">Install it</a></div>
-</div></div></section>
-</main>
-<footer><div class="wrap">
-<div class="foot">
-<div><a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a><p>A private, local-first life operations app.<br>Free to use. Your data stays on your device.</p></div>
-<nav aria-labelledby="f-product"><h2 id="f-product">Product</h2><ul><li><a href="features.html">Features</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="app/">Open the app</a></li></ul></nav>
-<nav aria-labelledby="f-trust"><h2 id="f-trust">Trust</h2><ul><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
-<nav aria-labelledby="f-source"><h2 id="f-source">Source</h2><ul><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Repository</a></li><li><a href="faq.html#open-source">License status</a></li></ul></nav>
 </div>
-<div class="foot-base"><span>Source is viewable; license not yet chosen.</span><span>This site sets no cookies and makes no third-party requests.</span></div>
+<ul class="facts"><li>Free to use</li><li>No account needed</li><li>Works offline</li><li>No trackers</li></ul>
+</div></section>
+
+</main>
+<footer class="site-foot"><div class="wrap ruled">
+<div class="foot-top">
+<div class="foot-id"><a class="brand" href="index.html" aria-label="Northstar home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#e3b261"/><path d="M8 32h48" stroke="#e3b261" stroke-width="2.5"/></svg><span>Northstar</span></a><p>A private, local-first life operations app. Free to use. Your records stay on your device.</p></div>
+<nav aria-labelledby="f-p"><h2 id="f-p">Product</h2><ul><li><a href="features.html">Features</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="app/">Open the app</a></li></ul></nav>
+<nav aria-labelledby="f-t"><h2 id="f-t">Trust</h2><ul><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
+<nav aria-labelledby="f-s"><h2 id="f-s">Source</h2><ul><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Repository</a></li><li><a href="faq.html#open-source">License status</a></li></ul></nav>
+</div>
+<svg class="foot-word" viewBox="0 0 1000 215" aria-hidden="true" focusable="false"><text x="0" y="178" textLength="1000" lengthAdjust="spacingAndGlyphs">Northstar</text></svg>
+<div class="foot-base"><span>Source is viewable; license not yet chosen.</span><span>Set in Fraunces and Inter, served from this site. No cookies, no storage, no third-party requests.</span></div>
 </div></footer>
 <div id="live" class="sr-only" aria-live="polite"></div>
 </body>

@@ -4,89 +4,133 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>Privacy: what stays on your device, and what can leave</title>
-<meta name="description" content="Northstar stores your data in your browser on your device. Exactly what each optional, off-by-default connection sends, and what is never collected.">
+<title>Privacy: what leaves your device, and what never does | Northstar</title>
+<meta name="description" content="Northstar keeps your records in your browser. Four optional connections exist, each off by default; this page lists exactly what each one sends and to whom.">
 <meta name="theme-color" content="#0c0d10">
 <meta name="color-scheme" content="dark">
-<meta name="view-transition" content="same-origin">
 <link rel="canonical" href="%BASE%privacy.html">
-<link rel="icon" type="image/svg+xml" href="icon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="manifest" href="site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Northstar">
-<meta property="og:title" content="Privacy: what stays on your device, and what can leave">
-<meta property="og:description" content="Northstar stores your data in your browser on your device. Exactly what each optional, off-by-default connection sends, and what is never collected.">
+<meta property="og:title" content="Privacy: what leaves your device, and what never does | Northstar">
+<meta property="og:description" content="Northstar keeps your records in your browser. Four optional connections exist, each off by default; this page lists exactly what each one sends and to whom.">
 <meta property="og:url" content="%BASE%privacy.html">
 <meta property="og:image" content="%BASE%img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Northstar: your whole life, run from one private place. The Today page in a window frame on a dark background.">
+<meta property="og:image:alt" content="Northstar. Write one line; Northstar files it. A private, local-first life operations app.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Privacy: what stays on your device, and what can leave">
-<meta name="twitter:description" content="Northstar stores your data in your browser on your device. Exactly what each optional, off-by-default connection sends, and what is never collected.">
+<meta name="twitter:title" content="Privacy: what leaves your device, and what never does | Northstar">
+<meta name="twitter:description" content="Northstar keeps your records in your browser. Four optional connections exist, each off by default; this page lists exactly what each one sends and to whom.">
 <meta name="twitter:image" content="%BASE%img/og.jpg">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="preload" href="fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <script src="site.js" defer></script>
 </head>
-<body>
+<body class="pg-privacy">
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-head"><div class="wrap">
-<a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a>
-<nav aria-label="Main"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html" aria-current="page">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
-<a class="btn" href="app/">Open the app</a>
+<header class="site-head"><div class="wrap head-in">
+<a class="brand" href="index.html" aria-label="Northstar home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#e3b261"/><path d="M8 32h48" stroke="#e3b261" stroke-width="2.5"/></svg><span>Northstar</span></a>
+<nav class="nav-d" aria-label="Main"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html" aria-current="page">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
+<button type="button" class="pal-btn js-only" data-pal aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span class="pal-l">Search</span><kbd class="pal-k" aria-hidden="true">Ctrl K</kbd></button>
+<a class="btn sm head-cta" href="app/">Open the app</a>
+<details class="nav-m"><summary aria-label="Menu"><span class="nm-i" aria-hidden="true"><i></i><i></i></span></summary><nav aria-label="Main (mobile)"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html" aria-current="page">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li><li><a href="app/">Open the app</a></li></ul></nav></details>
 </div></header>
 <main id="main">
-<section class="page-hero"><div class="wrap"><p class="eyebrow ld">Privacy</p><h1 class="ld ld-2">Your data stays where you put it.</h1><p class="lede ld ld-3">Northstar is local-first by design, not by policy. There is no Northstar server that receives your data.</p></div></section>
-<section id="explorer" class="band"><div class="wrap">
-<div class="sec-head rv"><p class="eyebrow">Explorer</p><h2>What leaves your device, switch by switch.</h2><p class="lede">Every connection below is off by default. Turn them on here to see exactly what each one would send and to whom. This page changes nothing in the app.</p></div>
-<div class="explore rv" id="explore">
-<ul class="sw-list js-only"><li><label class="sw"><input type="checkbox" role="switch" data-f="sync" aria-label="Encrypted sync"><span class="track" aria-hidden="true"></span><span class="t">Encrypted sync<small>Off by default</small></span></label></li><li><label class="sw"><input type="checkbox" role="switch" data-f="gcal" aria-label="Google Calendar"><span class="track" aria-hidden="true"></span><span class="t">Google Calendar<small>Off by default</small></span></label></li><li><label class="sw"><input type="checkbox" role="switch" data-f="off" aria-label="Open Food Facts search"><span class="track" aria-hidden="true"></span><span class="t">Open Food Facts search<small>Off by default</small></span></label></li><li><label class="sw"><input type="checkbox" role="switch" data-f="sfin" aria-label="Live bank feed (SimpleFIN)"><span class="track" aria-hidden="true"></span><span class="t">Live bank feed (SimpleFIN)<small>Off by default</small></span></label></li></ul>
-<div class="flowmap">
-<svg viewBox="0 0 560 300" role="img" aria-label="Your device on the left, with one line to each of four optional destinations on the right. Lines turn amber when that connection is on.">
-<rect class="fm-node dev" x="6" y="110" width="174" height="80" rx="10"/><text class="fm-txt" x="24" y="145">Your device</text><text class="fm-sub" x="24" y="165">IndexedDB, readable</text>
-<g id="fm-sync"><path class="fm-wire" d="M180 150 C 275 150, 275 40, 370 40"/><g class="fm-dest"><rect class="fm-node dst" x="370" y="14" width="184" height="52" rx="8"/><text class="fm-txt" x="386" y="37">Your Supabase project</text><text class="fm-sub" x="386" y="54">ciphertext only</text></g></g><g id="fm-gcal"><path class="fm-wire" d="M180 150 C 275 150, 275 112, 370 112"/><g class="fm-dest"><rect class="fm-node dst" x="370" y="86" width="184" height="52" rx="8"/><text class="fm-txt" x="386" y="109">Google Calendar</text><text class="fm-sub" x="386" y="126">read-only, events in</text></g></g><g id="fm-off"><path class="fm-wire" d="M180 150 C 275 150, 275 184, 370 184"/><g class="fm-dest"><rect class="fm-node dst" x="370" y="158" width="184" height="52" rx="8"/><text class="fm-txt" x="386" y="181">Open Food Facts</text><text class="fm-sub" x="386" y="198">search text only</text></g></g><g id="fm-sfin"><path class="fm-wire" d="M180 150 C 275 150, 275 256, 370 256"/><g class="fm-dest"><rect class="fm-node dst" x="370" y="230" width="184" height="52" rx="8"/><text class="fm-txt" x="386" y="253">SimpleFIN via your relay</text><text class="fm-sub" x="386" y="270">transactions in</text></g></g>
+<section class="phero" data-noindex><div class="wrap ruled">
+<div class="ann-row ld" aria-hidden="true"><span>N&nbsp;02</span><span>Privacy</span><span class="hide-s">4 opt-in connections, all off by default</span></div>
+<div class="ph-g"><div><h1 class="ld ld-1">Your records stay where you put them.</h1>
+<p class="lede ld ld-2">Northstar is local-first by design, not by policy. There is no Northstar server that receives your data. What can leave your device is listed below, switch by switch.</p>
+</div><p class="hnum ld ld-2"><b class="gnum">4</b><span class="ann">opt-in connections, all off</span></p></div>
+</div></section>
+
+<section class="sec" id="explorer"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;01</span><span>Explorer</span><span class="hide-s">Fig. 1</span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">01</span><div><h2>What leaves your device, switch by switch.</h2><p class="lede">Every connection is off by default. Turn them on here to see what each one would send and to whom. This page changes nothing in the app.</p></div></div>
+</header>
+<div class="explore" id="explore">
+<ul class="sw-list js-only">
+<li><label class="sw"><input type="checkbox" role="switch" data-f="sync"><span class="track" aria-hidden="true"></span><span class="t">Encrypted sync<small>Off by default</small></span></label></li>
+<li><label class="sw"><input type="checkbox" role="switch" data-f="gcal"><span class="track" aria-hidden="true"></span><span class="t">Google Calendar<small>Off by default</small></span></label></li>
+<li><label class="sw"><input type="checkbox" role="switch" data-f="off"><span class="track" aria-hidden="true"></span><span class="t">Open Food Facts search<small>Off by default</small></span></label></li>
+<li><label class="sw"><input type="checkbox" role="switch" data-f="sfin"><span class="track" aria-hidden="true"></span><span class="t">Live bank feed (SimpleFIN)<small>Off by default</small></span></label></li>
+</ul>
+<figure class="plate flowmap">
+<svg viewBox="0 0 600 320" role="img" aria-label="Your device on the left, with one line to each of four optional destinations on the right. A line turns amber when that connection is on.">
+<path class="dim" d="M8 22 H196 M8 16 v12 M196 16 v12"/><text class="dim-l" x="102" y="12" text-anchor="middle">THIS DEVICE</text>
+<path class="dim" d="M392 22 H592 M392 16 v12 M592 16 v12"/><text class="dim-l" x="492" y="12" text-anchor="middle">ELSEWHERE, ONLY IF ON</text>
+<rect class="fm-node dev" x="8" y="120" width="188" height="88" rx="6"/><text class="fm-txt" x="26" y="156">Your device</text><text class="fm-sub" x="26" y="178">IndexedDB, readable</text>
+<g id="fm-sync"><path class="fm-wire" d="M196 164 C 290 164, 300 64, 392 64"/><path class="fm-wire on" pathLength="1" d="M196 164 C 290 164, 300 64, 392 64"/><rect class="fm-node dst" x="392" y="38" width="200" height="52" rx="6"/><text class="fm-txt" x="408" y="61">Your Supabase project</text><text class="fm-sub" x="408" y="78">ciphertext only</text></g>
+<g id="fm-gcal"><path class="fm-wire" d="M196 164 C 290 164, 300 136, 392 136"/><path class="fm-wire on in" pathLength="1" d="M392 136 C 300 136, 290 164, 196 164"/><rect class="fm-node dst" x="392" y="110" width="200" height="52" rx="6"/><text class="fm-txt" x="408" y="133">Google Calendar</text><text class="fm-sub" x="408" y="150">read-only, events in</text></g>
+<g id="fm-off"><path class="fm-wire" d="M196 164 C 290 164, 300 208, 392 208"/><path class="fm-wire on" pathLength="1" d="M196 164 C 290 164, 300 208, 392 208"/><rect class="fm-node dst" x="392" y="182" width="200" height="52" rx="6"/><text class="fm-txt" x="408" y="205">Open Food Facts</text><text class="fm-sub" x="408" y="222">search text only</text></g>
+<g id="fm-sfin"><path class="fm-wire" d="M196 164 C 290 164, 300 280, 392 280"/><path class="fm-wire on" pathLength="1" d="M196 164 C 290 164, 300 280, 392 280"/><rect class="fm-node dst" x="392" y="254" width="200" height="52" rx="6"/><text class="fm-txt" x="408" y="277">SimpleFIN, via your relay</text><text class="fm-sub" x="408" y="294">transactions in</text></g>
 </svg>
-<div class="sent"><h3>Sent</h3><ul><li class="none"><b>Nothing.</b> With every option off, your records stay in IndexedDB on this device and no request carries them.</li><li data-f="sync"><b>Encrypted sync:</b> each record as AES-256-GCM ciphertext, plus metadata (account email, table names, opaque ids, counts, timestamps, sizes), to a Supabase project you create.</li><li data-f="gcal"><b>Google Calendar:</b> nothing of yours is sent. Google&rsquo;s script loads only when you press Connect; events are copied into your local database.</li><li data-f="off"><b>Open Food Facts:</b> the text you type into food search, plus your IP address, to world.openfoodfacts.org.</li><li data-f="sfin"><b>SimpleFIN:</b> your setup token once, then your access URL and a date range, through a stateless relay in your own Supabase project. Transactions come back.</li></ul></div>
-</div>
+</figure>
+<div class="sent"><h3 class="ann">Sent</h3><ul>
+<li class="none"><b>Nothing.</b> With every option off, your records stay in IndexedDB on this device and no request carries them.</li>
+<li data-f="sync"><b>Encrypted sync:</b> each record as AES-256-GCM ciphertext, plus metadata (account email, table names, opaque ids, counts, timestamps, sizes), to a Supabase project you create.</li>
+<li data-f="gcal"><b>Google Calendar:</b> nothing of yours is sent. Google&rsquo;s script loads only when you press Connect; events are copied into your local database.</li>
+<li data-f="off"><b>Open Food Facts:</b> the text you type into food search, plus your IP address, to world.openfoodfacts.org.</li>
+<li data-f="sfin"><b>SimpleFIN:</b> your setup token once, then your access URL and a date range, through a stateless relay in your own Supabase project. Transactions come back.</li>
+</ul></div>
 </div>
 </div></section>
-<section><div class="wrap"><div class="prose">
-<h2>The short version</h2>
-<p>The app is a set of static files. Once loaded, it reads and writes a database inside your browser (IndexedDB). By default it makes no network requests that carry your records. There are four optional connections, each off until you turn it on. A strict content security policy limits what the app can connect to, and fonts are self-hosted. This website makes no requests to any other site.</p>
-<h2>Every connection, in one table</h2>
+
+<section class="sec" id="short"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;02</span><span>The short version</span><span class="hide-s"></span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">02</span><div><h2>Static files, a database in your browser, nothing else by default.</h2></div></div>
+</header>
+<div class="prose cols2">
+<p>The app is a set of static files. Once loaded, it reads and writes a database inside your browser (IndexedDB). By default it makes no network requests that carry your records. There are four optional connections, each off until you turn it on.</p>
+<p>A strict content security policy limits what the app can connect to, and fonts are self-hosted. This website makes no requests to any other site, sets no cookies and stores nothing in your browser.</p>
 </div>
-<div class="tablewrap"><table class="plain stack"><thead><tr><th scope="col">Feature</th><th scope="col">Default</th><th scope="col">What is sent, and where</th><th scope="col">Who can see it</th></tr></thead><tbody>
-<tr><td data-l="Feature">Everything else (tasks, goals, journal, finance, food, body, people, history, settings)</td><td data-l="Default">On device only</td><td data-l="What is sent, and where">Nothing. Stored in IndexedDB in your browser.</td><td data-l="Who can see it">You</td></tr>
-<tr><td data-l="Feature">Encrypted sync</td><td data-l="Default">Off</td><td data-l="What is sent, and where">Each record, encrypted on your device with AES-256-GCM, plus metadata, to a Supabase project you create. Your passphrase, recovery code and keys never leave your devices.</td><td data-l="Who can see it">Supabase sees your account email, table names, opaque ids, row counts, timestamps and ciphertext sizes. It cannot read any record.</td></tr>
-<tr><td data-l="Feature">Google Calendar (read-only)</td><td data-l="Default">Off</td><td data-l="What is sent, and where">Nothing of yours. Google&rsquo;s script loads only when you press Connect; events are fetched into your browser and copied into your local database. The access token stays in memory only.</td><td data-l="Who can see it">Google knows you signed in and read your calendar.</td></tr>
-<tr><td data-l="Feature">Open Food Facts search</td><td data-l="Default">Off</td><td data-l="What is sent, and where">The text you type into the food search, sent to world.openfoodfacts.org. Nothing else.</td><td data-l="Who can see it">Open Food Facts sees the search text and your IP address.</td></tr>
-<tr><td data-l="Feature">Live bank feed (SimpleFIN)</td><td data-l="Default">Off</td><td data-l="What is sent, and where">Your SimpleFIN Setup Token (once), then your access URL and a date range, sent to a small relay in your own Supabase project, which forwards them to SimpleFIN. Transactions come back through the relay.</td><td data-l="Who can see it">SimpleFIN sees the transactions. The relay stores nothing and logs only the action name and a status code. The access URL stays on this device and is never synced or backed up.</td></tr></tbody></table></div>
-<div class="prose">
-<p class="mute">Bank credentials are never asked for or stored. Without the optional bank feed, bank data enters only through a CSV or OFX file you pick yourself.</p>
-<h2>What is not collected</h2>
-<ul><li>No accounts or sign-ins, unless you turn on sync.</li><li>No analytics, advertising or tracking scripts.</li><li>No cloud storage by default.</li><li>No third-party requests from this website or the app at rest.</li><li>No third-party fonts, CDNs or embeds.</li></ul>
-<h2>What is stored on your device</h2>
-<p>Tasks and goals, finance transactions and budgets, planner events, habits, journal entries and mood, meals and weights, learning items, people and contact notes, your history timeline, and settings. Backups are JSON files that you export and import yourself; treat one like any personal document, because it holds your data in readable form.</p>
-<h2>Offline and the service worker</h2>
-<p>A service worker caches the app&rsquo;s own files so it opens without a connection. It caches application code and assets only, never your data.</p>
-<h2>Clearing your data</h2>
-<p>Clearing this site&rsquo;s data in your browser erases your Northstar data from that device. Export a backup first if you want to keep it. Without sync there is no cloud copy that could restore it. With sync on, your other devices and the encrypted cloud copy still have it.</p>
-<p>How the encryption works is explained on the <a href="security.html">Security page</a>.</p>
-<p><a class="btn" href="app/">Open the app</a></p>
-</div></div></section>
+</div></section>
+
+<section class="sec" id="table"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;03</span><span>Every connection</span><span class="hide-s">Table 1</span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">03</span><div><h2>Every connection, in one table.</h2></div></div>
+</header>
+<div class="tablewrap"><table class="ledger-t stack"><caption class="sr-only">Every connection Northstar can make, its default, what it sends and who can see it</caption><thead><tr><th scope="col">Feature</th><th scope="col">Default</th><th scope="col">What is sent, and where</th><th scope="col">Who can see it</th></tr></thead><tbody>
+<tr><th scope="row" data-l="Feature">Everything else <span class="mute">(tasks, goals, journal, finance, food, body, people, history, settings)</span></th><td data-l="Default"><span class="st on">On device only</span></td><td data-l="What is sent, and where">Nothing. Stored in IndexedDB in your browser.</td><td data-l="Who can see it">You</td></tr>
+<tr><th scope="row" data-l="Feature">Encrypted sync</th><td data-l="Default"><span class="st">Off</span></td><td data-l="What is sent, and where">Each record, encrypted on your device with AES-256-GCM, plus metadata, to a Supabase project you create. Your passphrase, recovery code and keys never leave your devices.</td><td data-l="Who can see it">Supabase sees your account email, table names, opaque ids, row counts, timestamps and ciphertext sizes. It cannot read any record.</td></tr>
+<tr><th scope="row" data-l="Feature">Google Calendar <span class="mute">(read-only)</span></th><td data-l="Default"><span class="st">Off</span></td><td data-l="What is sent, and where">Nothing of yours. Google&rsquo;s script loads only when you press Connect; events are fetched into your browser and copied into your local database. The access token stays in memory only.</td><td data-l="Who can see it">Google knows you signed in and read your calendar.</td></tr>
+<tr><th scope="row" data-l="Feature">Open Food Facts search</th><td data-l="Default"><span class="st">Off</span></td><td data-l="What is sent, and where">The text you type into the food search, sent to world.openfoodfacts.org. Nothing else.</td><td data-l="Who can see it">Open Food Facts sees the search text and your IP address.</td></tr>
+<tr><th scope="row" data-l="Feature">Live bank feed <span class="mute">(SimpleFIN)</span></th><td data-l="Default"><span class="st">Off</span></td><td data-l="What is sent, and where">Your SimpleFIN Setup Token (once), then your access URL and a date range, sent to a small relay in your own Supabase project, which forwards them to SimpleFIN. Transactions come back through the relay.</td><td data-l="Who can see it">SimpleFIN sees the transactions. The relay stores nothing and logs only the action name and a status code. The access URL stays on this device and is never synced or backed up.</td></tr>
+</tbody></table></div>
+<p class="fine">Bank credentials are never asked for or stored. Without the optional bank feed, bank data enters only through a CSV or OFX file you pick yourself.</p>
+</div></section>
+
+<section class="sec" id="details"><div class="wrap ruled">
+<header class="sh">
+<div class="ann-row"><span>&sect;&nbsp;04</span><span>The details</span><span class="hide-s"></span></div>
+<div class="sh-row"><span class="sh-num" aria-hidden="true">04</span><div><h2>What is kept, what is not, and how to erase it.</h2></div></div>
+</header>
+<dl class="spec">
+<div id="not-collected"><dt>What is not collected</dt><dd><ul><li>No accounts or sign-ins, unless you turn on sync.</li><li>No analytics, advertising or tracking scripts.</li><li>No cloud storage by default.</li><li>No third-party requests from this website or the app at rest.</li><li>No third-party fonts, CDNs or embeds.</li></ul></dd></div>
+<div id="stored"><dt>What is stored on your device</dt><dd><p>Tasks and goals, finance transactions and budgets, planner events, habits, journal entries and mood, meals and weights, learning items, people and contact notes, your history timeline, and settings.</p><p>Backups are JSON files that you export and import yourself; treat one like any personal document, because it holds your data in readable form.</p></dd></div>
+<div id="service-worker"><dt>Offline and the service worker</dt><dd><p>A service worker caches the app&rsquo;s own files so it opens without a connection. It caches application code and assets only, never your data.</p></dd></div>
+<div id="clearing"><dt>Clearing your data</dt><dd><p>Clearing this site&rsquo;s data in your browser erases your Northstar data from that device. Export a backup first if you want to keep it. Without sync there is no cloud copy that could restore it. With sync on, your other devices and the encrypted cloud copy still have it.</p></dd></div>
+</dl>
+<div class="actions"><a class="btn" href="app/">Open the app <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="btn ghost" href="security.html">How the encryption works <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+</div></section>
+<section class="next" aria-labelledby="next-h" data-noindex><div class="wrap ruled"><div class="ann-row"><span>&rarr;</span><span id="next-h">Read next</span><span class="hide-s"></span></div><div class="next-g"><a class="ncard" href="security.html"><span class="ann">security</span><span><b>Security</b><span class="d">How encrypted sync keeps the server unable to read you.</span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="ncard" href="faq.html"><span class="ann">faq</span><span><b>FAQ</b><span class="d">Questions about data, backups and sync, answered.</span></span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></div></section>
 </main>
-<footer><div class="wrap">
-<div class="foot">
-<div><a class="brand" href="index.html" aria-label="Northstar home"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6l6 26-6 26-6-26z" fill="#e3b261"/><path d="M10 32h44" stroke="#e3b261" stroke-width="2" opacity=".5"/></svg>Northstar</a><p>A private, local-first life operations app.<br>Free to use. Your data stays on your device.</p></div>
-<nav aria-labelledby="f-product"><h2 id="f-product">Product</h2><ul><li><a href="features.html">Features</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="app/">Open the app</a></li></ul></nav>
-<nav aria-labelledby="f-trust"><h2 id="f-trust">Trust</h2><ul><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
-<nav aria-labelledby="f-source"><h2 id="f-source">Source</h2><ul><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Repository</a></li><li><a href="faq.html#open-source">License status</a></li></ul></nav>
+<footer class="site-foot"><div class="wrap ruled">
+<div class="foot-top">
+<div class="foot-id"><a class="brand" href="index.html" aria-label="Northstar home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#e3b261"/><path d="M8 32h48" stroke="#e3b261" stroke-width="2.5"/></svg><span>Northstar</span></a><p>A private, local-first life operations app. Free to use. Your records stay on your device.</p></div>
+<nav aria-labelledby="f-p"><h2 id="f-p">Product</h2><ul><li><a href="features.html">Features</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="app/">Open the app</a></li></ul></nav>
+<nav aria-labelledby="f-t"><h2 id="f-t">Trust</h2><ul><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
+<nav aria-labelledby="f-s"><h2 id="f-s">Source</h2><ul><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Repository</a></li><li><a href="faq.html#open-source">License status</a></li></ul></nav>
 </div>
-<div class="foot-base"><span>Source is viewable; license not yet chosen.</span><span>This site sets no cookies and makes no third-party requests.</span></div>
+<svg class="foot-word" viewBox="0 0 1000 215" aria-hidden="true" focusable="false"><text x="0" y="178" textLength="1000" lengthAdjust="spacingAndGlyphs">Northstar</text></svg>
+<div class="foot-base"><span>Source is viewable; license not yet chosen.</span><span>Set in Fraunces and Inter, served from this site. No cookies, no storage, no third-party requests.</span></div>
 </div></footer>
 <div id="live" class="sr-only" aria-live="polite"></div>
 </body>

@@ -35,7 +35,7 @@ Undo: delete the file(s) in `.claude/commands/`. Delete a checkpoint: `git updat
 Plain Node, no dependencies, always exit 0, silent on internal errors.
 
 - **PostToolUse** (Edit/Write/MultiEdit) `post-edit.mjs`: runs `npx oxlint <file>` for `src/**/*.ts(x)`; only speaks when there are findings (as `additionalContext`). For `src/sync/`, `supabase/` and `src/db.ts` it adds a reminder to follow the privacy checklist and get a security review.
-- **PreToolUse** (Edit/Write/MultiEdit/NotebookEdit) `pre-guard.mjs`: denies `.env*` (except `.env.example`), any path containing `northstar-private` or `Passphrase`, and `.git/` internals. Nothing else is blocked.
+- **PreToolUse** (Edit/Write/MultiEdit/NotebookEdit) `pre-guard.mjs`: denies `.env*` (except `.env.example`), any path inside a folder named in `~/.northstar-tools/private-paths.txt` (kept outside the repo), and `.git/` internals. Nothing else is blocked.
 - **UserPromptSubmit** `prompt-submit.mjs`: writes a start timestamp to the OS temp dir.
 - **Stop** `stop.mjs`: informational only, never blocks, ignores `stop_hook_active`. Runs `npm run typecheck` at most once per 120 s and only if `git status --porcelain` changed since the last run (state in the temp dir); reports error count + first 3 as a `systemMessage`. If the turn took more than 90 s it shows a Windows balloon notification (PowerShell `NotifyIcon`, no modules). Set `NORTHSTAR_NO_NOTIFY=1` to silence it.
 - **statusLine** `statusline.mjs`: `branch | N dirty | model | ctx NN%`, only fields that exist.
