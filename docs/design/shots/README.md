@@ -9,3 +9,7 @@ Demo data only (built-in "Load demo"), production build, headless Chrome, full p
 
 Main comparisons: `today`, `tasks`, `habits`, `finance`, `goals`, `body`, `food`, `journal` (before vs after, both widths).
 Note: figures count up for ~0.5s on first paint, so a shot taken during that window can show an intermediate number; the settled value is checked by the scripted pass (no `.countup.is-counting` after 1.5s).
+
+## Phase 3 (2026-11-01)
+- `phase3/before/<route>-<width>.png` and `phase3/after/<route>-<width>.png` (today = home): ops, planner, learning, people, history, review, settings, data, ontology, goals, plus tasks/habits/journal in after.
+- `phase3/interact/`: real-browser checks: `shortcuts-1440`, `palette-1440`, `palette-results-1440`, `palette-empty-1440`, `settings-compact-1440`, `history-compact-1440`, `goal-complete-moment-1440`, `goal-complete-toast-1440`, `milestone-toast-1440`, `habit-streak-toast-1440`, `print-review`, `print-journal`.

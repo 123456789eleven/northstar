@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { db, type Habit } from '../../db'
-import { toggleCheckIn } from './habitData'
+import { checkIn, toggleCheckIn, undoCheckIn } from './habitData'
 
 const mk = async (perWeek = 7): Promise<Habit> => {
   const h: Habit = { name: 'Walk', area: 'health', perWeek, createdAt: '2026-01-01T00:00:00.000Z' }
@@ -41,5 +41,17 @@ describe('toggleCheckIn', () => {
     const h = await mk(3)
     expect(await toggleCheckIn(h, '2026-10-27')).toBe(true)
     expect((await db.habitLogs.toArray())[0].date).toBe('2026-10-27')
+  })
+})
+
+describe('checkIn milestone moment', () => {
+  it('reports the milestone it reached with the next rung, and undo removes the log and the event', async () => {
+    const h = await mk()
+    for (const d of ['23', '24', '25', '26', '27', '28']) expect((await checkIn(h, `2026-10-${d}`)).milestone).toBeNull()
+    const r = await checkIn(h, '2026-10-29')
+    expect(r).toMatchObject({ checked: true, milestone: { count: 7, unit: 'day', key: 'streak:day:7', next: 30 } })
+    await undoCheckIn(h, '2026-10-29', r.milestone)
+    expect(await db.habitLogs.count()).toBe(6)
+    expect(await db.events.count()).toBe(0)
   })
 })

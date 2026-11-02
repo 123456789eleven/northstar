@@ -1,8 +1,8 @@
 import type { CalendarEvent, Habit, ISODate, Task } from '../../db'
 import { db } from '../../db'
-import { Card } from '../../components/ui'
+import { Card, Empty } from '../../components/ui'
 import { toggleDone } from '../tasks/taskActions'
-import { toggleCheckIn } from '../habits/habitData'
+import { useHabitCheckIn } from '../habits/useHabitCheckIn'
 import { isGoogleEvent } from '../gcal/help'
 import '../gcal/gcal.css'
 import { DAY_MIN, daySegments, fmtTime, hourRange, layoutSegments, timeLabel } from './layout'
@@ -32,10 +32,11 @@ export function TaskLine({ t }: { t: Task }) {
 }
 
 export function HabitLine({ h, date, checked }: { h: Habit; date: ISODate; checked: boolean }) {
+  const tick = useHabitCheckIn()
   return (
     <div className={`pl-task ${checked ? 'done' : ''}`}>
       <label className="hb-check">
-        <input type="checkbox" className="check" checked={checked} onChange={() => void toggleCheckIn(h, date)} aria-label={`${h.name} on ${date}`} />
+        <input type="checkbox" className="check" checked={checked} onChange={() => void tick(h, date)} aria-label={`${h.name} on ${date}`} />
       </label>
       <span>{h.name}</span>
     </div>
@@ -88,7 +89,7 @@ export function PlanPanel({ tasks, date, label }: { tasks: Task[]; date: ISODate
   return (
     <Card title="Plan my day">
       {list.length === 0 ? (
-        <div className="pl-empty">No unscheduled high-priority tasks. Mark a task High with no due date and it shows up here.</div>
+        <Empty>Nothing to place. High-priority tasks without a due date show up here, ready to drop into {label}.</Empty>
       ) : (
         <>
           <div className="pl-note" style={{ marginBottom: 6 }}>Tap to schedule for {label}.</div>

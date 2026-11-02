@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { AREAS, db, logEvent, type Area, type LifeEvent } from '../../db'
-import { AREA_LABEL, Empty, Field, Modal } from '../../components/ui'
+import { AREA_LABEL, Empty, Field, Modal, Skeleton } from '../../components/ui'
 import { formatDate, parseISODate, today } from '../../lib/dates'
 import { countByArea, dayOf, groupByWeek, weekLabel } from './group'
 
@@ -85,14 +85,17 @@ export function Timeline({ onAdd }: { onAdd: () => void }) {
           <button className="btn btn-ghost btn-sm" style={{ width: 'auto', padding: '0 10px' }} onClick={clear}>Clear filters</button>
         </div>
       )}
+      {!rows && <section className="card"><Skeleton rows={8} label="Loading history" /></section>}
       {rows && weeks.length === 0 && (
-        <Empty>
+        <section className="card">
           {filtered ? (
-            <>Nothing matches that filter.<br /><button className="btn btn-sm" style={{ marginTop: 10 }} onClick={clear}>Clear filters</button></>
+            <Empty title="Nothing matches that filter" action={<button className="btn btn-sm" onClick={clear}>Clear filters</button>} />
           ) : (
-            <>Your history fills itself as you complete tasks, log meals, contact people and finish goals.<br /><button className="btn btn-primary btn-sm" style={{ marginTop: 10 }} onClick={onAdd}>Add something worth remembering</button></>
+            <Empty title="Nothing here yet" action={<button className="btn btn-primary" onClick={onAdd}>Add something worth remembering</button>}>
+              Your history fills itself as you complete tasks, log meals, contact people and finish goals.
+            </Empty>
           )}
-        </Empty>
+        </section>
       )}
       {weeks.map((w) => (
         <section className="hist-week" key={w.weekOf} aria-label={weekLabel(w.weekOf)}>
@@ -100,6 +103,7 @@ export function Timeline({ onAdd }: { onAdd: () => void }) {
             <span>{weekLabel(w.weekOf)}</span>
             <span className="faint">{w.count} {w.count === 1 ? 'entry' : 'entries'}</span>
           </h2>
+          <div className="hist-week-card">
           {w.days.map(({ day, items }) => (
             <div className="hist-day" key={day}>
               <div className="hist-day-head">
@@ -109,13 +113,14 @@ export function Timeline({ onAdd }: { onAdd: () => void }) {
               {items.map((e) => (
                 <div className="hist-item" key={e.id}>
                   <span className="hist-time">{timeOf(e)}</span>
-                  <span className={e.milestone ? 'chip chip-accent hist-chip' : 'chip hist-chip'}>{AREA_LABEL[e.area] ?? e.area}</span>
-                  <span className={e.milestone ? 'hist-title is-milestone' : 'hist-title'}><Hit text={e.title} needle={needle} /></span>
+                  <span className="chip hist-chip">{AREA_LABEL[e.area] ?? e.area}</span>
+                  <span className={e.milestone ? 'hist-title is-milestone' : 'hist-title'}>{e.milestone && <span className="hist-ms" title="Milestone"><span className="sr-only">Milestone: </span></span>}<Hit text={e.title} needle={needle} /></span>
                   <button className="btn btn-ghost hist-del" aria-label={`Remove ${e.title}`} onClick={() => removeEvent(e)}><XIcon /></button>
                 </div>
               ))}
             </div>
           ))}
+          </div>
         </section>
       ))}
       {hasMore && (
@@ -148,13 +153,14 @@ export function Achievements({ onAdd }: { onAdd: () => void }) {
     return out
   }, [items])
 
-  if (!all) return null
+  if (!all) return <section className="card"><Skeleton rows={6} label="Loading achievements" /></section>
   if (all.length === 0)
     return (
-      <Empty>
-        Milestones collect here: finished goals, completed courses, and anything you add with “Milestone” switched on.<br />
-        <button className="btn btn-primary btn-sm" style={{ marginTop: 10 }} onClick={onAdd}>Add a milestone</button>
-      </Empty>
+      <section className="card">
+        <Empty title="No milestones yet" action={<button className="btn btn-primary" onClick={onAdd}>Add a milestone</button>}>
+          Milestones collect here: finished goals, completed courses, streaks, and anything you add with “Milestone” switched on.
+        </Empty>
+      </section>
     )
 
   const latest = all[0]

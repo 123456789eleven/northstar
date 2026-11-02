@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Kbd } from '../components/Shortcuts'
+import { openShortcuts } from '../components/shortcutsData'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { Card, Empty, PageHeader, Skeleton } from '../components/ui'
@@ -175,7 +177,11 @@ export default function Tasks() {
               </div>
             )}
           </Card>
-          {!phone && order.length > 0 && <div className="faint tiny tq-keys">Keys: j and k move, x completes. Click a task to edit it.</div>}
+          {!phone && order.length > 0 && (
+            <button type="button" className="key-hint tq-keys" onClick={openShortcuts}>
+              <span className="sr-only">Keyboard shortcuts: </span><span><Kbd k={['j']} /><Kbd k={['k']} /> move</span><span><Kbd k={['x']} /> complete</span><span><Kbd k={['?']} /> all shortcuts</span>
+            </button>
+          )}
         </div>
 
         {selected && (

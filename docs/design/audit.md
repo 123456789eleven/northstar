@@ -13,7 +13,7 @@ Ranking: 1 = most responsible for the "skeleton" feeling. **[fixed]** = done in 
 7. **Empty states had no action** and indented 4px off the card title line. `ui.tsx` Empty, `index.css .empty`. **[fixed]** `Empty{title, action}`, aligned.
 8. Input focus was a border colour change only; no hover, invalid or disabled states. **[fixed]** (`Field{hint,error}`, `aria-invalid`).
 9. Card-title actions wrapped mid-value on phone ("$1,622.49 / month"). **[fixed]** action never wraps.
-10. Open: the focus trap's opener capture misses when a modal child uses `autoFocus` (Habit modal): Esc returns focus to `<body>`, not "New habit". Pre-existing, left as is per "focus handling unchanged". `components/useFocusTrap.ts:12`.
+10. The focus trap's opener capture missed when a modal child used `autoFocus` (Habit modal): Esc returned focus to `<body>`. `components/useFocusTrap.ts`. **[fixed phase 3]** opener captured at first render; browser-verified (mouse and keyboard).
 
 ## Today (`pages/Today.tsx`, `features/today/*`)
 1. 32px dead band between "Your day" and "Suggested focus" (`.sub-head` top padding after the card title). `today.css:20`. **[fixed]**
@@ -44,7 +44,7 @@ Ranking: 1 = most responsible for the "skeleton" feeling. **[fixed]** = done in 
 1. Goal trees sat directly on the page background with only hairlines: no grouping, weak hierarchy. `goals.css:6`. **[fixed]** each life-goal tree is one surface.
 2. Five bordered "Complete" buttons per screen competed with the primary "New goal". `GoalCard.tsx:72`. **[fixed]** quiet ghost actions.
 3. Filter-empty state had no way back. `Goals.tsx:138`. **[fixed]** "Show all active goals".
-4. Open: goal completion has no moment beyond leaving the Active list (candidate: brief toast with Undo).
+4. Goal completion had no moment. **[fixed phase 3]** check draws, bar settles, toast with Undo + next step; milestones too.
 
 ## Body (`pages/Body.tsx`, `features/body/*`)
 1. Empty state + five-column goal form stretched the full 1100px width; guidance a thin full-width strip. `Body.tsx:88-92`. **[fixed]** goal and guidance side by side (3:2), same split when data exists.
@@ -64,13 +64,13 @@ Ranking: 1 = most responsible for the "skeleton" feeling. **[fixed]** = done in 
 3. Entry rows had underline-only hover. **[fixed]** row hover surface.
 4. Focus mode: entrance now fades in; behaviour untouched. Open: the word-goal bar under focus mode animates by width (not animated today); convert to `Progress` if motion is wanted.
 
-## Command (`pages/Ops.tsx`, `features/ops/*`) - not in this run
+## Command (`pages/Ops.tsx`, `features/ops/*`) - **phase 3**: skeleton, Empty with actions, mono facet label, key hint opens `?` overlay, disclosure chevron on Network view
 1. Object-type legend uses amber squares that encode nothing (`ops.css:19-20`). 2. Network view summary is one long sentence in a full-width card (`Ops.tsx:227`). 3. Review panel leaves ~400px empty under it at 1440.
 
-## Planner (`pages/Planner.tsx`, `features/planner/*`) - not in this run
+## Planner (`pages/Planner.tsx`, `features/planner/*`) - **phase 3**: today column neutral (label carries the accent), neutral event bars, Plan my day uses Empty. Open: time axis in week view
 1. Week day columns ~150px wrap titles to 2-3 lines; no time axis. 2. "Plan my day" empty card spans full width under the week (`PlannerParts.tsx:89`). 3. Two amber elements compete (New event + today column border).
 
-## Learning, People, History, Review, Data, Ontology, Settings - not in this run
+## Learning, People, History, Review, Data, Ontology, Settings - **phase 3 done** (skeletons, Empty{title,action}, one primary per view, History week surfaces + sticky day heads under the top bar, Review serif figures + soft rating state + print, Settings density/shortcuts rows, Data secondary pickers + import-history actions, Ontology sticky detail + empty/loading). Open items: Learning progress still uses its own range-as-bar; Habits "7 of 5" copy; Food header buttons.
 - Learning `pages/Learning.tsx:22` returns null while loading (needs `PageSkeleton`); progress uses its own `.learn-progress` (`learning.css:11`) instead of `Progress`.
 - People / History / Review: list pages on `.card` + `.list-item`; migrate to `ListRow` for hover/pressed/focus states; History is 2,100px tall at 1440 with no month grouping density control.
 - Data `pages/DataHub.tsx:133`: empty batches state without an action.

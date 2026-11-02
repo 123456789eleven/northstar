@@ -59,3 +59,27 @@
 .rv-rate-btns .btn:disabled { opacity: 0.55; }
 .rv-weeknav { padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
 @media (max-width: 520px) { .rv-save .btn { flex: 1; } .rv-rate-btns .btn { width: 38px; } }
+
+/* Phase 3: figures in the digest read as figures (Fraunces, tabular); a chosen rating is a soft accent, not six solid
+   amber blocks; the selected past week is marked with weight and a bar, not amber text. */
+.rv-fact-value { font-family: var(--serif); font-size: var(--text-lg); line-height: 26px; letter-spacing: var(--track-display); }
+.rv-fact-label { font-family: var(--mono); font-size: var(--text-label); letter-spacing: var(--track-label); text-transform: uppercase; }
+.rv-rate-btns .btn[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent-line); color: var(--ink); font-weight: 600; }
+.rv-rate-row { min-height: 36px; border-bottom: 1px solid var(--line-soft); }
+.rv-rate-row:last-child { border-bottom: 0; }
+.rv-past-item { padding-left: 8px; margin-left: -8px; width: calc(100% + 8px); border-radius: 0; transition: background-color var(--dur-fast) var(--ease-out); }
+.rv-past-item:hover { background: var(--surface-2); }
+.rv-past-item.is-current { box-shadow: inset 2px 0 0 var(--accent); }
+.rv-past-item.is-current .rv-past-week { color: var(--ink); font-weight: 600; }
+.rv-suggest { border-left-width: 1px; }
+
+/* Print: one clean page of the week (digest, your words, ratings). Screen-only controls drop out. */
+@media print {
+  .rv-layout { display: block; }
+  .rv-layout > .stack:last-child, .rv-suggest, .rv-weeknav .btn, .rv-save, .insights-week { display: none !important; }
+  .rv-weeknav { border: 0; padding: 0; margin: 0 0 12pt; }
+  .rv-layout textarea { display: none; }
+  .rv-print-text { white-space: pre-wrap; font-size: 11pt; line-height: 1.5; padding: 2pt 0 8pt; color: #111; }
+  .rv-rate-btns { display: none; }
+  .rv-fact-value { font-size: 14pt; }
+}

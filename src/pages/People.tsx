@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Interaction, type Person } from '../db'
-import { Card, Empty, PageHeader } from '../components/ui'
+import { Card, Empty, PageHeader, PageSkeleton } from '../components/ui'
 import { useToast } from '../components/toastContext'
 import { daysBetween, formatDate, relativeDay, today } from '../lib/dates'
 import { KINDS, cadenceLabel, logContact, nextBirthday, sortPeople, undoContact } from '../features/people/people'
@@ -76,11 +76,12 @@ export default function People() {
   return (
     <>
       <PageHeader title="People" sub={sub} actions={<button className="btn btn-primary" onClick={() => setAdding(true)}>Add person</button>} />
-      {people && people.length === 0 ? (
+      {people === undefined ? (
+        <PageSkeleton strip={false} rows={7} />
+      ) : people.length === 0 ? (
         <Card>
-          <Empty>
+          <Empty title="No one here yet" action={<button className="btn btn-primary" onClick={() => setAdding(true)}>Add your first person</button>}>
             Add someone you want to stay close to and choose how often to check in. When you talk, tap “Contacted” and Northstar will tell you who is due next.
-            <div style={{ marginTop: 14 }}><button className="btn btn-primary" onClick={() => setAdding(true)}>Add your first person</button></div>
           </Empty>
         </Card>
       ) : (
@@ -90,8 +91,8 @@ export default function People() {
             <div>
               {sorted.map(({ p, s }, idx) => (
                 <div key={p.id}>
-                  {idx === 0 && s.overdue && <div className="ppl-group">Due now · {dueCount}</div>}
-                  {!s.overdue && (idx === 0 || sorted[idx - 1].s.overdue) && <div className="ppl-group">{dueCount ? 'Up to date' : 'Everyone'}</div>}
+                  {idx === 0 && s.overdue && <div className="ppl-group"><span>Due now</span><span className="mono">{dueCount}</span></div>}
+                  {!s.overdue && (idx === 0 || sorted[idx - 1].s.overdue) && <div className="ppl-group"><span>{dueCount ? 'Up to date' : 'Everyone'}</span><span className="mono">{sorted.length - dueCount}</span></div>}
                   <div className="ppl-row">
                     <button className="ppl-main" onClick={() => setOpenId(p.id!)}>
                       <span className="ppl-name">{p.name}</span>
@@ -100,7 +101,7 @@ export default function People() {
                       </span>
                     </button>
                     <span className={s.overdue ? 'ppl-status is-due' : 'ppl-status'}>{s.text.replace(' · never logged', '')}</span>
-                    <button className={s.overdue ? 'btn btn-sm btn-primary ppl-act' : 'btn btn-sm ppl-act'} onClick={() => quickLog(p)} aria-label={`Contacted ${p.name} today`}>Contacted</button>
+                    <button className="btn btn-sm ppl-act" onClick={() => quickLog(p)} aria-label={`Contacted ${p.name} today`}>Contacted</button>
                     <button className="btn btn-sm btn-ghost ppl-more" onClick={() => setLoggingId(loggingId === p.id ? null : p.id!)} aria-label={`Log details for ${p.name}`} aria-expanded={loggingId === p.id}>Details</button>
                     {loggingId === p.id && <LogPanel person={p} onDone={() => setLoggingId(null)} />}
                   </div>
@@ -110,7 +111,7 @@ export default function People() {
           </Card>
           <Card title="Birthdays · next 30 days" className={birthdays.length ? 'ppl-bday-card' : 'ppl-bday-card is-empty'}>
             {birthdays.length === 0 ? (
-              <p className="small faint" style={{ margin: 0 }}>None coming up. Add birthdays from a person’s Edit screen.</p>
+              <Empty>None in the next 30 days. Add birthdays from a person’s Edit screen.</Empty>
             ) : (
               birthdays.map(({ p, next, inDays }) => (
                 <div className="ppl-bday" key={p.id}>

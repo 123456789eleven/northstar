@@ -6,6 +6,8 @@ import { routeTitle } from './components/nav'
 import { Rail, TabBar, TopBar } from './components/Shell'
 import ToastProvider from './components/Toast'
 import UpdatePrompt from './components/UpdatePrompt'
+import { ShortcutsHost } from './components/Shortcuts'
+import { useDensity } from './components/density'
 
 const Today = lazy(() => import('./pages/Today'))
 const Ops = lazy(() => import('./pages/Ops'))
@@ -68,6 +70,7 @@ function Shell() {
   const { pathname } = useLocation()
   useEffect(() => { document.title = routeTitle(pathname) }, [pathname])
   useNavTransitions()
+  useDensity()
   return (
       <div className="shell">
         <a className="skip-link" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus() }}>Skip to content</a>
@@ -102,6 +105,7 @@ function Shell() {
         </div>
         <TabBar />
         <UpdatePrompt />
+        <ShortcutsHost />
       </div>
   )
 }

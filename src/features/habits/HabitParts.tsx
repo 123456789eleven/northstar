@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { db, AREAS, type Area, type Goal, type Habit, type ISODate } from '../../db'
 import { Field, Modal, AREA_LABEL } from '../../components/ui'
 import { formatDate } from '../../lib/dates'
-import { archiveHabit, deleteHabit, toggleCheckIn } from './habitData'
+import { archiveHabit, deleteHabit } from './habitData'
+import { useHabitCheckIn } from './useHabitCheckIn'
 import { PER_WEEK_PRESETS, heatGrid, lastDays, perWeekLabel, streak, weekProgress } from './stats'
 
 export function HeatStrip({ dates, today }: { dates: Set<ISODate>; today: ISODate }) {
@@ -38,6 +39,7 @@ export function HeatStrip({ dates, today }: { dates: Set<ISODate>; today: ISODat
 const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 export function HabitCard({ habit, dates, today, goalTitle, onEdit }: { habit: Habit; dates: Set<ISODate>; today: ISODate; goalTitle?: string; onEdit: (h: Habit) => void }) {
+  const tick = useHabitCheckIn()
   const s = streak(dates, today, habit.perWeek)
   const wp = weekProgress(dates, today, habit.perWeek)
   return (
@@ -66,7 +68,7 @@ export function HabitCard({ habit, dates, today, goalTitle, onEdit }: { habit: H
               type="button"
               className={`habit-day ${on ? 'on' : ''} ${d === today ? 'today' : ''}`}
               aria-pressed={on}
-              onClick={() => void toggleCheckIn(habit, d)}
+              onClick={() => void tick(habit, d)}
             >
               <span aria-hidden>{DOW[dow]}</span>
               <b aria-hidden>{Number(d.slice(8))}</b>

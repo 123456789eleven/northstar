@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Card, Empty, PageHeader, Progress, Tabs } from '../components/ui'
+import { Card, Empty, PageHeader, PageSkeleton, Progress, Tabs } from '../components/ui'
 import { db, getSetting, setSetting, type LearningItem } from '../db'
 import { startOfWeek, today } from '../lib/dates'
 import ItemModal from '../features/learning/ItemModal'
@@ -35,7 +35,7 @@ function WeekTarget({ minutes }: { minutes: number }) {
             <button className="btn btn-sm" type="submit">Set</button>
           </form>
         ) : (
-          <button className="btn btn-ghost btn-sm" onClick={() => { setVal(String(target)); setEditing(true) }} aria-label="Change weekly target">
+          <button className="btn btn-ghost btn-sm" onClick={() => { setVal(String(target)); setEditing(true) }} aria-label={`Target ${fmtMinutes(target)}: change weekly target`}>
             Target {fmtMinutes(target)}
           </button>
         )}
@@ -88,7 +88,7 @@ export default function Learning() {
           </button>
         }
       />
-      {loaded && <WeekTarget minutes={weekTotal} />}
+      {loaded ? <WeekTarget minutes={weekTotal} /> : <PageSkeleton rows={4} />}
       <Tabs
         value={view}
         onChange={setView}
@@ -104,17 +104,18 @@ export default function Learning() {
         loaded &&
         (active.length === 0 ? (
           <Card>
-            <Empty>
-              <div className="stack">
-                <span>
-                  {all.length === 0
-                    ? 'Add one concrete thing you’re learning right now — a course you’re enrolled in, a certification you’re studying for, or the book on your nightstand.'
-                    : 'Nothing in progress. Start something from Planned, or add what you’re working on now.'}
-                </span>
-                <button className="btn btn-primary" onClick={addFor('active')}>
-                  Add what you’re learning
-                </button>
-              </div>
+            <Empty
+              title={all.length === 0 ? 'Nothing here yet' : 'Nothing in progress'}
+              action={
+                <>
+                  <button className="btn btn-primary" onClick={addFor('active')}>Add what you’re learning</button>
+                  {planned.length > 0 && <button className="btn" onClick={() => setView('planned')}>See planned ({planned.length})</button>}
+                </>
+              }
+            >
+              {all.length === 0
+                ? 'Add one concrete thing you’re learning right now: a course you’re enrolled in, a certification you’re studying for, or the book on your nightstand.'
+                : 'Start something from Planned, or add what you’re working on now.'}
             </Empty>
           </Card>
         ) : (
@@ -128,13 +129,8 @@ export default function Learning() {
       {view === 'planned' && loaded && (
         <Card>
           {planned.length === 0 ? (
-            <Empty>
-              <div className="stack">
-                <span>Keep a short list of what’s next — the course after this one, a certification you want by year end.</span>
-                <button className="btn" onClick={addFor('planned')}>
-                  Add a planned item
-                </button>
-              </div>
+            <Empty title="No planned items" action={<button className="btn" onClick={addFor('planned')}>Add a planned item</button>}>
+              Keep a short list of what’s next: the course after this one, a certification you want by year end.
             </Empty>
           ) : (
             <div className="list">
@@ -149,7 +145,9 @@ export default function Learning() {
       {view === 'done' && loaded && (
         <Card>
           {done.length === 0 ? (
-            <Empty>Finished items land here and on your Achievements wall. Already have a certification or course behind you? Add it with status Completed.</Empty>
+            <Empty title="Nothing completed yet" action={<button className="btn" onClick={addFor('done')}>Add a completed item</button>}>
+              Finished items land here and on your Achievements wall. Already have a certification or course behind you? Add it as completed.
+            </Empty>
           ) : (
             <div className="list">
               {done.map((i) => (

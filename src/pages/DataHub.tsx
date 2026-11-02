@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, Empty, PageHeader } from '../components/ui'
+import { Card, Empty, PageHeader, PageSkeleton } from '../components/ui'
 import DataTable from '../components/DataTable'
 import KpiStrip from '../components/KpiStrip'
 import StatusChip from '../components/StatusChip'
@@ -58,7 +58,7 @@ export default function DataHub() {
     const [tx, cal, ppl, tasks, meals, events] = await Promise.all([db.transactions.count(), db.calendar.count(), db.people.count(), db.tasks.count(), db.meals.count(), db.events.count()])
     return { fin: fin ?? [], dat: dat ?? [], optin: optin === true, sync, gcal, tx, cal, ppl, tasks, meals, events }
   }, [])
-  if (!data) return <PageHeader title="Data" />
+  if (!data) return <><PageHeader title="Data" sub="Every way data gets into Northstar, and where it goes." /><PageSkeleton rows={8} /></>
   const { fin, dat, optin, sync, gcal } = data
   const lastOf = (kind: DataImportRecord['kind']) => dat.find((r) => r.kind === kind)
   const sumOf = (kind: DataImportRecord['kind']) => dat.filter((r) => r.kind === kind).reduce((n, r) => n + r.added, 0)
@@ -114,7 +114,7 @@ export default function DataHub() {
             { key: 'status', header: 'Status', value: true, render: (r) => <StatusChip status={r.tone === 'good' ? 'good' : r.tone === 'warn' ? 'warn' : 'neutral'}>{r.status}</StatusChip> },
           ]}
         />
-        <p className="small muted" style={{ margin: 0, padding: 16 }}>
+        <p className="small muted dh-where">
           Where it goes: everything is stored in this browser on this device. Nothing leaves it except two things you turn on yourself: the food search, which sends only your search text to world.openfoodfacts.org, and optional sync / Google Calendar. Imported files are read locally and never uploaded.
         </p>
       </Card>
@@ -130,7 +130,15 @@ export default function DataHub() {
 
         <Card title="Import history">
           {history.length === 0 ? (
-            <Empty>No imports yet. Each file you import is kept as a batch here so you can undo it in one step.</Empty>
+            <Empty
+              title="No imports yet"
+              action={<>
+                <Link className="btn btn-sm" to="/finance">Import a bank CSV</Link>
+                <button className="btn btn-sm btn-ghost" onClick={() => document.querySelector('#import-calendar')?.scrollIntoView({ block: 'start' })}>Import a calendar file</button>
+              </>}
+            >
+              Each file you import is kept as a batch here so you can undo it in one step.
+            </Empty>
           ) : (
             <div className="list">
               {history.map((h) => (

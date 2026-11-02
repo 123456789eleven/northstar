@@ -127,3 +127,18 @@
 .cmd-queue .ops-clip { max-width: none; display: block; }
 .cmd .side-panel { z-index: 2; flex: none; }
 @media (min-width: 820px) { .cmd .side-panel { width: 360px; } }
+
+/* Phase 3: facet heading uses the label style; the key hint is a real button that opens the shortcuts overlay; the
+   empty review column is a quiet placeholder instead of a tall box; Network view summary reads as a disclosure. */
+.cmd-sub { font-family: var(--mono); font-size: var(--text-label); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); padding: 0 8px; }
+.cmd .cmd-empty-panel { min-height: 0; }
+.cmd-empty-panel .sheet-body { padding-bottom: 16px; }
+.cmd-network summary { list-style: none; font-weight: 600; }
+.cmd-network summary::-webkit-details-marker { display: none; }
+.cmd-network summary::before { content: ''; width: 6px; height: 6px; border-right: 1.5px solid var(--ink-2); border-bottom: 1.5px solid var(--ink-2); transform: rotate(-45deg); margin-right: 8px; transition: transform var(--dur-fast) var(--ease-out); }
+.cmd-network[open] summary::before { transform: rotate(45deg); }
+.cmd-toggle { border-top: 1px solid var(--line-soft); padding: 8px 0; }
+.cmd-toggle:first-of-type { border-top: 0; }
+/* Ontology: the detail panel follows you down a long object list (desktop). */
+@media (min-width: 981px) { .onto-detail { position: sticky; top: 64px; max-height: calc(100vh - 80px); overflow-y: auto; } }
+.onto-diagram .edge-label { font-variant-numeric: tabular-nums; }

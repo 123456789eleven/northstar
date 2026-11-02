@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { toISODate } from '../lib/dates'
-import { PageHeader } from '../components/ui'
+import { Empty, PageHeader, Skeleton } from '../components/ui'
 import DataTable from '../components/DataTable'
 import SidePanel from '../components/SidePanel'
 import { PHONE_QUERY, useMedia } from '../components/useMedia'
@@ -232,7 +232,11 @@ export default function Ontology() {
             <input className="input" style={{ flex: 1, minWidth: 140 }} placeholder="Search" aria-label="Search objects" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
           {shown.length === 0 ? (
-            <div className="ops-panel-body" style={{ fontSize: 13, color: 'var(--ink-3)' }}>{rows ? `No ${def.label.toLowerCase()} rows match.` : 'Loading'}</div>
+            <div className="ops-panel-body">
+              {rows ? (
+                <Empty title={q ? `No ${def.label.toLowerCase()} rows match` : `No ${def.label.toLowerCase()} rows yet`} action={q ? <button className="btn btn-sm" onClick={() => setQ('')}>Clear search</button> : undefined} />
+              ) : <Skeleton rows={6} label="Loading objects" />}
+            </div>
           ) : (
             <div>
               <DataTable
@@ -252,7 +256,7 @@ export default function Ontology() {
         </section>
 
         {!phone && (
-          <section className="ops-panel" aria-label="Object detail">
+          <section className="ops-panel onto-detail" aria-label="Object detail">
             <div className="ops-panel-head"><span className="ops-label">Object</span></div>
             {selected ? <Panel type={type} row={selected} onGo={go} /> : <div className="ops-panel-body" style={{ fontSize: 13, color: 'var(--ink-3)' }}>Select a row to see its properties, links, actions and timeline.</div>}
           </section>

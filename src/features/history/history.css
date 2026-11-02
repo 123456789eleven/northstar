@@ -72,3 +72,22 @@
   .ach-entry-title { flex-basis: calc(100% - 62px); order: 2; }
   .ach-entry-meta { order: 3; flex-basis: 100%; padding-left: 62px; }
 }
+
+/* Phase 3: each week is one surface; day headers stick under the top bar; area chips stay neutral (a milestone is
+   marked by a small accent dot and weight, not an amber chip); remove buttons appear on hover or focus. */
+.hist-week { margin-bottom: var(--sp-5); }
+.hist-week-head { font-family: var(--mono); font-size: var(--text-label); font-weight: 500; letter-spacing: var(--track-label); color: var(--ink-2); margin: 0 0 var(--sp-2); }
+.hist-week-head .faint { font-family: var(--font); font-size: var(--text-xs); color: var(--ink-3); }
+.hist-week-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: clip; }
+.hist-day { margin: 0; }
+.hist-day + .hist-day { border-top: 1px solid var(--line); }
+.hist-day-head { top: 48px; background: var(--surface); padding: 8px var(--pad) 6px; font-size: var(--text-sm); color: var(--ink); border-bottom: 1px solid var(--line-soft); }
+.hist-day-head .faint { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.hist-item { padding: var(--list-py) var(--pad); min-height: var(--row); border-bottom-color: var(--line-soft); transition: background-color var(--dur-fast) var(--ease-out); }
+.hist-item:hover { background: var(--surface-2); }
+.hist-ms { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 8px; vertical-align: 2px; }
+.hist-del { opacity: 0; transition: opacity var(--dur-fast) var(--ease-out); }
+.hist-item:hover .hist-del, .hist-del:focus-visible { opacity: 1; }
+@media (hover: none) { .hist-del { opacity: 0.6; } }
+.hist-chip { min-width: 0; }
+@media (max-width: 819px) { .hist-day-head { top: 44px; } .hist-item { min-height: 44px; } }

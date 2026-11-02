@@ -7,25 +7,32 @@ import { searchAll, scoreFields, type SearchGroup } from '../lib/search'
 import { openBulk } from '../features/bulk/openBulk'
 import { NAV } from './nav'
 import { useFocusTrap } from './useFocusTrap'
+import { Icon, type IconName } from './Icons'
+import { Kbd } from './Shortcuts'
+import { openShortcuts } from './shortcutsData'
+import { getSetting } from '../db'
+import { DENSITY_KEY, normalizeDensity, setDensity } from './density'
 
 interface Item {
   id: string
   group: string
   label: string
   secondary: string
+  icon: IconName
   run: () => void
 }
 
-/** Shortcuts that exist in the app today. */
-const SHORTCUTS: Array<[string, string]> = [
-  ['Ctrl K / Cmd K', 'Search and commands'],
-  ['/', 'Focus the capture bar'],
-  ['j / k', 'Next / previous row (Tasks, Command)'],
-  ['Enter', 'Open the selected task (Tasks)'],
-  ['x', 'Complete the selected task (Tasks)'],
-  ['e / a', 'Explain / apply proposal (Command)'],
-  ['Esc', 'Close dialogs and sheets'],
-]
+const GROUP_ICON: Record<string, IconName> = {
+  Tasks: 'tasks', Goals: 'goals', Habits: 'habits', People: 'people', Journal: 'journal', Food: 'food',
+  Learning: 'learning', Finance: 'finance', Calendar: 'planner', History: 'history',
+}
+
+/** Bold the first case-insensitive match of the query inside a label (no colour: weight only). */
+function Highlight({ text, q }: { text: string; q: string }) {
+  const i = q ? text.toLowerCase().indexOf(q.toLowerCase()) : -1
+  if (i < 0) return <>{text}</>
+  return <>{text.slice(0, i)}<mark className="cp-mark">{text.slice(i, i + q.length)}</mark>{text.slice(i + q.length)}</>
+}
 
 /** Shell listens for this and focuses/opens the capture bar. */
 const CAPTURE_EVENT = 'ns:capture'
@@ -39,18 +46,19 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState('')
   const [groups, setGroups] = useState<Array<{ group: SearchGroup; items: Item[] }>>([])
   const [active, setActive] = useState(0)
-  const [help, setHelp] = useState(false)
   const [searched, setSearched] = useState(true)
   useFocusTrap(ref, onClose)
 
   const go = (to: string) => () => { onClose(); navigate(to) }
   const baseItems = useMemo<Item[]>(() => {
     const actions: Item[] = [
-      { id: 'act:capture', group: 'Actions', label: 'New task', secondary: 'Focus the capture bar', run: () => { onClose(); setTimeout(() => window.dispatchEvent(new Event(CAPTURE_EVENT)), 0) } },
-      { id: 'act:bulk', group: 'Actions', label: 'Add many items', secondary: 'Paste tasks, people, goals, meals, transactions', run: () => { onClose(); setTimeout(openBulk, 0) } },
-      { id: 'act:backup', group: 'Actions', label: 'Export or restore backup', secondary: 'Settings', run: go('/settings') },
+      { id: 'act:capture', group: 'Actions', icon: 'capture', label: 'New task', secondary: 'Focus the capture bar', run: () => { onClose(); setTimeout(() => window.dispatchEvent(new Event(CAPTURE_EVENT)), 0) } },
+      { id: 'act:bulk', group: 'Actions', icon: 'plus', label: 'Add many items', secondary: 'Paste tasks, people, goals, meals, transactions', run: () => { onClose(); setTimeout(openBulk, 0) } },
+      { id: 'act:backup', group: 'Actions', icon: 'data', label: 'Export or restore backup', secondary: 'Settings', run: go('/settings') },
+      { id: 'act:density', group: 'Actions', icon: 'settings', label: 'Switch density', secondary: 'Comfortable or compact, this device', run: () => { onClose(); void getSetting(DENSITY_KEY, 'comfortable').then((d) => setDensity(normalizeDensity(d) === 'compact' ? 'comfortable' : 'compact')) } },
+      { id: 'act:keys', group: 'Actions', icon: 'command', label: 'Keyboard shortcuts', secondary: 'Press ? anywhere', run: () => { onClose(); setTimeout(openShortcuts, 0) } },
     ]
-    const pages = NAV.map((n): Item => ({ id: `nav:${n.to}`, group: 'Go to', label: n.label, secondary: n.group, run: go(n.to) }))
+    const pages = NAV.map((n): Item => ({ id: `nav:${n.to}`, group: 'Go to', icon: n.icon, label: n.label, secondary: n.group, run: go(n.to) }))
     return [...actions, ...pages]
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -66,7 +74,7 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
         if (stale) return
         setGroups(res.map((g) => ({
           group: g.group,
-          items: g.hits.map((h) => ({ id: h.id, group: h.group, label: h.label, secondary: h.secondary, run: go(h.to) })),
+          items: g.hits.map((h) => ({ id: h.id, group: h.group, icon: GROUP_ICON[h.group] ?? 'more', label: h.label, secondary: h.secondary, run: go(h.to) })),
         })))
         setSearched(true)
       }).catch(() => { if (!stale) { setGroups([]); setSearched(true) } })
@@ -83,7 +91,7 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
         { name: 'Go to', items: baseItems.filter((i) => i.group === 'Go to') },
       ]
     }
-    const cmds = baseItems.filter((i) => scoreFields([i.label], q) > 0)
+    const cmds = baseItems.filter((i) => scoreFields([i.label, i.id === 'act:keys' ? 'help shortcuts keys' : i.id === 'act:density' ? 'compact comfortable spacing' : ''], q) > 0)
     const out: Array<{ name: string; items: Item[] }> = []
     const acts = cmds.filter((i) => i.group === 'Actions')
     const pgs = cmds.filter((i) => i.group === 'Go to')
@@ -153,23 +161,32 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
                     onMouseMove={() => i !== active && setActive(i)}
                     onClick={() => it.run()}
                   >
-                    <span className="cp-label">{it.label}</span>
+                    <span className="cp-ico" aria-hidden><Icon name={it.icon} /></span>
+                    <span className="cp-label"><Highlight text={it.label} q={query.trim()} /></span>
                     <span className="cp-sec">{it.secondary}</span>
+                    <span className="cp-enter" aria-hidden><kbd className="kbd">Enter</kbd></span>
                   </div>
                 )
               })}
             </div>
           ))}
-          {searched && query.trim() && !flat.length && <div className="cp-empty">Nothing matches &quot;{query.trim()}&quot;. Searched on this device only.</div>}
+          {!searched && query.trim() && !flat.length && <div className="cp-empty" aria-hidden><span className="cp-empty-title">Searching</span></div>}
+          {searched && query.trim() && !flat.length && (
+            <div className="cp-empty">
+              <span className="cp-empty-title">No matches for &ldquo;{query.trim()}&rdquo;</span>
+              <span>Search covers tasks, goals, habits, people, journal, food, learning, money and history, on this device only. Try a shorter word.</span>
+            </div>
+          )}
         </div>
-        {help && (
-          <dl className="cp-help" aria-label="Keyboard shortcuts">
-            {SHORTCUTS.map(([k, d]) => (<div key={k}><dt><kbd>{k}</kbd></dt><dd>{d}</dd></div>))}
-          </dl>
-        )}
         <div className="cp-foot">
-          <span className="cp-hint">Up/Down to move, Enter to open, Esc to close</span>
-          <button type="button" className="cp-q" aria-expanded={help} aria-label="Keyboard shortcuts" onClick={() => setHelp((h) => !h)}>?</button>
+          <span className="cp-hint">
+            <span className="cp-hint-item"><Kbd k={['Up']} /><Kbd k={['Down']} /> move</span>
+            <span className="cp-hint-item"><Kbd k={['Enter']} /> open</span>
+            <span className="cp-hint-item"><Kbd k={['Esc']} /> close</span>
+          </span>
+          <button type="button" className="btn btn-ghost btn-sm cp-keys" onClick={() => { onClose(); setTimeout(openShortcuts, 0) }}>
+            Shortcuts <Kbd k={['?']} />
+          </button>
         </div>
       </div>
     </div>,

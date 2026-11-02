@@ -30,6 +30,10 @@ Validate this index any time: `python "C:\Users\bearf\OneDrive\Desktop\The One\t
 | set up / verify Supabase | northstar-supabase-ops |
 | choose a model / keep cost down | northstar-model-efficiency |
 | plan or run a multi-step request (who does what) | northstar-org-workflow |
+| what can I decide without asking / what must I escalate | northstar-autonomy |
+| add or change a feature end to end | northstar-new-feature |
+| click through the live app or a real browser safely | northstar-live-verify |
+| the owner shared statements, contacts or any real data | northstar-owner-data |
 
 ## Catalog by type
 
@@ -38,10 +42,11 @@ Validate this index any time: `python "C:\Users\bearf\OneDrive\Desktop\The One\t
 - **Delegation:** northstar-dispatch, northstar-parallel-build, subagent-driven-development, dispatching-parallel-agents
 - **Integration:** northstar-integrate, requesting-code-review, receiving-code-review, finishing-a-development-branch
 - **Cost control:** northstar-model-efficiency
+- **Operating rules:** northstar-autonomy, northstar-owner-data
 - **Git hygiene:** using-git-worktrees
 
 ### 2. Build recipes (how to add things)
-- **Structure:** northstar-add-page, northstar-new-module, northstar-ontology-type
+- **Structure:** northstar-add-page, northstar-new-module, northstar-new-feature, northstar-ontology-type
 - **Data in:** northstar-importer, northstar-capture-syntax
 - **Intelligence:** northstar-rules-engine
 - **Presentation:** northstar-chart
@@ -49,7 +54,7 @@ Validate this index any time: `python "C:\Users\bearf\OneDrive\Desktop\The One\t
 
 ### 3. Quality (how we know it works)
 - **Verification:** northstar-fast-verify, northstar-definition-of-done, verification-before-completion
-- **Testing:** test-driven-development, northstar-browser-qa
+- **Testing:** test-driven-development, northstar-browser-qa, northstar-live-verify
 - **Debugging:** northstar-bugfix-loop, systematic-debugging
 - **Review:** northstar-design-review, northstar-privacy-audit
 

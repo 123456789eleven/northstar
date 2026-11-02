@@ -52,3 +52,14 @@
 .pl-plan span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 
 .pl-day-body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+/* Phase 3: one amber thing per view. Today is marked by its label and a stronger hairline, not an amber box; event
+   bars are neutral (timed = ink-3, all-day = line-strong) so New event stays the single accent. */
+.pl-day.today { border-color: var(--line-strong); background: var(--surface-2); }
+.pl-day.today .pl-ev { background: var(--surface-3); }
+.pl-ev { border-left-color: var(--ink-3); transition: background-color var(--dur-fast) var(--ease-out); }
+.pl-ev:hover { background: var(--surface-3); }
+.pl-ev.allday { border-left-color: var(--line-strong); }
+.pl-day-head:hover b { text-decoration: underline; text-decoration-color: var(--ink-3); text-underline-offset: 3px; }
+.pl-side .card .empty { padding: 0; }
+.pl-bar .pl-title { font-variant-numeric: tabular-nums; }

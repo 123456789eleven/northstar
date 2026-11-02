@@ -100,3 +100,15 @@ html[data-focus="1"] body { overflow: hidden; }
 .jr-sq:not(:disabled):hover { border-color: var(--ink-3); }
 .jr-big { font-variant-numeric: tabular-nums; letter-spacing: var(--track-display); }
 .jr-focus { animation: fade-in var(--dur-slow) var(--ease-out); }
+
+/* Print the reading view as a clean page: the date, the entry, its mood line. Nothing else from the screen. */
+@media print {
+  body:has(.jr-reading-card) .jr-grid { display: block; }
+  body:has(.jr-reading-card) .jr-col:last-child,
+  body:has(.jr-reading-card) .jr-col > .card:not(.jr-reading-card),
+  body:has(.jr-reading-card) .page-head { display: none !important; }
+  .jr-reading-card .card-title { font-family: var(--serif); font-size: 18pt; font-weight: 500; margin-bottom: 14pt; }
+  .jr-reading-card .jr-date { display: none; }
+  .jr-read { font-size: 12pt; line-height: 1.7; max-width: none; color: #111; }
+  .jr-foot { font-size: 9pt; color: #555; margin-top: 10pt; }
+}

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
-import { Card, PageHeader } from '../components/ui'
+import { Card, Empty, PageHeader } from '../components/ui'
 import { addDays, formatDate, parseISODate, startOfWeek, today } from '../lib/dates'
 import { avgRating, reviewStreak, type LockableReview } from '../features/review/summary'
 import { Digest, ReviewForm } from '../features/review/ReviewParts'
@@ -45,7 +45,7 @@ export default function Review() {
 
   return (
     <>
-      <PageHeader title="Weekly review" sub={sub} />
+      <PageHeader title="Weekly review" sub={sub} actions={<button className="btn btn-ghost no-print" onClick={() => window.print()}>Print</button>} />
 
       {suggestLast && (
         <div className="rv-suggest">
@@ -90,7 +90,7 @@ export default function Review() {
                 })}
               </div>
             ) : (
-              <p className="small faint" style={{ margin: 0 }}>Your first review will appear here. Fill in the form and save.</p>
+              <Empty>Your first review will appear here. Fill in the form and save.</Empty>
             )}
           </Card>
         </div>

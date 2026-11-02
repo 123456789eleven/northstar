@@ -54,3 +54,13 @@
   .ppl-row > .ppl-status { flex: 1; }
   .ppl-row > .ppl-more { padding: 0 8px; }
 }
+
+/* Phase 3: one primary per view (Add person). Due rows keep a neutral Contacted button and carry the meaning in the
+   status word plus a warn dot; group headers use the mono label style with a count. */
+.ppl-group { display: flex; justify-content: space-between; font-family: var(--mono); font-size: var(--text-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); padding: 12px 16px 6px; background: var(--bg); }
+.ppl-row { padding-top: var(--list-py); padding-bottom: var(--list-py); transition: background-color var(--dur-fast) var(--ease-out); }
+.ppl-row:hover { background: var(--surface-2); }
+.ppl-status.is-due { color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
+.ppl-status.is-due::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--warn); }
+.ppl-act { min-width: 96px; }
+.ppl-bday { align-items: center; min-height: 36px; padding: 6px 0; }

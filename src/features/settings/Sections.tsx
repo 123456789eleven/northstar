@@ -7,6 +7,8 @@ import { loadDemoWithConfirm } from '../onboarding/demoActions'
 import { BACKUP_LAST_KEY, BACKUP_REMIND_DAYS, eraseAll, exportBackup, importBackup, parseBackup, type ParsedBackup } from '../../lib/backup'
 import AddFromFile from './AddFromFile'
 import { openSetup } from '../onboarding/setupLogic'
+import { setDensity, useDensity, type Density } from '../../components/density'
+import { openShortcuts } from '../../components/shortcutsData'
 import * as sync from '../../sync/manager'
 import { eraseLocalWithoutSync, restoreWithoutSync } from '../../sync/manager'
 
@@ -52,12 +54,46 @@ export function ProfileSection() {
         </Field>
         <button className="btn" type="submit" disabled={!dirty}>Save</button>
       </form>
-      <div className="row-between" style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--line)' }}>
-        <span className="small muted">Guided setup: goals, habits, budgets, people and first tasks.</span>
+      <p className="set-text tiny faint set-saved" role="status">{saved ? 'Saved.' : 'The name stays on this device unless you turn on Sync.'}</p>
+      <DensityRow />
+      <div className="set-pref-row">
+        <div className="set-pref-text">
+          <span className="set-pref-label">Keyboard shortcuts</span>
+          <span className="small muted">Press ? anywhere outside a text field.</span>
+        </div>
+        <button className="btn btn-sm" onClick={openShortcuts}>Show shortcuts</button>
+      </div>
+      <div className="set-pref-row">
+        <div className="set-pref-text">
+          <span className="set-pref-label">Guided setup</span>
+          <span className="small muted">Goals, habits, budgets, people and first tasks.</span>
+        </div>
         <button className="btn btn-sm" onClick={openSetup}>Run setup</button>
       </div>
-      <p className="set-text tiny faint" style={{ marginTop: 8 }} role="status">{saved ? 'Saved.' : 'Northstar is dark only and has no other display options. The name stays on this device unless you turn on Sync.'}</p>
     </Card>
+  )
+}
+
+const DENSITIES: Array<{ value: Density; label: string }> = [
+  { value: 'comfortable', label: 'Comfortable' },
+  { value: 'compact', label: 'Compact' },
+]
+
+/** Spacing preference for this device only. Phones always use comfortable spacing. */
+function DensityRow() {
+  const d = useDensity()
+  return (
+    <div className="set-pref-row">
+      <div className="set-pref-text">
+        <span className="set-pref-label" id="density-label">Density</span>
+        <span className="small muted">Compact tightens rows and spacing on this device. Phones keep comfortable spacing.</span>
+      </div>
+      <div className="seg" role="radiogroup" aria-labelledby="density-label">
+        {DENSITIES.map((o) => (
+          <button key={o.value} type="button" role="radio" aria-checked={d === o.value} className="seg-btn" onClick={() => void setDensity(o.value)}>{o.label}</button>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -269,17 +305,17 @@ export function StatusStrip() {
       <div>
         <dt>Sync</dt>
         <dd className={syncStatus.state === 'error' ? 'warn' : undefined}>{syncLabel}</dd>
-        <span className="set-status-note">{syncOn && syncStatus.lastSyncedAt ? `Last ${fmtWhen(syncStatus.lastSyncedAt)}` : 'Nothing leaves this device'}</span>
+        <dd className="set-status-note">{syncOn && syncStatus.lastSyncedAt ? `Last ${fmtWhen(syncStatus.lastSyncedAt)}` : 'Nothing leaves this device'}</dd>
       </div>
       <div>
         <dt>Last backup</dt>
         <dd className={stale ? 'warn' : undefined}>{lastBackup.at ? fmtWhen(lastBackup.at) : 'Never'}</dd>
-        <span className="set-status-note">{ageDays === null ? 'Export one under Backup' : ageDays === 0 ? 'Today' : `${ageDays} ${ageDays === 1 ? 'day' : 'days'} ago`}</span>
+        <dd className="set-status-note">{ageDays === null ? 'Export one under Backup' : ageDays === 0 ? 'Today' : `${ageDays} ${ageDays === 1 ? 'day' : 'days'} ago`}</dd>
       </div>
       <div>
         <dt>Demo data</dt>
         <dd>{demo.v ? 'Present' : 'None'}</dd>
-        <span className="set-status-note">{demo.v ? `${demo.v.rows.toLocaleString()} sample rows` : 'Only your own data'}</span>
+        <dd className="set-status-note">{demo.v ? `${demo.v.rows.toLocaleString()} sample rows` : 'Only your own data'}</dd>
       </div>
     </dl>
   )

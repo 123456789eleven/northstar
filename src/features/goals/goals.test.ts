@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { db, type Goal, type Task } from '../../db'
-import { addMilestone, completeGoal, createGoal, removeMilestone, reopenGoal, setPaused, toggleMilestone } from './goalActions'
+import { addMilestone, completeGoal, createGoal, removeMilestone, reopenGoal, setPaused, toggleMilestone, undoMilestone } from './goalActions'
 import { goalProgress, newId, progressLabel } from './progress'
 
 const goal = (over: Partial<Goal> = {}): Goal => ({
@@ -94,6 +94,17 @@ describe('goal actions (db)', () => {
     await toggleMilestone(g, 'missing') // no-op
     await removeMilestone(g, g.milestones[0].id)
     expect((await db.goals.get(g.id!))!.milestones).toEqual([])
+  })
+
+  it('undoMilestone unchecks it and removes the event that check logged', async () => {
+    let g = await make()
+    await addMilestone(g, 'First')
+    g = (await db.goals.get(g.id!))!
+    await toggleMilestone(g, g.milestones[0].id)
+    expect(await db.events.count()).toBe(1)
+    await undoMilestone(g.id!, g.milestones[0].id)
+    expect((await db.goals.get(g.id!))!.milestones[0].done).toBe(false)
+    expect(await db.events.count()).toBe(0)
   })
 
   it('setPaused toggles status', async () => {

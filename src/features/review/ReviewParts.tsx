@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { AREAS, db, logEvent, type Area, type ISODate } from '../../db'
-import { AREA_LABEL, Card, Field } from '../../components/ui'
+import { AREA_LABEL, Card, Field, Skeleton } from '../../components/ui'
 import { addDays, formatDate, money, toISODate } from '../../lib/dates'
 import { spendChange, weekDigest, type LockableReview } from './summary'
 
@@ -25,7 +25,7 @@ function fmtMinutes(m: number) {
 export function Digest({ weekOf }: { weekOf: ISODate }) {
   const res = useLiveQuery(async () => ({ weekOf, d: await weekDigest(weekOf) }), [weekOf])
   const d = res && res.weekOf === weekOf ? res.d : undefined
-  if (!d) return <Card title="1 · What happened"><div style={{ height: 120 }} /></Card>
+  if (!d) return <Card title="1 · What happened"><Skeleton lines={4} label="Loading the week" /></Card>
 
   let spendNote: string | undefined
   if (d.hasMoney) {
@@ -130,19 +130,22 @@ export function ReviewForm({ weekOf, existing, planned }: { weekOf: ISODate; exi
         )}
         <Field label="2 · Wins: what went well, what are you proud of?">
           <textarea className="textarea" value={wins} readOnly={locked} onChange={(e) => edit(setWins)(e.target.value)} placeholder="Even small ones count." />
+          <div className="print-only rv-print-text">{wins || '—'}</div>
         </Field>
         <Field label="3 · Slipped: what was hard or did not happen?">
           <textarea className="textarea" value={struggles} readOnly={locked} onChange={(e) => edit(setStruggles)(e.target.value)} placeholder="Say what got in the way, not just what was missed." />
+          <div className="print-only rv-print-text">{struggles || '—'}</div>
         </Field>
         <Field label="4 · Next week: the one to three things that matter most">
           <textarea className="textarea" value={focusNext} readOnly={locked} onChange={(e) => edit(setFocusNext)(e.target.value)} placeholder="These show up here again when you review the following week." />
+          <div className="print-only rv-print-text">{focusNext || '—'}</div>
         </Field>
         <div>
           <div className="field" style={{ marginBottom: 6 }}><span>5 · How did each area feel? 1 = rough, 5 = great; tap again to clear.</span></div>
           <div className="rv-ratings">
             {AREAS.map((a) => (
               <div className="rv-rate-row" key={a}>
-                <span className="rv-rate-name">{AREA_LABEL[a]}</span>
+                <span className="rv-rate-name">{AREA_LABEL[a]}<span className="print-only mono"> {ratings[a] ?? '—'} / 5</span></span>
                 <div className="rv-rate-btns" role="group" aria-label={`${AREA_LABEL[a]} rating`}>
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button type="button" key={n} className="btn" disabled={locked} aria-pressed={ratings[a] === n} onClick={() => rate(a, n)}>{n}</button>

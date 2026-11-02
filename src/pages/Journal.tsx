@@ -39,7 +39,7 @@ function ReadingView({ entry, onEdit }: { entry: JournalEntry; onEdit: () => voi
         <span>{[entry.mood ? `Mood ${entry.mood}` : '', entry.energy ? `Energy ${entry.energy}` : '', (entry.tags ?? []).map((x) => `#${x}`).join(' ')].filter(Boolean).join(' · ') || 'No mood or tags'}</span>
         <span>{wordCount(entry.text)} words</span>
       </div>
-      <div><button className="btn btn-sm" onClick={onEdit}>Edit</button></div>
+      <div className="row"><button className="btn btn-sm" onClick={onEdit}>Edit</button><button className="btn btn-ghost btn-sm" onClick={() => window.print()}>Print</button></div>
     </div>
   )
 }
@@ -82,6 +82,7 @@ export default function Journal() {
       <div className="jr-grid">
         <div className="jr-col">
           <Card
+            className={reading ? 'jr-reading-card' : ''}
             title={date === t ? `Today · ${formatDate(date, { weekday: 'long', month: 'short', day: 'numeric' })}` : formatDate(date, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
             action={
               <span className="row jr-nav">

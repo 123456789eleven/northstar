@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
-import { Card, PageHeader } from '../components/ui'
+import { Card, Empty, PageHeader, PageSkeleton } from '../components/ui'
+import { Kbd } from '../components/Shortcuts'
+import { openShortcuts } from '../components/shortcutsData'
 import { useNow } from '../components/useNow'
 import KpiStrip from '../components/KpiStrip'
 import DataTable, { type Column } from '../components/DataTable'
@@ -62,7 +64,9 @@ function ReviewPanel({ p, mode, setMode, onDone }: { p: Proposal; mode: Mode; se
         <button className="btn btn-sm btn-ghost" aria-pressed={mode === 'explain'} onClick={() => toggle('explain')}>Evidence</button>
         <button className="btn btn-sm btn-ghost" aria-pressed={mode === 'logic'} onClick={() => toggle('logic')}>Show logic</button>
       </div>
-      <div className="faint tiny cmd-keys">Keys: j and k move, a accepts, e shows evidence.</div>
+      <button type="button" className="key-hint" onClick={openShortcuts}>
+        <span className="sr-only">Keyboard shortcuts: </span><span><Kbd k={['j']} /><Kbd k={['k']} /> move</span><span><Kbd k={['a']} /> accept</span><span><Kbd k={['e']} /> evidence</span>
+      </button>
       {err && <div className="ops-error" role="alert">{err}</div>}
       {mode === 'modify' && (
         <div className="ops-edit">
@@ -167,6 +171,7 @@ export default function Ops() {
     <>
       <PageHeader title="Command" sub="Proposals from your own data. Nothing changes until you approve it, unless you opt a low-risk rule into auto-apply." />
 
+      {state === undefined ? <PageSkeleton rows={6} /> : <>
       <KpiStrip
         items={[
           { label: 'Open proposals', value: proposals?.length ?? 0 },
@@ -191,15 +196,14 @@ export default function Ops() {
           {visible.length === 0 ? (
             <Card>
               {proposals?.length ? (
-                <p className="muted small" style={{ margin: 0 }}>Every open proposal is hidden by the object filters.</p>
+                <Empty title="Everything is filtered out" action={<button className="btn btn-sm" onClick={() => setHidden(new Set())}>Show all types</button>}>
+                  Every open proposal is hidden by the object type filters.
+                </Empty>
               ) : (
-                <>
-                  <div style={{ fontWeight: 600, marginBottom: 6 }}>Nothing to review.</div>
-                  <p className="muted small" style={{ margin: 0 }}>
-                    Proposals are generated on this device from your data by fixed rules: an overdue task, a quarter goal with no progress in 14 days, a person past their contact cadence,
-                    uncategorized transactions that match a merchant rule, a budget on pace to go over, or a study streak about to lapse. Add tasks, goals, people or import transactions and they will appear here.
-                  </p>
-                </>
+                <Empty title="Nothing to review" action={<button className="btn btn-sm" onClick={() => navigate('/tasks')}>Open Tasks</button>}>
+                  Proposals are generated on this device from your data by fixed rules: an overdue task, a quarter goal with no progress in 14 days, a person past their contact cadence,
+                  uncategorized transactions that match a merchant rule, a budget on pace to go over, or a study streak about to lapse.
+                </Empty>
               )}
             </Card>
           ) : (
@@ -255,6 +259,7 @@ export default function Ops() {
           </div>
         ))}
       </Card>
+      </>}
     </>
   )
 }

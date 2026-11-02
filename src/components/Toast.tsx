@@ -20,7 +20,7 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
     clear()
     setLeaving(false)
     setT({ ...o, id: ++seq.current })
-    timer.current = window.setTimeout(dismiss, o.ms ?? (o.undo ? 8000 : 4000))
+    timer.current = window.setTimeout(dismiss, o.ms ?? (o.undo || o.action ? 8000 : 4000))
   }, [dismiss])
   useEffect(() => () => clear(), [])
   return (
@@ -30,6 +30,9 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
         {t && (
           <div key={t.id} className={`toast ${leaving ? 'is-leaving' : ''}`}>
             <span className="toast-msg">{t.message}</span>
+            {t.action && (
+              <button className="btn btn-ghost btn-sm toast-act" onClick={() => { void t.action?.run(); clear(); setT(null); setLeaving(false) }}>{t.action.label}</button>
+            )}
             {t.undo && (
               <button className="btn btn-ghost btn-sm" onClick={() => { void t.undo?.(); clear(); setT(null); setLeaving(false) }}>Undo</button>
             )}

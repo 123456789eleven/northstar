@@ -35,6 +35,20 @@ export async function toggleMilestone(g: Goal, msId: string) {
   })
 }
 
+/** Undo of a just-checked milestone: unchecks it and removes the timeline event that check logged. */
+export async function undoMilestone(goalId: number, msId: string) {
+  await db.transaction('rw', db.goals, db.events, async () => {
+    const g = await db.goals.get(goalId)
+    const ms = g?.milestones.find((m) => m.id === msId)
+    if (!g || !ms || !ms.done) return
+    await db.goals.update(goalId, { milestones: g.milestones.map((m) => (m.id === msId ? { ...m, done: false } : m)) })
+    const title = `${ms.title} (${g.title})`
+    const evs = await db.events.filter((e) => e.refTable === 'goals' && e.refId === goalId && e.kind === 'goal.milestone' && e.title === title).toArray()
+    const last = evs.sort((a, b) => b.at.localeCompare(a.at))[0]
+    if (last?.id != null) await db.events.delete(last.id)
+  })
+}
+
 export async function addMilestone(g: Goal, title: string) {
   if (g.id == null || !title.trim()) return
   await db.goals.update(g.id, { milestones: [...g.milestones, { id: newId(), title: title.trim(), done: false }] })

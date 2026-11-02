@@ -15,7 +15,7 @@ function Picker({ label, accept, onFile }: { label: string; accept: string; onFi
   const ref = useRef<HTMLInputElement>(null)
   return (
     <>
-      <button className="btn btn-primary" onClick={() => ref.current?.click()}>
+      <button className="btn" onClick={() => ref.current?.click()}>
         {label}
       </button>
       <input

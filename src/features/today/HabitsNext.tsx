@@ -6,12 +6,13 @@ import { db } from '../../db'
 import { Card } from '../../components/ui'
 import { useNow } from '../../components/useNow'
 import { addDays, relativeDay, today } from '../../lib/dates'
-import { toggleCheckIn } from '../habits/habitData'
+import { useHabitCheckIn } from '../habits/useHabitCheckIn'
 import { streak } from '../habits/stats'
 import { sortedUpcoming, timeLabel } from '../planner/layout'
 import '../habits/habits.css'
 
 export function HabitsTile() {
+  const tick = useHabitCheckIn()
   const d = today()
   const habits = useLiveQuery(() => db.habits.filter((h) => !h.archived).toArray(), [])
   const logs = useLiveQuery(() => db.habitLogs.toArray(), [])
@@ -36,7 +37,7 @@ export function HabitsTile() {
           return (
             <div key={h.id} className="habit-tile-row">
               <label className="hb-check">
-                <input type="checkbox" className="check" checked={checked} onChange={() => void toggleCheckIn(h, d)} aria-label={`${h.name} today`} />
+                <input type="checkbox" className="check" checked={checked} onChange={() => void tick(h, d)} aria-label={`${h.name} today`} />
               </label>
               <span className="name">{h.name}</span>
               {s.count > 0 && <span className="streak">{s.count}{s.unit === 'day' ? 'd' : 'w'}</span>}
