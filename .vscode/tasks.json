@@ -1,0 +1,62 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev server",
+      "type": "shell",
+      "command": "npm run dev",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE",
+          "endsPattern": "Local:"
+        }
+      },
+      "presentation": { "reveal": "silent", "panel": "dedicated" }
+    },
+    {
+      "label": "Verify",
+      "type": "shell",
+      "command": "npm run verify",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Typecheck",
+      "type": "shell",
+      "command": "npm run typecheck",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Test",
+      "type": "shell",
+      "command": "npm test",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Shots",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "C:\\Users\\bearf\\OneDrive\\Desktop\\The One\\tools\\qa.mjs",
+        "--name", "shots",
+        "--routes", "${input:routes}",
+        "--widths", "1280,375",
+        "--demo"
+      ],
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "routes",
+      "type": "promptString",
+      "description": "Comma-separated routes to screenshot",
+      "default": "home,finance"
+    }
+  ]
+}
