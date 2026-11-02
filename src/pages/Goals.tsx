@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { AREAS, db, type Area, type Goal, type Task } from '../db'
+import { AREAS, db, getSetting, type Area, type Goal, type Task } from '../db'
 import { AREA_LABEL, Card, Empty, PageHeader, Skeleton, Tabs } from '../components/ui'
 import { GoalCard } from '../features/goals/GoalCard'
 import { GoalEditor } from '../features/goals/GoalEditor'
 import { CHILD_HORIZON } from '../features/goals/progress'
+import { SuggestedLinks } from '../features/goals/SuggestedLinks'
+import { loadMetricData } from '../features/progress/metricsData'
 import { TaskEditor } from '../features/tasks/TaskEditor'
 import '../features/tasks/tasks.css'
 import '../features/goals/goals.css'
@@ -16,6 +18,8 @@ export default function Goals() {
   const goals = useLiveQuery(() => db.goals.toArray(), [])
   const tasks = useLiveQuery(() => db.tasks.toArray(), [])
   const learning = useLiveQuery(() => db.learning.toArray(), [])
+  const metricData = useLiveQuery(() => loadMetricData(), [])
+  const bodyGoal = useLiveQuery(() => getSetting<number>('body.goal', 165), [])
   const [area, setArea] = useState<Area | 'all'>('all')
   const [status, setStatus] = useState<StatusFilter>('active')
   const [editing, setEditing] = useState<Partial<Goal> | null>(null)
@@ -58,6 +62,7 @@ export default function Goals() {
         onEdit={setEditing}
         onAddChild={addChild}
         onEditTask={setEditingTask}
+        metricData={metricData}
       >
         {children && <div className="goal-children">{children.map(render)}</div>}
       </GoalCard>
@@ -110,6 +115,8 @@ export default function Goals() {
               </button>
             </div>
           )}
+
+          <SuggestedLinks goals={all} bodyGoal={bodyGoal ?? 165} />
 
           <Tabs<StatusFilter>
             value={status}
