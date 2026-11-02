@@ -52,6 +52,8 @@ test('Journal: enter Focus mode and exit with Esc', async ({ page }) => {
 
 test('Ctrl+K palette: search and navigate', async ({ page }) => {
   await page.goto('/')
+  // The Ctrl+K listener is attached when the shell mounts; wait for the Search trigger so the key press is not lost.
+  await expect(page.getByRole('button', { name: /^Search/ }).first()).toBeVisible()
   await page.keyboard.press('Control+k')
   const palette = page.getByRole('dialog', { name: 'Search and commands' })
   await expect(palette).toBeVisible()

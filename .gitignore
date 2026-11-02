@@ -33,3 +33,7 @@ pages-dist
 
 # Playwright MCP output
 .playwright-mcp/
+
+# Playwright
+test-results/
+playwright-report/
