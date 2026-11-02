@@ -1,0 +1,15 @@
+#!/bin/sh
+# Blocks a push if any tracked text file contains one of the owner's personal terms.
+# The term list lives OUTSIDE the repo (~/.northstar-tools/personal-terms.txt, one regex per line) so this file names nothing.
+# Skips images and the lockfile. Bypass is not offered here; fix the file instead.
+terms="$HOME/.northstar-tools/personal-terms.txt"
+[ -f "$terms" ] || exit 0
+hits=$(git grep -n -I -i -E -f "$terms" -- . ':!package-lock.json' 2>/dev/null)
+if [ -n "$hits" ]; then
+  echo "pre-push: personal terms found in tracked files (list is private; showing file:line only):"
+  echo "$hits" | cut -d: -f1,2 | head -20
+  echo "pre-push: push blocked. Replace real names/amounts with invented examples."
+  exit 1
+fi
+echo "pre-push: personal-data check ok"
+exit 0

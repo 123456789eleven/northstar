@@ -109,7 +109,7 @@ function HoldingSetup({ assetNames, latest }: { assetNames: string[]; latest: Ma
       <div className="inv-note">
         {mode === 'balance'
           ? shares != null && effAmount != null && p != null
-            ? `${money(effAmount)} ÷ ${money(p)} = ${fmtShares(shares)} shares (rounded to 3 decimals). Find the exact share count on your Schwab positions page later and correct it.`
+            ? `${money(effAmount)} ÷ ${money(p)} = ${fmtShares(shares)} shares (rounded to 3 decimals). Find the exact share count on your brokerage's positions page later and correct it.`
             : 'Shares = balance ÷ price. Leave balance empty to use the latest Net worth balance.'
           : shares != null && p != null
             ? `${fmtShares(shares)} shares × ${money(p)} = ${money(shares * p)}.`

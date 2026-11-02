@@ -36,7 +36,7 @@ const HELP: Record<BulkKind, { hint: string; placeholder: string }> = {
   },
   balances: {
     hint: 'Name, asset or liability, amount, date (optional, default today). Dates: 2026-09-30 or 09/30/2026.',
-    placeholder: 'Marcus Savings (HYSA), asset, 14490.94, 2026-09-30\nVisa Card, liability, 1250.00\nCar loan, debt, $8,400',
+    placeholder: 'Example Savings (HYSA), asset, 5200.00, 2026-09-30\nVisa Card, liability, 1250.00\nCar loan, debt, $8,400',
   },
 }
 

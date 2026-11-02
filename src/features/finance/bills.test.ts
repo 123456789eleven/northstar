@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Transaction } from '../../db'
 import { accrued, addMonthsISO, budgetSpend, daysToDue, detectBillSuggestions, matchesBill, monthlyEquivalent, monthsElapsed, nextDue, parseBills, serializeBills, type Bill } from './bills'
 
-const bill: Bill = { id: 'b1', name: 'State Farm', amount: 1122.03, everyMonths: 6, lastPaid: '2026-09-03', category: 'Insurance', matchText: 'state farm' }
+const bill: Bill = { id: 'b1', name: 'Example Insurance', amount: 1200, everyMonths: 6, lastPaid: '2026-09-03', category: 'Insurance', matchText: 'example insurance' }
 const tx = (date: string, amount: number, description: string, category = 'Insurance'): Transaction => ({ date, amount, description, category })
 
 describe('month math', () => {
@@ -14,7 +14,7 @@ describe('month math', () => {
     expect(addMonthsISO('2026-11-30', 3)).toBe('2027-02-28')
   })
   it('derives monthly equivalent, next due, days to due', () => {
-    expect(monthlyEquivalent(bill)).toBe(187.01)
+    expect(monthlyEquivalent(bill)).toBe(200)
     expect(nextDue(bill)).toBe('2027-03-03')
     expect(daysToDue(bill, '2027-02-01')).toBe(30)
   })
@@ -24,36 +24,36 @@ describe('month math', () => {
     expect(monthsElapsed('2026-09-03', '2026-09-02')).toBe(0)
   })
   it('accrues and caps at the amount', () => {
-    expect(accrued(bill, '2026-11-03')).toBe(374.02)
-    expect(accrued(bill, '2028-01-01')).toBe(1122.03)
+    expect(accrued(bill, '2026-11-03')).toBe(400)
+    expect(accrued(bill, '2028-01-01')).toBe(1200)
   })
 })
 
 describe('matching', () => {
   it('matches by text or by amount within 7%', () => {
-    expect(matchesBill(bill, tx('2026-09-03', -50, 'STATE FARM RO 123'))).toBe(true)
-    expect(matchesBill(bill, tx('2026-09-03', -1100, 'ACH PAYMENT'))).toBe(true)
+    expect(matchesBill(bill, tx('2026-09-03', -50, 'EXAMPLE INSURANCE RO 123'))).toBe(true)
+    expect(matchesBill(bill, tx('2026-09-03', -1150, 'ACH PAYMENT'))).toBe(true)
     expect(matchesBill(bill, tx('2026-09-03', -1300, 'ACH PAYMENT'))).toBe(false)
-    expect(matchesBill(bill, tx('2026-09-03', -1122, 'STATE FARM', 'Groceries'))).toBe(false)
-    expect(matchesBill(bill, tx('2026-09-03', 1122, 'STATE FARM refund'))).toBe(false)
+    expect(matchesBill(bill, tx('2026-09-03', -1200, 'EXAMPLE INSURANCE', 'Groceries'))).toBe(false)
+    expect(matchesBill(bill, tx('2026-09-03', 1200, 'EXAMPLE INSURANCE refund'))).toBe(false)
   })
 })
 
 describe('budgetSpend', () => {
   it('owner case: payment month no longer 600% over', () => {
-    const { spent, billInfo } = budgetSpend([tx('2026-09-03', -1122.03, 'STATE FARM INSURANCE')], [bill])
-    expect(spent.get('Insurance')).toBe(187.01)
-    expect(billInfo.get('Insurance')?.monthly).toBe(187.01)
+    const { spent, billInfo } = budgetSpend([tx('2026-09-03', -1200, 'EXAMPLE INSURANCE CO')], [bill])
+    expect(spent.get('Insurance')).toBe(200)
+    expect(billInfo.get('Insurance')?.monthly).toBe(200)
   })
   it('other months commit the monthly share', () => {
-    expect(budgetSpend([], [bill]).spent.get('Insurance')).toBe(187.01)
+    expect(budgetSpend([], [bill]).spent.get('Insurance')).toBe(200)
   })
   it('non-matching spend in the category still counts', () => {
     const { spent } = budgetSpend([tx('2026-09-10', -40, 'Renters fee')], [bill])
-    expect(spent.get('Insurance')).toBe(227.01)
+    expect(spent.get('Insurance')).toBe(240)
   })
   it('no bills leaves cash basis', () => {
-    expect(budgetSpend([tx('2026-09-03', -1122.03, 'x')], []).spent.get('Insurance')).toBe(1122.03)
+    expect(budgetSpend([tx('2026-09-03', -1200, 'x')], []).spent.get('Insurance')).toBe(1200)
   })
 })
 
@@ -67,14 +67,14 @@ describe('parse', () => {
 
 describe('suggestions', () => {
   it('finds a 6-month repeat and a big one-off', () => {
-    const txs = [tx('2026-03-03', -1122.03, 'STATE FARM INSURANCE'), tx('2026-09-03', -1122.03, 'STATE FARM INSURANCE')]
+    const txs = [tx('2026-03-03', -1200, 'EXAMPLE INSURANCE CO'), tx('2026-09-03', -1200, 'EXAMPLE INSURANCE CO')]
     const s = detectBillSuggestions(txs, [], [], '2026-11-01')
-    expect(s[0]).toMatchObject({ everyMonths: 6, amount: 1122.03, category: 'Insurance', confirm: false })
-    const one = detectBillSuggestions([tx('2026-09-03', -1122.03, 'STATE FARM INSURANCE')], [{ category: 'Insurance', monthlyLimit: 187 }], [], '2026-11-01')
-    expect(one[0]).toMatchObject({ confirm: true, amount: 1122.03 })
+    expect(s[0]).toMatchObject({ everyMonths: 6, amount: 1200, category: 'Insurance', confirm: false })
+    const one = detectBillSuggestions([tx('2026-09-03', -1200, 'EXAMPLE INSURANCE CO')], [{ category: 'Insurance', monthlyLimit: 187 }], [], '2026-11-01')
+    expect(one[0]).toMatchObject({ confirm: true, amount: 1200 })
   })
   it('skips already-tracked bills', () => {
-    const one = detectBillSuggestions([tx('2026-09-03', -1122.03, 'STATE FARM INSURANCE')], [{ category: 'Insurance', monthlyLimit: 187 }], [bill], '2026-11-01')
+    const one = detectBillSuggestions([tx('2026-09-03', -1200, 'EXAMPLE INSURANCE CO')], [{ category: 'Insurance', monthlyLimit: 187 }], [bill], '2026-11-01')
     expect(one).toEqual([])
   })
 })

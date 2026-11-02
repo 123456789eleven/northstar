@@ -162,7 +162,7 @@ function BillModal({ bill, isNew, onClose, onSave, onDelete }: { bill: Bill; isN
             </select>
           </Field>
         </div>
-        <Field label="Match text in bank description (optional)"><input className="input" value={matchText} onChange={(e) => setMatchText(e.target.value)} placeholder="state farm" /></Field>
+        <Field label="Match text in bank description (optional)"><input className="input" value={matchText} onChange={(e) => setMatchText(e.target.value)} placeholder="example insurance" /></Field>
         <Field label="Account note (optional)"><input className="input" value={account} onChange={(e) => setAccount(e.target.value)} /></Field>
         <div className="row-between">
           {!isNew ? <button type="button" className="btn btn-ghost" onClick={() => onDelete(bill)}>Delete</button> : <span />}

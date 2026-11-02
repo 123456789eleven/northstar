@@ -31,7 +31,7 @@ export function templateRows(kind: BulkKind, now: string = today()): string[][] 
     case 'balances':
       return [
         ['Name', 'Type', 'Balance', 'Date'],
-        ['Marcus Savings (HYSA)', 'asset', '14490.94', now],
+        ['Example Savings (HYSA)', 'asset', '5200.00', now],
         ['Visa Card', 'liability', '1250.00', now],
       ]
     default:

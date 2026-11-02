@@ -7,7 +7,7 @@ description: Use when a command fails or behaves oddly on this Windows machine -
 
 | Symptom | Cause / fix |
 |---|---|
-| `Author identity unknown` | Repo-local identity already set (bearfauth@gmail.com / bearf). Re-set with `git config user.email/user.name` in the repo, not global. |
+| `Author identity unknown` | Repo-local identity is already set. Re-set with `git config user.email/user.name` in the repo, not global. |
 | `LF will be replaced by CRLF` warnings | Harmless. `core.autocrlf=false` is set; filter with `2>&1 \| grep -v "LF will"`. |
 | Bash heredoc with nested quotes dies (`unexpected EOF`) | Use the Write tool for files containing quotes/backticks; heredocs only with a quoted `'EOF'` and no shell functions. |
 | `python` not found | Installed at `C:\Users\bearf\AppData\Local\Programs\Python\Python313\python.exe` (PATH may be stale in this shell). |

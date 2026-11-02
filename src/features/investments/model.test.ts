@@ -6,7 +6,7 @@ const c = (date: string, amount: number, kind: Contribution['kind'] = 'contribut
 
 describe('investments model', () => {
   it('shares from balance and price, 3 decimals', () => {
-    expect(sharesFromBalance(33700, 312.45)).toBe(107.857)
+    expect(sharesFromBalance(12000, 250)).toBe(48)
     expect(sharesFromBalance(100, 0)).toBeNull()
     expect(sharesFromBalance(-1, 10)).toBeNull()
   })
@@ -43,7 +43,7 @@ describe('investments model', () => {
       { id: 1, date: '2026-03-01', amount: -500, description: 'SCHWAB BROKERAGE ROTH' },
       { id: 2, date: '2026-03-02', amount: -40, description: 'Grocery' },
       { id: 3, date: '2026-03-03', amount: 500, description: 'IRA refund' },
-      { id: 4, date: '2026-04-01', amount: -500, description: 'Schwab' },
+      { id: 4, date: '2026-04-01', amount: -500, description: 'Brokerage transfer to Roth IRA' },
     ]
     expect(importCandidates(t, [c('2026-03-01', 500)]).map((x) => x.key)).toEqual(['4'])
   })

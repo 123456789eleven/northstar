@@ -10,9 +10,9 @@ const one = (line: string, c = ctx) => parseBulk('balances', line, c).rows[0]
 
 describe('balances parser', () => {
   it('parses a valid line, abs amount, and date formats', () => {
-    const r = one('Marcus Savings (HYSA), asset,"$14,490.94",2026-09-30')
+    const r = one('Example Savings (HYSA), asset,"$5,200.00",2026-09-30')
     expect(r.status).toBe('ok')
-    expect(r.item).toMatchObject({ kind: 'balances', name: 'Marcus Savings (HYSA)', accountKind: 'asset', balance: 14490.94, date: '2026-09-30' })
+    expect(r.item).toMatchObject({ kind: 'balances', name: 'Example Savings (HYSA)', accountKind: 'asset', balance: 5200, date: '2026-09-30' })
     expect(one('Visa, liability, -1250, 09/30/2026').item).toMatchObject({ balance: 1250, date: '2026-09-30' })
     expect(one('Cash, a, 20').item).toMatchObject({ date: '2026-10-30', accountKind: 'asset' })
   })
