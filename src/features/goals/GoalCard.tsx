@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { db, type Goal, type LearningItem, type Task } from '../../db'
 import { AREA_LABEL, Progress } from '../../components/ui'
 import { useToast } from '../../components/toastContext'
@@ -10,7 +10,20 @@ import { formatDate } from '../../lib/dates'
 import { TaskRow } from '../tasks/TaskRow'
 import { CHILD_HORIZON, HORIZON_LABEL, goalProgress, progressLabel } from './progress'
 import { RowMenu } from './GoalMenu'
-import { addMilestone, completeGoal, removeMilestone, reopenGoal, setPaused, toggleMilestone, undoMilestone } from './goalActions'
+import { goalMetric, type MetricData } from '../progress/metrics'
+import { addMilestone, autoCompleteGoal, completeGoal, undoAutoComplete, removeMilestone, reopenGoal, setPaused, toggleMilestone, undoMilestone } from './goalActions'
+
+function metricEmptyHint(source?: string) {
+  switch (source) {
+    case 'weight': return 'Log a weigh-in (capture: weight 138.2) to start.'
+    case 'protein-days': case 'calorie-days': return 'Needs a target in Food and logged meals.'
+    case 'workouts': return 'Needs a lift or workout habit with check-ins.'
+    case 'study-minutes': return 'Log a study session in Learning.'
+    case 'under-budget': return 'Needs budgets set in Finance.'
+    case 'net-worth': return 'Add balance snapshots in Finance.'
+    default: return ''
+  }
+}
 
 function XIcon() {
   return (
@@ -27,6 +40,7 @@ export function GoalCard({
   onEdit,
   onAddChild,
   onEditTask,
+  metricData,
   children,
 }: {
   goal: Goal
@@ -35,6 +49,8 @@ export function GoalCard({
   onEdit: (g: Goal) => void
   onAddChild: (g: Goal) => void
   onEditTask: (t: Task) => void
+  /** Live data for goals that track a metric automatically. */
+  metricData?: MetricData
   children?: ReactNode
 }) {
   const [adding, setAdding] = useState(false)
@@ -54,7 +70,7 @@ export function GoalCard({
   const done = goal.status === 'done'
 
   /** The completion moment: check + bar settle (~0.5s), then save, then a toast with Undo and the next step. */
-  async function finish() {
+  async function finish(auto = false) {
     if (completing || goal.id == null) return
     const id = goal.id
     if (!prefersReducedMotion()) {
@@ -62,15 +78,28 @@ export function GoalCard({
       await new Promise((r) => window.setTimeout(r, DUR.slow + 200))
     }
     const fresh = (await db.goals.get(id)) ?? goal
-    await completeGoal(fresh)
+    if (auto) {
+      if (!(await autoCompleteGoal(id))) { setCompleting(false); return }
+    } else await completeGoal(fresh)
     setCompleting(false)
     const step = nextStepAfterGoal(fresh, await db.goals.toArray())
     toast({
-      message: `Goal complete: ${goal.title}. ${step.text}`,
-      undo: async () => { const f = await db.goals.get(id); if (f) await reopenGoal(f) },
+      message: `${auto ? 'Goal reached' : 'Goal complete'}: ${goal.title}. ${step.text}`,
+      undo: async () => { if (auto) await undoAutoComplete(id); else { const f = await db.goals.get(id); if (f) await reopenGoal(f) } },
       action: step.kind === 'add-child' ? { label: childLabel(step.parent), run: () => onAddChild(step.parent) } : undefined,
     })
   }
+
+  const metric = goal.metric && metricData ? goalMetric(goal, metricData) : null
+  const autoTried = useRef(false)
+  const reached = !!metric?.met && goal.status === 'active' && goal.metric?.autoComplete !== false
+  useEffect(() => {
+    if (!reached || autoTried.current) return
+    autoTried.current = true
+    void finish(true)
+    // finish is recreated every render; only the transition into "reached" matters.
+  }, [reached]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (!reached) autoTried.current = false }, [reached])
 
   async function onMilestone(msId: string, title: string, wasDone: boolean) {
     if (goal.id == null) return
@@ -81,7 +110,7 @@ export function GoalCard({
     toast({
       message: step.allDone ? step.text : `Milestone done: ${title}. ${step.text}`,
       undo: () => undoMilestone(id, msId),
-      action: step.allDone && goal.status === 'active' ? { label: 'Complete goal', run: finish } : undefined,
+      action: step.allDone && goal.status === 'active' ? { label: 'Complete goal', run: () => finish() } : undefined,
     })
   }
   const hasMs = goal.milestones.length > 0
@@ -126,6 +155,19 @@ export function GoalCard({
         </div>
 
         {goal.why && <div className="goal-why">{goal.why}</div>}
+
+        {metric && (
+          <div className="goal-metric" data-testid="goal-metric">
+            <div className="goal-metric-top">
+              <span className="goal-metric-value">{metric.hasData ? metric.label : 'No data yet'}</span>
+              <span className="goal-metric-tag">Tracked automatically</span>
+            </div>
+            <Progress value={metric.pct} label={`${goal.title} metric progress`} />
+            <div className="goal-metric-note">
+              {metric.hasData ? metric.note || `${Math.round(metric.pct)}% there` : metricEmptyHint(goal.metric?.source)}
+            </div>
+          </div>
+        )}
 
         {(p.basis !== 'none' || collapsible) &&
           (collapsible ? (

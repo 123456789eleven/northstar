@@ -6,6 +6,7 @@ import { addDays, formatDate, parseISODate, startOfWeek, today } from '../lib/da
 import { avgRating, reviewStreak, type LockableReview } from '../features/review/summary'
 import { Digest, ReviewForm } from '../features/review/ReviewParts'
 import { RatingsTrend } from '../features/review/RatingsTrend'
+import { WeekInNumbers } from '../features/review/WeekInNumbers'
 import { InsightsWeek } from '../features/insights/InsightsCard'
 import '../features/review/review.css'
 
@@ -66,6 +67,7 @@ export default function Review() {
 
       <div className="rv-layout">
         <div className="stack" style={{ gap: 16 }}>
+          {current !== undefined && <WeekInNumbers weekOf={weekOf} snapshot={(current as LockableReview | null)?.numbers} />}
           <Digest weekOf={weekOf} />
           {weekOf === thisWeek && <InsightsWeek />}
           {current !== undefined && <ReviewForm key={weekOf} weekOf={weekOf} existing={current} planned={planned} />}

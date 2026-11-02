@@ -69,3 +69,21 @@ test('Career: log a win and see it listed', async ({ page }) => {
   await expect(page.getByRole('list', { name: 'Wins' }).getByText('Fixture shipped the new checklist')).toBeVisible()
   await expect(page.getByRole('list', { name: 'Wins' }).getByText('3h/week')).toBeVisible()
 })
+
+test('Goals: track a goal automatically from weight and see the live number', async ({ page }) => {
+  await page.goto('/#/body')
+  const capture = page.getByLabel('Quick capture')
+  await capture.fill('w 138.2')
+  await capture.press('Enter')
+  await expect(page.getByLabel('Weight in pounds')).toHaveAttribute('placeholder', /138\.2/)
+
+  await page.goto('/#/goals')
+  await page.getByRole('button', { name: 'Create your first life goal' }).click()
+  const editor = page.getByRole('dialog', { name: /New life goal/ })
+  await editor.getByLabel('Goal').fill('Reach 165 lb')
+  await editor.getByLabel('Track automatically').selectOption('weight')
+  await editor.getByLabel('Target (lb)').fill('165')
+  await editor.getByRole('button', { name: 'Save' }).click()
+  await expect(editor).toBeHidden()
+  await expect(page.getByTestId('goal-metric')).toContainText('138.2 of 165 lb')
+})

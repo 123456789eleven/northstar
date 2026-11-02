@@ -4,6 +4,7 @@ import { AREAS, db, logEvent, type Area, type ISODate } from '../../db'
 import { AREA_LABEL, Card, Field, Skeleton } from '../../components/ui'
 import { addDays, formatDate, money, toISODate } from '../../lib/dates'
 import { spendChange, weekDigest, type LockableReview } from './summary'
+import { loadWeekNumbers } from './weekNumbers'
 
 function Fact({ label, value, zero, note }: { label: string; value: string; zero?: boolean; note?: string }) {
   return (
@@ -101,13 +102,15 @@ export function ReviewForm({ weekOf, existing, planned }: { weekOf: ISODate; exi
     setStatus('saving')
     const body = { wins: wins.trim(), struggles: struggles.trim(), focusNext: focusNext.trim(), ratings }
     const lockedAt = lock ? new Date().toISOString() : undefined
+    // Locking freezes the "Week in numbers" so past weeks keep the numbers they had (optional field, no schema change).
+    const numbers = lock ? { savedAt: lockedAt, items: await loadWeekNumbers(weekOf) } : undefined
     await db.transaction('rw', db.reviews, db.events, async () => {
       const row = await db.reviews.where('weekOf').equals(weekOf).first()
       if (row?.id != null) {
-        await db.reviews.update(row.id, (lock ? { ...body, lockedAt } : body) as never)
+        await db.reviews.update(row.id, (lock ? { ...body, lockedAt, numbers } : body) as never)
         return
       }
-      const id = await db.reviews.add({ weekOf, ...body, ...(lock ? { lockedAt } : {}), createdAt: new Date().toISOString() } as never)
+      const id = await db.reviews.add({ weekOf, ...body, ...(lock ? { lockedAt, numbers } : {}), createdAt: new Date().toISOString() } as never)
       await logEvent({ area: 'personal', kind: 'review.done', title: `Reviewed the week of ${formatDate(weekOf)}`, refTable: 'reviews', refId: id })
     })
     setStatus('saved')

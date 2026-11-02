@@ -83,7 +83,7 @@ export function spendChange(spent: number, prev: number): number | null {
 }
 
 /** A review row may carry a lock timestamp (extra field on the row; no schema change, it is not indexed). */
-export type LockableReview = Review & { lockedAt?: string }
+export type LockableReview = Review & { lockedAt?: string; numbers?: import('./weekNumbers').WeekSnapshot }
 
 /**
  * Tasks due inside the week that are still open. In the current week only days already past count, so

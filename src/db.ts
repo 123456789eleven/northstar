@@ -34,6 +34,19 @@ export interface Milestone {
   done: boolean
 }
 
+/**
+ * Optional auto-metric on a Goal (src/features/progress/metrics.ts). Extra, unindexed field on the goal row:
+ * NO schema version bump (like Review.lockedAt). `autoComplete: false` is set when the owner undoes/reopens an
+ * auto-completion so it does not complete again by itself.
+ */
+export interface GoalMetric {
+  source: 'weight' | 'protein-days' | 'calorie-days' | 'workouts' | 'study-minutes' | 'under-budget' | 'net-worth' | 'manual'
+  target: number
+  direction?: 'up' | 'down'
+  window?: 'week' | 'month' | 'goal'
+  autoComplete?: false
+}
+
 export interface Goal {
   id?: number
   title: string
@@ -46,6 +59,7 @@ export interface Goal {
   milestones: Milestone[]
   createdAt: ISOTime
   completedAt?: ISOTime
+  metric?: GoalMetric
 }
 
 export type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'snack'
