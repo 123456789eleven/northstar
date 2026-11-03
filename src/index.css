@@ -17,7 +17,7 @@
   /* ink (all AA on --page and --surface) */
   --ink: #ecebf3;
   --ink-2: #a9a7ba;
-  --ink-3: #8b89a0;
+  --ink-3: #9391a8;
   /* accent */
   --accent: #8b7cf0;
   --accent-ink: #0e0b1f;
@@ -115,20 +115,21 @@
   /* ambient layer: max 3 glows, alpha <= .14, static */
   /* palette v3 "Graphite and Violet" (docs/design/game-direction.md): violet top-left, indigo right, slate bottom, alpha <= .12.
      The v2 names (--aurora-amber/-violet/-teal) are kept as aliases so site/style.css keeps resolving; new code uses --glow-*. */
-  --glow-violet: radial-gradient(60% 50% at 12% -5%, rgba(124, 109, 240, 0.12), transparent 70%);
-  --glow-indigo: radial-gradient(50% 45% at 92% 8%, rgba(91, 107, 240, 0.1), transparent 70%);
-  --glow-slate: radial-gradient(55% 50% at 70% 105%, rgba(107, 122, 144, 0.08), transparent 70%);
+  --glow-violet: radial-gradient(65% 55% at 18% 4%, rgba(124, 109, 240, 0.15), transparent 72%);
+  --glow-indigo: radial-gradient(55% 50% at 96% 28%, rgba(91, 107, 240, 0.13), transparent 72%);
+  --glow-slate: radial-gradient(60% 50% at 45% 100%, rgba(107, 122, 144, 0.11), transparent 72%);
   --aurora-amber: var(--glow-violet);
   --aurora-violet: var(--glow-indigo);
   --aurora-teal: var(--glow-slate);
   /* glass */
-  --glass-bg: rgba(255, 255, 255, 0.04);
-  --glass-bg-hover: rgba(255, 255, 255, 0.06);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-sheen: linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0) 58%);
+  --glass-bg-hover: rgba(255, 255, 255, 0.075);
   --glass-bg-strong: rgba(22, 22, 30, 0.76);
   --glass-bg-bar: rgba(16, 16, 22, 0.88);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.10);
   --glass-border-hover: rgba(255, 255, 255, 0.15);
-  --glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.09);
   --glass-blur: blur(14px) saturate(115%);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.32);
   /* gradients (fixed vocabulary) */
@@ -739,7 +740,7 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-even
 @media (prefers-reduced-motion: reduce) { :root[data-aurora-drift] body::before { animation: none; } }
 
 /* Glass: top-level cards, panels, KPI strip. Rows, tables, list items and chart plots sit on the card's own surface (no glass). */
-.card, .kpi-strip, .side-panel { background: var(--glass-bg); border-color: var(--glass-border); box-shadow: var(--glass-edge); }
+.card, .kpi-strip, .side-panel { background-color: var(--glass-bg); background-image: var(--glass-sheen); border-color: var(--glass-border); box-shadow: var(--glass-edge); }
 .card, .kpi-strip { position: relative; }
 .card::before, .kpi-strip::before, .side-panel::before, .topbar::before, .tabbar::before {
   content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; pointer-events: none;
