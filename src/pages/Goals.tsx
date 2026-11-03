@@ -7,6 +7,7 @@ import { GoalEditor } from '../features/goals/GoalEditor'
 import { CHILD_HORIZON } from '../features/goals/progress'
 import { SuggestedLinks } from '../features/goals/SuggestedLinks'
 import { loadMetricData } from '../features/progress/metricsData'
+import { useFocusTarget } from '../lib/useFocusParam'
 import { TaskEditor } from '../features/tasks/TaskEditor'
 import '../features/tasks/tasks.css'
 import '../features/goals/goals.css'
@@ -26,6 +27,12 @@ export default function Goals() {
   const [editingTask, setEditingTask] = useState<Task | null>(null)
 
   const all = useMemo(() => goals ?? [], [goals])
+  const [focusId, setFocusId] = useState<number | null>(null)
+  useFocusTarget({
+    ready: goals !== undefined,
+    exists: (id) => all.some((g) => String(g.id) === id),
+    reveal: (id) => { setStatus('all'); setArea('all'); setFocusId(Number(id)) },
+  })
 
   const { roots, kids } = useMemo(() => {
     const visible = all
@@ -63,6 +70,7 @@ export default function Goals() {
         onAddChild={addChild}
         onEditTask={setEditingTask}
         metricData={metricData}
+        focused={focusId === g.id}
       >
         {children && <div className="goal-children">{children.map(render)}</div>}
       </GoalCard>

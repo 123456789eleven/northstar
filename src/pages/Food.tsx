@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { PageHeader, Tabs } from '../components/ui'
 import { db } from '../db'
 import { today } from '../lib/dates'
+import { useFocusParam, useFocusTarget } from '../lib/useFocusParam'
 import DayView from '../features/food/DayView'
 import WeekView from '../features/food/WeekView'
 import TemplatesModal from '../features/food/TemplatesModal'
@@ -17,6 +18,13 @@ export default function Food() {
   const [date, setDate] = useState(today())
   const [modal, setModal] = useState<'targets' | 'favorites' | 'templates' | null>(null)
   const targetsRow = useLiveQuery(() => db.settings.get(TARGETS_KEY), [])
+  const focusDay = useFocusParam().focus
+  const hasMeals = useLiveQuery(async () => (focusDay ? (await db.meals.where('date').equals(focusDay).count()) > 0 : undefined), [focusDay])
+  useFocusTarget({
+    ready: !focusDay || hasMeals !== undefined,
+    exists: () => !!hasMeals,
+    reveal: (id) => { setDate(id); setView('day') },
+  })
   const targets = (targetsRow?.value as FoodTargets | undefined) ?? {}
 
   return (

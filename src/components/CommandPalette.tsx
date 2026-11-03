@@ -3,7 +3,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
-import { searchAll, scoreFields, type SearchGroup } from '../lib/search'
+import { resultHref, searchAll, scoreFields, type SearchGroup } from '../lib/search'
 import { openBulk } from '../features/bulk/openBulk'
 import { NAV } from './nav'
 import { useFocusTrap } from './useFocusTrap'
@@ -74,7 +74,7 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
         if (stale) return
         setGroups(res.map((g) => ({
           group: g.group,
-          items: g.hits.map((h) => ({ id: h.id, group: h.group, icon: GROUP_ICON[h.group] ?? 'more', label: h.label, secondary: h.secondary, run: go(h.to) })),
+          items: g.hits.map((h) => ({ id: h.id, group: h.group, icon: GROUP_ICON[h.group] ?? 'more', label: h.label, secondary: h.secondary, run: go(resultHref(h)) })),
         })))
         setSearched(true)
       }).catch(() => { if (!stale) { setGroups([]); setSearched(true) } })

@@ -87,3 +87,41 @@ test('Goals: track a goal automatically from weight and see the live number', as
   await expect(editor).toBeHidden()
   await expect(page.getByTestId('goal-metric')).toContainText('138.2 of 165 lb')
 })
+
+async function searchFor(page: import('@playwright/test').Page, text: string, optionName: RegExp) {
+  await expect(page.getByRole('button', { name: /^Search/ }).first()).toBeVisible()
+  await page.keyboard.press('Control+k')
+  const palette = page.getByRole('dialog', { name: 'Search and commands' })
+  await expect(palette).toBeVisible()
+  await page.getByRole('combobox', { name: /Search tasks/ }).fill(text)
+  await palette.getByRole('option', { name: optionName }).first().click()
+  await expect(palette).toBeHidden()
+}
+
+test('Search deep link: a person opens with their details', async ({ page }) => {
+  await page.goto('/#/people')
+  await page.getByRole('button', { name: 'Add your first person' }).click()
+  const form = page.getByRole('dialog', { name: 'Add a person' })
+  await form.getByLabel('Name').fill('Fixture Wendell Marsh')
+  await form.getByRole('button', { name: 'Add person' }).click()
+  await expect(form).toBeHidden()
+  await page.goto('/#/home')
+  await searchFor(page, 'Wendell', /Fixture Wendell Marsh/)
+  await expect(page).toHaveURL(/#\/people$/) // focus param is consumed and cleared
+  await expect(page.getByRole('dialog', { name: 'Fixture Wendell Marsh' })).toBeVisible()
+  // A second search for the same person works again, and a missing record only toasts.
+  await page.goto('/#/people?focus=99999')
+  await expect(page.getByText('That item no longer exists')).toBeVisible()
+})
+
+test('Search deep link: a task opens in the task panel', async ({ page }) => {
+  await page.goto('/#/tasks')
+  await page.getByLabel('New task').fill('Fixture renew library card')
+  await page.getByLabel('New task').press('Enter')
+  await expect(page.locator('.task-row', { hasText: 'Fixture renew library card' })).toBeVisible()
+  await page.goto('/#/habits')
+  await searchFor(page, 'library card', /Fixture renew library card/)
+  await expect(page).toHaveURL(/#\/tasks$/)
+  await expect(page.locator('.task-row.selected')).toContainText('Fixture renew library card')
+  await expect(page.locator('.task-row.focus-flash')).toBeVisible()
+})

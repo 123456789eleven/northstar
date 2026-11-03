@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Interaction, type Person } from '../db'
 import { Card, Empty, PageHeader, PageSkeleton } from '../components/ui'
 import { useToast } from '../components/toastContext'
+import { useFocusTarget } from '../lib/useFocusParam'
 import { daysBetween, formatDate, relativeDay, today } from '../lib/dates'
 import { KINDS, cadenceLabel, logContact, nextBirthday, sortPeople, undoContact } from '../features/people/people'
 import { PersonDetail, PersonForm } from '../features/people/PersonModals'
@@ -57,6 +58,12 @@ export default function People() {
     toast({ message: `Logged ${label} with ${p.name}`, undo: () => undoContact(p.id!, kind, today()) })
   }
 
+  useFocusTarget({
+    ready: people !== undefined,
+    exists: (id) => (people ?? []).some((p) => String(p.id) === id),
+    reveal: (id) => setOpenId(Number(id)),
+  })
+
   const sorted = useMemo(() => (people ? sortPeople(people, now) : []), [people, now])
   const dueCount = sorted.filter((x) => x.s.overdue).length
 
@@ -93,7 +100,7 @@ export default function People() {
                 <div key={p.id}>
                   {idx === 0 && s.overdue && <div className="ppl-group"><span>Due now</span><span className="mono">{dueCount}</span></div>}
                   {!s.overdue && (idx === 0 || sorted[idx - 1].s.overdue) && <div className="ppl-group"><span>{dueCount ? 'Up to date' : 'Everyone'}</span><span className="mono">{sorted.length - dueCount}</span></div>}
-                  <div className="ppl-row">
+                  <div className="ppl-row" data-focus-id={p.id}>
                     <button className="ppl-main" onClick={() => setOpenId(p.id!)}>
                       <span className="ppl-name">{p.name}</span>
                       <span className="ppl-meta">

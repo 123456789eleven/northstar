@@ -1,8 +1,10 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { PageHeader, Tabs } from '../components/ui'
 import { db } from '../db'
 import { monthKey } from '../lib/dates'
+import { useFocusParam, useFocusTarget } from '../lib/useFocusParam'
 import Budgets from '../features/finance/Budgets'
 import Import from '../features/finance/Import'
 import NetWorth from '../features/finance/NetWorth'
@@ -16,12 +18,25 @@ import '../features/finance/finance.css'
 type Tab = 'overview' | 'transactions' | 'budgets' | 'networth' | 'investments' | 'import'
 
 export default function Finance() {
-  const [tab, setTab] = useState<Tab>('overview')
-  const [month, setMonth] = useState(monthKey())
+  // Search deep link: ?tab=transactions&focus=<txId>&month=YYYY-MM (read once here, and again by useFocusTarget for in-page jumps).
+  const [params] = useSearchParams()
+  const linkMonth = /^\d{4}-\d{2}$/.test(params.get('month') ?? '') ? params.get('month')! : null
+  const linked = params.get('focus') != null && params.get('tab') === 'transactions'
+  const [tab, setTab] = useState<Tab>(linked ? 'transactions' : 'overview')
+  const [month, setMonth] = useState(linkMonth ?? monthKey())
   const [category, setCategory] = useState('')
-  const [jumped, setJumped] = useState(false)
+  const [jumped, setJumped] = useState(linkMonth != null)
   const latest = useLiveQuery(() => db.transactions.orderBy('date').last(), [])
   const uncategorized = useLiveQuery(() => db.transactions.where('category').equals(UNCATEGORIZED).count(), []) ?? 0
+
+  const focusId = useFocusParam().focus
+  const focusTx = useLiveQuery(async () => (focusId ? ((await db.transactions.get(Number(focusId))) ?? null) : undefined), [focusId])
+  useFocusTarget({
+    ready: !focusId || focusTx !== undefined,
+    exists: () => !!focusTx,
+    reveal: () => { setJumped(true); setTab('transactions'); setCategory(''); setMonth(linkMonth ?? focusTx!.date.slice(0, 7)) },
+    alsoClear: ['tab', 'month'],
+  })
 
   // If this month is empty but older data exists (e.g. just imported last month's CSV), open on the latest month with data.
   if (!jumped && latest !== undefined) {

@@ -147,6 +147,7 @@ export default function Transactions({ month, category, setCategory, onImport }:
             label="Transactions"
             rows={shown}
             rowKey={(t) => t.id!}
+            focusId={(t) => t.id!}
             columns={[
               { key: 'desc', header: 'Description', primary: true, render: (t) => (
                 <span className="fin-desc"><span>{t.description}</span>{t.account && <span className="tiny faint"> · {t.account}</span>}</span>
