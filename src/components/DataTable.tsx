@@ -8,10 +8,12 @@ import { Skeleton } from './ui'
 export interface Column<T> { key: string; header: string; render: (row: T) => ReactNode; align?: 'right'; primary?: boolean; value?: boolean }
 type Key = string | number
 
-export default function DataTable<T>({ columns, rows, rowKey, selectable, selected, onSelectedChange, onRow, activeKey, empty, label, loading }: {
+export default function DataTable<T>({ columns, rows, rowKey, selectable, selected, onSelectedChange, onRow, activeKey, empty, label, loading, focusId }: {
   columns: Column<T>[]; rows: T[]; rowKey: (r: T) => Key
   selectable?: boolean; selected?: Set<Key>; onSelectedChange?: (s: Set<Key>) => void
   onRow?: (r: T) => void; activeKey?: Key | null; empty?: ReactNode; label?: string; loading?: boolean
+  /** Deep-link target id for each row (data-focus-id). */
+  focusId?: (r: T) => Key
 }) {
   const sel = selected ?? new Set<Key>()
   const toggle = (k: Key) => {
@@ -50,7 +52,7 @@ export default function DataTable<T>({ columns, rows, rowKey, selectable, select
           {rows.map((r) => {
             const k = rowKey(r)
             return (
-              <tr key={k} tabIndex={0} className={`${onRow ? 'dt-click' : ''} ${activeKey === k ? 'selected' : ''}`} onClick={() => onRow?.(r)} onKeyDown={(e) => onKey(e, r)}>
+              <tr key={k} data-focus-id={focusId?.(r)} tabIndex={0} className={`${onRow ? 'dt-click' : ''} ${activeKey === k ? 'selected' : ''}`} onClick={() => onRow?.(r)} onKeyDown={(e) => onKey(e, r)}>
                 {selectable && <td className="dt-check" onClick={(e) => e.stopPropagation()}><input type="checkbox" className="check" aria-label="Select row" checked={sel.has(k)} onChange={() => toggle(k)} /></td>}
                 {columns.map((c) => <td key={c.key} className={c.align === 'right' ? 'num' : ''}>{c.render(r)}</td>)}
               </tr>
@@ -62,7 +64,7 @@ export default function DataTable<T>({ columns, rows, rowKey, selectable, select
         {rows.map((r) => {
           const k = rowKey(r)
           return (
-            <div key={k} role="listitem" tabIndex={0} className={`list-row ${onRow ? 'lr-btn' : ''} ${activeKey === k ? 'selected' : ''}`} onClick={() => onRow?.(r)} onKeyDown={(e) => onKey(e, r)}>
+            <div key={k} role="listitem" data-focus-id={focusId?.(r)} tabIndex={0} className={`list-row ${onRow ? 'lr-btn' : ''} ${activeKey === k ? 'selected' : ''}`} onClick={() => onRow?.(r)} onKeyDown={(e) => onKey(e, r)}>
               {selectable && <span className="lr-lead" onClick={(e) => e.stopPropagation()}><input type="checkbox" className="check" aria-label="Select row" checked={sel.has(k)} onChange={() => toggle(k)} /></span>}
               <span className="lr-main">
                 <span className="lr-title">{primary.render(r)}</span>

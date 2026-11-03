@@ -41,6 +41,7 @@ export function GoalCard({
   onAddChild,
   onEditTask,
   metricData,
+  focused = false,
   children,
 }: {
   goal: Goal
@@ -51,6 +52,8 @@ export function GoalCard({
   onEditTask: (t: Task) => void
   /** Live data for goals that track a metric automatically. */
   metricData?: MetricData
+  /** Deep-linked from search: expand the milestone list. */
+  focused?: boolean
   children?: ReactNode
 }) {
   const [adding, setAdding] = useState(false)
@@ -115,11 +118,11 @@ export function GoalCard({
   }
   const hasMs = goal.milestones.length > 0
   const collapsible = phone && hasMs
-  const showMs = !collapsible || msOpen || adding
+  const showMs = !collapsible || msOpen || adding || focused
 
   return (
     <div>
-      <article className={`goal goal-${goal.horizon} ${goal.status} ${completing ? 'is-done-moment' : ''}`}>
+      <article data-focus-id={goal.id} className={`goal goal-${goal.horizon} ${goal.status} ${completing ? 'is-done-moment' : ''}`}>
         <div className="goal-head">
           <div className="grow">
             <div className="goal-title">{completing && <DoneMark />}{goal.title}</div>
@@ -171,10 +174,10 @@ export function GoalCard({
 
         {(p.basis !== 'none' || collapsible) &&
           (collapsible ? (
-            <button type="button" className="goal-progress goal-progress-btn" aria-expanded={msOpen} onClick={() => setMsOpen((v) => !v)}>
+            <button type="button" className="goal-progress goal-progress-btn" aria-expanded={showMs} onClick={() => setMsOpen(!showMs)}>
               {p.basis !== 'none' ? <Progress value={p.pct} label={`${goal.title} progress`} /> : <span className="grow" />}
               <span className="goal-progress-label">{p.basis !== 'none' ? progressLabel(p) : `${goal.milestones.length} milestones`}</span>
-              <span className="goal-chev" aria-hidden>{msOpen ? '−' : '+'}</span>
+              <span className="goal-chev" aria-hidden>{showMs ? '−' : '+'}</span>
             </button>
           ) : (
             <div className="goal-progress">

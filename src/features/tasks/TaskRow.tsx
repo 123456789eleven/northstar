@@ -50,7 +50,7 @@ export function TaskRow({
     toast({ message: `Completed "${task.title}"`, undo: async () => { const fresh = await db.tasks.get(task.id!); if (fresh) await reopenTask(fresh) } })
   }
   return (
-    <div className={`task-row ${done ? 'done' : ''} ${completing ? 'completing' : ''} ${selected ? 'selected' : ''}`} data-task-id={task.id}>
+    <div className={`task-row ${done ? 'done' : ''} ${completing ? 'completing' : ''} ${selected ? 'selected' : ''}`} data-task-id={task.id} data-focus-id={task.id}>
       <span className={`task-flag ${task.priority === 1 && !done ? 'p1' : ''}`} aria-hidden />
       <label className="check-hit">
         <input

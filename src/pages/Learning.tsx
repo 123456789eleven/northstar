@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { Card, Empty, PageHeader, PageSkeleton, Progress, Tabs } from '../components/ui'
 import { db, getSetting, setSetting, type LearningItem } from '../db'
 import { startOfWeek, today } from '../lib/dates'
+import { useFocusTarget } from '../lib/useFocusParam'
 import ItemModal from '../features/learning/ItemModal'
 import { ActiveCard, DoneRow, PlannedRow } from '../features/learning/ItemCards'
 import LogView from '../features/learning/LogView'
@@ -73,6 +74,12 @@ export default function Learning() {
   const active = all.filter((i) => i.status === 'active').sort((a, b) => (weekByItem.get(b.id!) ?? 0) - (weekByItem.get(a.id!) ?? 0))
   const planned = all.filter((i) => i.status === 'planned').sort((a, b) => a.createdAt.localeCompare(b.createdAt))
   const done = all.filter((i) => i.status === 'done').sort((a, b) => (b.completedAt ?? '').localeCompare(a.completedAt ?? ''))
+
+  useFocusTarget({
+    ready: items !== undefined,
+    exists: (id) => all.some((i) => String(i.id) === id),
+    reveal: (id) => { const i = all.find((x) => String(x.id) === id); if (i) setView(i.status) },
+  })
 
   const addFor = (status: LearningItem['status']) => () => setModal({ status })
   const loaded = items !== undefined

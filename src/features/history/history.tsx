@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { AREAS, db, logEvent, type Area, type LifeEvent } from '../../db'
 import { AREA_LABEL, Empty, Field, Modal, Skeleton } from '../../components/ui'
@@ -52,10 +52,14 @@ function AreaChips<T extends string>({ value, onChange, areas, label }: { value:
   )
 }
 
-export function Timeline({ onAdd }: { onAdd: () => void }) {
+export function Timeline({ onAdd, revealAt }: { onAdd: () => void; /** Deep link: load enough pages to include the event logged at this time. */ revealAt?: string }) {
   const [area, setArea] = useState<'' | LifeEvent['area']>('')
   const [q, setQ] = useState('')
   const [pages, setPages] = useState(1)
+  useEffect(() => {
+    if (!revealAt) return
+    void db.events.where('at').above(revealAt).count().then((n) => setPages((p) => Math.max(p, Math.ceil((n + 1) / PAGE))))
+  }, [revealAt])
   const needle = q.trim().toLowerCase()
 
   const rows = useLiveQuery(() => {
@@ -111,7 +115,7 @@ export function Timeline({ onAdd }: { onAdd: () => void }) {
                 <span className="faint">{items.length}</span>
               </div>
               {items.map((e) => (
-                <div className="hist-item" key={e.id}>
+                <div className="hist-item" key={e.id} data-focus-id={e.id}>
                   <span className="hist-time">{timeOf(e)}</span>
                   <span className="chip hist-chip">{AREA_LABEL[e.area] ?? e.area}</span>
                   <span className={e.milestone ? 'hist-title is-milestone' : 'hist-title'}>{e.milestone && <span className="hist-ms" title="Milestone"><span className="sr-only">Milestone: </span></span>}<Hit text={e.title} needle={needle} /></span>

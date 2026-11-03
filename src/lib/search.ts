@@ -13,12 +13,20 @@ export interface SearchHit {
   group: SearchGroup
   label: string
   secondary: string
-  /** Existing route to open (no page supports deep links yet). */
+  /** Route to open (path only). */
   to: string
+  /** Query params that deep-link to the exact record (see resultHref). Absent for records with no page-level target. */
+  params?: Record<string, string>
   score: number
 }
 
 export interface SearchGroupResult { group: SearchGroup; hits: SearchHit[] }
+
+/** Router location for a hit: its route plus the deep-link query, e.g. `/tasks?focus=12`. Pure. */
+export function resultHref(hit: Pick<SearchHit, 'to' | 'params'>): string {
+  const qs = new URLSearchParams(hit.params ?? {}).toString()
+  return qs ? `${hit.to}?${qs}` : hit.to
+}
 
 export const PER_GROUP = 5
 export const TOTAL_CAP = 30
@@ -98,44 +106,44 @@ async function collect(query: string): Promise<Array<Row & { group: SearchGroup 
 
   for (const t of tasks) {
     add('Tasks', {
-      hit: { id: `task:${t.id}`, group: 'Tasks', label: t.title, secondary: t.status === 'done' ? 'Done' : t.due ? `Due ${t.due}` : 'Open', to: '/tasks' },
+      hit: { id: `task:${t.id}`, group: 'Tasks', label: t.title, secondary: t.status === 'done' ? 'Done' : t.due ? `Due ${t.due}` : 'Open', to: '/tasks', params: { focus: String(t.id) } },
       fields: [t.title, t.notes], recency: t.due ?? t.createdAt,
     })
   }
   for (const g of goals) {
     add('Goals', {
-      hit: { id: `goal:${g.id}`, group: 'Goals', label: g.title, secondary: `${g.horizon} goal, ${g.status}`, to: '/goals' },
+      hit: { id: `goal:${g.id}`, group: 'Goals', label: g.title, secondary: `${g.horizon} goal, ${g.status}`, to: '/goals', params: { focus: String(g.id) } },
       fields: [g.title, g.why], recency: g.createdAt,
     })
     for (const m of g.milestones ?? []) {
       add('Goals', {
-        hit: { id: `ms:${g.id}:${m.id}`, group: 'Goals', label: m.title, secondary: `Milestone of ${g.title}`, to: '/goals' },
+        hit: { id: `ms:${g.id}:${m.id}`, group: 'Goals', label: m.title, secondary: `Milestone of ${g.title}`, to: '/goals', params: { focus: String(g.id) } },
         fields: [m.title], recency: g.createdAt,
       })
     }
   }
   for (const h of habits) {
     add('Habits', {
-      hit: { id: `habit:${h.id}`, group: 'Habits', label: h.name, secondary: h.archived ? 'Archived' : `${h.perWeek}x a week`, to: '/habits' },
+      hit: { id: `habit:${h.id}`, group: 'Habits', label: h.name, secondary: h.archived ? 'Archived' : `${h.perWeek}x a week`, to: '/habits', params: { focus: String(h.id) } },
       fields: [h.name], recency: h.createdAt,
     })
   }
   for (const p of people) {
     add('People', {
-      hit: { id: `person:${p.id}`, group: 'People', label: p.name, secondary: p.relation, to: '/people' },
+      hit: { id: `person:${p.id}`, group: 'People', label: p.name, secondary: p.relation, to: '/people', params: { focus: String(p.id) } },
       fields: [p.name, p.relation], recency: p.lastContact ?? '',
     })
   }
   for (const j of journal) {
     // Private: only a short matching snippet is ever surfaced.
     add('Journal', {
-      hit: { id: `journal:${j.id}`, group: 'Journal', label: j.date, secondary: snippet(j.text, query), to: '/journal' },
+      hit: { id: `journal:${j.id}`, group: 'Journal', label: j.date, secondary: snippet(j.text, query), to: '/journal', params: { focus: j.date } },
       fields: [j.text, ...(j.tags ?? [])], recency: j.date,
     })
   }
   for (const m of meals) {
     add('Food', {
-      hit: { id: `meal:${m.id}`, group: 'Food', label: m.name, secondary: `${m.slot}, ${m.date}`, to: '/food' },
+      hit: { id: `meal:${m.id}`, group: 'Food', label: m.name, secondary: `${m.slot}, ${m.date}`, to: '/food', params: { focus: m.date } },
       fields: [m.name], recency: m.date,
     })
   }
@@ -147,25 +155,25 @@ async function collect(query: string): Promise<Array<Row & { group: SearchGroup 
   }
   for (const l of learning) {
     add('Learning', {
-      hit: { id: `learn:${l.id}`, group: 'Learning', label: l.title, secondary: `${l.kind}, ${l.status}`, to: '/learning' },
+      hit: { id: `learn:${l.id}`, group: 'Learning', label: l.title, secondary: `${l.kind}, ${l.status}`, to: '/learning', params: { focus: String(l.id) } },
       fields: [l.title, l.provider], recency: l.createdAt,
     })
   }
   for (const x of txns) {
     add('Finance', {
-      hit: { id: `txn:${x.id}`, group: 'Finance', label: x.description, secondary: `${x.date}, ${money(x.amount)}`, to: '/finance' },
+      hit: { id: `txn:${x.id}`, group: 'Finance', label: x.description, secondary: `${x.date}, ${money(x.amount)}`, to: '/finance', params: { tab: 'transactions', focus: String(x.id), month: x.date.slice(0, 7) } },
       fields: [x.description, x.category], recency: x.date,
     })
   }
   for (const c of cal) {
     add('Calendar', {
-      hit: { id: `cal:${c.id}`, group: 'Calendar', label: c.title, secondary: c.allDay || !c.start ? c.date : `${c.date} ${c.start}`, to: '/planner' },
+      hit: { id: `cal:${c.id}`, group: 'Calendar', label: c.title, secondary: c.allDay || !c.start ? c.date : `${c.date} ${c.start}`, to: '/planner', params: { focus: c.date } },
       fields: [c.title, c.location], recency: c.date,
     })
   }
   for (const e of events) {
     add('History', {
-      hit: { id: `event:${e.id}`, group: 'History', label: e.title, secondary: e.at.slice(0, 10), to: '/history' },
+      hit: { id: `event:${e.id}`, group: 'History', label: e.title, secondary: e.at.slice(0, 10), to: '/history', params: { focus: String(e.id) } },
       fields: [e.title], recency: e.at,
     })
   }

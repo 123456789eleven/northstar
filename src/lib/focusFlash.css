@@ -1,0 +1,14 @@
+/* Deep-link highlight (lib/useFocusParam.ts): outline + opacity only, ~2s. Reduced motion keeps a static ring. */
+.focus-flash {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius, 8px);
+  animation: focus-flash 2s ease-out forwards;
+}
+@keyframes focus-flash {
+  0%, 70% { outline-color: var(--accent); opacity: 1; }
+  100% { outline-color: transparent; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .focus-flash { animation: none; }
+}

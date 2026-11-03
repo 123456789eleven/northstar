@@ -10,6 +10,7 @@ import { groupByMonth, matchesSearch, moodSeries, wordCount, wordStreak } from '
 import { highlight, lookback, snippet, tagCounts } from '../features/journal/insights'
 import { MonthMap } from '../features/journal/MonthMap'
 import { useJournalPrefs } from '../features/journal/prefs'
+import { useFocusTarget } from '../lib/useFocusParam'
 import '../features/journal/journal.css'
 
 function Hl({ text, q }: { text: string; q: string }) {
@@ -63,6 +64,11 @@ export default function Journal() {
     setHidePreview(v)
     try { localStorage.setItem(HIDE_KEY, v ? '1' : '0') } catch { /* ignore */ }
   }
+  useFocusTarget({
+    ready: entries !== undefined,
+    exists: (id) => (entries ?? []).some((e) => e.date === id),
+    reveal: (id) => open(id),
+  })
   const written = (entries ?? []).filter((e) => e.text.trim()).length
 
   const current = entries?.find((e) => e.date === date)
@@ -93,6 +99,7 @@ export default function Journal() {
               </span>
             }
           >
+            <span data-focus-id={date} />
             {entries === undefined && <Skeleton lines={6} label="Loading journal" />}
             {entries !== undefined && (reading && current
               ? <ReadingView entry={current} onEdit={() => setEditing(true)} />

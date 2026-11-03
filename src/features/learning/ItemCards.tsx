@@ -33,7 +33,7 @@ export function ActiveCard({ item, weekMinutes, goalTitle, onEdit }: { item: Lea
     toast({ message: `Logged ${m}m on ${item.title}`, undo: () => undoLast(id, m) })
   }
   return (
-    <section className="card learn-card">
+    <section className="card learn-card" data-focus-id={item.id}>
       <div className="row-between learn-card-head">
         <h2 className="learn-title">{item.title}</h2>
         <button className="btn btn-ghost btn-sm" onClick={onEdit}>
@@ -81,7 +81,7 @@ export function ActiveCard({ item, weekMinutes, goalTitle, onEdit }: { item: Lea
 
 export function PlannedRow({ item, goalTitle, onEdit }: { item: LearningItem; goalTitle?: string; onEdit: () => void }) {
   return (
-    <div className="list-item learn-row">
+    <div className="list-item learn-row" data-focus-id={item.id}>
       <div className="grow">
         <div className="learn-row-title">{item.title}</div>
         <Meta item={item} goalTitle={goalTitle} />
@@ -98,7 +98,7 @@ export function PlannedRow({ item, goalTitle, onEdit }: { item: LearningItem; go
 
 export function DoneRow({ item, totalMinutes, goalTitle, onEdit }: { item: LearningItem; totalMinutes: number; goalTitle?: string; onEdit: () => void }) {
   return (
-    <div className="list-item learn-row">
+    <div className="list-item learn-row" data-focus-id={item.id}>
       <div className="grow">
         <div className="learn-row-title">{item.title}</div>
         <Meta item={item} goalTitle={goalTitle} />

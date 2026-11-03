@@ -43,7 +43,7 @@ export function HabitCard({ habit, dates, today, goalTitle, onEdit }: { habit: H
   const s = streak(dates, today, habit.perWeek)
   const wp = weekProgress(dates, today, habit.perWeek)
   return (
-    <section className={`card habit ${habit.archived ? 'archived' : ''}`}>
+    <section data-focus-id={habit.id} className={`card habit ${habit.archived ? 'archived' : ''}`}>
       <div className="habit-head">
         <div className="grow">
           <div className="habit-name">{habit.name}</div>

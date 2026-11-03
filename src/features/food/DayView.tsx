@@ -81,7 +81,7 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
   }
 
   return (
-    <div className="stack food-day">
+    <div className="stack food-day" data-focus-id={date}>
       <div className="food-stepper">
         <button className="btn" onClick={() => setDate(addDays(date, -1))} aria-label="Previous day">
           ‹

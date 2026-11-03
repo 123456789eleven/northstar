@@ -14,6 +14,7 @@ import { TaskForm } from '../features/tasks/TaskEditor'
 import { MAX_FOCUS, addTask, completeTask, reopenTask } from '../features/tasks/taskActions'
 import { groupOpenTasks, queueOrder, selectionAfterRemoval, stepSelection } from '../features/tasks/queue'
 import { useToast } from '../components/toastContext'
+import { useFocusTarget } from '../lib/useFocusParam'
 import '../features/tasks/tasks.css'
 
 export default function Tasks() {
@@ -77,6 +78,16 @@ export default function Tasks() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
+  })
+
+  useFocusTarget({
+    ready: tasks !== undefined,
+    exists: (id) => (tasks ?? []).some((t) => String(t.id) === id),
+    reveal: (id) => {
+      const t = (tasks ?? []).find((x) => String(x.id) === id)
+      if (t?.status === 'done') setShowDone(true)
+      pick(t!.id!)
+    },
   })
 
   const parsed = parseTask(draft, { goals: activeGoals })

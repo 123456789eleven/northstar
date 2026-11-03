@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { db } from '../db'
-import { scoreFields, searchAll, snippet } from './search'
+import { resultHref, scoreFields, searchAll, snippet } from './search'
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] })
@@ -91,5 +91,38 @@ describe('searchAll', () => {
     }
     const total = (await searchAll('call')).reduce((n, g) => n + g.hits.length, 0)
     expect(total).toBeLessThanOrEqual(30)
+  })
+})
+
+describe('resultHref', () => {
+  it('builds the route plus its query, or just the route when there is no target', () => {
+    expect(resultHref({ to: '/tasks', params: { focus: '7' } })).toBe('/tasks?focus=7')
+    expect(resultHref({ to: '/food' })).toBe('/food')
+  })
+
+  it('deep-links every group to its exact record', async () => {
+    const t = await task('Plan garden layout')
+    const g = await db.goals.add({ title: 'Garden shed', area: 'personal', horizon: 'year', status: 'active', createdAt: now, milestones: [{ id: 'm1', title: 'Buy garden hose', done: false }] })
+    const p = await db.people.add({ name: 'Garden Gnome', relation: 'friend', cadenceDays: 0 })
+    const h = await db.habits.add({ name: 'Garden walk', area: 'health', perWeek: 7, createdAt: now })
+    await db.journal.add({ date: '2026-05-05', text: 'Spent the afternoon in the garden, felt calm.', createdAt: now })
+    await db.meals.add({ date: '2026-05-04', slot: 'lunch', name: 'Garden salad' })
+    const l = await db.learning.add({ title: 'Garden design 101', kind: 'course', status: 'active', progress: 0, createdAt: now })
+    const x = await db.transactions.add({ date: '2026-04-28', amount: -23.5, description: 'GARDEN CENTER #4', category: 'Home' })
+    await db.calendar.add({ title: 'Garden club', date: '2026-05-09', allDay: true })
+    const e = await db.events.add({ at: now, area: 'personal', kind: 'x', title: 'Finished garden bed', milestone: false })
+    const res = await searchAll('garden')
+    const hrefs = (group: string) => res.find((r) => r.group === group)!.hits.map(resultHref)
+    expect(hrefs('Tasks')).toEqual([`/tasks?focus=${t}`])
+    expect(hrefs('Goals')).toEqual(expect.arrayContaining([`/goals?focus=${g}`]))
+    expect(hrefs('Goals')).toHaveLength(2) // the goal and its milestone both open the goal
+    expect(hrefs('People')).toEqual([`/people?focus=${p}`])
+    expect(hrefs('Habits')).toEqual([`/habits?focus=${h}`])
+    expect(hrefs('Journal')).toEqual(['/journal?focus=2026-05-05'])
+    expect(hrefs('Food')).toEqual(['/food?focus=2026-05-04'])
+    expect(hrefs('Learning')).toEqual([`/learning?focus=${l}`])
+    expect(hrefs('Finance')).toEqual([`/finance?tab=transactions&focus=${x}&month=2026-04`])
+    expect(hrefs('Calendar')).toEqual(['/planner?focus=2026-05-09'])
+    expect(hrefs('History')).toEqual([`/history?focus=${e}`])
   })
 })

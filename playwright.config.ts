@@ -1,7 +1,7 @@
 // Playwright e2e config. Needs @playwright/test installed (see docs/dev-setup.md); not part of typecheck/build.
 import { defineConfig } from '@playwright/test'
 
-const PORT = 4173
+const PORT = Number(process.env.E2E_PORT ?? 4173)
 
 export default defineConfig({
   testDir: './e2e',

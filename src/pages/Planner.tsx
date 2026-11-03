@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { Card, PageHeader } from '../components/ui'
 import { useNow } from '../components/useNow'
 import { addDays, formatDate, today } from '../lib/dates'
+import { useFocusTarget } from '../lib/useFocusParam'
 import { allDayOn, daySegments, weekDates } from '../features/planner/layout'
 import { EventModal } from '../features/planner/EventModal'
 import { DayGrid, EventButton, HabitLine, PlanPanel, TaskLine } from '../features/planner/PlannerParts'
@@ -49,6 +50,12 @@ export default function Planner() {
   const dailyHabits = (habits ?? []).filter((h) => h.perWeek >= 7)
   const habitsOpenToday = dailyHabits.filter((h) => !logSet.has(`${h.id}|${t}`)).length
   const openNew = (date: ISODate, start?: string) => setEditing({ event: null, date, start })
+
+  useFocusTarget({
+    ready: events !== undefined,
+    exists: (id) => evs.some((e) => e.date === id),
+    reveal: (id) => { setAnchor(id); setView('week') },
+  })
 
   const dayBody = (d: ISODate) => {
     const allDay = allDayOn(evs, d)
@@ -102,7 +109,7 @@ export default function Planner() {
           {view === 'week' ? (
             <div className="pl-week">
               {days.map((d) => (
-                <section key={d} className={`pl-day ${d === t ? 'today' : ''}`}>
+                <section key={d} data-focus-id={d} className={`pl-day ${d === t ? 'today' : ''}`}>
                   <button className="pl-day-head" onClick={() => { setAnchor(d); setView('day') }} aria-label={`${formatDate(d, { weekday: 'short' })} ${formatDate(d, { month: 'short', day: 'numeric' })}, open day view`}>
                     <b>{formatDate(d, { weekday: 'short' })}</b>{' '}
                     <span>{formatDate(d, { month: 'short', day: 'numeric' })}</span>
