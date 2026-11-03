@@ -54,7 +54,7 @@ export default function Finance() {
   return (
     <>
       <PageHeader
-        title="Finance"
+        title="Money"
         sub="Stays on this device. Import OFX or CSV files from your bank. No logins, no syncing."
         actions={
           showMonth && (

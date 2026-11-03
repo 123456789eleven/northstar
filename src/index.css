@@ -8,20 +8,21 @@
 
 :root {
   /* surfaces: elevation = step + 1px line */
-  --page: #0c0d10;
-  --surface: #15171c;
-  --surface-2: #1c1f26;
-  --surface-3: #242831;
-  --line: #262a33;
-  --line-strong: #343a46;
+  --page: #0b0b10;
+  --surface: #14141b;
+  --surface-2: #1b1b25;
+  --surface-3: #24242f;
+  --line: #2a2a36;
+  --line-strong: #3a3a4a;
   /* ink (all AA on --page and --surface) */
-  --ink: #eceae4;
-  --ink-2: #a6a49d;
-  --ink-3: #9a9891;
+  --ink: #ecebf3;
+  --ink-2: #a9a7ba;
+  --ink-3: #8b89a0;
   /* accent */
-  --accent: #e3b261;
-  --accent-ink: #1a1408;
-  --accent-soft: rgba(227, 178, 97, 0.12);
+  --accent: #8b7cf0;
+  --accent-ink: #0e0b1f;
+  --accent-soft: rgba(139, 124, 240, 0.14);
+  --accent-text: #a99df7; /* accent-coloured TEXT on an --accent-soft tint (accent itself is 3.96:1 there) */
   /* status (always with a label or icon) */
   --good: #6cc49a;
   --warn: #e07a5f;
@@ -61,13 +62,13 @@
   /* surfaces: aliases so --bg / --surface-1..3 read as one ladder */
   --bg: var(--page);
   --surface-1: var(--surface);
-  --line-soft: #1f232b;
+  --line-soft: #20202a;
   /* accent states */
-  --accent-hover: #ebc17a;
-  --accent-pressed: #d6a24f;
-  --accent-line: rgba(227, 178, 97, 0.45);
+  --accent-hover: #9d90f5;
+  --accent-pressed: #7a6add;
+  --accent-line: rgba(139, 124, 240, 0.45);
   --accent-ring: 0 0 0 1px var(--accent);
-  --ink-disabled: #6b6a66;
+  --ink-disabled: #6b6a7e;
   /* status soft backgrounds (with a label, never alone) */
   --good-soft: rgba(108, 196, 154, 0.12);
   --warn-soft: rgba(224, 122, 95, 0.12);
@@ -112,29 +113,55 @@
 
   /* ---- Aurora (docs/design/aurora.md, owner-approved 2026-11-02). Names shared with site/style.css. ---- */
   /* ambient layer: max 3 glows, alpha <= .14, static */
-  --aurora-amber: radial-gradient(60% 50% at 12% -5%, rgba(242, 196, 107, 0.14), transparent 70%);
-  --aurora-violet: radial-gradient(50% 45% at 92% 8%, rgba(124, 109, 240, 0.13), transparent 70%);
-  --aurora-teal: radial-gradient(55% 50% at 70% 105%, rgba(47, 191, 155, 0.1), transparent 70%);
+  /* palette v3 "Graphite and Violet" (docs/design/game-direction.md): violet top-left, indigo right, slate bottom, alpha <= .12.
+     The v2 names (--aurora-amber/-violet/-teal) are kept as aliases so site/style.css keeps resolving; new code uses --glow-*. */
+  --glow-violet: radial-gradient(60% 50% at 12% -5%, rgba(124, 109, 240, 0.12), transparent 70%);
+  --glow-indigo: radial-gradient(50% 45% at 92% 8%, rgba(91, 107, 240, 0.1), transparent 70%);
+  --glow-slate: radial-gradient(55% 50% at 70% 105%, rgba(107, 122, 144, 0.08), transparent 70%);
+  --aurora-amber: var(--glow-violet);
+  --aurora-violet: var(--glow-indigo);
+  --aurora-teal: var(--glow-slate);
   /* glass */
-  --glass-bg: rgba(255, 255, 255, 0.045);
-  --glass-bg-hover: rgba(255, 255, 255, 0.065);
-  --glass-bg-strong: rgba(24, 26, 34, 0.72);
-  --glass-bg-bar: rgba(18, 19, 24, 0.88);
-  --glass-border: rgba(255, 255, 255, 0.09);
-  --glass-border-hover: rgba(255, 255, 255, 0.16);
-  --glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  --glass-blur: blur(14px) saturate(120%);
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-bg-hover: rgba(255, 255, 255, 0.06);
+  --glass-bg-strong: rgba(22, 22, 30, 0.76);
+  --glass-bg-bar: rgba(16, 16, 22, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(255, 255, 255, 0.15);
+  --glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --glass-blur: blur(14px) saturate(115%);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.32);
   /* gradients (fixed vocabulary) */
+  /* --grad-amber keeps its name and value but is now REWARD-only (alias --grad-reward). Action/brand = --grad-violet. */
   --grad-amber: linear-gradient(135deg, #f2c46b, #e58f55);
-  --grad-violet: linear-gradient(135deg, #7c6df0, #b46bf0);
+  --grad-violet: linear-gradient(135deg, #7c6df0, #a48bf5);
+  --grad-indigo: linear-gradient(135deg, #5b6bf0, #8b7cf0);
+  --grad-slate: linear-gradient(135deg, #4a5568, #6b7a90);
   --grad-teal: linear-gradient(135deg, #2fbf9b, #2aa9c4);
-  --grad-rose: linear-gradient(135deg, #ee6a8e, #f0876a);
+  --grad-rose: linear-gradient(135deg, #c06ad0, #9a6ae0);
+  --grad-sky: linear-gradient(135deg, #4f86c6, #6aa6d6);
+  /* reward: XP, level-ups, trophies ONLY (never actions, focus or status) */
+  --reward: #f2c46b;
+  --reward-2: #e58f55;
+  --reward-ink: #1a1408;
+  --reward-soft: rgba(242, 196, 107, 0.12);
+  --reward-line: rgba(242, 196, 107, 0.4);
+  --grad-reward: var(--grad-amber);
+  /* skill hues (one per constellation star; graphics, rings and tiles, not body text) */
+  --skill-body: #c06ad0;
+  --skill-money: #2fbf9b;
+  --skill-mind: #6f7bf0;
+  --skill-career: #8b7cf0;
+  --skill-people: #6aa6d6;
   --grad-sheen-hover: rgba(255, 255, 255, 0.12);
   --grad-sheen-press: rgba(0, 0, 0, 0.1);
   --grad-ink: #fff;
   --radius-tile: 10px;
   --ease-spring: cubic-bezier(0.3, 1.35, 0.5, 1);
+  /* spring v3: a damped spring sampled into linear() (soft ~6% overshoot, settles by 60%); cubic fallback below */
+  --ease-spring-soft: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --dur-spring: 560ms;
+  --dur-moment: 900ms;
 
   color-scheme: dark;
   font-family: var(--font);
@@ -399,7 +426,7 @@ a.btn { text-decoration: none; }
   border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--line);
   font-size: 12px; color: var(--ink-2); white-space: nowrap;
 }
-.chip-accent { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.chip-accent { background: var(--accent-soft); border-color: transparent; color: var(--accent-text); }
 .status-chip { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--line); font-size: 12px; white-space: nowrap; }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: 0 0 auto; }
 .status-good { color: var(--good); } .status-warn { color: var(--warn); } .status-info { color: var(--info); } .status-neutral { color: var(--ink-2); }
@@ -706,7 +733,7 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
 html { background: var(--bg); }
 body { background: transparent; }
 /* Ambient layer: one fixed, non-interactive layer of 3 low-alpha glows. Static. The 60s drift is opt-in ([data-aurora-drift] on <html>) and never runs for reduced motion. */
-body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--aurora-amber), var(--aurora-violet), var(--aurora-teal); }
+body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--glow-violet), var(--glow-indigo), var(--glow-slate); }
 :root[data-aurora-drift] body::before { inset: -4%; animation: aurora-drift 60s ease-in-out infinite alternate; }
 @keyframes aurora-drift { to { transform: translate3d(1.5%, 1%, 0); } }
 @media (prefers-reduced-motion: reduce) { :root[data-aurora-drift] body::before { animation: none; } }
@@ -751,32 +778,35 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-even
 .more-link { background: var(--glass-bg); border-color: var(--glass-border); }
 .tabs { border-bottom-color: var(--glass-border); }
 
-/* Primary button: amber gradient. States use a sheen layer (opacity only): hover lightens, pressed darkens, disabled is neutral, focus ring unchanged. */
-.btn-primary { position: relative; isolation: isolate; background: var(--grad-amber); background-origin: border-box; border-color: transparent; color: var(--accent-ink); }
+/* Primary button: violet gradient (palette v3; amber is reward-only). States use a sheen layer (opacity only): hover lightens, pressed darkens, disabled is neutral, focus ring unchanged. */
+.btn-primary { position: relative; isolation: isolate; background: var(--grad-violet); background-origin: border-box; border-color: transparent; color: var(--accent-ink); }
 .btn-primary::after { content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; background: var(--grad-sheen-hover); opacity: 0; transition: opacity var(--dur-fast) var(--ease-out); pointer-events: none; }
-.btn-primary:hover:not(:disabled) { background: var(--grad-amber); background-origin: border-box; border-color: transparent; }
+.btn-primary:hover:not(:disabled) { background: var(--grad-violet); background-origin: border-box; border-color: transparent; }
 .btn-primary:hover:not(:disabled)::after { opacity: 1; }
-.btn-primary:active:not(:disabled) { background: var(--grad-amber); background-origin: border-box; border-color: transparent; }
+.btn-primary:active:not(:disabled) { background: var(--grad-violet); background-origin: border-box; border-color: transparent; }
 .btn-primary:active:not(:disabled)::after { background: var(--grad-sheen-press); opacity: 1; }
 .btn-primary:disabled::after { content: none; }
 
-/* Progress fill: the gradient is sized to the visible part of the slid fill (--p), so a short bar still runs amber to copper.
+/* Progress fill: the gradient is sized to the visible part of the slid fill (--p), so a short bar still runs violet to lilac.
    Tone variants keep their semantic solid colour (their selectors are more specific). */
-.progress > div { background: var(--grad-amber) right / calc(var(--p, 100) * 1%) 100% no-repeat; }
+.progress > div { background: var(--grad-violet) right / calc(var(--p, 100) * 1%) 100% no-repeat; }
 
-/* Brand mark: the amber gradient tile. */
-.brand-tile { display: inline-grid; place-items: center; width: 26px; height: 26px; flex: 0 0 26px; border-radius: var(--radius-sm); background: var(--grad-amber); box-shadow: var(--glass-edge); }
+/* Brand mark: the violet gradient tile. */
+.brand-tile { display: inline-grid; place-items: center; width: 26px; height: 26px; flex: 0 0 26px; border-radius: var(--radius-sm); background: var(--grad-violet); box-shadow: var(--glass-edge); }
 .brand-tile .brand-mark { width: 18px; height: 18px; color: var(--accent-ink); }
 
 /* Module icon tile: 36px (24px compact, filter lists only) gradient square holding a line icon. Hue follows the module
    (mapping in system.md, components/moduleHue.ts); amber carries dark ink like the primary button, the cooler hues carry white. */
-.tile { flex: 0 0 auto; display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: var(--radius-tile); background: var(--tile-grad, var(--grad-amber)); color: var(--tile-ink, var(--accent-ink)); box-shadow: var(--glass-edge); }
+.tile { flex: 0 0 auto; display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: var(--radius-tile); background: var(--tile-grad, var(--grad-violet)); color: var(--tile-ink, var(--accent-ink)); box-shadow: var(--glass-edge); }
 .tile > svg { width: var(--icon-lg); height: var(--icon-lg); }
 .tile-quiet { background: var(--surface-2); color: var(--ink-2); box-shadow: none; border: 1px solid var(--line); }
 .tile-sm { width: 24px; height: 24px; border-radius: var(--radius-sm); }
 .tile-sm > svg { width: var(--icon-sm); height: var(--icon-sm); }
-.hue-amber { --tile-grad: var(--grad-amber); --tile-ink: var(--accent-ink); }
-.hue-violet { --tile-grad: var(--grad-violet); --tile-ink: var(--grad-ink); }
+.hue-amber { --tile-grad: var(--grad-reward); --tile-ink: var(--reward-ink); } /* reward surfaces only */
+.hue-violet { --tile-grad: var(--grad-violet); --tile-ink: var(--accent-ink); }
+.hue-indigo { --tile-grad: var(--grad-indigo); --tile-ink: var(--grad-ink); }
+.hue-slate { --tile-grad: var(--grad-slate); --tile-ink: var(--grad-ink); }
+.hue-sky { --tile-grad: var(--grad-sky); --tile-ink: var(--grad-ink); }
 .hue-teal { --tile-grad: var(--grad-teal); --tile-ink: var(--grad-ink); }
 .hue-rose { --tile-grad: var(--grad-rose); --tile-ink: var(--grad-ink); }
 
@@ -803,11 +833,11 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-even
 :is(.card, .side-panel, .modal, .sheet, .cp) .kpi-strip[data-n] > .kpi-cell:nth-child(n) { background: transparent; box-shadow: none; }
 :is(.card, .side-panel, .modal, .sheet, .cp) .kpi-cell::before { content: none; }
 
-/* Hero numeral: gradient text on at most one figure per screen; solid amber where background-clip:text is unsupported.
+/* Hero numeral: gradient text on at most one figure per screen; solid violet where background-clip:text is unsupported.
    A semantic child colour (.warn) still wins because only `color` is made transparent. */
 .grad-text { color: var(--accent); }
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
-  .grad-text { background: var(--grad-amber); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .grad-text { background: var(--grad-violet); -webkit-background-clip: text; background-clip: text; color: transparent; }
 }
 
 /* Fallbacks: no backdrop-filter, or the user asked for less transparency -> solid surfaces, same borders. */

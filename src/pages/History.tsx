@@ -22,8 +22,8 @@ export default function History() {
   return (
     <>
       <PageHeader
-        title="History"
-        sub="Everything you have done, in one place."
+        title="Trophies"
+        sub="Milestones, and everything you have done, in one place."
         actions={<button className="btn btn-primary" onClick={() => setAdding(true)}>Add entry</button>}
       />
 

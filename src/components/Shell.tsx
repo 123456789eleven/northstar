@@ -1,6 +1,7 @@
-// App shell parts: desktop rail, top bar (context, capture, sync, date), phone bottom bar + More sheet.
-import { lazy, Suspense, useEffect, useState } from 'react'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+// App shell v3 ("Constellation"): desktop rail (Today, Plan, Skills with level pips, You), top bar (context, capture,
+// search, sync, date; phone: player strip), phone bottom bar (Today | Plan | capture orb | Skills | You) and the capture sheet.
+import { lazy, Suspense, useEffect, useState, type CSSProperties } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { getSetting } from '../db'
 import { parseISODate, today } from '../lib/dates'
@@ -8,12 +9,19 @@ import QuickCapture from './QuickCapture'
 import BulkHost from '../features/bulk/BulkHost'
 import { SetupHost } from '../features/onboarding/SetupWizard'
 import BottomSheet from './BottomSheet'
-import { Icon } from './Icons'
-import { NAV, NAV_GROUPS, PRIMARY_TABS } from './nav'
+import { Icon, type IconName } from './Icons'
+import { HUBS, hubForPath, navItemFor, NAV, tabActive, type HubId } from './nav'
 import { useMedia, PHONE_QUERY } from './useMedia'
+import { usePlayerState } from '../features/game/ui/playerContext'
+import { LevelBadge } from '../features/game/ui/Ring'
+import { PlayerStrip } from '../features/game/ui/Mission'
+import type { SkillId } from '../features/game/types'
+import './shell.css'
 
 const CommandPalette = lazy(() => import('./CommandPalette'))
 const OPEN_PALETTE = 'ns:palette'
+/** Opens the phone capture sheet (orb, PWA shortcut, palette "New task" on phone). */
+export const OPEN_CAPTURE_SHEET = 'ns:capture-sheet'
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
 
 /** Owns Ctrl/Cmd+K and mounts the lazy-loaded palette only once it is first opened. */
@@ -63,21 +71,63 @@ export function Mark() {
   )
 }
 
+/** The last page visited inside each hub, so Plan / Skills / You return you where you were. */
+const lastInHub: Partial<Record<HubId, string>> = {}
+function useRememberHubPath() {
+  const { pathname } = useLocation()
+  useEffect(() => { lastInHub[hubForPath(pathname)] = pathname }, [pathname])
+}
+
+interface RailEntry { to: string; label: string; icon: IconName; also?: string[]; skill?: SkillId }
+
+function RailLink({ e, pathname, pip }: { e: RailEntry; pathname: string; pip?: { level: number; progress: number } }) {
+  const active = tabActive(e, pathname)
+  const exact = pathname === e.to
+  return (
+    <Link to={e.to} className={`nav-link ${active ? 'active' : ''}`} aria-current={exact ? 'page' : active ? 'true' : undefined} style={e.skill ? ({ '--pip-c': `var(--skill-${e.skill})` } as CSSProperties) : undefined}>
+      <Icon name={e.icon} />
+      <span className="nav-label">{e.label}</span>
+      {pip && <span className="nav-pip"><LevelBadge level={pip.level} progress={pip.progress} size={22} tone={e.skill} label={`${e.label} level ${pip.level}`} /></span>}
+    </Link>
+  )
+}
+
+const RAIL_TOP: RailEntry[] = [
+  { to: '/', label: 'Today', icon: 'today' },
+  { to: '/plan', label: 'Plan', icon: 'planner', also: HUBS.plan.tabs.map((t) => t.to) },
+]
+const RAIL_SKILLS: RailEntry[] = [
+  { to: '/skills', label: 'Constellation', icon: 'star' },
+  { to: '/body', label: 'Body', icon: 'body', also: ['/food'], skill: 'body' },
+  { to: '/finance', label: 'Money', icon: 'finance', skill: 'money' },
+  { to: '/mind', label: 'Mind', icon: 'mind', also: ['/journal', '/learning'], skill: 'mind' },
+  { to: '/career', label: 'Career', icon: 'career', skill: 'career' },
+  { to: '/people', label: 'People', icon: 'people', skill: 'people' },
+]
+const RAIL_YOU: RailEntry[] = ['/you', '/history', '/review', '/ops', '/settings', '/data'].map((to) => {
+  const n = NAV.find((x) => x.to === to)!
+  return { to, label: to === '/you' ? 'Overview' : n.label, icon: n.icon, also: to === '/data' ? ['/ontology'] : undefined }
+})
+
 export function Rail() {
+  const { pathname } = useLocation()
+  const p = usePlayerState()
+  const showPips = !p.calm && !p.loading
+  const level = Object.fromEntries(p.skills.map((s) => [s.id, s]))
   return (
     <nav className="sidebar" aria-label="Main">
       <div className="brand"><Mark />Northstar</div>
-      {NAV_GROUPS.map((g) => (
-        <div key={g} className="nav-group" role="group" aria-label={g}>
-          <div className="nav-section">{g}</div>
-          {NAV.filter((n) => n.group === g).map((n) => (
-            <NavLink key={n.to} to={n.to} end={n.to === '/'} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              <Icon name={n.icon} />
-              {n.label}
-            </NavLink>
-          ))}
-        </div>
-      ))}
+      <div className="nav-group">{RAIL_TOP.map((e) => <RailLink key={e.to} e={e} pathname={pathname} />)}</div>
+      <div className="nav-group" role="group" aria-labelledby="rail-skills">
+        <div className="nav-section" id="rail-skills">Skills</div>
+        {RAIL_SKILLS.map((e) => (
+          <RailLink key={e.to} e={e} pathname={pathname} pip={showPips && e.skill ? { level: level[e.skill].level, progress: level[e.skill].xpForNext ? level[e.skill].xpIntoLevel / level[e.skill].xpForNext : 0 } : undefined} />
+        ))}
+      </div>
+      <div className="nav-group" role="group" aria-labelledby="rail-you">
+        <div className="nav-section" id="rail-you">You</div>
+        {RAIL_YOU.map((e) => <RailLink key={e.to} e={e} pathname={pathname} />)}
+      </div>
     </nav>
   )
 }
@@ -115,29 +165,31 @@ export function SyncChip({ dotOnly = false }: { dotOnly?: boolean }) {
 
 function useRouteContext() {
   const { pathname } = useLocation()
-  const item = NAV.find((n) => (n.to === '/' ? pathname === '/' : pathname.startsWith(n.to)))
-  return item ?? { label: 'Northstar', group: '' }
+  const item = navItemFor(pathname)
+  if (!item) return { label: 'Northstar', group: '' }
+  return { label: item.label, group: item.group === item.label ? '' : item.group }
 }
 
 const dateLabel = () => parseISODate(today()).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
 
 export function TopBar() {
   const phone = useMedia(PHONE_QUERY)
-  const [open, setOpen] = useState(false)
   const ctx = useRouteContext()
   const { search } = useLocation()
   const navigate = useNavigate()
+  const openCapture = () => (phone ? window.dispatchEvent(new Event(OPEN_CAPTURE_SHEET)) : window.dispatchEvent(new KeyboardEvent('keydown', { key: '/' })))
   // PWA shortcut "Quick capture" opens #/?capture=1: focus the capture line (desktop) or open the sheet (phone).
   useEffect(() => {
     if (!new URLSearchParams(search).has('capture')) return
     navigate('/', { replace: true })
-    setTimeout(() => (phone ? setOpen(true) : window.dispatchEvent(new KeyboardEvent('keydown', { key: '/' }))), 0)
+    setTimeout(openCapture, 0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, phone, navigate])
   // "New task" in the palette: focus the capture line (desktop) or open the capture sheet (phone).
   useEffect(() => {
-    const onCapture = () => (phone ? setOpen(true) : window.dispatchEvent(new KeyboardEvent('keydown', { key: '/' })))
-    window.addEventListener('ns:capture', onCapture)
-    return () => window.removeEventListener('ns:capture', onCapture)
+    window.addEventListener('ns:capture', openCapture)
+    return () => window.removeEventListener('ns:capture', openCapture)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phone])
   return (
     <header className="topbar">
@@ -147,67 +199,88 @@ export function TopBar() {
       </div>
       {!phone && <div className="topbar-capture"><QuickCapture /></div>}
       <div className="topbar-right">
+        {phone && <PlayerStrip />}
         <SearchButton compact={phone} />
         <SyncChip dotOnly={phone} />
         {!phone && <span className="topbar-date mono">{dateLabel()}</span>}
-        {phone && (
-          <button className="icon-btn" onClick={() => setOpen(true)} aria-label="Quick capture">
-            <Icon name="capture" size={18} />
-          </button>
-        )}
       </div>
       <PaletteHost />
       <BulkHost />
       <SetupHost />
-      {phone && open && (
-        <BottomSheet title="Capture" onClose={() => setOpen(false)}>
-          <QuickCapture autoFocus />
-        </BottomSheet>
-      )}
     </header>
   )
 }
 
-export function TabBar() {
-  const [open, setOpen] = useState(false)
-  const { pathname } = useLocation()
-  const tabs = PRIMARY_TABS.map((to) => NAV.find((n) => n.to === to)!)
-  const moreActive = !PRIMARY_TABS.some((to) => (to === '/' ? pathname === '/' : pathname.startsWith(to)))
+const QUICK_LOGS: Array<{ label: string; icon: IconName; text: string; hint: string }> = [
+  { label: 'Weigh-in', icon: 'weight', text: 'w ', hint: 'w 182.4' },
+  { label: 'Meal', icon: 'food', text: 'ate ', hint: 'ate oats 350cal' },
+  { label: 'Win', icon: 'win', text: 'win: ', hint: 'win: shipped it #career' },
+  { label: 'Journal', icon: 'journal', text: 'journal: ', hint: 'journal: long walk' },
+]
+
+/** Phone capture sheet: the same one-line capture (same parser and save path) plus one-tap quick-log prefixes. */
+function CaptureSheet({ onClose }: { onClose: () => void }) {
+  const [seed, setSeed] = useState<{ text: string; n: number } | undefined>()
+  const [hint, setHint] = useState('')
   return (
-    <>
-      <nav className="tabbar" aria-label="Main mobile">
-        {tabs.map((n) => (
-          <NavLink key={n.to} to={n.to} end={n.to === '/'} className={({ isActive }) => `tab-item ${isActive ? 'active' : ''}`}>
-            <Icon name={n.icon} size={20} />
-            <span>{n.label}</span>
-          </NavLink>
+    <BottomSheet title="Capture" onClose={onClose}>
+      <QuickCapture autoFocus seed={seed} />
+      <div className="qlog" role="group" aria-label="Quick logs">
+        {QUICK_LOGS.map((q) => (
+          <button key={q.label} type="button" className="qlog-btn" onClick={() => { setSeed({ text: q.text, n: Date.now() }); setHint(q.hint) }}>
+            <Icon name={q.icon} size={18} />
+            <span>{q.label}</span>
+          </button>
         ))}
-        <button className={`tab-item ${moreActive ? 'active' : ''}`} onClick={() => setOpen(true)} aria-haspopup="dialog">
-          <Icon name="more" size={20} />
-          <span>More</span>
+      </div>
+      <p className="qlog-help">{hint ? <>For example <span className="mono">{hint}</span>, then Enter.</> : <>One line: a task, <span className="mono">$12 lunch</span>, <span className="mono">w 182.4</span>, <span className="mono">ate oats 350cal</span>, <span className="mono">win: …</span>, <span className="mono">journal: …</span></>}</p>
+    </BottomSheet>
+  )
+}
+
+export function CaptureHost() {
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    const onOpen = () => setOpen(true)
+    window.addEventListener(OPEN_CAPTURE_SHEET, onOpen)
+    return () => window.removeEventListener(OPEN_CAPTURE_SHEET, onOpen)
+  }, [])
+  return open ? <CaptureSheet onClose={() => setOpen(false)} /> : null
+}
+
+const BAR: Array<{ hub: HubId; to: string; label: string; icon: IconName }> = [
+  { hub: 'today', to: '/', label: 'Today', icon: 'today' },
+  { hub: 'plan', to: '/plan', label: 'Plan', icon: 'planner' },
+  { hub: 'skills', to: '/skills', label: 'Skills', icon: 'star' },
+  { hub: 'you', to: '/you', label: 'You', icon: 'user' },
+]
+
+export function TabBar() {
+  const { pathname } = useLocation()
+  useRememberHubPath()
+  const hub = hubForPath(pathname)
+  const item = (b: (typeof BAR)[number]) => {
+    const active = hub === b.hub
+    // Re-tapping the current hub goes to its overview; coming from elsewhere returns to the last page you had open there.
+    const to = active || b.hub === 'today' ? b.to : (lastInHub[b.hub] ?? b.to)
+    return (
+      <Link key={b.hub} to={to} className={`tab-item ${active ? 'active' : ''}`} aria-current={active ? (pathname === b.to ? 'page' : 'true') : undefined}>
+        <Icon name={b.icon} size={22} />
+        <span>{b.label}</span>
+      </Link>
+    )
+  }
+  return (
+    <nav className="tabbar" aria-label="Main mobile">
+      {item(BAR[0])}
+      {item(BAR[1])}
+      <div className="tab-orb-slot">
+        <button type="button" className="tab-orb" aria-label="Capture" aria-haspopup="dialog" onClick={() => window.dispatchEvent(new Event(OPEN_CAPTURE_SHEET))}>
+          <Icon name="plus" size={22} />
         </button>
-      </nav>
-      {open && (
-        <BottomSheet title="More" onClose={() => setOpen(false)}>
-          {NAV_GROUPS.map((g) => {
-            const items = NAV.filter((n) => n.group === g && !PRIMARY_TABS.includes(n.to))
-            if (!items.length) return null
-            return (
-              <div key={g} className="more-group">
-                <div className="nav-section">{g}</div>
-                <div className="more-grid">
-                  {items.map((n) => (
-                    <NavLink key={n.to} to={n.to} onClick={() => setOpen(false)} className={({ isActive }) => `more-link ${isActive ? 'active' : ''}`}>
-                      <Icon name={n.icon} />
-                      {n.label}
-                    </NavLink>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-        </BottomSheet>
-      )}
-    </>
+      </div>
+      {item(BAR[2])}
+      {item(BAR[3])}
+    </nav>
   )
 }

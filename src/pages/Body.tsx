@@ -131,7 +131,7 @@ export default function Body() {
                 ))}
               </div>
             }
-            legend={[{ label: '7-day average', color: '#e3b261' }, { label: 'Daily weigh-ins (faint)', color: 'rgba(227,178,97,0.4)' }]}
+            legend={[{ label: '7-day average', color: '#8b7cf0' }, { label: 'Daily weigh-ins (faint)', color: 'rgba(139,124,240,0.4)' }]}
             table={
               <DataTable
                 label="Weigh-ins"

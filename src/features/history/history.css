@@ -56,7 +56,7 @@
 .hist-chips { display: flex; flex-wrap: wrap; gap: 6px; flex-basis: 100%; }
 .hist-chipbtn { min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: none; color: var(--ink-2); font: inherit; font-size: 13px; cursor: pointer; }
 .hist-chipbtn:hover { color: var(--ink); }
-.hist-chipbtn[aria-pressed='true'] { background: var(--accent-soft); border-color: transparent; color: var(--accent); font-weight: 500; }
+.hist-chipbtn[aria-pressed='true'] { background: var(--accent-soft); border-color: transparent; color: var(--accent-text); font-weight: 500; }
 .hist-result { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: -4px 0 10px; }
 .hist-week { margin-bottom: 18px; }
 .hist-week-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 0 0 2px; font: inherit; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
@@ -74,7 +74,7 @@
 }
 
 /* Phase 3: each week is one surface; day headers stick under the top bar; area chips stay neutral (a milestone is
-   marked by a small accent dot and weight, not an amber chip); remove buttons appear on hover or focus. */
+   marked by a small accent dot and weight, not a coloured chip); remove buttons appear on hover or focus. */
 .hist-week { margin-bottom: var(--sp-5); }
 .hist-week-head { font-family: var(--mono); font-size: var(--text-label); font-weight: 500; letter-spacing: var(--track-label); color: var(--ink-2); margin: 0 0 var(--sp-2); }
 .hist-week-head .faint { font-family: var(--font); font-size: var(--text-xs); color: var(--ink-3); }
@@ -85,7 +85,7 @@
 .hist-day-head .faint { color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .hist-item { padding: var(--list-py) var(--pad); min-height: var(--row); border-bottom-color: var(--line-soft); transition: background-color var(--dur-fast) var(--ease-out); }
 .hist-item:hover { background: var(--surface-2); }
-.hist-ms { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-right: 8px; vertical-align: 2px; }
+.hist-ms { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--reward); margin-right: 8px; vertical-align: 2px; }
 .hist-del { opacity: 0; transition: opacity var(--dur-fast) var(--ease-out); }
 .hist-item:hover .hist-del, .hist-del:focus-visible { opacity: 1; }
 @media (hover: none) { .hist-del { opacity: 0.6; } }

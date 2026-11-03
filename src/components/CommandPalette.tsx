@@ -24,7 +24,7 @@ interface Item {
 
 const GROUP_ICON: Record<string, IconName> = {
   Tasks: 'tasks', Goals: 'goals', Habits: 'habits', People: 'people', Journal: 'journal', Food: 'food',
-  Learning: 'learning', Finance: 'finance', Calendar: 'planner', History: 'history',
+  Learning: 'learning', Finance: 'finance', Calendar: 'calendar', History: 'trophy',
 }
 
 /** Bold the first case-insensitive match of the query inside a label (no colour: weight only). */
@@ -58,7 +58,8 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
       { id: 'act:density', group: 'Actions', icon: 'settings', label: 'Switch density', secondary: 'Comfortable or compact, this device', run: () => { onClose(); void getSetting(DENSITY_KEY, 'comfortable').then((d) => setDensity(normalizeDensity(d) === 'compact' ? 'comfortable' : 'compact')) } },
       { id: 'act:keys', group: 'Actions', icon: 'command', label: 'Keyboard shortcuts', secondary: 'Press ? anywhere', run: () => { onClose(); setTimeout(openShortcuts, 0) } },
     ]
-    const pages = NAV.map((n): Item => ({ id: `nav:${n.to}`, group: 'Go to', icon: n.icon, label: n.label, secondary: n.group, run: go(n.to) }))
+    // Destinations follow the hub IA (nav.ts); the old page name rides in the secondary line and in search ("Finance" finds Money).
+    const pages = NAV.map((n): Item => ({ id: `nav:${n.to}`, group: 'Go to', icon: n.icon, label: n.label, secondary: n.label === n.group ? 'Hub' : n.aka ? `${n.group} · ${n.aka}` : n.group, run: go(n.to) }))
     return [...actions, ...pages]
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -91,7 +92,7 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
         { name: 'Go to', items: baseItems.filter((i) => i.group === 'Go to') },
       ]
     }
-    const cmds = baseItems.filter((i) => scoreFields([i.label, i.id === 'act:keys' ? 'help shortcuts keys' : i.id === 'act:density' ? 'compact comfortable spacing' : ''], q) > 0)
+    const cmds = baseItems.filter((i) => scoreFields([i.label, i.id === 'act:keys' ? 'help shortcuts keys' : i.id === 'act:density' ? 'compact comfortable spacing' : i.id === 'act:capture' ? 'capture log weigh-in meal win' : i.group === 'Go to' ? i.secondary : ''], q) > 0)
     const out: Array<{ name: string; items: Item[] }> = []
     const acts = cmds.filter((i) => i.group === 'Actions')
     const pgs = cmds.filter((i) => i.group === 'Go to')

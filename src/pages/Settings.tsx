@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { PageHeader } from '../components/ui'
 import { AboutSection, BackupSection, DangerSection, ProfileSection, StatusStrip, StorageSection } from '../features/settings/Sections'
 import { SyncSection } from '../features/settings/SyncSection'
+import { GameSection } from '../features/settings/GameSection'
 import '../features/settings/settings.css'
 
 const SECTIONS = [
@@ -9,6 +11,7 @@ const SECTIONS = [
   { id: 'set-backup', label: 'Backup & restore' },
   { id: 'set-data', label: 'Data on this device' },
   { id: 'set-prefs', label: 'Preferences' },
+  { id: 'set-game', label: 'Game' },
   { id: 'set-about', label: 'About & privacy' },
   { id: 'set-danger', label: 'Danger zone' },
 ]
@@ -42,9 +45,14 @@ function SectionIndex() {
 }
 
 export default function Settings() {
+  const { hash } = useLocation()
+  // "Why do I earn XP?" links to /settings#game.
+  useEffect(() => {
+    if (hash === '#game') requestAnimationFrame(() => document.getElementById('set-game')?.scrollIntoView({ block: 'start' }))
+  }, [hash])
   return (
     <>
-      <PageHeader title="Settings" sub="Sync, backups, data on this device and privacy." />
+      <PageHeader title="Settings" sub="Sync, backups, data on this device, the game layer and privacy." />
       <StatusStrip />
       <div className="set-layout">
         <SectionIndex />
@@ -53,6 +61,7 @@ export default function Settings() {
           <div id="set-backup" className="set-anchor"><BackupSection /></div>
           <div id="set-data" className="set-anchor"><StorageSection /></div>
           <div id="set-prefs" className="set-anchor"><ProfileSection /></div>
+          <div id="set-game" className="set-anchor"><GameSection /></div>
           <div id="set-about" className="set-anchor"><AboutSection /></div>
           <div id="set-danger" className="set-anchor set-danger-wrap"><DangerSection /></div>
         </div>

@@ -8,7 +8,8 @@ import { saveCapture, type Saved } from '../features/tasks/captureSave'
 import { openBulk } from '../features/bulk/openBulk'
 import '../features/tasks/tasks.css'
 
-export default function QuickCapture({ autoFocus = false }: { autoFocus?: boolean }) {
+/** seed: put a prefix in the line and focus it (the capture sheet's one-tap quick logs: "w ", "ate ", "win: ", "journal: "). */
+export default function QuickCapture({ autoFocus = false, seed }: { autoFocus?: boolean; seed?: { text: string; n: number } }) {
   const [text, setText] = useState('')
   const [saved, setSaved] = useState<Saved | null>(null)
   const ref = useRef<HTMLInputElement>(null)
@@ -42,6 +43,19 @@ export default function QuickCapture({ autoFocus = false }: { autoFocus?: boolea
   }, [])
 
   useEffect(() => () => window.clearTimeout(timer.current), [])
+
+  // A new seed replaces the line (render-time update), then focus lands at its end.
+  const [lastSeed, setLastSeed] = useState(seed)
+  if (seed !== lastSeed) {
+    setLastSeed(seed)
+    if (seed) { setText(seed.text); setSaved(null) }
+  }
+  useEffect(() => {
+    const el = ref.current
+    if (!seed || !el) return
+    el.focus()
+    el.setSelectionRange(seed.text.length, seed.text.length)
+  }, [seed])
 
   async function submit() {
     const result = await saveCapture(parsed)

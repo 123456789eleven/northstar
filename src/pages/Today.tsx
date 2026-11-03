@@ -17,6 +17,7 @@ import { GlanceTiles } from '../features/today/GlanceTiles'
 import { HabitsTile, NextUp } from '../features/today/HabitsNext'
 import { FirstRunCard } from '../features/onboarding/FirstRunCard'
 import { InsightsCard } from '../features/insights/InsightsCard'
+import { MissionBoard } from '../features/game/ui/Mission'
 import '../features/tasks/tasks.css'
 import '../features/today/today.css'
 
@@ -97,6 +98,9 @@ export default function Today() {
       />
 
       <FirstRunCard />
+
+      {/* Game layer: today's self-completing quests. Calm mode renders nothing here, leaving the classic Today below. */}
+      <MissionBoard />
 
       {(
         <>

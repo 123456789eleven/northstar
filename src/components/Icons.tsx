@@ -25,6 +25,16 @@ const P = {
   arrowDown: <path d="M8 3v10M3.5 8.5L8 13l4.5-4.5" />,
   flat: <path d="M3 8h10" />,
   capture: <path d="M2.5 13.5l1-3.5 7-7 2.5 2.5-7 7zM9 4.5l2.5 2.5" />,
+  calendar: <><rect x="2" y="3" width="12" height="11" rx="1.5" /><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3M5 9.5h2M9 9.5h2M5 12h2" /></>,
+  star: <path d="M8 1.8l1.5 4.7 4.7 1.5-4.7 1.5L8 14.2l-1.5-4.7L1.8 8l4.7-1.5z" />,
+  user: <><circle cx="8" cy="8" r="6" /><circle cx="8" cy="6.6" r="2" /><path d="M4.3 12.3c.9-1.4 2.1-2.1 3.7-2.1s2.8.7 3.7 2.1" /></>,
+  mind: <path d="M6 14h4M6.3 11.8h3.4M8 2a4 4 0 0 0-2.4 7.2c.4.3.7.8.7 1.3v1.3h3.4v-1.3c0-.5.3-1 .7-1.3A4 4 0 0 0 8 2z" />,
+  career: <><rect x="2" y="5" width="12" height="8.5" rx="1.5" /><path d="M6 5V3.5h4V5M2 9h12" /></>,
+  trophy: <path d="M5 2.5h6V6a3 3 0 0 1-6 0zM5 3.5H2.5v.8A2.6 2.6 0 0 0 5.2 7M11 3.5h2.5v.8A2.6 2.6 0 0 1 10.8 7M8 9v3M5.5 13.5h5" />,
+  check: <path d="M3.5 8.5l3 3 6-6.5" />,
+  close: <path d="M4 4l8 8M12 4l-8 8" />,
+  weight: <><rect x="2.5" y="2.5" width="11" height="11" rx="2.5" /><path d="M5.5 6.5a3.5 3.5 0 0 1 5 0L8 8.5" /></>,
+  win: <path d="M3 13.5V2.5M3 3h8.5l-1.8 2.8 1.8 2.7H3" />,
 } satisfies Record<string, ReactNode>
 
 export type IconName = keyof typeof P
