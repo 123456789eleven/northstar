@@ -63,3 +63,24 @@
 .pl-day-head:hover b { text-decoration: underline; text-decoration-color: var(--ink-3); text-underline-offset: 3px; }
 .pl-side .card .empty { padding: 0; }
 .pl-bar .pl-title { font-variant-numeric: tabular-nums; }
+
+/* Week time axis (wide): 44px axis + 7 columns; all-day lane on top; hour lines are the column background. */
+.pl-wk { padding: 0; overflow: hidden; }
+.pl-wk-row { display: grid; grid-template-columns: 52px repeat(7, minmax(0, 1fr)); }
+.pl-wk-heads { border-bottom: 1px solid var(--line); }
+.pl-wk-head { display: flex; align-items: baseline; gap: 6px; padding: 8px 8px; min-height: 36px; background: none; border: 0; border-left: 1px solid var(--line-soft); color: inherit; font: inherit; cursor: pointer; text-align: left; }
+.pl-wk-head b { font-size: 13px; font-weight: 600; }
+.pl-wk-head span { font-size: 12px; color: var(--ink-3); }
+.pl-wk-head.today b { color: var(--accent); }
+.pl-wk-head:hover b { text-decoration: underline; text-underline-offset: 3px; }
+.pl-wk-allday { border-bottom: 1px solid var(--line); }
+.pl-wk-axis-label { font-size: 11px; color: var(--ink-3); padding: 8px 6px 0 0; text-align: right; }
+.pl-wk-cell { display: flex; flex-direction: column; gap: 4px; padding: 6px; min-width: 0; min-height: 40px; border-left: 1px solid var(--line-soft); }
+.pl-wk-cell.today, .pl-wk-col.today { background: var(--surface-2); }
+.pl-wk-axis { position: relative; }
+.pl-wk-axis i { position: absolute; right: 6px; transform: translateY(-50%); font-style: normal; font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+.pl-wk-axis i:first-child { transform: none; margin-top: 2px; }
+.pl-wk-col { position: relative; min-width: 0; border-left: 1px solid var(--line-soft); cursor: copy; }
+.pl-wk-col .pl-ev { position: absolute; min-height: 20px; overflow: hidden; width: auto; }
+.pl-wk-col .pl-now { left: 0; right: 0; }
+.pl-wk-line { position: absolute; left: 0; right: 0; border-top: 1px solid var(--line-soft); pointer-events: none; }

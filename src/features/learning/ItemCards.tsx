@@ -1,8 +1,9 @@
-import { useState, type CSSProperties } from 'react'
+import { useState } from 'react'
 import { db, type LearningItem } from '../../db'
 import { formatDate } from '../../lib/dates'
 import { useToast } from '../../components/toastContext'
 import { addSession, undoLast, completeItem, fmtMinutes, KIND_LABEL, startItem } from './learningData'
+import { Progress } from '../../components/ui'
 
 function Meta({ item, goalTitle }: { item: LearningItem; goalTitle?: string }) {
   return (
@@ -47,10 +48,11 @@ export function ActiveCard({ item, weekMinutes, goalTitle, onEdit }: { item: Lea
           <span className="muted">{weekMinutes ? `${fmtMinutes(weekMinutes)} this week` : 'Nothing this week'}</span>
           <span className="mono">{value}%</span>
         </div>
+        <div className="learn-bar">
+        <Progress value={value} label={`${item.title} progress`} />
         <input
           type="range"
           className="learn-range"
-          style={{ '--v': `${value}%` } as CSSProperties}
           min={0}
           max={100}
           step={5}
@@ -61,6 +63,7 @@ export function ActiveCard({ item, weekMinutes, goalTitle, onEdit }: { item: Lea
           onKeyUp={commit}
           onBlur={commit}
         />
+        </div>
       </div>
 
       <div className="row wrap learn-actions">

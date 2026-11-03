@@ -152,7 +152,7 @@ export function Empty({ children, title, action, icon }: { children?: ReactNode;
   const mod = title && icon !== false ? (icon ?? moduleForPath(pathname)) : undefined
   return (
     <div className={`empty ${mod ? 'empty-has-tile' : ''}`}>
-      {mod && <ModuleTile icon={mod} />}
+      {mod && <ModuleTile icon={mod} quiet />}
       <div className="empty-main">
         {title && <div className="empty-title">{title}</div>}
         {children && <div className="empty-body">{children}</div>}

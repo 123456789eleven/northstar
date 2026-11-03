@@ -1,11 +1,13 @@
+import type { ReactNode } from 'react'
 import type { CalendarEvent, Habit, ISODate, Task } from '../../db'
+import { formatDate } from '../../lib/dates'
 import { db } from '../../db'
 import { Card, Empty } from '../../components/ui'
 import { toggleDone } from '../tasks/taskActions'
 import { useHabitCheckIn } from '../habits/useHabitCheckIn'
 import { isGoogleEvent } from '../gcal/help'
 import '../gcal/gcal.css'
-import { DAY_MIN, daySegments, fmtTime, hourRange, layoutSegments, timeLabel } from './layout'
+import { DAY_MIN, allDayOn, daySegments, fmtTime, hourRange, layoutSegments, timeLabel } from './layout'
 
 const PX_PER_HOUR = 48
 
@@ -104,5 +106,76 @@ export function PlanPanel({ tasks, date, label }: { tasks: Task[]; date: ISODate
         </>
       )}
     </Card>
+  )
+}
+
+/**
+ * Week time axis (wide screens): day heads, an all-day lane on top (all-day events, tasks due, birthdays), then one shared
+ * hour axis with each day as a column and a now-line across today's column. Clicking an empty hour starts an event there.
+ */
+export function WeekGrid({ days, today, events, nowMin, allDayExtras, onOpen, onNew, onOpenDay }: {
+  days: ISODate[]; today: ISODate; events: CalendarEvent[]; nowMin: number
+  allDayExtras: (d: ISODate) => ReactNode
+  onOpen: (e: CalendarEvent) => void; onNew: (d: ISODate, start: string) => void; onOpenDay: (d: ISODate) => void
+}) {
+  const perDay = days.map((d) => ({ d, segs: daySegments(events, d) }))
+  const [lo, hi] = hourRange(perDay.flatMap((x) => x.segs))
+  const hours = Array.from({ length: hi - lo }, (_, i) => lo + i)
+  const y = (min: number) => ((min - lo * 60) / 60) * PX_PER_HOUR
+  return (
+    <div className="card pl-wk" role="group" aria-label="Week schedule">
+      <div className="pl-wk-row pl-wk-heads">
+        <span />
+        {days.map((d) => (
+          <button key={d} className={`pl-wk-head ${d === today ? 'today' : ''}`} onClick={() => onOpenDay(d)} aria-label={`${formatDate(d, { weekday: 'short' })} ${formatDate(d, { month: 'short', day: 'numeric' })}, open day view`}>
+            <b>{formatDate(d, { weekday: 'short' })}</b> <span>{formatDate(d, { month: 'short', day: 'numeric' })}</span>
+          </button>
+        ))}
+      </div>
+      <div className="pl-wk-row pl-wk-allday">
+        <span className="pl-wk-axis-label">All day</span>
+        {days.map((d) => (
+          <div key={d} className={`pl-wk-cell ${d === today ? 'today' : ''}`}>
+            {allDayOn(events, d).map((e) => <EventButton key={e.id} e={e} onOpen={onOpen} />)}
+            {allDayExtras(d)}
+          </div>
+        ))}
+      </div>
+      <div className="pl-wk-row pl-wk-timed">
+        <div className="pl-wk-axis" style={{ height: hours.length * PX_PER_HOUR }}>
+          {hours.map((h) => <i key={h} style={{ top: (h - lo) * PX_PER_HOUR }}>{fmtTime(h * 60)}</i>)}
+        </div>
+        {perDay.map(({ d, segs }) => {
+          const placed = layoutSegments(segs)
+          const isToday = d === today
+          return (
+            <div
+              key={d}
+              className={`pl-wk-col ${isToday ? 'today' : ''}`}
+              style={{ height: hours.length * PX_PER_HOUR }}
+              onClick={(ev) => {
+                if (ev.target !== ev.currentTarget) return
+                const rect = ev.currentTarget.getBoundingClientRect()
+                onNew(d, `${String(Math.min(23, lo + Math.floor((ev.clientY - rect.top) / PX_PER_HOUR))).padStart(2, '0')}:00`)
+              }}
+            >
+              {hours.slice(1).map((h) => <div key={h} className="pl-wk-line" style={{ top: (h - lo) * PX_PER_HOUR }} aria-hidden />)}
+              {placed.map((p) => (
+                <button
+                  key={`${p.event.id}-${p.continued}`}
+                  className="pl-ev"
+                  style={{ top: y(p.start), height: Math.max(22, y(p.end) - y(p.start) - 2), left: `${(p.col / p.cols) * 100}%`, width: `calc(${100 / p.cols}% - 3px)` }}
+                  onClick={() => onOpen(p.event)}
+                >
+                  <span className="pl-ev-title">{p.event.title}</span>
+                  <small>{p.continued ? `Until ${fmtTime(p.end)}` : timeLabel(p.event)}</small>
+                </button>
+              ))}
+              {isToday && nowMin >= lo * 60 && nowMin <= Math.min(DAY_MIN, hi * 60) && <div className="pl-now" style={{ top: y(nowMin) }} aria-hidden />}
+            </div>
+          )
+        })}
+      </div>
+    </div>
   )
 }

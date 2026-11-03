@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { heatGrid, lastDays, milestoneFor, streak, weekCount, weekProgress } from './stats'
+import { heatGrid, lastDays, milestoneFor, streak, weekCount, weekCountText, weekProgress } from './stats'
 
 const S = (...d: string[]) => new Set(d)
 
@@ -65,5 +65,13 @@ describe('week progress, milestones, heat grid', () => {
   })
   it('lists the last 7 days oldest first', () => {
     expect(lastDays('2026-11-02')).toEqual(['2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02'])
+  })
+})
+
+describe('weekCountText', () => {
+  it('never shows an impossible fraction', () => {
+    expect(weekCountText(3, 5)).toEqual({ main: '3 of 5', caption: 'this week', met: false })
+    expect(weekCountText(5, 5).met).toBe(true)
+    expect(weekCountText(7, 5)).toEqual({ main: '7', caption: 'this week (target 5)', met: true })
   })
 })

@@ -112,3 +112,4 @@
   .food-quick-text { flex: 1 1 100%; }
   .food-quick-slot { flex: 1 1 0; }
 }
+@media (max-width: 819px) { .food-stepper .btn[aria-label] { width: 40px; } .food-stepper-label { min-width: 0; flex: 1; } }

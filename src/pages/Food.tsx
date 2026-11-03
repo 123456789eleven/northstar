@@ -6,6 +6,8 @@ import { today } from '../lib/dates'
 import { useFocusParam, useFocusTarget } from '../lib/useFocusParam'
 import DayView from '../features/food/DayView'
 import WeekView from '../features/food/WeekView'
+import { RowMenu } from '../features/goals/GoalMenu'
+import { PHONE_QUERY, useMedia } from '../components/useMedia'
 import TemplatesModal from '../features/food/TemplatesModal'
 import { FavoritesModal, TargetsModal } from '../features/food/FoodModals'
 import { TARGETS_KEY, type FoodTargets } from '../features/food/foodData'
@@ -17,6 +19,7 @@ export default function Food() {
   const [view, setView] = useState<View>('day')
   const [date, setDate] = useState(today())
   const [modal, setModal] = useState<'targets' | 'favorites' | 'templates' | null>(null)
+  const phone = useMedia(PHONE_QUERY)
   const targetsRow = useLiveQuery(() => db.settings.get(TARGETS_KEY), [])
   const focusDay = useFocusParam().focus
   const hasMeals = useLiveQuery(async () => (focusDay ? (await db.meals.where('date').equals(focusDay).count()) > 0 : undefined), [focusDay])
@@ -37,12 +40,18 @@ export default function Food() {
             <button className="btn" onClick={() => setModal('favorites')}>
               Favorites
             </button>
-            <button className="btn" onClick={() => setModal('templates')}>
-              Templates
-            </button>
-            <button className="btn" onClick={() => setModal('targets')}>
-              Targets
-            </button>
+            {phone ? (
+              <RowMenu label="More food actions" items={[{ label: 'Templates', onSelect: () => setModal('templates') }, { label: 'Targets', onSelect: () => setModal('targets') }]} />
+            ) : (
+              <>
+                <button className="btn" onClick={() => setModal('templates')}>
+                  Templates
+                </button>
+                <button className="btn" onClick={() => setModal('targets')}>
+                  Targets
+                </button>
+              </>
+            )}
           </>
         }
       />

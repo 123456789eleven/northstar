@@ -81,3 +81,18 @@
 .fin-hbar:hover .fin-hbar-fill { filter: none; opacity: 0.85; }
 .fin-hbar-track { background: var(--surface-2); border-radius: 0 4px 4px 0; }
 .fin-month-label { font-weight: 500; }
+
+/* Print (Overview): light on white, no glass, same approach as Review/Journal. Tokens are flipped light in index.css @media print. */
+@media print {
+  .fin-month-label { min-width: 0; font-size: 12pt; font-weight: 600; }
+  .kpi-strip { background: none; border: 1px solid var(--line); break-inside: avoid; }
+  .kpi-cell { border-color: var(--line); }
+  .kpi-value, .stat-value { color: var(--ink); }
+  .stat { background: none; border: 1px solid var(--line); padding: 8px 12px; }
+  .tile, .stat-icon, .brand-tile { display: none !important; }
+  .progress { background: var(--surface-3); border: 1px solid var(--line); }
+  .progress > .progress-fill { background: #555 !important; transform: translateX(calc(var(--p, 0) * 1% - 100%)) !important; }
+  .recharts-text, .recharts-cartesian-axis-tick-value { fill: #444 !important; }
+  .recharts-cartesian-grid line { stroke: #ddd !important; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

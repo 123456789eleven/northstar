@@ -772,6 +772,7 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-even
    (mapping in system.md, components/moduleHue.ts); amber carries dark ink like the primary button, the cooler hues carry white. */
 .tile { flex: 0 0 auto; display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: var(--radius-tile); background: var(--tile-grad, var(--grad-amber)); color: var(--tile-ink, var(--accent-ink)); box-shadow: var(--glass-edge); }
 .tile > svg { width: var(--icon-lg); height: var(--icon-lg); }
+.tile-quiet { background: var(--surface-2); color: var(--ink-2); box-shadow: none; border: 1px solid var(--line); }
 .tile-sm { width: 24px; height: 24px; border-radius: var(--radius-sm); }
 .tile-sm > svg { width: var(--icon-sm); height: var(--icon-sm); }
 .hue-amber { --tile-grad: var(--grad-amber); --tile-ink: var(--accent-ink); }
@@ -833,3 +834,12 @@ body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-even
   .card { background: none; }
   .grad-text { background: none; color: inherit; }
 }
+
+/* ---------- polish pass (2026-11-02): phone hierarchy fixes ---------- */
+@media (max-width: 819px) {
+  .page-head > .row.wrap { margin-left: auto; }
+  .lr-title { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+  .car-month > .stat .stat-value { font-size: var(--text-lg); line-height: 28px; }
+  .car-month > .stat { padding: 12px; gap: 8px; }
+}
+@media (max-width: 819px) { .page-head .row-menu .icon-btn { width: 40px; height: 40px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface-2); } }

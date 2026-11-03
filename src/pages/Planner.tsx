@@ -3,12 +3,13 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, getSetting, setSetting, type CalendarEvent, type ISODate } from '../db'
 import { Link } from 'react-router-dom'
 import { Card, PageHeader } from '../components/ui'
+import { useMedia } from '../components/useMedia'
 import { useNow } from '../components/useNow'
 import { addDays, formatDate, today } from '../lib/dates'
 import { useFocusTarget } from '../lib/useFocusParam'
 import { allDayOn, daySegments, weekDates } from '../features/planner/layout'
 import { EventModal } from '../features/planner/EventModal'
-import { DayGrid, EventButton, HabitLine, PlanPanel, TaskLine } from '../features/planner/PlannerParts'
+import { DayGrid, EventButton, HabitLine, PlanPanel, TaskLine, WeekGrid } from '../features/planner/PlannerParts'
 import { GCAL_DISMISS_KEY } from '../features/gcal/help'
 import '../features/gcal/gcal.css'
 import '../features/planner/planner.css'
@@ -18,6 +19,7 @@ type Editing = { event: CalendarEvent | null; date: ISODate; start?: string }
 
 export default function Planner() {
   const t = today()
+  const wide = useMedia('(min-width: 1240px)')
   const [view, setView] = useState<View>('week')
   const [anchor, setAnchor] = useState<ISODate>(t)
   const [editing, setEditing] = useState<Editing | null>(null)
@@ -106,7 +108,13 @@ export default function Planner() {
 
       <div className={`pl-main ${view}`}>
         <div style={{ minWidth: 0 }}>
-          {view === 'week' ? (
+          {view === 'week' && wide ? (
+            <WeekGrid
+              days={days} today={t} events={evs} nowMin={nowMin}
+              allDayExtras={(d) => (<>{tasksOn(d).map((x) => <TaskLine key={x.id} t={x} />)}{birthdaysOn(d).map((p) => <div key={p.id} className="pl-note">Birthday: {p.name}</div>)}</>)}
+              onOpen={(x) => setEditing({ event: x, date: x.date })} onNew={(d, s) => openNew(d, s)} onOpenDay={(d) => { setAnchor(d); setView('day') }}
+            />
+          ) : view === 'week' ? (
             <div className="pl-week">
               {days.map((d) => (
                 <section key={d} data-focus-id={d} className={`pl-day ${d === t ? 'today' : ''}`}>
