@@ -112,7 +112,7 @@ export function TrendLine({ trend }: { trend: Trend }) {
   )
 }
 
-/** Stat card. icon: a module IconName renders that module's gradient tile (moduleHue.ts); any other node sits in an amber tile. trend: optional movement line. onClick/href make it interactive (lift on hover, focus ring). */
+/** Stat card. icon: a module IconName renders that module's gradient tile (moduleHue.ts); any other node sits in a violet tile. trend: optional movement line. onClick/href make it interactive (lift on hover, focus ring). */
 export function Stat({ label, value, note, icon, trend, onClick, href }: { label: string; value: ReactNode; note?: ReactNode; icon?: ReactNode; trend?: Trend; onClick?: () => void; href?: string }) {
   const body = (
     <>
@@ -122,7 +122,7 @@ export function Stat({ label, value, note, icon, trend, onClick, href }: { label
         {trend && <TrendLine trend={trend} />}
         {note && <div className="stat-note">{note}</div>}
       </div>
-      {typeof icon === 'string' ? <ModuleTile icon={icon as IconName} /> : icon && <span className="stat-icon tile hue-amber" aria-hidden>{icon}</span>}
+      {typeof icon === 'string' ? <ModuleTile icon={icon as IconName} /> : icon && <span className="stat-icon tile hue-violet" aria-hidden>{icon}</span>}
     </>
   )
   if (href) return <a className="card stat stat-int" href={href}>{body}</a>

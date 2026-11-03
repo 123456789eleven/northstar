@@ -3,8 +3,37 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 export const DUR = { fast: 120, base: 200, slow: 320 } as const
 
+/** OS "reduce motion", or Settings > Game > Motion = reduced (`data-motion="reduced"` on <html>, set by the shell). */
 export function prefersReducedMotion(): boolean {
-  return typeof window === 'undefined' || typeof window.matchMedia !== 'function' || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return true
+  if (typeof document !== 'undefined' && document.documentElement.dataset.motion === 'reduced') return true
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
+
+/**
+ * Number roll: returns the figure to display while it glides from its previous value to `value` (integers, ~600 ms,
+ * ease-out). The first value shows as-is (nothing rolls on page load); reduced motion jumps straight to the new value.
+ */
+export function useNumberRoll(value: number, ms = 600, from?: number): number {
+  const [shown, setShown] = useState(from ?? value)
+  const prev = useRef(from ?? value)
+  useEffect(() => {
+    const start = prev.current
+    prev.current = value
+    if (start === value || prefersReducedMotion()) { setShown(value); return }
+    let raf = 0
+    const t0 = performance.now()
+    const step = (now: number) => {
+      const t = Math.min(1, (now - t0) / ms)
+      setShown(Math.round(start + (value - start) * easeOutCubic(t)))
+      if (t < 1) raf = requestAnimationFrame(step)
+    }
+    raf = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(raf)
+  }, [value, ms])
+  return shown
 }
 
 /**

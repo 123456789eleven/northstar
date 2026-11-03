@@ -2,15 +2,15 @@
 //   <CartesianGrid {...GRID_PROPS} />  <XAxis {...X_AXIS} dataKey=.. />  <YAxis {...Y_AXIS} />
 //   <Tooltip {...tooltipProps(<ChartTip fmt={money} />, 'bar')} />  (ChartTip lives in ChartTip.tsx)  dots: DOT(color) / ACTIVE_DOT(color)
 // SVG presentation attributes cannot read CSS variables reliably, so the token values are mirrored here (index.css :root).
-// Series colors are data, not chrome: data palette slots (--data-1..6); amber appears only where a module already chose it.
+// Series colors are data, not chrome: data palette slots (--data-1..6); the accent (violet) appears only where a module already chose it.
 import type { ReactElement } from 'react'
 
 export const CHART = {
-  grid: '#262a33', // --line
-  axis: '#a6a49d', // --ink-2 (AA on --surface)
-  surface: '#15171c', // --surface (dot rings, gaps between fills)
+  grid: '#2a2a36', // --line
+  axis: '#a9a7ba', // --ink-2 (AA on --surface)
+  surface: '#14141b', // --surface (dot rings, gaps between fills)
   cursorFill: 'rgba(255, 255, 255, 0.04)',
-  accent: '#e3b261', // --accent
+  accent: '#8b7cf0', // --accent (violet, palette v3)
   data: ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#9085e9'], // --data-1..6
 } as const
 

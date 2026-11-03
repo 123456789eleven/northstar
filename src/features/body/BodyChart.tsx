@@ -1,4 +1,4 @@
-// Weight trend: faint daily points, one amber 7-day-average line, dashed goal line.
+// Weight trend: faint daily points, one accent (violet) 7-day-average line, dashed goal line.
 import { CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { formatDate } from '../../lib/dates'
 import type { AvgPoint } from './model'

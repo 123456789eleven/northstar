@@ -171,7 +171,7 @@ export default function Ops() {
 
   return (
     <>
-      <PageHeader title="Command" sub="Proposals from your own data. Nothing changes until you approve it, unless you opt a low-risk rule into auto-apply." />
+      <PageHeader title="Intel" sub="Proposals from your own data. Nothing changes until you approve it, unless you opt a low-risk rule into auto-apply." />
 
       {state === undefined ? <PageSkeleton rows={6} /> : <>
       <KpiStrip

@@ -11,7 +11,7 @@ describe('shortcuts', () => {
   })
   it('lists only the shortcuts the app handles', () => {
     const keys = SHORTCUT_GROUPS.flatMap((g) => g.items.flatMap((i) => i.keys.map((k) => `${g.name}:${k.join('+')}`)))
-    for (const k of ['Anywhere:/', 'Anywhere:?', 'Anywhere:Esc', 'Tasks:x', 'Command:a', 'Command:e', 'Command:j', 'Command:k']) expect(keys).toContain(k)
+    for (const k of ['Anywhere:/', 'Anywhere:?', 'Anywhere:Esc', 'Tasks:x', 'Intel (proposals):a', 'Intel (proposals):e', 'Intel (proposals):j', 'Intel (proposals):k']) expect(keys).toContain(k)
     expect(keys.some((k) => k.startsWith('Anywhere:') && k.endsWith('+K'))).toBe(true)
     expect(new Set(keys).size).toBe(keys.length)
   })

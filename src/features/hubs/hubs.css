@@ -1,0 +1,28 @@
+/* Hub landing pages (/plan, /skills, /mind, /you). Cards are the one glass card style; previews inside are plain rows. */
+.hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: var(--gap); }
+.hub-card { display: flex; flex-direction: column; gap: var(--sp-3); color: inherit; text-decoration: none; min-width: 0; }
+.hub-card-head { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.hub-card-name { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; }
+.hub-card-title { font-size: var(--text-md); line-height: 22px; font-weight: 600; letter-spacing: var(--track-tight); }
+.hub-card-sub { font-size: var(--text-xs); line-height: 16px; color: var(--ink-2); }
+.hub-card-stat { flex: 0 0 auto; font-family: var(--serif); font-size: var(--text-lg); font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+.hub-card-stat .hub-card-sub { font-family: var(--font); }
+.hub-card-body { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.hub-list { display: flex; flex-direction: column; }
+.hub-li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); padding: 6px 0; border-top: 1px solid var(--line-soft); font-size: var(--text-sm); min-width: 0; }
+.hub-li-goal { flex-direction: column; align-items: stretch; gap: 6px; }
+.hub-li-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hub-li-meta { flex: 0 0 auto; font-size: var(--text-xs); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.hub-empty { font-size: var(--text-sm); color: var(--ink-2); }
+.hub-meter { display: flex; align-items: center; gap: var(--sp-3); }
+.hub-meter > .xpbar { flex: 1 1 auto; }
+.hub-today-xp { font-family: var(--font); font-size: var(--text-xs); color: var(--reward); font-weight: 600; }
+.hub-section { margin-bottom: var(--gap); }
+.hub-player { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--sp-4); }
+.hub-player .xpbar { max-width: 420px; }
+.hub-player-week { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.hub-player-note { font-size: var(--text-xs); color: var(--ink-2); }
+@media (max-width: 619px) {
+  .hub-player { grid-template-columns: auto minmax(0, 1fr); }
+  .hub-player-week { grid-column: 1 / -1; align-items: flex-start; }
+}

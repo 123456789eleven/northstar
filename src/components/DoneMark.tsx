@@ -1,4 +1,4 @@
-/** Small amber check that pops and draws its mark once: the visual half of a completion moment. Decorative. */
+/** Small accent (violet) check that pops and draws its mark once: the visual half of a completion moment. Decorative. */
 export function DoneMark() {
   return (
     <span className="done-mark" aria-hidden>

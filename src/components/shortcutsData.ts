@@ -1,6 +1,6 @@
 // Shortcut list + helpers (no components, so Shortcuts.tsx stays fast-refresh friendly).
 // Keep SHORTCUT_GROUPS in step with the real handlers: Shell (Ctrl/Cmd K), QuickCapture (/), CommandPalette,
-// pages/Tasks (j k Enter x), pages/Ops (j k a e), journal/FocusMode (Esc, Ctrl/Cmd Enter).
+// pages/Tasks (j k Enter x), pages/Ops = Intel (j k a e), journal/FocusMode (Esc, Ctrl/Cmd Enter).
 export const OPEN_SHORTCUTS = 'ns:shortcuts'
 export const openShortcuts = () => window.dispatchEvent(new Event(OPEN_SHORTCUTS))
 
@@ -15,9 +15,16 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
     name: 'Anywhere',
     items: [
       { keys: [[MOD, 'K']], label: 'Search and commands' },
-      { keys: [['/']], label: 'Focus the capture bar' },
+      { keys: [['/']], label: 'Focus the capture bar (phone: the + button)' },
       { keys: [['?']], label: 'Show these shortcuts' },
-      { keys: [['Esc']], label: 'Close a dialog, sheet or panel' },
+      { keys: [['Esc']], label: 'Close a dialog, sheet, panel or moment' },
+    ],
+  },
+  {
+    name: 'Getting around',
+    items: [
+      { keys: [[MOD, 'K']], label: 'Jump to Today, Plan, Skills or You (type a page or an old name)' },
+      { keys: [['Tab']], label: "Move through a hub's tab strip" },
     ],
   },
   {
@@ -44,7 +51,7 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
     ],
   },
   {
-    name: 'Command',
+    name: 'Intel (proposals)',
     items: [
       { keys: [['j'], ['k']], label: 'Next or previous proposal' },
       { keys: [['a']], label: 'Accept the selected proposal' },

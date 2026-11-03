@@ -48,4 +48,4 @@
 
 .habit-tile-row .hb-check + .name { cursor: default; }
 .habit-foot { margin-top: -4px; }
-.habit-streak strong.is-met { color: var(--accent); }
+.habit-streak strong.is-met { color: var(--reward); }
