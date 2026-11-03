@@ -148,3 +148,17 @@ describe('nextBestAction', () => {
     expect(nextBestAction(snap({ tasks: [task({})] }))?.href).toBe('/goals')
   })
 })
+
+describe('backup nudge reminder settings', () => {
+  const t = [task({})]
+  const textOf = (s: Snapshot) => generateInsights(s).find((i) => i.id === 'backup')?.text
+  it('respects reminderDays and off', () => {
+    expect(ids(snap({ tasks: t, lastBackupAt: '2026-10-20T10:00:00.000Z', backupReminderDays: 7 }))).toContain('backup')
+    expect(ids(snap({ tasks: t, lastBackupAt: '2026-10-20T10:00:00.000Z', backupReminderDays: 30 }))).not.toContain('backup')
+    expect(ids(snap({ tasks: t, lastBackupAt: null, backupReminderDays: 0 }))).not.toContain('backup')
+  })
+  it('says whether the last backup was encrypted and suggests encrypted after a plain one', () => {
+    expect(textOf(snap({ tasks: t, lastBackupAt: '2026-09-01T00:00:00.000Z', lastBackupEncrypted: false }))).toMatch(/plain, unencrypted.*encrypted one/)
+    expect(textOf(snap({ tasks: t, lastBackupAt: '2026-09-01T00:00:00.000Z', lastBackupEncrypted: true }))).toMatch(/[(]encrypted[)]/)
+  })
+})
