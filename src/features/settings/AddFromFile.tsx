@@ -3,7 +3,9 @@ import { useRef, useState, type ChangeEvent } from 'react'
 import { Modal } from '../../components/ui'
 import { useToast } from '../../components/toastContext'
 import { applyAdditiveImport, describeAdded, planAdditiveImport, undoAdditiveImport, type AdditivePlan, type TablePlan } from '../../lib/additiveImport'
-import { parseBackup } from '../../lib/backup'
+import { parseBackup, MAX_BACKUP_BYTES } from '../../lib/backup'
+import { isEncryptedBackupText } from '../../lib/encryptedBackup'
+import { UnlockModal } from './BackupModals'
 import { money } from '../../lib/dates'
 
 function Block<T>({ title, plan, row, extra }: { title: string; plan: TablePlan<T>; row: (r: T) => string; extra?: string }) {
@@ -28,6 +30,12 @@ export default function AddFromFile({ disabled, onError }: { disabled?: boolean;
   const [plan, setPlan] = useState<AdditivePlan | null>(null)
   const [source, setSource] = useState<Awaited<ReturnType<typeof parseBackup>>['data'] | null>(null)
   const [busy, setBusy] = useState(false)
+  const [locked, setLocked] = useState<string | null>(null)
+
+  async function planFrom(data: Awaited<ReturnType<typeof parseBackup>>['data']) {
+    setSource(data)
+    setPlan(await planAdditiveImport(data))
+  }
 
   async function onPick(e: ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]
@@ -35,9 +43,10 @@ export default function AddFromFile({ disabled, onError }: { disabled?: boolean;
     if (!f) return
     onError('')
     try {
-      const parsed = await parseBackup(f)
-      setSource(parsed.data)
-      setPlan(await planAdditiveImport(parsed.data))
+      if (f.size > MAX_BACKUP_BYTES) throw new Error('That file is too large for a Northstar backup (limit 50 MB).')
+      const text = await f.text()
+      if (isEncryptedBackupText(text)) setLocked(text)
+      else await planFrom((await parseBackup(f)).data)
     } catch (err) {
       onError(err instanceof Error ? err.message : 'Could not read that file.')
     }
@@ -68,6 +77,13 @@ export default function AddFromFile({ disabled, onError }: { disabled?: boolean;
     <>
       <button className="btn" onClick={() => fileRef.current?.click()} disabled={disabled || busy}>Add from a data file…</button>
       <input ref={fileRef} className="set-file" type="file" accept="application/json,.json" onChange={onPick} tabIndex={-1} aria-hidden />
+      {locked && (
+        <UnlockModal
+          text={locked}
+          onClose={() => setLocked(null)}
+          onOpened={(p) => { setLocked(null); planFrom(p.data).catch((err) => onError(err instanceof Error ? err.message : 'Could not read that file.')) }}
+        />
+      )}
       {plan && (
         <Modal title="Add from this file?" onClose={close}>
           <p className="set-text">Nothing you already have is replaced. You can undo right after adding.</p>

@@ -39,6 +39,10 @@ export interface Snapshot {
   proteinTarget?: number
   /** ISO timestamp of the last export, or null if never. */
   lastBackupAt: string | null
+  /** Whether that last export was encrypted (undefined = unknown). */
+  lastBackupEncrypted?: boolean
+  /** Reminder threshold in days; 0 = off. Default 14. */
+  backupReminderDays?: number
 }
 
 export const MAX_INSIGHTS = 5
@@ -297,12 +301,16 @@ const birthdays: Rule = (s) => {
 const backupAge: Rule = (s) => {
   const hasData = s.tasks.length + s.goals.length + s.meals.length + s.transactions.length + s.people.length > 0
   if (!hasData) return []
+  const limit = s.backupReminderDays ?? 14
+  if (limit === 0) return []
   if (!s.lastBackupAt) {
-    return [{ id: 'backup', severity: 'nudge', text: 'You have never exported a backup. Your data lives only in this browser.', href: '/settings', score: 68 }]
+    return [{ id: 'backup', severity: 'nudge', text: 'You have never exported a backup. Your data lives only in this browser. An encrypted backup is the safer kind.', href: '/settings', score: 68 }]
   }
   const age = Math.floor((new Date(`${s.today}T12:00:00`).getTime() - new Date(s.lastBackupAt).getTime()) / 86_400_000)
-  if (age <= 14) return []
-  return [{ id: 'backup', severity: 'nudge', text: `Your last backup was ${plural(age, 'day')} ago. Export a fresh copy from Settings.`, href: '/settings', score: 66 }]
+  if (age <= limit) return []
+  const kind = s.lastBackupEncrypted === true ? 'encrypted' : s.lastBackupEncrypted === false ? 'plain, unencrypted' : ''
+  const tail = s.lastBackupEncrypted === false ? 'Export an encrypted one from Settings.' : 'Export a fresh copy from Settings.'
+  return [{ id: 'backup', severity: 'nudge', text: `Your last backup was ${plural(age, 'day')} ago${kind ? ` (${kind})` : ''}. ${tail}`, href: '/settings', score: 66 }]
 }
 
 const wins: Rule = (s) => {

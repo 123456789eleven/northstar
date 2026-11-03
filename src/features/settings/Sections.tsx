@@ -4,7 +4,9 @@ import { db, getSetting, setSetting } from '../../db'
 import { Card, Field, Modal } from '../../components/ui'
 import { demoCounts, removeDemo } from '../../lib/demo'
 import { loadDemoWithConfirm } from '../onboarding/demoActions'
-import { BACKUP_LAST_KEY, BACKUP_REMIND_DAYS, eraseAll, exportBackup, importBackup, parseBackup, type ParsedBackup } from '../../lib/backup'
+import { BACKUP_LAST_ENCRYPTED_KEY, BACKUP_LAST_KEY, BACKUP_REMIND_DAYS, BACKUP_REMIND_KEY, MAX_BACKUP_BYTES, REMINDER_OPTIONS, eraseAll, exportBackup, getReminderDays, importBackup, parseBackup, type ParsedBackup } from '../../lib/backup'
+import { isEncryptedBackupText } from '../../lib/encryptedBackup'
+import { ExportEncryptedModal, UnlockModal } from './BackupModals'
 import AddFromFile from './AddFromFile'
 import { openSetup } from '../onboarding/setupLogic'
 import { setDensity, useDensity, type Density } from '../../components/density'
@@ -100,17 +102,21 @@ function DensityRow() {
 export function BackupSection() {
   const backupInfo = useLiveQuery(async () => {
     const at = await getSetting<string | null>(BACKUP_LAST_KEY, null)
-    return { at, ageDays: at ? Math.floor((Date.now() - new Date(at).getTime()) / 86_400_000) : null }
+    const encrypted = await getSetting<boolean | null>(BACKUP_LAST_ENCRYPTED_KEY, null)
+    const remind = await getReminderDays()
+    return { at, encrypted, remind, ageDays: at ? Math.floor((Date.now() - new Date(at).getTime()) / 86_400_000) : null }
   }, [])
   const lastAt = backupInfo?.at
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState('')
   const [pending, setPending] = useState<ParsedBackup | null>(null)
+  const [exportOpen, setExportOpen] = useState(false)
+  const [locked, setLocked] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const ageDays = backupInfo?.ageDays ?? null
-  const overdue = backupInfo !== undefined && (ageDays === null || ageDays > BACKUP_REMIND_DAYS)
+  const overdue = backupInfo !== undefined && (backupInfo.remind > 0) && (ageDays === null || ageDays > backupInfo.remind)
 
   async function onExport() {
     setBusy(true); setError(''); setDone('')
@@ -131,7 +137,10 @@ export function BackupSection() {
     if (!f) return
     setError(''); setDone('')
     try {
-      setPending(await parseBackup(f))
+      if (f.size > MAX_BACKUP_BYTES) throw new Error('That file is too large for a Northstar backup (limit 50 MB).')
+      const text = await f.text()
+      if (isEncryptedBackupText(text)) setLocked(text)
+      else setPending(await parseBackup(f))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not read that file.')
     }
@@ -158,7 +167,7 @@ export function BackupSection() {
       {overdue && (
         <div className="set-notice" style={{ marginBottom: 14 }}>
           <span>{ageDays === null ? 'You have never made a backup.' : `Last backup was ${ageDays} days ago.`}</span>
-          <button className="btn btn-sm" onClick={onExport} disabled={busy}>Back up now</button>
+          <button className="btn btn-sm" onClick={() => setExportOpen(true)} disabled={busy}>Back up now</button>
         </div>
       )}
       <p className="set-text">
@@ -170,14 +179,26 @@ export function BackupSection() {
         <dd>{lastAt ? fmtWhen(lastAt) : 'Never'}</dd>
       </dl>
       <div className="row wrap">
-        <button className="btn btn-primary" onClick={onExport} disabled={busy}>Export backup</button>
+        <button className="btn btn-primary" onClick={() => setExportOpen(true)} disabled={busy}>Export encrypted backup</button>
         <button className="btn" onClick={() => fileRef.current?.click()} disabled={busy}>Import backup…</button>
         <input ref={fileRef} className="set-file" type="file" accept="application/json,.json" onChange={onPick} tabIndex={-1} aria-hidden />
         <AddFromFile disabled={busy} onError={setError} />
       </div>
-      <p className="set-text small">Adds transactions, balances and budgets from a file. Nothing you already have is replaced.</p>
+      <p className="set-text small">Adds transactions, balances and budgets from a plain or encrypted file. Nothing you already have is replaced.</p>
+      <div className="row wrap" style={{ marginTop: 12 }}>
+        <button className="btn btn-ghost" onClick={onExport} disabled={busy}>Export plain backup (unencrypted)</button>
+      </div>
+      <p className="set-text small">Caution: a plain backup is readable by anyone who gets the file, including through a synced folder. Prefer the encrypted one.</p>
+      <Field label="Remind me to back up" hint="Device-local. Shown on Today and here.">
+        <select className="input" value={backupInfo?.remind ?? BACKUP_REMIND_DAYS} onChange={(e) => void setSetting(BACKUP_REMIND_KEY, Number(e.target.value))}>
+          {REMINDER_OPTIONS.map((d) => <option key={d} value={d}>{d === 0 ? 'Off' : `After ${d} days`}</option>)}
+        </select>
+      </Field>
       {error && <p className="set-error" role="alert">{error}</p>}
       {done && <p className="set-ok" role="status">{done}</p>}
+
+      {exportOpen && <ExportEncryptedModal onClose={() => setExportOpen(false)} onDone={(n) => setDone(`Exported ${n.toLocaleString()} rows, encrypted.`)} />}
+      {locked && <UnlockModal text={locked} onClose={() => setLocked(null)} onOpened={(p) => { setPending(p); setLocked(null) }} />}
 
       {pending && (
         <Modal title="Restore this backup?" onClose={() => !busy && setPending(null)}>
@@ -293,12 +314,14 @@ export function StatusStrip() {
   const syncOn = useLiveQuery(() => getSetting<boolean>(sync.ENABLED_KEY, false), [])
   const lastBackup = useLiveQuery(async () => {
     const at = await getSetting<string | null>(BACKUP_LAST_KEY, null)
-    return { at, ageDays: at ? Math.floor((Date.now() - new Date(at).getTime()) / 86_400_000) : null }
+    const encrypted = await getSetting<boolean | null>(BACKUP_LAST_ENCRYPTED_KEY, null)
+    const remind = await getReminderDays()
+    return { at, encrypted, remind, ageDays: at ? Math.floor((Date.now() - new Date(at).getTime()) / 86_400_000) : null }
   }, [])
   const demo = useLiveQuery(async () => ({ v: await demoCounts() }), [])
   if (!syncStatus || !lastBackup || !demo) return <div className="set-status" aria-hidden style={{ minHeight: 64 }} />
   const ageDays = lastBackup.ageDays
-  const stale = ageDays === null || ageDays > BACKUP_REMIND_DAYS
+  const stale = lastBackup.remind > 0 && (ageDays === null || ageDays > lastBackup.remind)
   const syncLabel = !syncOn || syncStatus.state === 'off' ? 'Off' : ({ locked: 'Locked', syncing: 'Syncing', 'up-to-date': 'On, up to date', offline: 'On, offline', error: 'Error' } as Record<string, string>)[syncStatus.state] ?? 'On'
   return (
     <dl className="set-status" aria-label="Status">
@@ -310,7 +333,7 @@ export function StatusStrip() {
       <div>
         <dt>Last backup</dt>
         <dd className={stale ? 'warn' : undefined}>{lastBackup.at ? fmtWhen(lastBackup.at) : 'Never'}</dd>
-        <dd className="set-status-note">{ageDays === null ? 'Export one under Backup' : ageDays === 0 ? 'Today' : `${ageDays} ${ageDays === 1 ? 'day' : 'days'} ago`}</dd>
+        <dd className="set-status-note">{ageDays === null ? 'Export one under Backup' : `${ageDays === 0 ? 'Today' : `${ageDays} ${ageDays === 1 ? 'day' : 'days'} ago`}${lastBackup.encrypted === true ? ', encrypted' : lastBackup.encrypted === false ? ', plain' : ''}`}</dd>
       </div>
       <div>
         <dt>Demo data</dt>

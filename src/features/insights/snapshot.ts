@@ -1,7 +1,7 @@
 // Reads the local database into a Snapshot for the (pure) insights engine. Nothing leaves the device.
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, getSetting } from '../../db'
-import { BACKUP_LAST_KEY } from '../../lib/backup'
+import { BACKUP_LAST_ENCRYPTED_KEY, BACKUP_LAST_KEY, getReminderDays } from '../../lib/backup'
 import { addDays, today } from '../../lib/dates'
 import { TARGETS_KEY, type FoodTargets } from '../food/foodData'
 import { generateInsights, nextBestAction, type Insight, type NextAction, type Snapshot } from './engine'
@@ -9,7 +9,7 @@ import { generateInsights, nextBestAction, type Insight, type NextAction, type S
 export async function loadSnapshot(): Promise<Snapshot> {
   const d = today()
   const since = addDays(d, -70) // enough history for month-over-month and streak checks
-  const [tasks, goals, meals, transactions, budgets, studySessions, people, events, targets, lastBackupAt, habits, habitLogs, calendar] = await Promise.all([
+  const [tasks, goals, meals, transactions, budgets, studySessions, people, events, targets, lastBackupAt, habits, habitLogs, calendar, lastBackupEncrypted, backupReminderDays] = await Promise.all([
     db.tasks.toArray(),
     db.goals.toArray(),
     db.meals.where('date').aboveOrEqual(since).toArray(),
@@ -23,8 +23,10 @@ export async function loadSnapshot(): Promise<Snapshot> {
     db.habits.toArray(),
     db.habitLogs.where('date').aboveOrEqual(addDays(d, -400)).toArray(),
     db.calendar.where('date').equals(d).toArray(),
+    getSetting<boolean | null>(BACKUP_LAST_ENCRYPTED_KEY, null),
+    getReminderDays(),
   ])
-  return { today: d, tasks, goals, meals, transactions, budgets, studySessions, people, events, habits, habitLogs, calendar, hour: new Date().getHours(), proteinTarget: targets.protein, lastBackupAt }
+  return { today: d, tasks, goals, meals, transactions, budgets, studySessions, people, events, habits, habitLogs, calendar, hour: new Date().getHours(), proteinTarget: targets.protein, lastBackupAt, lastBackupEncrypted: lastBackupEncrypted ?? undefined, backupReminderDays }
 }
 
 export interface InsightsState {

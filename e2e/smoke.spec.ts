@@ -87,3 +87,51 @@ test('Goals: track a goal automatically from weight and see the live number', as
   await expect(editor).toBeHidden()
   await expect(page.getByTestId('goal-metric')).toContainText('138.2 of 165 lb')
 })
+
+test('Settings: encrypted backup round trip (export, erase, import with passphrase)', async ({ page }) => {
+
+  const pass = 'fixture passphrase 123'
+  await page.goto('/#/body')
+  const capture = page.getByLabel('Quick capture')
+  await capture.fill('w 141.2')
+  await capture.press('Enter')
+  await expect(page.getByLabel('Weight in pounds')).toHaveAttribute('placeholder', /141\.2/)
+
+  await page.goto('/#/settings')
+  await page.getByRole('button', { name: 'Export encrypted backup' }).click()
+  const exp = page.getByRole('dialog', { name: 'Export encrypted backup' })
+  await expect(exp.getByText(/cannot be recovered/)).toBeVisible()
+  await exp.getByLabel(/^Passphrase/).fill(pass)
+  await exp.getByLabel('Confirm passphrase').fill(pass)
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    exp.getByRole('button', { name: 'Encrypt and download' }).click(),
+  ])
+  expect(download.suggestedFilename()).toMatch(/^northstar-backup-\d{4}-\d{2}-\d{2}\.enc\.json$/)
+  const saved = test.info().outputPath('backup.enc.json')
+  await download.saveAs(saved)
+  await expect(page.getByText(/rows, encrypted/)).toBeVisible()
+
+  await page.getByRole('button', { name: 'Erase all data…' }).click()
+  const erase = page.getByRole('dialog', { name: 'Erase all data' })
+  await erase.getByLabel('Type ERASE to confirm').fill('ERASE')
+  await erase.getByRole('button', { name: 'Erase everything' }).click()
+  await expect(erase).toBeHidden()
+
+  const [chooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.getByRole('button', { name: /Import backup/ }).click(),
+  ])
+  await chooser.setFiles(saved)
+  const unlock = page.getByRole('dialog', { name: 'Unlock encrypted backup' })
+  await unlock.getByLabel(/^Passphrase/).fill('wrong passphrase here')
+  await unlock.getByRole('button', { name: 'Unlock' }).click()
+  await expect(unlock.getByText('Wrong passphrase or damaged file.')).toBeVisible()
+  await unlock.getByLabel(/^Passphrase/).fill(pass)
+  await unlock.getByRole('button', { name: 'Unlock' }).click()
+  await page.getByRole('dialog', { name: 'Restore this backup?' }).getByRole('button', { name: 'Replace and restore' }).click()
+  await expect(page.getByText(/Restored backup from/)).toBeVisible()
+
+  await page.goto('/#/body')
+  await expect(page.getByLabel('Weight in pounds')).toHaveAttribute('placeholder', /141\.2/)
+})

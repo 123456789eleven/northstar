@@ -13,7 +13,17 @@ export interface BackupFile {
 /** Settings under this prefix hold secrets: excluded from backups and kept across a restore. */
 export const SECRET_PREFIX = 'simplefin.'
 export const BACKUP_LAST_KEY = 'backup.lastAt'
+export const BACKUP_LAST_ENCRYPTED_KEY = 'backup.lastEncrypted'
+export const BACKUP_REMIND_KEY = 'backup.reminderDays'
 export const BACKUP_REMIND_DAYS = 14
+/** Reminder choices in days; 0 turns the reminder off. */
+export const REMINDER_OPTIONS = [7, 14, 30, 0] as const
+
+/** Days after which the backup nudge appears (0 = off). Device-local setting. */
+export async function getReminderDays(): Promise<number> {
+  const v = await getSetting<number>(BACKUP_REMIND_KEY, BACKUP_REMIND_DAYS)
+  return (REMINDER_OPTIONS as readonly number[]).includes(v) ? v : BACKUP_REMIND_DAYS
+}
 
 export async function buildBackup(): Promise<BackupFile> {
   const tables: Record<string, unknown[]> = {}
@@ -25,20 +35,29 @@ export async function buildBackup(): Promise<BackupFile> {
   return { app: 'northstar', version: db.verno, exportedAt: new Date().toISOString(), tables }
 }
 
-/** Builds the backup, triggers a download, and records the time. */
-export async function exportBackup() {
-  // Record the time first so the file itself carries it (otherwise a restore reverts to "never backed up").
-  await setSetting(BACKUP_LAST_KEY, new Date().toISOString())
-  const data = await buildBackup()
-  const blob = new Blob([JSON.stringify(data)], { type: 'application/json' })
+/** Hands bytes to the browser as a download. Nothing is uploaded anywhere. */
+export function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `northstar-backup-${today()}.json`
+  a.download = filename
   document.body.appendChild(a)
   a.click()
   a.remove()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+/** Records when (and how) the last backup was made, before building it so the file itself carries it. */
+export async function markBackup(encrypted: boolean) {
+  await setSetting(BACKUP_LAST_KEY, new Date().toISOString())
+  await setSetting(BACKUP_LAST_ENCRYPTED_KEY, encrypted)
+}
+
+/** Builds the plain (unencrypted) backup, triggers a download, and records the time. */
+export async function exportBackup() {
+  await markBackup(false)
+  const data = await buildBackup()
+  downloadBlob(new Blob([JSON.stringify(data)], { type: 'application/json' }), `northstar-backup-${today()}.json`)
   return data
 }
 
@@ -55,9 +74,14 @@ export const MAX_BACKUP_BYTES = 50 * 1024 * 1024
 export async function parseBackup(file: File): Promise<ParsedBackup> {
   if (file.size > MAX_BACKUP_BYTES) throw new Error(`This file is ${(file.size / 1048576).toFixed(0)} MB, which is too large for a Northstar backup (limit 50 MB).`)
   if (!/.json$/i.test(file.name) && file.type && !/json|text/.test(file.type)) throw new Error('This does not look like a backup file. Choose a northstar-backup-....json file.')
+  return parseBackupText(await file.text())
+}
+
+/** Validates the text of a plain backup file. */
+export function parseBackupText(text: string): ParsedBackup {
   let raw: unknown
   try {
-    raw = JSON.parse(await file.text())
+    raw = JSON.parse(text)
   } catch {
     throw new Error('This file is not valid JSON.')
   }
