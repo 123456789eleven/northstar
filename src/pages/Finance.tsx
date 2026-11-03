@@ -56,6 +56,7 @@ export default function Finance() {
                   This month
                 </button>
               )}
+              {tab === 'overview' && <button className="btn btn-sm btn-ghost no-print" onClick={() => window.print()}>Print</button>}
             </div>
           )
         }

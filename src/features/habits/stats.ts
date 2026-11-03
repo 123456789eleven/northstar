@@ -22,6 +22,14 @@ export function weekProgress(dates: Set<ISODate>, today: ISODate, perWeek: numbe
   return { done: weekCount(dates, today), target: perWeek }
 }
 
+/** Week count text that never shows an impossible fraction: "3 of 5", or "7" + "this week (target 5)" once exceeded. */
+export function weekCountText(done: number, target: number): { main: string; caption: string; met: boolean } {
+  const met = done >= target
+  return done > target
+    ? { main: String(done), caption: `this week (target ${target})`, met }
+    : { main: `${done} of ${target}`, caption: met ? 'this week · done' : 'this week', met }
+}
+
 /** A streak survives until its period is missed: today/this week may still be open. */
 export function streak(dates: Set<ISODate>, today: ISODate, perWeek: number): Streak {
   if (isDaily(perWeek)) {

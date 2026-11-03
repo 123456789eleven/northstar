@@ -1,6 +1,6 @@
-import { useState, type CSSProperties } from 'react'
+import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Field, Modal } from '../../components/ui'
+import { Field, Modal, Progress } from '../../components/ui'
 import { db, type LearningItem } from '../../db'
 import { KINDS, saveItem, STATUSES } from './learningData'
 
@@ -81,7 +81,10 @@ export default function ItemModal({
         </div>
         {status !== 'done' && (
           <Field label={`Progress · ${progress}%`}>
-            <input type="range" className="learn-range" style={{ "--v": `${progress}%` } as CSSProperties} min={0} max={100} step={5} value={progress} onChange={(e) => setProgress(Number(e.target.value))} />
+            <div className="learn-bar">
+              <Progress value={progress} label="Progress" />
+              <input type="range" className="learn-range" min={0} max={100} step={5} value={progress} onChange={(e) => setProgress(Number(e.target.value))} />
+            </div>
           </Field>
         )}
         <Field label="Linked goal (optional)">

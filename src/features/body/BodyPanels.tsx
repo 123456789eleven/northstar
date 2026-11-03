@@ -119,7 +119,7 @@ export function TrainingCard({ habits, logs, target }: { habits: Habit[]; logs: 
   return (
     <Card title="Training">
       <div className="row wrap" style={{ justifyContent: 'space-between', gap: 8 }}>
-        <span className="small">{habit.name}: <strong className="mono">{done} of {target}</strong> sessions this week{done >= target ? ' - target met' : ''}</span>
+        <span className="small">{habit.name}: <strong className="mono">{done > target ? `${done}` : `${done} of ${target}`}</strong> sessions this week{done > target ? ` (target ${target})` : ''}{done >= target ? ' - target met' : ''}</span>
         <button className="btn btn-sm" aria-pressed={checked} onClick={() => void tick(habit, today())}>{checked ? 'Today done (undo)' : 'Log today’s session'}</button>
       </div>
     </Card>

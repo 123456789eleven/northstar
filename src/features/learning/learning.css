@@ -10,22 +10,18 @@
 
 .learn-progress { display: flex; flex-direction: column; gap: 2px; }
 
-/* Range doubles as the progress bar: 6px track, accent fill up to --v, 18px thumb, 32px hit area. */
-.learn-range {
-  -webkit-appearance: none; appearance: none; width: 100%; height: 32px; margin: 0;
-  background: transparent; cursor: pointer; --v: 0%;
-}
+/* The shared Progress bar draws the track and fill; the range input sits invisibly over it for dragging (32px hit area, thumb only). */
+.learn-bar { position: relative; height: 32px; display: flex; align-items: center; }
+.learn-bar > .progress { width: 100%; }
+.learn-bar > .learn-range { position: absolute; inset: 0; }
+.learn-range { -webkit-appearance: none; appearance: none; width: 100%; height: 32px; margin: 0; background: transparent; cursor: pointer; }
 .learn-range:focus { outline: none; }
-.learn-range::-webkit-slider-runnable-track {
-  height: 6px; border-radius: 999px;
-  background: linear-gradient(to right, var(--accent) 0 var(--v), var(--surface-2) var(--v) 100%);
-}
+.learn-range::-webkit-slider-runnable-track { height: 6px; background: transparent; }
 .learn-range::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none; width: 18px; height: 18px; margin-top: -6px;
   border-radius: 50%; background: var(--ink); border: 2px solid var(--surface);
 }
-.learn-range::-moz-range-track { height: 6px; border-radius: 999px; background: var(--surface-2); }
-.learn-range::-moz-range-progress { height: 6px; border-radius: 999px; background: var(--accent); }
+.learn-range::-moz-range-track { height: 6px; background: transparent; }
 .learn-range::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--ink); border: 2px solid var(--surface); }
 .learn-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 2px var(--accent); }
 .learn-range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(--accent); }

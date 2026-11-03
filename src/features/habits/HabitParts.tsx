@@ -4,7 +4,7 @@ import { Field, Modal, AREA_LABEL } from '../../components/ui'
 import { formatDate } from '../../lib/dates'
 import { archiveHabit, deleteHabit } from './habitData'
 import { useHabitCheckIn } from './useHabitCheckIn'
-import { PER_WEEK_PRESETS, heatGrid, lastDays, perWeekLabel, streak, weekProgress } from './stats'
+import { PER_WEEK_PRESETS, heatGrid, lastDays, perWeekLabel, streak, weekCountText, weekProgress } from './stats'
 
 export function HeatStrip({ dates, today }: { dates: Set<ISODate>; today: ISODate }) {
   const grid = heatGrid(dates, today, 12)
@@ -42,6 +42,7 @@ export function HabitCard({ habit, dates, today, goalTitle, onEdit }: { habit: H
   const tick = useHabitCheckIn()
   const s = streak(dates, today, habit.perWeek)
   const wp = weekProgress(dates, today, habit.perWeek)
+  const wt = weekCountText(wp.done, wp.target)
   return (
     <section className={`card habit ${habit.archived ? 'archived' : ''}`}>
       <div className="habit-head">
@@ -54,8 +55,8 @@ export function HabitCard({ habit, dates, today, goalTitle, onEdit }: { habit: H
           </div>
         </div>
         <div className="habit-streak">
-          <strong>{wp.done} of {wp.target}</strong>
-          <span>this week{s.count >= 1 ? ` · ${s.count} ${s.unit}${s.count === 1 ? '' : 's'} streak` : ' · no streak yet'}</span>
+          <strong className={wt.met ? 'is-met' : ''}>{wt.main}</strong>
+          <span>{wt.caption}{s.count >= 1 ? ` · ${s.count} ${s.unit}${s.count === 1 ? '' : 's'} streak` : ' · no streak yet'}</span>
         </div>
       </div>
       <div className="habit-days">

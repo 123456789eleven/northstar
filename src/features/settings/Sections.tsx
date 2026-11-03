@@ -404,6 +404,12 @@ export function AboutSection() {
         ciphertext. Supabase can still see your account email, how many records each section has, when they change, and their encrypted sizes,
         but not what they say. Bank data only enters through CSV files you choose to import, and no bank credentials are ever stored.
       </p>
+      <p className="set-text small">
+        Read the details on the public site:{' '}
+        <a href="../privacy.html" target="_blank" rel="noopener">Privacy</a>
+        {' · '}
+        <a href="../security.html" target="_blank" rel="noopener">Security</a>
+      </p>
       <p className="set-text small faint">Data format version {db.verno}.</p>
     </Card>
   )
