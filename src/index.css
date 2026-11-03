@@ -22,6 +22,7 @@
   --accent: #8b7cf0;
   --accent-ink: #0e0b1f;
   --accent-soft: rgba(139, 124, 240, 0.14);
+  --accent-text: #a99df7; /* accent-coloured TEXT on an --accent-soft tint (accent itself is 3.96:1 there) */
   /* status (always with a label or icon) */
   --good: #6cc49a;
   --warn: #e07a5f;
@@ -425,7 +426,7 @@ a.btn { text-decoration: none; }
   border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--line);
   font-size: 12px; color: var(--ink-2); white-space: nowrap;
 }
-.chip-accent { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.chip-accent { background: var(--accent-soft); border-color: transparent; color: var(--accent-text); }
 .status-chip { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--line); font-size: 12px; white-space: nowrap; }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: 0 0 auto; }
 .status-good { color: var(--good); } .status-warn { color: var(--warn); } .status-info { color: var(--info); } .status-neutral { color: var(--ink-2); }

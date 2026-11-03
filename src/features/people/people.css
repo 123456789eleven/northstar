@@ -28,7 +28,7 @@
 
 .ppl-seg { display: flex; flex-wrap: wrap; gap: 6px; }
 .ppl-seg .btn { height: 32px; }
-.ppl-seg .btn[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.ppl-seg .btn[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
 
 .ppl-notes { white-space: pre-wrap; font-size: 14px; color: var(--ink-2); margin: 0 0 14px; }
 .ppl-section { font-size: 12px; color: var(--ink-2); font-weight: 600; margin: 16px 0 6px; }

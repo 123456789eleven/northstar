@@ -83,7 +83,7 @@ export function MissionRail() {
           </section>
         )}
         <section className="mr-sec" aria-labelledby="mr-w">
-          <h2 className="mr-head" id="mr-w"><span>This week</span></h2>
+          <h2 className="mr-head" id="mr-w"><span>Weekly streak</span></h2>
           <WeekDots streak={p.streak} />
           <p className="mr-note">{streakLine(p)}</p>
         </section>

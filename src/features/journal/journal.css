@@ -35,7 +35,7 @@
 .jr-chip { min-height: 32px; cursor: pointer; font: inherit; font-size: 13px; }
 .jr-chip:disabled { opacity: .45; cursor: default; }
 .jr-actions { gap: 8px; }
-.jr-hit { background: var(--accent-soft); color: var(--accent); border-radius: 2px; padding: 0 1px; }
+.jr-hit { background: var(--accent-soft); color: var(--accent-text); border-radius: 2px; padding: 0 1px; }
 .jr-read { font-size: 17px; line-height: 1.8; max-width: 66ch; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); }
 
 /* Finish ritual */

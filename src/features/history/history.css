@@ -56,7 +56,7 @@
 .hist-chips { display: flex; flex-wrap: wrap; gap: 6px; flex-basis: 100%; }
 .hist-chipbtn { min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: none; color: var(--ink-2); font: inherit; font-size: 13px; cursor: pointer; }
 .hist-chipbtn:hover { color: var(--ink); }
-.hist-chipbtn[aria-pressed='true'] { background: var(--accent-soft); border-color: transparent; color: var(--accent); font-weight: 500; }
+.hist-chipbtn[aria-pressed='true'] { background: var(--accent-soft); border-color: transparent; color: var(--accent-text); font-weight: 500; }
 .hist-result { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: -4px 0 10px; }
 .hist-week { margin-bottom: 18px; }
 .hist-week-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 0 0 2px; font: inherit; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
