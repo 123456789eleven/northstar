@@ -112,3 +112,43 @@ html[data-focus="1"] body { overflow: hidden; }
   .jr-read { font-size: 12pt; line-height: 1.7; max-width: none; color: #111; }
   .jr-foot { font-size: 9pt; color: #555; margin-top: 10pt; }
 }
+
+/* Mood constellation (G4): stars sized by words, tinted by mood on the violet scale */
+.jr-star { position: relative; display: grid; place-items: center; min-height: 40px; border: 1px solid transparent; border-radius: var(--radius-sm); background: transparent; color: var(--ink-3); font: inherit; cursor: pointer; padding: 0; transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out); }
+.jr-star svg { grid-area: 1 / 1; width: 100%; height: 100%; max-width: 40px; max-height: 40px; }
+.jr-star-day { grid-area: 1 / 1; align-self: end; font-size: 9px; line-height: 1; padding-bottom: 2px; color: var(--ink-3); }
+.jr-star-dot { fill: var(--star, var(--ink-3)); opacity: var(--star-o, 1); }
+.jr-star[data-on="1"] .jr-star-dot { filter: drop-shadow(0 0 3px var(--star, transparent)); }
+.jr-star-empty { fill: var(--line-strong); }
+.jr-star[data-m="0"] { --star: var(--ink-2); }
+.jr-star[data-m="1"], .jr-sq-key[data-m="1"] { --star: var(--accent); --star-o: .4; }
+.jr-star[data-m="2"], .jr-sq-key[data-m="2"] { --star: var(--accent); --star-o: .6; }
+.jr-star[data-m="3"], .jr-sq-key[data-m="3"] { --star: var(--accent); --star-o: .8; }
+.jr-star[data-m="4"], .jr-sq-key[data-m="4"] { --star: var(--accent); --star-o: 1; }
+.jr-star[data-m="5"], .jr-sq-key[data-m="5"] { --star: var(--accent-text); --star-o: 1; }
+.jr-sq-key[data-m] { background: var(--star); opacity: var(--star-o); border-color: transparent; }
+.jr-star:not(:disabled):hover { border-color: var(--line-strong); background: var(--surface-2); }
+.jr-star[data-sel="1"] { border-color: var(--accent); }
+.jr-star[aria-current="date"] .jr-star-day { color: var(--ink); font-weight: 700; }
+.jr-star:disabled { opacity: .35; cursor: default; }
+.jr-const { gap: 2px; }
+
+/* Writing hero + editor header word ring */
+.jr-hero { display: flex; align-items: center; gap: var(--sp-5); flex-wrap: wrap; margin-bottom: var(--gap); }
+.jr-hero-item { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.jr-hero-num { font-family: var(--serif); font-size: 17px; line-height: 1; font-variant-numeric: tabular-nums; }
+.jr-hero-label { font-size: 12px; color: var(--ink-2); }
+.jr-hero-text { display: flex; flex-direction: column; gap: 4px; }
+.jr-edhead { display: flex; align-items: center; gap: var(--sp-3); font-size: 13px; color: var(--ink-2); }
+.jr-edhead.is-pulsing .jr-wordring { animation: jr-pulse 700ms var(--ease-spring-soft) both; }
+.jr-focus-progress.is-pulsing > div { animation: jr-bar-pulse 700ms var(--ease-out) both; }
+@keyframes jr-pulse { 0% { transform: scale(1); } 40% { transform: scale(1.14); } 100% { transform: scale(1); } }
+@keyframes jr-bar-pulse { 0% { opacity: 1; } 40% { opacity: .55; } 100% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .jr-edhead.is-pulsing .jr-wordring, .jr-focus-progress.is-pulsing > div { animation: none; } }
+:root[data-motion='reduced'] :is(.jr-edhead.is-pulsing .jr-wordring, .jr-focus-progress.is-pulsing > div) { animation: none; }
+
+/* Mind hub preview */
+.jr-preview { display: block; width: 100%; color: inherit; text-decoration: none; }
+.jr-preview-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; max-width: 154px; }
+.jr-star-mini { min-height: 0; cursor: inherit; display: block; }
+.jr-star-mini svg { display: block; width: 100%; height: auto; aspect-ratio: 1; max-width: none; max-height: none; }

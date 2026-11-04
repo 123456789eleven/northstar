@@ -20,7 +20,7 @@ function Meta({ item, goalTitle }: { item: LearningItem; goalTitle?: string }) {
   )
 }
 
-export function ActiveCard({ item, weekMinutes, goalTitle, onEdit }: { item: LearningItem; weekMinutes: number; goalTitle?: string; onEdit: () => void }) {
+export function ActiveCard({ item, weekMinutes, goalTitle, onEdit, onFocus }: { item: LearningItem; weekMinutes: number; goalTitle?: string; onEdit: () => void; onFocus?: () => void }) {
   const [draft, setDraft] = useState<number | null>(null)
   const value = draft ?? item.progress
   const commit = () => {
@@ -74,6 +74,7 @@ export function ActiveCard({ item, weekMinutes, goalTitle, onEdit }: { item: Lea
             </button>
           ))}
         </div>
+        {onFocus && <button className="btn btn-sm btn-primary" onClick={onFocus}>Start focus</button>}
         <button className="btn btn-ghost btn-sm" onClick={() => completeItem(item)}>
           {item.kind === 'certification' ? 'Mark earned' : 'Mark complete'}
         </button>

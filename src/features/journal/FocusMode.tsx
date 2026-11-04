@@ -15,6 +15,8 @@ interface Props {
   template?: JournalTemplate
   /** done = user chose Done (offer the closing ritual) */
   onExit: (done: boolean) => void
+  /** brief completion pulse when the daily goal is reached */
+  pulse?: boolean
 }
 
 const MIRROR_PROPS = ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'paddingTop', 'paddingLeft', 'paddingRight', 'paddingBottom', 'whiteSpace', 'overflowWrap', 'wordBreak', 'tabSize'] as const
@@ -41,7 +43,7 @@ function caretY(ta: HTMLTextAreaElement): number {
   return y
 }
 
-export function FocusMode({ title, text, onChange, saved, prefs, onPref, template, onExit }: Props) {
+export function FocusMode({ title, text, onChange, saved, prefs, onPref, template, onExit, pulse }: Props) {
   const root = useRef<HTMLDivElement>(null)
   const area = useRef<HTMLTextAreaElement>(null)
   const [elapsed, setElapsed] = useState(0)
@@ -157,7 +159,7 @@ export function FocusMode({ title, text, onChange, saved, prefs, onPref, templat
           <button type="button" className="btn btn-sm" onClick={() => onExit(false)}>Exit <span className="muted">Esc</span></button>
         </div>
       </div>
-      <div className="jr-focus-progress" role="progressbar" aria-label="Daily word goal" aria-valuemin={0} aria-valuemax={prefs.goal} aria-valuenow={Math.min(words, prefs.goal)}>
+      <div className={`jr-focus-progress ${pulse ? 'is-pulsing' : ''}`} role="progressbar" aria-label="Daily word goal" aria-valuemin={0} aria-valuemax={prefs.goal} aria-valuenow={Math.min(words, prefs.goal)}>
         <div style={{ width: `${pct}%` }} />
       </div>
       <div className="jr-focus-main">

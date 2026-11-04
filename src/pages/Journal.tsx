@@ -10,6 +10,8 @@ import { groupByMonth, matchesSearch, moodSeries, wordCount, wordStreak } from '
 import { highlight, lookback, snippet, tagCounts } from '../features/journal/insights'
 import { MonthMap } from '../features/journal/MonthMap'
 import { useJournalPrefs } from '../features/journal/prefs'
+import { WritingHero } from '../features/journal/WritingHero'
+import { usePlayerState } from '../features/game/ui/playerContext'
 import { useFocusTarget } from '../lib/useFocusParam'
 import '../features/journal/journal.css'
 
@@ -69,6 +71,7 @@ export default function Journal() {
     exists: (id) => (entries ?? []).some((e) => e.date === id),
     reveal: (id) => open(id),
   })
+  const weekTarget = usePlayerState().streak.target || 5
   const written = (entries ?? []).filter((e) => e.text.trim()).length
 
   const current = entries?.find((e) => e.date === date)
@@ -85,6 +88,7 @@ export default function Journal() {
         title="Journal"
         sub={entries === undefined ? ' ' : `${stats.streak ? `${stats.streak}-day streak · ` : ''}${written} ${written === 1 ? 'entry' : 'entries'} · private to this device`}
               />
+      {entries !== undefined && <WritingHero entries={entries} goal={prefs.goal} target={weekTarget} streak={stats.streak} />}
       <div className="jr-grid">
         <div className="jr-col">
           <Card
