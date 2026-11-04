@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import type { FavoriteMeal, ISODate, Meal, MealSlot } from '../../db'
+import SwipeRow from '../g3/SwipeRow'
+import { db, type FavoriteMeal, type ISODate, type Meal, type MealSlot } from '../../db'
 import FoodLookup from './FoodLookup'
 import { useToast } from '../../components/toastContext'
 import { addMeal, applyTemplate, copyYesterdayIds, createTemplate, logFavorite, optNum, removeMeal, removeMeals, sumMeals } from './foodData'
@@ -43,12 +44,20 @@ export default function SlotCard({
   const [fav, setFav] = useState(false)
   const [mult, setMult] = useState(1)
   const [tplName, setTplName] = useState<string | null>(null)
+  const [open, setOpen] = useState(false)
   const toast = useToast()
   const totals = sumMeals(meals)
 
   const undoable = async (message: string, ids: (number | undefined)[]) => {
     const real = ids.filter((x): x is number => x != null)
     toast({ message, undo: () => removeMeals(real) })
+  }
+
+  const removeWithUndo = async (m: Meal) => {
+    if (m.id == null) return
+    const { id, ...rest } = m
+    await removeMeal(id)
+    toast({ message: `Removed ${m.name}`, undo: async () => { await db.meals.add(rest) } })
   }
 
   const onName = (v: string) => {
@@ -84,6 +93,9 @@ export default function SlotCard({
           )}
         </span>
         <span className="row" style={{ gap: 4 }}>
+          <button type="button" className="btn btn-sm food-add-btn" aria-expanded={open} onClick={() => setOpen((v) => !v)} aria-label={`Add to ${label.toLowerCase()}`}>
+            {open ? 'Close' : '+ Add'}
+          </button>
           {meals.length > 0 && tplName == null && (
             <button className="btn btn-ghost btn-sm" onClick={() => setTplName(label === 'Snack' ? 'Usual snack' : `Usual ${label.toLowerCase()}`)}>
               Save as template
@@ -124,7 +136,7 @@ export default function SlotCard({
         </form>
       )}
 
-      {templates.length > 0 && (
+      {open && templates.length > 0 && (
         <div className="food-favs" aria-label={`Templates for ${label}`}>
           {templates.map((t) => (
             <button
@@ -143,25 +155,29 @@ export default function SlotCard({
         </div>
       )}
 
+      {meals.length === 0 && !open && <p className="faint small food-slot-empty">Nothing yet</p>}
+
       {meals.length > 0 && (
         <div className="list">
           {meals.map((m) => (
-            <div key={m.id} className="list-item food-meal">
+            <SwipeRow key={m.id} label="Delete" onCommit={() => void removeWithUndo(m)}>
+            <div className="list-item food-meal">
               <span className="grow food-meal-name">{m.name}</span>
               <span className="mono small muted">
                 {m.calories != null ? `${m.calories} kcal` : ''}
                 {m.calories != null && m.protein != null ? ' · ' : ''}
                 {m.protein != null ? `${m.protein} g` : ''}
               </span>
-              <button className="btn btn-ghost btn-sm food-x" onClick={() => m.id != null && removeMeal(m.id)} aria-label={`Remove ${m.name}`}>
+              <button className="btn btn-ghost btn-sm food-x" onClick={() => void removeWithUndo(m)} aria-label={`Remove ${m.name}`}>
                 ×
               </button>
             </div>
+            </SwipeRow>
           ))}
         </div>
       )}
 
-      {(favorites.length > 0 || recents.length > 0) && (
+      {open && (favorites.length > 0 || recents.length > 0) && (
         <div className="food-favs" aria-label={`Favorites and recent for ${label}`}>
           <button className="food-fav food-mult" onClick={() => setMult(mult >= 3 ? 1 : mult + 1)} title="Quantity multiplier for the chips" aria-label={`Quantity multiplier x${mult}`}>
             x{mult}
@@ -181,14 +197,14 @@ export default function SlotCard({
         </div>
       )}
 
-      <form
+      {open && <form
         className="food-add"
         onSubmit={(e) => {
           e.preventDefault()
           void submit()
         }}
       >
-        <input className="input food-add-name" placeholder={`Add to ${label.toLowerCase()}…`} value={name} onChange={(e) => onName(e.target.value)} list={listId} aria-label="Meal name" />
+        <input className="input food-add-name" placeholder={`Add to ${label.toLowerCase()}…`} value={name} onChange={(e) => onName(e.target.value)} list={listId} aria-label="Meal name" autoFocus />
         <input className="input food-add-num" inputMode="numeric" placeholder="kcal" value={kcal} onChange={(e) => setKcal(e.target.value)} aria-label="Calories" />
         <input className="input food-add-num" inputMode="numeric" placeholder="prot g" value={protein} onChange={(e) => setProtein(e.target.value)} aria-label="Protein grams" />
         <label className="food-fav-toggle small muted" title="Save as a favorite chip for this slot">
@@ -198,15 +214,15 @@ export default function SlotCard({
         <button className="btn btn-primary" type="submit" disabled={!name.trim()}>
           Add
         </button>
-      </form>
-      <FoodLookup
+      </form>}
+      {open && <FoodLookup
         query={name}
         onPick={(f) => {
           setName(f.name)
           setKcal(f.kcal != null ? String(f.kcal) : '')
           setProtein(f.protein != null ? String(f.protein) : '')
         }}
-      />
+      />}
     </section>
   )
 }

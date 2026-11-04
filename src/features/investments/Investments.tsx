@@ -4,6 +4,7 @@ import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YA
 import ChartFrame from '../../components/ChartFrame'
 import { ACTIVE_DOT, CHART, GRID_PROPS, MARGIN, X_AXIS, Y_AXIS, tooltipProps } from '../../components/chartTheme'
 import { ChartTip } from '../../components/ChartTip'
+import { NetWorthHero, NetWorthPath } from '../finance/NetWorthHero'
 import StatusChip from '../../components/StatusChip'
 import { Card, Empty, PageSkeleton, Progress } from '../../components/ui'
 import { db, setSetting, type BalanceSnapshot, type Contribution, type Holding } from '../../db'
@@ -38,8 +39,25 @@ export default function Investments() {
   const accounts = [...new Set([...holdings.map((h) => h.account), ...marked])]
   const untracked = assetNames.filter((n) => !accounts.includes(n))
 
+  // Combined value of tracked accounts over time (each account's latest balance carried forward at every snapshot date).
+  const tracked = new Set(accounts)
+  const trackedSnaps = balances.filter((b) => tracked.has(b.name)).sort((a, b) => a.date.localeCompare(b.date) || (a.id ?? 0) - (b.id ?? 0))
+  const carry = new Map<string, number>()
+  const path: { date: string; net: number }[] = []
+  trackedSnaps.forEach((b, i) => {
+    carry.set(b.name, b.balance)
+    if (trackedSnaps[i + 1]?.date === b.date) return
+    path.push({ date: b.date, net: [...carry.values()].reduce((x, y) => x + y, 0) })
+  })
+
   return (
     <div className="stack" style={{ gap: 16 }}>
+      {path.length > 0 && <NetWorthHero series={path} label="Invested" testId="invest-hero" />}
+      {path.length > 1 && (
+        <ChartFrame title="Invested path" hasData>
+          <NetWorthPath data={path} name="Invested" />
+        </ChartFrame>
+      )}
       {holdings.length === 0 && (
         <Card title="Add your first holding">
           <Empty>Add your VTI holding: type your balance and today's price. Prices are typed by hand; nothing is looked up online.</Empty>

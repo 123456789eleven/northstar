@@ -4,6 +4,7 @@ import { Card, Empty, Skeleton } from '../../components/ui'
 import { useToast } from '../../components/toastContext'
 import { db, type ISODate, type MealSlot } from '../../db'
 import { addDays, formatDate, relativeDay, today } from '../../lib/dates'
+import DayStrip from './DayStrip'
 import LeftToday from './LeftToday'
 import QuickAdd from './QuickAdd'
 import SlotCard, { type Suggestion } from './SlotCard'
@@ -110,9 +111,14 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
         )}
       </div>
 
-      <LeftToday targets={targets} totals={totals} isToday={isToday} hour={hour} onTargets={onTargets} />
-      <QuickAdd date={date} slot={slot} setSlot={setSlot} />
+      <DayStrip date={date} targets={targets} onPick={setDate} />
+
+      <div className="food-cols">
+      <div className="stack food-col-left">
+      <LeftToday targets={targets} totals={totals} isToday={isToday} hour={hour} onTargets={onTargets} ready={meals !== undefined} />
       {left && (left.kcal > 0 || left.protein > 0) && <Suggestions remaining={remaining} own={own} date={date} slot={slot} />}
+      </div>
+      <div className="stack food-col-right">
 
       {meals && meals.length === 0 && (favorites?.length ?? 0) === 0 && (
         <Card>
@@ -127,11 +133,11 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
       </datalist>
 
       {meals === undefined && (
-        <div className="grid grid-2" aria-busy="true">
+        <div className="food-slots" aria-busy="true">
           {SLOTS.map((s) => <Card key={s.value} title={s.label}><Skeleton lines={3} label={`Loading ${s.label}`} /></Card>)}
         </div>
       )}
-      {meals !== undefined && <div className="grid grid-2">
+      {meals !== undefined && <div className="food-slots">
         {SLOTS.map((s) => (
           <SlotCard
             key={s.value}
@@ -148,6 +154,9 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
           />
         ))}
       </div>}
+      <div className="food-quickdock"><QuickAdd date={date} slot={slot} setSlot={setSlot} /></div>
+      </div>
+      </div>
     </div>
   )
 }

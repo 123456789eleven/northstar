@@ -1,0 +1,24 @@
+/* G3 shared: swipe rows, hero numbers, flags, health bars. Tokens only; transform/opacity animate; reduced motion = instant. */
+
+.swipe { position: relative; overflow: hidden; border-radius: var(--radius-sm); }
+.swipe-back { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end; padding: 0 var(--sp-4); font-size: var(--text-sm); font-weight: 600; opacity: calc(var(--sw, 0)); }
+.swipe-warn .swipe-back { background: var(--warn-soft); color: var(--warn); }
+.swipe-accent .swipe-back { background: var(--accent-soft); color: var(--accent-text); }
+.swipe-front { position: relative; background: var(--surface-1); touch-action: pan-y; transition: transform var(--dur-base) var(--ease-spring); }
+
+/* Health bar: track, fill (scaleX via translate), pace tick, words */
+.hbar { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.hbar-track { position: relative; height: 8px; border-radius: var(--radius-pill); background: var(--surface-2); overflow: hidden; }
+.hbar-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--hb-c, var(--good)); transform: translateX(calc(var(--p, 0) * 100% - 100%)); transition: transform var(--dur-spring) var(--ease-spring-soft); }
+.hbar-tick { position: absolute; top: -2px; bottom: -2px; width: 2px; margin-left: -1px; background: var(--ink); opacity: 0.7; border-radius: 1px; }
+.hbar-words { display: flex; justify-content: space-between; gap: 8px; font-size: var(--text-xs); color: var(--ink-2); }
+.hbar-state { font-weight: 600; color: var(--hb-c, var(--good)); }
+.hbar.is-on-track { --hb-c: var(--good); }
+.hbar.is-watch { --hb-c: var(--accent-text); }
+.hbar.is-watch .hbar-fill { background: var(--accent); }
+.hbar.is-over { --hb-c: var(--warn); }
+
+@media (prefers-reduced-motion: reduce) {
+  .swipe-front, .hbar-fill { transition: none; }
+}
+:root[data-motion='reduced'] :is(.swipe-front, .hbar-fill) { transition: none; }

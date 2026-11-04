@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
-import { Card, CountUp, Empty, PageSkeleton, Progress } from '../../components/ui'
+import { Card, CountUp, Empty, PageSkeleton } from '../../components/ui'
+import HealthBar from './HealthBar'
 import { db, logEvent } from '../../db'
 import { money } from '../../lib/dates'
 import { EXPENSE_CATEGORIES } from './categories'
@@ -58,7 +59,7 @@ export default function Budgets({ month }: { month: string }) {
             <LeftLabel spent={totalSpent} limit={totalLimit} />
           </div>
           <div style={{ marginTop: 10 }}>
-            <BudgetBar spent={totalSpent} limit={totalLimit} />
+            <HealthBar spent={totalSpent} limit={totalLimit} month={month} label="Total budget" />
           </div>
           {unbudgetedSpend > 0 && <div className="tiny faint" style={{ marginTop: 8 }}>Plus {money(unbudgetedSpend)} in categories without a budget.</div>}
         </Card>
@@ -89,7 +90,7 @@ export default function Budgets({ month }: { month: string }) {
       >
         <div className="list">
           {ordered.map((c) => (
-            <BudgetRow key={c} category={c} limit={limitOf.get(c)} spent={Math.max(0, spent.get(c) ?? 0)} lastMonth={prevSpent.get(c) ?? 0} bill={billInfo.get(c)} />
+            <BudgetRow key={c} month={month} category={c} limit={limitOf.get(c)} spent={Math.max(0, spent.get(c) ?? 0)} lastMonth={prevSpent.get(c) ?? 0} bill={billInfo.get(c)} />
           ))}
         </div>
       </Card>
@@ -112,16 +113,7 @@ function LeftLabel({ spent, limit }: { spent: number; limit: number }) {
   )
 }
 
-function BudgetBar({ spent, limit }: { spent: number; limit: number }) {
-  const ratio = limit > 0 ? spent / limit : 0
-  return (
-    <div className={ratio > 1 ? 'fin-over' : ratio > 0.9 ? 'fin-near' : ''}>
-      <Progress value={ratio * 100} label="Budget used" tone={ratio > 1 ? 'warn' : undefined} />
-    </div>
-  )
-}
-
-function BudgetRow({ category, limit, spent, lastMonth, bill }: { category: string; limit?: number; spent: number; lastMonth: number; bill?: BillInfo }) {
+function BudgetRow({ month, category, limit, spent, lastMonth, bill }: { month: string; category: string; limit?: number; spent: number; lastMonth: number; bill?: BillInfo }) {
   const [draft, setDraft] = useState<string | null>(null)
   const value = draft ?? (limit ? String(limit) : '')
 
@@ -147,7 +139,7 @@ function BudgetRow({ category, limit, spent, lastMonth, bill }: { category: stri
         </div>
         {limit ? (
           <div style={{ marginTop: 6 }}>
-            <BudgetBar spent={spent} limit={limit} />
+            <HealthBar spent={spent} limit={limit} month={month} label={category} />
             {bill && (
               <div className="tiny muted" style={{ marginTop: 4 }}>
                 Bill: {money(bill.monthly)}/mo set aside (paid {bill.bills.map((b) => cadenceText(b, money)).join(' + ')})
