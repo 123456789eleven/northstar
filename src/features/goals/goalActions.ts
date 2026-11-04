@@ -1,5 +1,6 @@
 import { db, logEvent, type Goal, type GoalMetric } from '../../db'
 import { newId } from './progress'
+import type { ExampleBoss } from './boss'
 
 export async function completeGoal(g: Goal) {
   if (g.id == null) return
@@ -90,4 +91,13 @@ export async function setGoalMetric(id: number, metric: GoalMetric | undefined):
   const before = (await db.goals.get(id))?.metric
   await db.goals.update(id, { metric })
   return async () => { await db.goals.update(id, { metric: before }) }
+}
+
+/** Adopt a starter boss: creates a real quarter goal with its milestones. Returns the new id (for Undo). */
+export async function adoptExample(ex: ExampleBoss): Promise<number> {
+  return (await db.goals.add({
+    title: ex.title, area: ex.area, horizon: 'quarter', why: ex.why, targetDate: ex.targetDate, status: 'active',
+    milestones: ex.milestones.map((title) => ({ id: newId(), title, done: false })),
+    createdAt: new Date().toISOString(),
+  })) as number
 }

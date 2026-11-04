@@ -1,0 +1,62 @@
+/* Goals quest log: season bosses, HP bar with checkpoint flags, campaign rows. Tokens only; blur only on the top-level cards. */
+.quest-section { margin-bottom: var(--sp-5); }
+.quest-h { margin: 0 0 var(--sp-3); font-family: var(--mono); font-size: var(--text-label); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); }
+.quest-h-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-3); }
+.quest-h-row .quest-h { margin: 0; }
+.quest-lede { margin: var(--sp-2) 0 var(--sp-4); font-size: var(--text-base); color: var(--ink-2); }
+.quest-examples { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); }
+.quest-example { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); padding: var(--sp-4); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-1); }
+.quest-example-title { font-size: var(--text-md); font-weight: 600; line-height: 22px; }
+.quest-example-sub { font-size: var(--text-xs); color: var(--ink-2); flex: 1; }
+.quest-or { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--sp-4) 0 var(--sp-3); }
+.goal-start { max-width: 640px; }
+
+.boss-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: var(--gap); }
+.boss { display: flex; flex-direction: column; gap: var(--sp-2); width: 100%; min-width: 0; text-align: left; font: inherit; color: inherit; cursor: pointer; transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-base) var(--ease-spring); }
+.boss:hover { border-color: var(--line-strong); }
+.boss:active { transform: scale(0.99); }
+.boss-top { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+.boss-days { font-size: var(--text-xs); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.boss-title { font-size: var(--text-md); font-weight: 600; line-height: 22px; letter-spacing: var(--track-tight); overflow-wrap: anywhere; }
+.boss-numrow { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-3); }
+.boss-num { font-family: var(--serif); font-size: var(--text-lg); font-variant-numeric: tabular-nums; letter-spacing: var(--track-display); min-width: 0; overflow-wrap: anywhere; }
+.boss-hp { flex: 0 0 auto; font-size: var(--text-xs); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.boss-next { display: flex; flex-direction: column; gap: 2px; padding-top: var(--sp-2); border-top: 1px solid var(--line-soft); }
+.boss-next-k { font-family: var(--mono); font-size: var(--text-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); }
+.boss-next-v { font-size: var(--text-sm); color: var(--ink); overflow-wrap: anywhere; }
+
+/* HP bar: track with a fill that drains from the right, flags on the path */
+.bossbar { position: relative; padding-top: 6px; }
+.bossbar-path { position: relative; height: 12px; }
+.bossbar-track { position: absolute; left: 0; right: 0; top: 4px; height: 6px; border-radius: var(--radius-pill); background: var(--surface-3); overflow: hidden; }
+.bossbar-fill { position: absolute; inset: 0; border-radius: var(--radius-pill); background: var(--grad-violet); transform-origin: right center; transform: scaleX(var(--v, 0)); transition: transform var(--dur-spring) var(--ease-spring-soft); }
+.bossbar.is-calm .bossbar-fill { transform-origin: left center; }
+.bossbar-flag { position: absolute; top: 0; width: 2px; height: 12px; margin-left: -1px; border-radius: 1px; background: var(--ink-3); }
+.bossbar-flag.is-reached { background: var(--accent); }
+.bossbar-flag::after { content: ''; position: absolute; top: 0; left: 2px; width: 5px; height: 4px; background: inherit; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.bossbar-flag[style*='left: 100%']::after { left: -5px; transform: scaleX(-1); }
+.bossbar-labels { position: relative; height: 16px; margin-top: 2px; }
+.bossbar-label { position: absolute; transform: translateX(-50%); font-size: var(--text-label); line-height: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bossbar-label.is-end { transform: translateX(-100%); }
+.bossbar-label.is-reached { color: var(--ink); }
+
+/* Campaign */
+.camp-tree { display: flex; flex-direction: column; }
+.camp-tree > div + div { border-top: 1px solid var(--line-soft); }
+.camp-row { display: flex; align-items: center; gap: var(--sp-3); width: 100%; min-height: 52px; padding: 8px var(--sp-3); background: transparent; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: background-color var(--dur-fast) var(--ease-out); }
+.camp-row:hover { background: var(--glass-bg-hover); }
+.camp-row.paused { opacity: 0.7; }
+.camp-pct { font-size: 10px; }
+.camp-main { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; }
+.camp-title { font-size: var(--text-base); line-height: 20px; font-weight: 500; overflow-wrap: anywhere; }
+.camp-meta { display: flex; gap: var(--sp-2); font-size: var(--text-xs); color: var(--ink-2); }
+.camp-num { flex: 0 0 auto; max-width: 45%; font-size: var(--text-xs); color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+.camp-tree .goal-children { margin-left: 28px; padding-left: 0; border-left: 1px solid var(--line); }
+
+@media (max-width: 619px) {
+  .quest-examples { grid-template-columns: minmax(0, 1fr); }
+  .camp-tree .goal-children { margin-left: 16px; }
+  .camp-num { max-width: 38%; }
+}
+@media (prefers-reduced-motion: reduce) { .bossbar-fill, .boss { transition: none; } }
+:root[data-motion='reduced'] :is(.bossbar-fill, .boss) { transition: none; }

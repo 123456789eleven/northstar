@@ -3,8 +3,7 @@ import { db, AREAS, type Area, type Goal, type Habit, type ISODate } from '../..
 import { Field, Modal, AREA_LABEL } from '../../components/ui'
 import { formatDate } from '../../lib/dates'
 import { archiveHabit, deleteHabit } from './habitData'
-import { useHabitCheckIn } from './useHabitCheckIn'
-import { PER_WEEK_PRESETS, heatGrid, lastDays, perWeekLabel, streak, weekCountText, weekProgress } from './stats'
+import { PER_WEEK_PRESETS, heatGrid } from './stats'
 
 export function HeatStrip({ dates, today }: { dates: Set<ISODate>; today: ISODate }) {
   const grid = heatGrid(dates, today, 12)
@@ -33,57 +32,6 @@ export function HeatStrip({ dates, today }: { dates: Set<ISODate>; today: ISODat
         )
       })}
     </svg>
-  )
-}
-
-const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-
-export function HabitCard({ habit, dates, today, goalTitle, onEdit }: { habit: Habit; dates: Set<ISODate>; today: ISODate; goalTitle?: string; onEdit: (h: Habit) => void }) {
-  const tick = useHabitCheckIn()
-  const s = streak(dates, today, habit.perWeek)
-  const wp = weekProgress(dates, today, habit.perWeek)
-  const wt = weekCountText(wp.done, wp.target)
-  return (
-    <section data-focus-id={habit.id} className={`card habit ${habit.archived ? 'archived' : ''}`}>
-      <div className="habit-head">
-        <div className="grow">
-          <div className="habit-name">{habit.name}</div>
-          <div className="habit-meta">
-            <span>{AREA_LABEL[habit.area]}</span>
-            <span>{perWeekLabel(habit.perWeek)}</span>
-            {goalTitle && <span>{goalTitle}</span>}
-          </div>
-        </div>
-        <div className="habit-streak">
-          <strong className={wt.met ? 'is-met' : ''}>{wt.main}</strong>
-          <span>{wt.caption}{s.count >= 1 ? ` · ${s.count} ${s.unit}${s.count === 1 ? '' : 's'} streak` : ' · no streak yet'}</span>
-        </div>
-      </div>
-      <div className="habit-days">
-        {lastDays(today).map((d) => {
-          const on = dates.has(d)
-          const dow = new Date(Number(d.slice(0, 4)), Number(d.slice(5, 7)) - 1, Number(d.slice(8, 10))).getDay()
-          return (
-            <button
-              key={d}
-              type="button"
-              className={`habit-day ${on ? 'on' : ''} ${d === today ? 'today' : ''}`}
-              aria-pressed={on}
-              onClick={() => void tick(habit, d)}
-            >
-              <span aria-hidden>{DOW[dow]}</span>
-              <b aria-hidden>{Number(d.slice(8))}</b>
-              <span className="sr-only">{`${habit.name}, ${formatDate(d, { weekday: 'long', month: 'short', day: 'numeric' })}${on ? ', done' : ''}`}</span>
-            </button>
-          )
-        })}
-      </div>
-      <HeatStrip dates={dates} today={today} />
-      <div className="habit-foot">
-        <span className="habit-week">Last 12 weeks</span>
-        <button className="btn btn-ghost btn-sm" onClick={() => onEdit(habit)}>Edit</button>
-      </div>
-    </section>
   )
 }
 
