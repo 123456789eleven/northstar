@@ -37,7 +37,7 @@ export default function WeighInStepper({ loggedToday, last, first = false }: { l
             className="input wstep-input"
             inputMode="decimal"
             autoComplete="off"
-            placeholder={loggedToday != null ? `Today: ${loggedToday} lb. Type to update` : last != null ? `Last: ${last} lb` : 'e.g. 136.4'}
+            placeholder={loggedToday != null ? `Today: ${loggedToday}` : last != null ? `Last: ${last} lb` : 'e.g. 136.4'}
             value={text}
             onChange={(e) => setText(e.target.value)}
             aria-label="Weight in pounds"

@@ -9,6 +9,7 @@ import LeftToday from './LeftToday'
 import QuickAdd from './QuickAdd'
 import SlotCard, { type Suggestion } from './SlotCard'
 import Suggestions from './Suggestions'
+import { PHONE_QUERY, useMedia } from '../../components/useMedia'
 import { useTemplates } from './useTemplates'
 import { copyYesterdayIds, removeMeals, SLOTS, sumMeals, type FoodTargets } from './foodData'
 import { defaultSlot, leftToday, type Candidate } from './foodLogic'
@@ -18,6 +19,7 @@ const LIST_ID = 'food-recent-names'
 export default function DayView({ date, setDate, targets, onTargets }: { date: ISODate; setDate: (d: ISODate) => void; targets: FoodTargets; onTargets: () => void }) {
   const toast = useToast()
   const templates = useTemplates()
+  const phone = useMedia(PHONE_QUERY)
   const [hour] = useState(() => new Date().getHours())
   const [slot, setSlot] = useState<MealSlot>(() => defaultSlot(hour))
   const picker = useRef<HTMLInputElement>(null)
@@ -154,9 +156,10 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
           />
         ))}
       </div>}
-      <div className="food-quickdock"><QuickAdd date={date} slot={slot} setSlot={setSlot} /></div>
+      {!phone && <div className="food-quickdock"><QuickAdd date={date} slot={slot} setSlot={setSlot} /></div>}
       </div>
       </div>
+      {phone && <div className="food-quickdock"><QuickAdd date={date} slot={slot} setSlot={setSlot} /></div>}
     </div>
   )
 }

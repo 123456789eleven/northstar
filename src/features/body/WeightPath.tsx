@@ -21,7 +21,16 @@ const flagText = (f: CheckpointFlag) => (f.reached ? `${f.target} lb` : f.next ?
 
 export default function WeightPath({ data, flags, ghost, goal }: { data: AvgPoint[]; flags: CheckpointFlag[]; ghost: GhostLine; goal: number }) {
   const rows: Row[] = data.map((d) => ({ x: t(d.date), date: d.date, weight: d.weight, avg: d.avg }))
-  for (const g of ghost.points) {
+  // Keep the ghost line within a readable horizon so a far-off goal does not squash the real data.
+  const lastX = rows.length ? rows[rows.length - 1].x : t(ghost.points[0]?.date ?? '2026-01-01')
+  const spanDays = rows.length > 1 ? (lastX - rows[0].x) / 86400000 : 0
+  const horizon = lastX + Math.max(21, spanDays * 0.4) * 86400000
+  const g0 = ghost.points[0]
+  const g1 = ghost.points[1]
+  const ghostPts = g0 && g1 && t(g1.date) > horizon
+    ? [g0, { date: iso(horizon), ghost: g0.ghost + ((g1.ghost - g0.ghost) * (horizon - t(g0.date))) / (t(g1.date) - t(g0.date)) }]
+    : ghost.points
+  for (const g of ghostPts) {
     const x = t(g.date)
     const hit = rows.find((r) => r.x === x)
     if (hit) hit.ghost = g.ghost

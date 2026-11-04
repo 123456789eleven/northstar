@@ -21,6 +21,7 @@ async function seed(page: Page, data: Record<string, unknown[]>) {
     }
     db.close()
   }, data)
+  await page.reload()
 }
 
 const viewports = [
@@ -41,7 +42,7 @@ for (const vp of viewports) {
       await page.getByRole('button', { name: 'Raise by 0.1 pound' }).click()
       await expect(input).toHaveValue('136.1')
       await input.fill('138')
-      await page.getByRole('button', { name: 'Save', exact: true }).click()
+      await page.locator('.wstep').getByRole('button', { name: /^(Save|Update)$/ }).click()
       await expect(hero).toContainText('137.0')
       // Flags: the path lists its checkpoints in words.
       await expect(page.getByRole('list', { name: 'Checkpoints' })).toBeVisible()
@@ -51,7 +52,7 @@ for (const vp of viewports) {
       await page.goto('/#/body')
       await expect(page.getByText('Your first weigh-in')).toBeVisible()
       await page.getByLabel('Weight in pounds').fill('150')
-      await page.getByRole('button', { name: 'Save', exact: true }).click()
+      await page.locator('.wstep').getByRole('button', { name: /^(Save|Update)$/ }).click()
       await expect(page.getByTestId('hero-weight')).toContainText('150.0')
     })
 

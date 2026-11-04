@@ -28,7 +28,7 @@ export default function BodyHero({ current, last, change, rate, toGo, goal, next
       <dl className="body-hero-stats">
         <div><dt>Change this week</dt><dd className="mono">{change != null ? `${signed(change)} lb` : '--'}</dd></div>
         <div><dt>Rate, 4 weeks</dt><dd className="mono">{rate != null ? `${signed(rate)} lb/wk` : '--'}</dd></div>
-        <div><dt>To go</dt><dd className="mono">{toGo.toFixed(1)} lb</dd><span className="faint tiny">Goal {goal} lb{projected ? `, ${projected}` : ''}</span></div>
+        <div><dt>To go</dt><dd><span className="mono">{toGo.toFixed(1)} lb</span><span className="faint tiny" style={{ display: 'block' }}>Goal {goal} lb{projected ? `, ${projected}` : ''}</span></dd></div>
       </dl>
       {next && <p className="body-hero-next small">Next checkpoint {next.target} lb: <strong className="mono">{next.lbToGo.toFixed(1)} lb</strong> to go.</p>}
     </section>

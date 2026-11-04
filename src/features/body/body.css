@@ -72,3 +72,8 @@ ul.body-ms { list-style: none; margin: 0; padding: 0; }
 .train-recent { margin-top: var(--sp-4); }
 .train-list { list-style: none; margin: 4px 0 0; padding: 0; }
 .train-list li { display: flex; justify-content: space-between; padding: 6px 0; border-top: 1px solid var(--line-soft); }
+.body-hero-stats dd .mono { white-space: nowrap; }
+@media (max-width: 819px) {
+  .body-hero-stats dd { font-size: var(--text-base); }
+  .body-hero-stats { gap: var(--sp-2); }
+}
