@@ -1,0 +1,24 @@
+/* G2a time blocks: draggable/resizable local blocks, Training hue, conflicts, task tray. Tokens only. */
+.pl-ev.block { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; padding-bottom: 9px; }
+.pl-ev.block.task-block { border-left-color: var(--accent); }
+.pl-ev.training { border-left-color: var(--skill-body); background: color-mix(in srgb, var(--skill-body) 16%, var(--surface-2)); }
+.pl-ev.training:hover { background: color-mix(in srgb, var(--skill-body) 24%, var(--surface-2)); }
+.pl-ev.conflict { outline: 1px solid var(--warn); outline-offset: -1px; }
+.pl-ev.conflict small { color: var(--warn); }
+.pl-ev.dragging { cursor: grabbing; box-shadow: var(--glass-shadow); opacity: 0.92; transition: none; }
+.pl-resize { position: absolute; left: 0; right: 0; bottom: 0; height: 8px; cursor: ns-resize; }
+.pl-resize::after { content: ''; position: absolute; left: 50%; bottom: 3px; width: 18px; height: 2px; margin-left: -9px; border-radius: 2px; background: var(--ink-3); opacity: 0; transition: opacity var(--dur-fast) var(--ease-out); }
+.pl-ev.block:hover .pl-resize::after, .pl-ev.block.dragging .pl-resize::after, .pl-ev.block:focus-visible .pl-resize::after { opacity: 0.7; }
+.pl-grid .pl-ev.block, .pl-wk-col .pl-ev.block { overflow: hidden; }
+
+.pl-tray { list-style: none; margin: 0; padding: 0; }
+.pl-tray-item { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 4px 0; border-bottom: 1px solid var(--line); cursor: grab; }
+.pl-tray-item:last-child { border-bottom: 0; }
+.pl-tray-grip { width: 8px; height: 14px; flex: 0 0 8px; border-left: 4px double var(--ink-3); opacity: 0.7; }
+.pl-tray-title { flex: 1; min-width: 0; font-size: 13px; overflow-wrap: anywhere; }
+.pl-fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 12px; }
+
+@media (max-width: 819px) {
+  .pl-bar { gap: 6px; }
+  .pl-bar .pl-title { flex: 1 1 100%; order: 5; margin: 4px 0 0; }
+}

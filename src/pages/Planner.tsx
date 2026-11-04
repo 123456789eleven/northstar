@@ -3,16 +3,21 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, getSetting, setSetting, type CalendarEvent, type ISODate } from '../db'
 import { Link } from 'react-router-dom'
 import { Card, PageHeader } from '../components/ui'
-import { useMedia } from '../components/useMedia'
+import { useMedia, PHONE_QUERY } from '../components/useMedia'
 import { useNow } from '../components/useNow'
 import { addDays, formatDate, today } from '../lib/dates'
 import { useFocusTarget } from '../lib/useFocusParam'
 import { allDayOn, daySegments, weekDates } from '../features/planner/layout'
 import { EventModal } from '../features/planner/EventModal'
-import { DayGrid, EventButton, HabitLine, PlanPanel, TaskLine, WeekGrid } from '../features/planner/PlannerParts'
+import { DayGrid, EventButton, HabitLine, PlanPanel, TaskLine, TaskTray, WeekGrid } from '../features/planner/PlannerParts'
+import { BlockDialog, type BlockDefaults } from '../features/planner/BlockDialog'
+import { useBlocks } from '../features/planner/useBlocks'
+import { blockMeta, conflictIds } from '../features/planner/timeBlock'
+import type { BlockOps } from '../features/planner/GridEvent'
 import { GCAL_DISMISS_KEY } from '../features/gcal/help'
 import '../features/gcal/gcal.css'
 import '../features/planner/planner.css'
+import '../features/planner/g2a.css'
 
 type View = 'week' | 'day'
 type Editing = { event: CalendarEvent | null; date: ISODate; start?: string }
@@ -20,7 +25,10 @@ type Editing = { event: CalendarEvent | null; date: ISODate; start?: string }
 export default function Planner() {
   const t = today()
   const wide = useMedia('(min-width: 1240px)')
-  const [view, setView] = useState<View>('week')
+  const phone = useMedia(PHONE_QUERY)
+  const [view, setView] = useState<View>(() => (typeof window !== 'undefined' && window.matchMedia(PHONE_QUERY).matches ? 'day' : 'week'))
+  const [blockEd, setBlockEd] = useState<{ event: CalendarEvent | null; defaults: BlockDefaults } | null>(null)
+  const api = useBlocks()
   const [anchor, setAnchor] = useState<ISODate>(t)
   const [editing, setEditing] = useState<Editing | null>(null)
 
@@ -37,7 +45,7 @@ export default function Planner() {
   const logSet = useMemo(() => new Set((logs ?? []).map((l) => `${l.habitId}|${l.date}`)), [logs])
   const days = view === 'week' ? weekDates(anchor) : [anchor]
   const step = view === 'week' ? 7 : 1
-  const evs = events ?? []
+  const evs = useMemo(() => events ?? [], [events])
 
   const title =
     view === 'week'
@@ -52,6 +60,22 @@ export default function Planner() {
   const dailyHabits = (habits ?? []).filter((h) => h.perWeek >= 7)
   const habitsOpenToday = dailyHabits.filter((h) => !logSet.has(`${h.id}|${t}`)).length
   const openNew = (date: ISODate, start?: string) => setEditing({ event: null, date, start })
+  const openEvent = (x: CalendarEvent) => (blockMeta(x) ? setBlockEd({ event: x, defaults: { date: x.date } }) : setEditing({ event: x, date: x.date }))
+  const openBlock = (date: ISODate, start?: string, taskId?: number) => setBlockEd({ event: null, defaults: { date, start, taskId } })
+  const ops: BlockOps = (() => {
+    const conflicts = new Set<number>()
+    for (const d of days) for (const id of conflictIds(evs, d)) conflicts.add(id)
+    return {
+      conflicts,
+      onMove: (e, date, startMin) => void api.move(e, date, startMin),
+      onResize: (e, endMin) => void api.resize(e, endMin),
+      onDropTask: (date, startMin, taskId) => {
+        const t = (tasks ?? []).find((x) => x.id === taskId)
+        if (t) void api.drop(t, date, startMin)
+      },
+    }
+  })()
+  const linkedTasks = useMemo(() => new Set(evs.map((e) => blockMeta(e)?.taskId).filter((x): x is number => x != null)), [evs])
 
   useFocusTarget({
     ready: events !== undefined,
@@ -67,8 +91,8 @@ export default function Planner() {
     const empty = !allDay.length && !timed.length && !dt.length && !bd.length
     return (
       <>
-        {allDay.map((e) => <EventButton key={e.id} e={e} onOpen={(x) => setEditing({ event: x, date: x.date })} />)}
-        {timed.map((s) => <EventButton key={`${s.event.id}-${s.continued}`} e={s.event} onOpen={(x) => setEditing({ event: x, date: x.date })} />)}
+        {allDay.map((e) => <EventButton key={e.id} e={e} onOpen={(x) => openEvent(x)} />)}
+        {timed.map((s) => <EventButton key={`${s.event.id}-${s.continued}`} e={s.event} onOpen={(x) => openEvent(x)} />)}
         {dt.map((x) => <TaskLine key={x.id} t={x} />)}
         {bd.map((p) => <div key={p.id} className="pl-note">Birthday: {p.name}</div>)}
         {empty && events !== undefined && <div className="pl-empty">Free</div>}
@@ -80,7 +104,12 @@ export default function Planner() {
     <>
       <PageHeader
         title="Planner" sub={events === undefined ? ' ' : `${evs.filter((e) => days.includes(e.date)).length} events in view${habitsOpenToday ? ` · ${habitsOpenToday} daily ${habitsOpenToday === 1 ? 'habit' : 'habits'} open today` : ''}`}
-        actions={<button className="btn btn-primary" onClick={() => openNew(view === 'day' ? anchor : t)}>New event</button>}
+        actions={(
+          <>
+            <button className="btn" onClick={() => openBlock(view === 'day' ? anchor : t)}>{phone ? 'Add block' : 'Block time'}</button>
+            <button className="btn btn-primary" onClick={() => openNew(view === 'day' ? anchor : t)}>New event</button>
+          </>
+        )}
       />
 
       {showGcalPrompt && (
@@ -112,7 +141,7 @@ export default function Planner() {
             <WeekGrid
               days={days} today={t} events={evs} nowMin={nowMin}
               allDayExtras={(d) => (<>{tasksOn(d).map((x) => <TaskLine key={x.id} t={x} />)}{birthdaysOn(d).map((p) => <div key={p.id} className="pl-note">Birthday: {p.name}</div>)}</>)}
-              onOpen={(x) => setEditing({ event: x, date: x.date })} onNew={(d, s) => openNew(d, s)} onOpenDay={(d) => { setAnchor(d); setView('day') }}
+              onOpen={(x) => openEvent(x)} onNew={(d, s) => openNew(d, s)} onOpenDay={(d) => { setAnchor(d); setView('day') }} ops={ops}
             />
           ) : view === 'week' ? (
             <div className="pl-week">
@@ -130,10 +159,10 @@ export default function Planner() {
             <Card>
               {allDayOn(evs, anchor).length > 0 && (
                 <div className="stack" style={{ marginBottom: 14 }}>
-                  {allDayOn(evs, anchor).map((e) => <EventButton key={e.id} e={e} onOpen={(x) => setEditing({ event: x, date: x.date })} />)}
+                  {allDayOn(evs, anchor).map((e) => <EventButton key={e.id} e={e} onOpen={(x) => openEvent(x)} />)}
                 </div>
               )}
-              <DayGrid date={anchor} events={evs} isToday={anchor === t} nowMin={nowMin} onOpen={(x) => setEditing({ event: x, date: x.date })} onNew={(s) => openNew(anchor, s)} />
+              <DayGrid date={anchor} events={evs} isToday={anchor === t} nowMin={nowMin} onOpen={(x) => openEvent(x)} onNew={(s) => openNew(anchor, s)} ops={ops} />
             </Card>
           )}
         </div>
@@ -150,10 +179,12 @@ export default function Planner() {
               )}
             </Card>
           )}
+          {!phone && <TaskTray tasks={tasks ?? []} linked={linkedTasks} onBlock={(t) => openBlock(planDate, undefined, t.id)} />}
           <PlanPanel tasks={tasks ?? []} date={planDate} label={planDate === t ? 'today' : formatDate(planDate, { weekday: 'short', month: 'short', day: 'numeric' })} />
         </div>
       </div>
 
+      {blockEd && <BlockDialog block={blockEd.event} defaults={blockEd.defaults} tasks={tasks ?? []} phone={phone} api={api} onClose={() => setBlockEd(null)} />}
       {editing && <EventModal event={editing.event} defaults={{ date: editing.date, start: editing.start }} onClose={() => setEditing(null)} />}
     </>
   )
