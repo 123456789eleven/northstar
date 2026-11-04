@@ -40,3 +40,13 @@ export function selectionAfterRemoval(before: number[], removed: number, after: 
   const rest = before.filter((id) => id !== removed && after.includes(id))
   return rest[Math.min(i, rest.length - 1)] ?? null
 }
+
+/** The three list groups: Today (due today or overdue), Upcoming (dated later), Someday (no date). */
+export function groupForList(tasks: Task[], d: string): TaskGroup[] {
+  const open = tasks.filter((t) => t.status === 'open').sort(byDue)
+  return [
+    { key: 'today' as GroupKey, label: 'Today', tasks: open.filter((t) => t.due && t.due <= d) },
+    { key: 'week' as GroupKey, label: 'Upcoming', tasks: open.filter((t) => t.due && t.due > d) },
+    { key: 'none' as GroupKey, label: 'Someday', tasks: open.filter((t) => !t.due).sort((a, b) => a.priority - b.priority || a.createdAt.localeCompare(b.createdAt)) },
+  ].filter((g) => g.tasks.length > 0)
+}

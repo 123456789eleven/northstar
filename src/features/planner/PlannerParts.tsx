@@ -7,9 +7,11 @@ import { toggleDone } from '../tasks/taskActions'
 import { useHabitCheckIn } from '../habits/useHabitCheckIn'
 import { isGoogleEvent } from '../gcal/help'
 import '../gcal/gcal.css'
+import { GridEvent, type BlockOps } from './GridEvent'
+import { minFromY } from './timeBlock'
 import { DAY_MIN, allDayOn, daySegments, fmtTime, hourRange, layoutSegments, timeLabel } from './layout'
 
-const PX_PER_HOUR = 48
+export const PX_PER_HOUR = 48
 
 export function EventButton({ e, onOpen }: { e: CalendarEvent; onOpen: (e: CalendarEvent) => void }) {
   const allDay = e.allDay || !e.start
@@ -46,7 +48,7 @@ export function HabitLine({ h, date, checked }: { h: Habit; date: ISODate; check
 }
 
 /** Hour grid for one day. Clicking empty space starts a new event at that hour. */
-export function DayGrid({ date, events, isToday, nowMin, onOpen, onNew }: { date: ISODate; events: CalendarEvent[]; isToday: boolean; nowMin: number; onOpen: (e: CalendarEvent) => void; onNew: (start: string) => void }) {
+export function DayGrid({ date, events, isToday, nowMin, onOpen, onNew, ops }: { date: ISODate; events: CalendarEvent[]; isToday: boolean; nowMin: number; onOpen: (e: CalendarEvent) => void; onNew: (start: string) => void; ops: BlockOps }) {
   const segs = daySegments(events, date)
   const [lo, hi] = hourRange(segs)
   const placed = layoutSegments(segs)
@@ -57,6 +59,9 @@ export function DayGrid({ date, events, isToday, nowMin, onOpen, onNew }: { date
       className="pl-grid"
       role="group"
       aria-label="Day schedule"
+      data-col-date={date}
+      onDragOver={(ev) => ev.preventDefault()}
+      onDrop={(ev) => dropOn(ev, date, lo, ops)}
       onClick={(ev) => {
         if (ev.target !== ev.currentTarget && !(ev.target as HTMLElement).classList.contains('pl-hour')) return
         const rect = ev.currentTarget.getBoundingClientRect()
@@ -70,15 +75,7 @@ export function DayGrid({ date, events, isToday, nowMin, onOpen, onNew }: { date
         </div>
       ))}
       {placed.map((p) => (
-        <button
-          key={`${p.event.id}-${p.continued}`}
-          className="pl-ev"
-          style={{ top: y(p.start), height: Math.max(22, y(p.end) - y(p.start) - 2), left: `${(p.col / p.cols) * 100}%`, width: `calc(${100 / p.cols}% - 3px)` }}
-          onClick={() => onOpen(p.event)}
-        >
-          <span className="pl-ev-title">{p.event.title}{isGoogleEvent(p.event) && <span className="gcal-src" title="Imported from Google Calendar">Google</span>}</span>
-          <small>{p.continued ? `Until ${fmtTime(p.end)}` : timeLabel(p.event)}</small>
-        </button>
+        <GridEvent key={`${p.event.id}-${p.continued}`} p={p} top={y(p.start)} height={Math.max(22, y(p.end) - y(p.start) - 2)} pxPerHour={PX_PER_HOUR} ops={ops} onOpen={onOpen} />
       ))}
       {isToday && nowMin >= lo * 60 && nowMin <= Math.min(DAY_MIN, hi * 60) && <div className="pl-now" style={{ top: y(nowMin) }} aria-hidden />}
     </div>
@@ -113,10 +110,10 @@ export function PlanPanel({ tasks, date, label }: { tasks: Task[]; date: ISODate
  * Week time axis (wide screens): day heads, an all-day lane on top (all-day events, tasks due, birthdays), then one shared
  * hour axis with each day as a column and a now-line across today's column. Clicking an empty hour starts an event there.
  */
-export function WeekGrid({ days, today, events, nowMin, allDayExtras, onOpen, onNew, onOpenDay }: {
+export function WeekGrid({ days, today, events, nowMin, allDayExtras, onOpen, onNew, onOpenDay, ops }: {
   days: ISODate[]; today: ISODate; events: CalendarEvent[]; nowMin: number
   allDayExtras: (d: ISODate) => ReactNode
-  onOpen: (e: CalendarEvent) => void; onNew: (d: ISODate, start: string) => void; onOpenDay: (d: ISODate) => void
+  onOpen: (e: CalendarEvent) => void; onNew: (d: ISODate, start: string) => void; onOpenDay: (d: ISODate) => void; ops: BlockOps
 }) {
   const perDay = days.map((d) => ({ d, segs: daySegments(events, d) }))
   const [lo, hi] = hourRange(perDay.flatMap((x) => x.segs))
@@ -152,7 +149,10 @@ export function WeekGrid({ days, today, events, nowMin, allDayExtras, onOpen, on
             <div
               key={d}
               className={`pl-wk-col ${isToday ? 'today' : ''}`}
+              data-col-date={d}
               style={{ height: hours.length * PX_PER_HOUR }}
+              onDragOver={(ev) => ev.preventDefault()}
+              onDrop={(ev) => dropOn(ev, d, lo, ops)}
               onClick={(ev) => {
                 if (ev.target !== ev.currentTarget) return
                 const rect = ev.currentTarget.getBoundingClientRect()
@@ -161,15 +161,7 @@ export function WeekGrid({ days, today, events, nowMin, allDayExtras, onOpen, on
             >
               {hours.slice(1).map((h) => <div key={h} className="pl-wk-line" style={{ top: (h - lo) * PX_PER_HOUR }} aria-hidden />)}
               {placed.map((p) => (
-                <button
-                  key={`${p.event.id}-${p.continued}`}
-                  className="pl-ev"
-                  style={{ top: y(p.start), height: Math.max(22, y(p.end) - y(p.start) - 2), left: `${(p.col / p.cols) * 100}%`, width: `calc(${100 / p.cols}% - 3px)` }}
-                  onClick={() => onOpen(p.event)}
-                >
-                  <span className="pl-ev-title">{p.event.title}</span>
-                  <small>{p.continued ? `Until ${fmtTime(p.end)}` : timeLabel(p.event)}</small>
-                </button>
+                <GridEvent key={`${p.event.id}-${p.continued}`} p={p} top={y(p.start)} height={Math.max(22, y(p.end) - y(p.start) - 2)} pxPerHour={PX_PER_HOUR} ops={ops} onOpen={onOpen} />
               ))}
               {isToday && nowMin >= lo * 60 && nowMin <= Math.min(DAY_MIN, hi * 60) && <div className="pl-now" style={{ top: y(nowMin) }} aria-hidden />}
             </div>
@@ -177,5 +169,38 @@ export function WeekGrid({ days, today, events, nowMin, allDayExtras, onOpen, on
         })}
       </div>
     </div>
+  )
+}
+
+function dropOn(ev: React.DragEvent<HTMLElement>, date: ISODate, lo: number, ops: BlockOps) {
+  ev.preventDefault()
+  const id = Number(ev.dataTransfer.getData('text/x-task-id'))
+  if (!id) return
+  const rect = ev.currentTarget.getBoundingClientRect()
+  ops.onDropTask(date, minFromY(ev.clientY - rect.top, lo, PX_PER_HOUR), id)
+}
+
+/** Desktop side tray: open tasks to drag onto the grid. The Block button is the keyboard route to the same dialog. */
+export function TaskTray({ tasks, linked, onBlock }: { tasks: Task[]; linked: Set<number>; onBlock: (t: Task) => void }) {
+  const list = tasks.filter((t) => t.status === 'open' && !linked.has(t.id!)).sort((a, b) => a.priority - b.priority || (a.due ?? '9999').localeCompare(b.due ?? '9999')).slice(0, 12)
+  return (
+    <Card title="Task tray">
+      {list.length === 0 ? (
+        <Empty>No unblocked tasks. Add one on Tasks, then drag it onto the grid.</Empty>
+      ) : (
+        <>
+          <div className="pl-note" style={{ marginBottom: 6 }}>Drag a task onto the grid for a 45 minute block.</div>
+          <ul className="pl-tray">
+            {list.map((t) => (
+              <li key={t.id} className="pl-tray-item" draggable onDragStart={(ev) => { ev.dataTransfer.setData('text/x-task-id', String(t.id)); ev.dataTransfer.effectAllowed = 'copy' }}>
+                <span className="pl-tray-grip" aria-hidden />
+                <span className="pl-tray-title">{t.title}</span>
+                <button type="button" className="btn btn-sm" onClick={() => onBlock(t)} aria-label={`Block time for ${t.title}`}>Block</button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </Card>
   )
 }

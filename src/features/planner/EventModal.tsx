@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { db, type CalendarEvent, type ISODate } from '../../db'
 import { Field, Modal } from '../../components/ui'
+import { isGoogleEvent } from '../gcal/help'
 
 type Draft = Pick<CalendarEvent, 'title' | 'date' | 'allDay' | 'start' | 'end' | 'location' | 'notes'>
 
@@ -8,6 +9,7 @@ export function EventModal({ event, defaults, onClose }: { event: CalendarEvent 
   const [d, setD] = useState<Draft>(
     event ?? { title: '', date: defaults.date, allDay: !defaults.start, start: defaults.start, end: undefined, location: '', notes: '' },
   )
+  const readOnly = !!event && isGoogleEvent(event)
   const set = (p: Partial<Draft>) => setD((x) => ({ ...x, ...p }))
 
   const save = async () => {
@@ -29,8 +31,10 @@ export function EventModal({ event, defaults, onClose }: { event: CalendarEvent 
   }
 
   return (
-    <Modal title={event ? 'Edit event' : 'New event'} onClose={onClose}>
-      <form className="stack" onSubmit={(e) => { e.preventDefault(); void save() }}>
+    <Modal title={readOnly ? 'Google event' : event ? 'Edit event' : 'New event'} onClose={onClose}>
+      <form className="stack" onSubmit={(e) => { e.preventDefault(); if (!readOnly) void save() }}>
+        {readOnly && <p className="pl-note">Imported from Google Calendar. It is read-only here; change it in Google.</p>}
+        <fieldset className="pl-fieldset" disabled={readOnly}>
         <Field label="Title">
           <input className="input" value={d.title} onChange={(e) => set({ title: e.target.value })} placeholder="Dentist" autoFocus />
         </Field>
@@ -61,15 +65,16 @@ export function EventModal({ event, defaults, onClose }: { event: CalendarEvent 
         <Field label="Notes">
           <textarea className="textarea" value={d.notes ?? ''} onChange={(e) => set({ notes: e.target.value })} />
         </Field>
+        </fieldset>
         <div className="row-between">
-          {event?.id != null ? (
+          {event?.id != null && !readOnly ? (
             <button type="button" className="btn btn-sm btn-danger" onClick={() => void db.calendar.delete(event.id!).then(onClose)}>Delete</button>
           ) : (
             <span />
           )}
           <div className="row">
-            <button type="button" className="btn" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn-primary" disabled={!d.title.trim()}>Save</button>
+            <button type="button" className="btn" onClick={onClose}>{readOnly ? 'Close' : 'Cancel'}</button>
+            {!readOnly && <button type="submit" className="btn btn-primary" disabled={!d.title.trim()}>Save</button>}
           </div>
         </div>
       </form>

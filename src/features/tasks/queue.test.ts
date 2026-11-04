@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Task } from '../../db'
-import { groupOpenTasks, queueOrder, selectionAfterRemoval, stepSelection } from './queue'
+import { groupForList, groupOpenTasks, queueOrder, selectionAfterRemoval, stepSelection } from './queue'
 
 const t = (id: number, over: Partial<Task> = {}): Task => ({ id, title: `t${id}`, priority: 2, status: 'open', recurrence: 'none', createdAt: `2026-01-0${id}T00:00:00.000Z`, ...over })
 
@@ -40,5 +40,13 @@ describe('selection', () => {
     expect(selectionAfterRemoval([1, 2, 3], 2, [1, 3])).toBe(3)
     expect(selectionAfterRemoval([1, 2, 3], 3, [1, 2])).toBe(2)
     expect(selectionAfterRemoval([1], 1, [])).toBeNull()
+  })
+})
+
+describe('groupForList', () => {
+  const mk = (id: number, due?: string): Task => ({ id, title: 't' + id, due, priority: 2, status: 'open', recurrence: 'none', createdAt: '2026-11-01T00:00:00' })
+  it('buckets overdue with today, then upcoming, then someday', () => {
+    const g = groupForList([mk(1, '2026-11-01'), mk(2, '2026-11-02'), mk(3, '2026-11-09'), mk(4)], '2026-11-02')
+    expect(g.map((x) => [x.label, x.tasks.map((t) => t.id)])).toEqual([['Today', [1, 2]], ['Upcoming', [3]], ['Someday', [4]]])
   })
 })

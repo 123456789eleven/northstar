@@ -12,10 +12,13 @@ import { describeCapture, parseTask, type CaptureGoal } from '../lib/capture'
 import { TaskRow } from '../features/tasks/TaskRow'
 import { TaskForm } from '../features/tasks/TaskEditor'
 import { MAX_FOCUS, addTask, completeTask, reopenTask } from '../features/tasks/taskActions'
-import { groupOpenTasks, queueOrder, selectionAfterRemoval, stepSelection } from '../features/tasks/queue'
+import { groupForList, groupOpenTasks, queueOrder, selectionAfterRemoval, stepSelection } from '../features/tasks/queue'
 import { useToast } from '../components/toastContext'
 import { useFocusTarget } from '../lib/useFocusParam'
+import { FocusBar } from '../features/tasks/FocusBar'
+import { ComboChip } from '../features/tasks/ComboChip'
 import '../features/tasks/tasks.css'
+import '../features/tasks/g2a.css'
 
 export default function Tasks() {
   const d = today()
@@ -35,7 +38,7 @@ export default function Tasks() {
     [goals],
   )
 
-  const groups = useMemo(() => groupOpenTasks(tasks ?? [], d), [tasks, d])
+  const groups = useMemo(() => groupForList(tasks ?? [], d), [tasks, d])
   const order = useMemo(() => queueOrder(groups), [groups])
   const done = useMemo(() => {
     const cutoff = addDays(d, -14)
@@ -43,8 +46,8 @@ export default function Tasks() {
       .filter((t) => t.status === 'done' && (t.doneAt ?? '').slice(0, 10) >= cutoff)
       .sort((a, b) => (b.doneAt ?? '').localeCompare(a.doneAt ?? ''))
   }, [tasks, d])
-  const overdueCount = groups.find((g) => g.key === 'overdue')?.tasks.length ?? 0
-  const todayCount = groups.find((g) => g.key === 'today')?.tasks.length ?? 0
+  const overdueCount = useMemo(() => groupOpenTasks(tasks ?? [], d).find((g) => g.key === 'overdue')?.tasks.length ?? 0, [tasks, d])
+  const todayCount = useMemo(() => (tasks ?? []).filter((t) => t.status === 'open' && t.due === d).length, [tasks, d])
 
   // Desktop auto-selects the first row; phone opens the sheet only after a tap.
   const current = (tasks ?? []).find((t) => t.id === activeId && (t.status === 'open' || showDone))
@@ -117,6 +120,32 @@ export default function Tasks() {
 
   const loaded = tasks !== undefined
 
+  const quickAdd = (
+    <>
+      <form
+        className="quick-add"
+        onSubmit={(e) => {
+          e.preventDefault()
+          void add()
+        }}
+      >
+        <input className="input" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Add a task, e.g. renew passport in 2w !1" aria-label="New task" />
+        <button className="btn btn-primary" type="submit" disabled={!parsed.title}>
+          Add
+        </button>
+      </form>
+      {preview.length > 0 && (
+        <div className="row wrap" style={{ marginTop: phone ? 0 : -10, marginBottom: phone ? 8 : 14, gap: 4 }}>
+          {preview.map((p) => (
+            <span key={p} className="chip">
+              {p}
+            </span>
+          ))}
+        </div>
+      )}
+    </>
+  )
+
   return (
     <>
       <PageHeader title="Tasks" sub={loaded ? `${order.length} open${overdueCount ? ` · ${overdueCount} overdue` : ''}` : ' '} />
@@ -133,36 +162,18 @@ export default function Tasks() {
         />
       )}
 
+      {loaded && <div className="tq-focus"><FocusBar tasks={tasks} d={d} onEdit={(t) => pick(t.id!)} /></div>}
+
       <div className="tq">
         <div className="tq-main">
           <Card>
-            <form
-              className="quick-add"
-              onSubmit={(e) => {
-                e.preventDefault()
-                void add()
-              }}
-            >
-              <input className="input" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Add a task, e.g. renew passport in 2w !1" aria-label="New task" />
-              <button className="btn btn-primary" type="submit" disabled={!parsed.title}>
-                Add
-              </button>
-            </form>
-            {preview.length > 0 && (
-              <div className="row wrap" style={{ marginTop: -10, marginBottom: 14, gap: 4 }}>
-                {preview.map((p) => (
-                  <span key={p} className="chip">
-                    {p}
-                  </span>
-                ))}
-              </div>
-            )}
+            {!phone && quickAdd}
             {note && <div className="focus-note" style={{ marginBottom: 10 }}>{note}</div>}
 
             {!loaded && <Skeleton rows={8} label="Loading tasks" />}
             {loaded && order.length === 0 && (
               <Empty title={done.length ? 'All clear' : 'No tasks yet'}>
-                Type a task above. Add a day like "fri" or "in 3d" and a priority like "!1"; it lands in the right group.
+                Type a task in the add line. Add a day like "fri" or "in 3d" and a priority like "!1"; it lands in the right group.
               </Empty>
             )}
 
@@ -212,6 +223,9 @@ export default function Tasks() {
           </SidePanel>
         )}
       </div>
+      {phone && <div className="tq-phone-pad" aria-hidden />}
+      {phone && <div className="quick-add-sticky">{quickAdd}</div>}
+      <ComboChip />
     </>
   )
 }

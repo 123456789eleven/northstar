@@ -10,7 +10,7 @@ import { useNow } from '../components/useNow'
 import { fmtTime, sortedUpcoming, toMin } from '../features/planner/layout'
 import { TaskRow } from '../features/tasks/TaskRow'
 import { TaskEditor } from '../features/tasks/TaskEditor'
-import { MAX_FOCUS, togglePin } from '../features/tasks/taskActions'
+import { MAX_FOCUS, byDue } from '../features/tasks/taskActions'
 import { buildTodayView } from '../features/today/todayQueue'
 import { goalProgress, progressLabel } from '../features/goals/progress'
 import { GlanceTiles } from '../features/today/GlanceTiles'
@@ -18,8 +18,13 @@ import { HabitsTile, NextUp } from '../features/today/HabitsNext'
 import { FirstRunCard } from '../features/onboarding/FirstRunCard'
 import { InsightsCard } from '../features/insights/InsightsCard'
 import { MissionBoard } from '../features/game/ui/Mission'
+import { FocusBar } from '../features/tasks/FocusBar'
+import { AgendaStrip } from '../features/today/AgendaStrip'
+import { DailyFind } from '../features/today/DailyFindLine'
 import '../features/tasks/tasks.css'
+import '../features/tasks/g2a.css'
 import '../features/today/today.css'
+import '../features/today/g2a.css'
 
 export default function Today() {
   const d = today()
@@ -59,9 +64,7 @@ export default function Today() {
     />
   )
 
-  const pinAll = async () => {
-    for (const t of v.suggestions) await togglePin(t)
-  }
+  const dueList = useMemo(() => (tasks ?? []).filter((t) => t.status === 'open' && !!t.due && t.due <= d && t.focusDate !== d).sort(byDue), [tasks, d])
 
   const quarterCard = (
   <Card title="This quarter" action={<Link className="card-link" to="/goals">Goals</Link>}>
@@ -88,7 +91,7 @@ export default function Today() {
   </Card>
   )
 
-  const listed = v.focus.length + v.suggestions.length + v.due.length + v.done.length
+  const listed = dueList.length + v.done.length
 
   return (
     <>
@@ -101,6 +104,15 @@ export default function Today() {
 
       {/* Game layer: today's self-completing quests. Calm mode renders nothing here, leaving the classic Today below. */}
       <MissionBoard />
+
+      {loaded && (
+        <div className="today-top">
+          <FocusBar tasks={tasks} d={d} onEdit={setEditing} />
+          <AgendaStrip />
+        </div>
+      )}
+
+      <DailyFind />
 
       {(
         <>
@@ -119,30 +131,10 @@ export default function Today() {
           <div className="today-grid">
             <div className="today-col">
               <Card title="Your day" action={<Link className="card-link" to="/tasks">All tasks</Link>}>
-                {v.focus.length > 0 && (
-                  <>
-                    <div className="sub-head">Focus</div>
-                    <div className="list">{v.focus.map(row)}</div>
-                  </>
-                )}
-                {v.suggestions.length > 0 && (
-                  <>
-                    <div className="sub-head row-between">
-                      <span>Suggested focus</span>
-                      {v.suggestions.length > 1 && (
-                        <button className="btn btn-ghost btn-sm" onClick={() => void pinAll()}>
-                          Pin these
-                        </button>
-                      )}
-                    </div>
-                    <div className="focus-suggest">Nothing pinned yet. Chosen by priority and due date; tap the pin to commit.</div>
-                    <div className="list">{v.suggestions.map(row)}</div>
-                  </>
-                )}
-                {v.due.length > 0 && (
+                {dueList.length > 0 && (
                   <>
                     <div className="sub-head">Due today and overdue</div>
-                    <div className="list">{v.due.map(row)}</div>
+                    <div className="list">{dueList.map(row)}</div>
                   </>
                 )}
                 {v.done.length > 0 && (
@@ -154,7 +146,7 @@ export default function Today() {
                 {!loaded && <Skeleton rows={5} label="Loading your day" />}
                 {loaded && listed === 0 && (
                   <Empty
-                    title="Nothing open today"
+                    title="Nothing due today"
                     action={<button className="btn btn-sm" onClick={() => window.dispatchEvent(new Event('ns:capture'))}>Add a task</button>}
                   >
                     Type one into the capture line, e.g. "call dentist tmr !1". Press / to jump there.

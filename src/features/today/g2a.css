@@ -1,0 +1,34 @@
+/* G2a Today hierarchy: missions, focus + agenda, daily find, glance tiles. */
+.today-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-bottom: 12px; align-items: start; }
+@media (max-width: 819px) { .today-top { grid-template-columns: minmax(0, 1fr); } }
+.today-top > .card, .today-top > section { min-width: 0; }
+
+.daily-find { margin: 0 0 12px; font-size: var(--text-sm); color: var(--ink-2); line-height: 1.5; }
+.daily-find-k { margin-right: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+
+.agenda-card { padding: 12px var(--pad); min-width: 0; }
+.agenda-skel { min-height: 120px; }
+.agenda-rail { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; position: relative; }
+.agenda-rail::before { content: ''; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px; background: var(--line-strong); }
+.agenda-item { position: relative; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; padding: 6px 0 6px 20px; min-height: 36px; font-size: 14px; }
+.agenda-dot { position: absolute; left: 0; top: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--bg); border: 1.5px solid var(--ink-3); }
+.agenda-item.is-now .agenda-dot { background: var(--accent); border-color: var(--accent); }
+.agenda-item.is-next .agenda-dot { border-color: var(--accent); }
+.agenda-item.k-training .agenda-dot { border-color: var(--skill-body); }
+.agenda-item.k-training.is-now .agenda-dot { background: var(--skill-body); }
+.agenda-item.is-past { color: var(--ink-3); }
+.agenda-time { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.agenda-item.is-past .agenda-time { color: var(--ink-3); }
+.agenda-name { min-width: 0; overflow-wrap: anywhere; }
+.agenda-tag { font-size: 11px; font-weight: 600; color: var(--accent); }
+
+/* Phone: horizontal scroll-snap strip inside the card; the page itself never scrolls sideways. */
+@media (max-width: 819px) {
+  .agenda-rail { flex-direction: row; gap: 8px; overflow-x: auto; scroll-snap-type: x proximity; padding: 2px 0 6px; margin: 0 calc(var(--pad) * -1); padding-left: var(--pad); padding-right: var(--pad); scrollbar-width: none; overscroll-behavior-x: contain; }
+  .agenda-rail::-webkit-scrollbar { display: none; }
+  .agenda-rail::before, .agenda-dot { display: none; }
+  .agenda-item { flex: 0 0 auto; scroll-snap-align: start; flex-direction: column; align-items: flex-start; gap: 2px; width: 148px; min-height: 64px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2); }
+  .agenda-item.is-now { border-color: var(--accent); }
+  .agenda-item.k-training { border-left: 3px solid var(--skill-body); }
+  .agenda-name { font-size: 13px; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+}
