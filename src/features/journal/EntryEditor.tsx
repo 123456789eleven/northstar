@@ -10,6 +10,9 @@ import { TEMPLATES, composeTemplate, firstAnswerOffset, getTemplate, type Journa
 import { dailyPrompt } from './prompts'
 import { tagCounts, tagSuggestions } from './insights'
 import type { JournalPrefs } from './prefs'
+import { Ring } from '../game/ui/Ring'
+import { useGoalPulse } from './useGoalPulse'
+import { fraction } from './constellation'
 
 interface Props {
   date: ISODate
@@ -77,6 +80,7 @@ export function EntryEditor({ date, entry, entries, prefs, onPref }: Props) {
   const empty = !text.trim()
   const prompt = dailyPrompt(date, skip)
   const words = wordCount(text)
+  const pulse = useGoalPulse(words, prefs.goal)
   const streak = useMemo(
     () => wordStreak([...entries.filter((e) => e.date !== date), { date, text }], today()),
     [entries, date, text],
@@ -92,6 +96,12 @@ export function EntryEditor({ date, entry, entries, prefs, onPref }: Props) {
 
   return (
     <div className="stack">
+      <div className={`jr-edhead ${pulse ? 'is-pulsing' : ''}`}>
+        <Ring value={fraction(words, prefs.goal)} size={36} stroke={3} tone="mind" label={`Today's words: ${words} of ${prefs.goal}`} className="jr-wordring" />
+        <span className="jr-edhead-text">
+          <span className="mono">{words}</span> / {prefs.goal} words{words >= prefs.goal ? ' · goal met' : ''}
+        </span>
+      </div>
       {empty && !focus && (
         <div className="jr-start">
           <div className="jr-prompt">
@@ -155,6 +165,7 @@ export function EntryEditor({ date, entry, entries, prefs, onPref }: Props) {
           onPref={onPref}
           template={tpl}
           onExit={exitFocus}
+          pulse={pulse}
         />
       )}
     </div>

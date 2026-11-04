@@ -1,13 +1,17 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Interaction, type Person } from '../db'
-import { Card, Empty, PageHeader, PageSkeleton } from '../components/ui'
+import { Card, Empty, PageHeader, PageSkeleton, Tabs } from '../components/ui'
 import { useToast } from '../components/toastContext'
 import { useFocusTarget } from '../lib/useFocusParam'
-import { daysBetween, formatDate, relativeDay, today } from '../lib/dates'
-import { KINDS, cadenceLabel, logContact, nextBirthday, sortPeople, undoContact } from '../features/people/people'
+import { daysBetween, formatDate, today } from '../lib/dates'
+import { KINDS, logContact, nextBirthday, sortPeople, undoContact } from '../features/people/people'
 import { PersonDetail, PersonForm } from '../features/people/PersonModals'
+import { CircleView } from '../features/people/CircleView'
+import { PersonRow } from '../features/people/PersonRow'
+import { mostOverdue } from '../features/people/circle'
 import '../features/people/people.css'
+import '../features/people/circle.css'
 
 const KIND_KEY = 'northstar.people.lastKind'
 const lastKind = (): Interaction['kind'] => {
@@ -44,7 +48,14 @@ function LogPanel({ person, onDone }: { person: Person; onDone: () => void }) {
   )
 }
 
+type View = 'circle' | 'list'
+const VIEW_KEY = 'northstar.people.view'
+const MAX_OTHERS = 60
+
 export default function People() {
+  const [view, setView] = useState<View>(() => { try { return localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'circle' } catch { return 'circle' } })
+  const chooseView = (v: View) => { setView(v); try { localStorage.setItem(VIEW_KEY, v) } catch { /* ignore */ } }
+  const [q, setQ] = useState('')
   const people = useLiveQuery(() => db.people.toArray(), [])
   const [adding, setAdding] = useState(false)
   const [openId, setOpenId] = useState<number | null>(null)
@@ -65,7 +76,17 @@ export default function People() {
   })
 
   const sorted = useMemo(() => (people ? sortPeople(people, now) : []), [people, now])
-  const dueCount = sorted.filter((x) => x.s.overdue).length
+  const tracked = sorted.filter((x) => x.p.cadenceDays > 0)
+  const others = sorted.filter((x) => !(x.p.cadenceDays > 0))
+  const dueCount = tracked.filter((x) => x.s.overdue).length
+  const reach = mostOverdue(tracked.map((x) => x.p), now)
+  const matchedOthers = others.filter((x) => x.p.name.toLowerCase().includes(q.trim().toLowerCase()))
+  const shownOthers = matchedOthers.slice(0, MAX_OTHERS)
+  const row = (p: Person) => (
+    <PersonRow key={p.id} p={p} onOpen={() => setOpenId(p.id!)} onContacted={() => quickLog(p)} onDetails={() => setLoggingId(loggingId === p.id ? null : p.id!)}>
+      {loggingId === p.id && <LogPanel person={p} onDone={() => setLoggingId(null)} />}
+    </PersonRow>
+  )
 
   const birthdays = useMemo(() => {
     return (people ?? [])
@@ -93,43 +114,53 @@ export default function People() {
         </Card>
       ) : (
         <>
-        <div className="ppl-layout">
-          <Card title="Check-ins" flush>
-            <div>
-              {sorted.map(({ p, s }, idx) => (
-                <div key={p.id}>
-                  {idx === 0 && s.overdue && <div className="ppl-group"><span>Due now</span><span className="mono">{dueCount}</span></div>}
-                  {!s.overdue && (idx === 0 || sorted[idx - 1].s.overdue) && <div className="ppl-group"><span>{dueCount ? 'Up to date' : 'Everyone'}</span><span className="mono">{sorted.length - dueCount}</span></div>}
-                  <div className="ppl-row" data-focus-id={p.id}>
-                    <button className="ppl-main" onClick={() => setOpenId(p.id!)}>
-                      <span className="ppl-name">{p.name}</span>
-                      <span className="ppl-meta">
-                        {[p.relation, p.cadenceDays ? cadenceLabel(p.cadenceDays).toLowerCase() : null, p.lastContact ? `last ${relativeDay(p.lastContact).toLowerCase()}` : 'never contacted'].filter(Boolean).join(' · ')}
-                      </span>
-                    </button>
-                    <span className={s.overdue ? 'ppl-status is-due' : 'ppl-status'}>{s.text.replace(' · never logged', '')}</span>
-                    <button className="btn btn-sm ppl-act" onClick={() => quickLog(p)} aria-label={`Contacted ${p.name} today`}>Contacted</button>
-                    <button className="btn btn-sm btn-ghost ppl-more" onClick={() => setLoggingId(loggingId === p.id ? null : p.id!)} aria-label={`Log details for ${p.name}`} aria-expanded={loggingId === p.id}>Details</button>
-                    {loggingId === p.id && <LogPanel person={p} onDone={() => setLoggingId(null)} />}
+        {birthdays.length > 0 && (
+          <ul className="ppl-strip" aria-label="Birthdays in the next 30 days">
+            {birthdays.map(({ p, next, inDays }) => (
+              <li key={p.id} className="ppl-strip-item">
+                <span>{p.name}</span>
+                <span className={inDays <= 3 ? 'ppl-status is-due' : 'ppl-status'}>{inDays === 0 ? 'Today' : inDays === 1 ? 'Tomorrow' : `${formatDate(next)} · ${inDays} days`}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="ppl-toolbar">
+          <Tabs<View> value={view} onChange={chooseView} options={[{ value: 'circle', label: 'Circle' }, { value: 'list', label: 'List' }]} />
+          {reach && <button type="button" className="ppl-reach" onClick={() => setOpenId(reach.id!)} data-testid="reach-out">Reach out to {reach.name}</button>}
+        </div>
+        <div className={`ppl-board ${view === 'list' ? 'is-list' : ''}`}>
+          {view === 'circle' && (
+            <Card title="Your circle" className="ppl-circle-card">
+              {tracked.length === 0 ? (
+                <div className="ppl-empty-hint small muted">Nobody has a check-in rhythm yet. Open a person and choose weekly, monthly or quarterly to place them on the circle.</div>
+              ) : <CircleView people={tracked.map((x) => x.p)} onOpen={setOpenId} selectedId={openId} />}
+            </Card>
+          )}
+          <div className="ppl-col">
+            <Card title="Check-ins" flush>
+              <div>
+                {tracked.length === 0 && <div className="ppl-empty-hint small muted">Nothing scheduled. Everyone is in the list below.</div>}
+                {tracked.map(({ p, s }, idx) => (
+                  <div key={p.id}>
+                    {idx === 0 && s.overdue && <div className="ppl-group"><span>Due now</span><span className="mono">{dueCount}</span></div>}
+                    {!s.overdue && (idx === 0 || tracked[idx - 1].s.overdue) && <div className="ppl-group"><span>{dueCount ? 'Up to date' : 'On rhythm'}</span><span className="mono">{tracked.length - dueCount}</span></div>}
+                    {row(p)}
                   </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-          <Card title="Birthdays · next 30 days" className={birthdays.length ? 'ppl-bday-card' : 'ppl-bday-card is-empty'}>
-            {birthdays.length === 0 ? (
-              <Empty>None in the next 30 days. Add birthdays from a person’s Edit screen.</Empty>
-            ) : (
-              birthdays.map(({ p, next, inDays }) => (
-                <div className="ppl-bday" key={p.id}>
-                  <span>{p.name}</span>
-                  <span className={inDays <= 3 ? 'ppl-status is-due' : 'ppl-status'}>
-                    {inDays === 0 ? 'Today' : inDays === 1 ? 'Tomorrow' : `${formatDate(next)} · ${inDays} days`}
-                  </span>
-                </div>
-              ))
+                ))}
+              </div>
+            </Card>
+            {others.length > 0 && (
+              <Card flush className="ppl-else">
+                <details>
+                  <summary><span>Everyone else</span><span className="mono">{others.length}</span></summary>
+                  <div className="ppl-else-search"><input className="input" type="search" placeholder="Search by name" aria-label="Search everyone else" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+                  {shownOthers.map(({ p }) => <div key={p.id}>{row(p)}</div>)}
+                  {shownOthers.length < matchedOthers.length && <div className="ppl-empty-hint small muted">Showing {shownOthers.length} of {matchedOthers.length}. Search to narrow down.</div>}
+                  {matchedOthers.length === 0 && <div className="ppl-empty-hint small muted">No match.</div>}
+                </details>
+              </Card>
             )}
-          </Card>
+          </div>
         </div>
         </>
       )}

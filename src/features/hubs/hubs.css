@@ -26,3 +26,13 @@
   .hub-player { grid-template-columns: auto minmax(0, 1fr); }
   .hub-player-week { grid-column: 1 / -1; align-items: flex-start; }
 }
+
+/* Mind overview (G4) */
+.mind-overview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5); align-items: center; }
+.mind-ov-item { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.mind-ov-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mind-ov-label { font-size: var(--text-sm); font-weight: 600; }
+.mind-ov-num { font-family: var(--serif); font-size: var(--text-md); font-variant-numeric: tabular-nums; }
+.mind-ov-mood { flex-direction: column; align-items: flex-start; }
+@media (max-width: 819px) { .mind-overview { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp-4); } .mind-ov-mood { grid-column: 1 / -1; } }
+@media (max-width: 420px) { .mind-ov-item:not(.mind-ov-mood) { flex-direction: column; align-items: flex-start; } }

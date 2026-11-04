@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Card, Empty, PageHeader, PageSkeleton, Progress, Tabs } from '../components/ui'
+import { Ring } from '../features/game/ui/Ring'
+import { Ladder } from '../features/learning/Ladder'
+import { FocusChip, FocusSheet } from '../features/learning/FocusSheet'
+import { getFocusRun } from '../features/learning/focusStore'
+import { Card, Empty, PageHeader, PageSkeleton, Tabs } from '../components/ui'
 import { db, getSetting, setSetting, type LearningItem } from '../db'
 import { startOfWeek, today } from '../lib/dates'
 import { useFocusTarget } from '../lib/useFocusParam'
@@ -10,7 +14,7 @@ import LogView from '../features/learning/LogView'
 import { fmtMinutes } from '../features/learning/learningData'
 import '../features/learning/learning.css'
 
-type View = 'active' | 'planned' | 'done' | 'log'
+type View = 'ladder' | 'active' | 'planned' | 'done' | 'log'
 type ModalState = { item?: LearningItem; status?: LearningItem['status'] } | null
 
 const TARGET_KEY = 'learning.weeklyTargetMin'
@@ -41,18 +45,23 @@ function WeekTarget({ minutes }: { minutes: number }) {
           </button>
         )}
       </div>
-      <div className="learn-week-line">
-        <span className="stat-value">{fmtMinutes(minutes)}</span>
-        <span className="small muted mono">{minutes >= target ? 'target met' : `${fmtMinutes(target - minutes)} to go`}</span>
+      <div className="learn-week-ring" data-testid="study-ring">
+        <Ring value={target > 0 ? minutes / target : 0} size={56} stroke={4} tone="mind" label={`${fmtMinutes(minutes)} of ${fmtMinutes(target)} this week`}>
+          <span className="mono small">{Math.round(Math.min(1, minutes / target) * 100)}</span>
+        </Ring>
+        <div className="learn-week-line grow">
+          <span className="stat-value">{fmtMinutes(minutes)}</span>
+          <span className="small muted mono">{minutes >= target ? 'target met' : `${fmtMinutes(target - minutes)} to go`}</span>
+        </div>
       </div>
-      <Progress value={(minutes / target) * 100} label="Weekly study target" />
     </div>
   )
 }
 
 export default function Learning() {
-  const [view, setView] = useState<View>('active')
+  const [view, setView] = useState<View>('ladder')
   const [modal, setModal] = useState<ModalState>(null)
+  const [focusFor, setFocusFor] = useState<LearningItem | null>(null)
   const items = useLiveQuery(() => db.learning.toArray(), [])
   const goals = useLiveQuery(() => db.goals.toArray(), [])
   const sessions = useLiveQuery(() => db.studySessions.toArray(), [])
@@ -90,9 +99,12 @@ export default function Learning() {
         title="Learning"
         sub="Courses, certifications, books and skills."
         actions={
+          <>
+          <FocusChip onOpen={() => { const r = getFocusRun(); const it = r.phase !== 'idle' ? all.find((x) => x.id === r.itemId) : null; if (it) setFocusFor(it) }} />
           <button className="btn btn-primary" onClick={addFor(view === 'planned' ? 'planned' : view === 'done' ? 'done' : 'active')}>
             Add item
           </button>
+          </>
         }
       />
       {loaded ? <WeekTarget minutes={weekTotal} /> : <PageSkeleton rows={4} />}
@@ -100,12 +112,17 @@ export default function Learning() {
         value={view}
         onChange={setView}
         options={[
+          { value: 'ladder', label: 'Ladder' },
           { value: 'active', label: `Active${active.length ? ` ${active.length}` : ''}` },
           { value: 'planned', label: `Planned${planned.length ? ` ${planned.length}` : ''}` },
           { value: 'done', label: `Completed${done.length ? ` ${done.length}` : ''}` },
           { value: 'log', label: 'Log' },
         ]}
       />
+
+      {view === 'ladder' && loaded && (
+        <Ladder planned={planned} active={active} done={done} weekByItem={weekByItem} onFocus={setFocusFor} onEdit={(i) => setModal({ item: i })} onAdd={(s) => setModal({ status: s })} />
+      )}
 
       {view === 'active' &&
         loaded &&
@@ -128,7 +145,7 @@ export default function Learning() {
         ) : (
           <div className="grid grid-2 learn-grid">
             {active.map((i) => (
-              <ActiveCard key={i.id} item={i} weekMinutes={weekByItem.get(i.id!) ?? 0} goalTitle={goalTitle(i.goalId)} onEdit={() => setModal({ item: i })} />
+              <ActiveCard key={i.id} item={i} weekMinutes={weekByItem.get(i.id!) ?? 0} goalTitle={goalTitle(i.goalId)} onEdit={() => setModal({ item: i })} onFocus={() => setFocusFor(i)} />
             ))}
           </div>
         ))}
@@ -167,6 +184,8 @@ export default function Learning() {
 
       {view === 'log' && <LogView items={all} />}
 
+      {focusFor && <FocusSheet itemId={focusFor.id!} title={focusFor.title} onClose={() => setFocusFor(null)} />}
+      {focusFor && focusFor.id != null && <FocusSheet itemId={focusFor.id} title={focusFor.title} onClose={() => setFocusFor(null)} />}
       {modal && <ItemModal item={modal.item} defaultStatus={modal.status} onClose={() => setModal(null)} />}
     </>
   )
