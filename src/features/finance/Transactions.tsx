@@ -1,7 +1,10 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { type FormEvent, useMemo, useRef, useState } from 'react'
 import { Card, Empty, Modal } from '../../components/ui'
+import BottomSheet from '../../components/BottomSheet'
 import DataTable from '../../components/DataTable'
+import { PHONE_QUERY, useMedia } from '../../components/useMedia'
+import SwipeRow from '../g3/SwipeRow'
 import { db, type Transaction } from '../../db'
 import { formatDate, today } from '../../lib/dates'
 import { addMerchantRule, CATEGORIES, categorize, INCOME, merchantKey, merchantLabel, UNCATEGORIZED } from './categories'
@@ -21,6 +24,8 @@ export default function Transactions({ month, category, setCategory, onImport }:
   const [flash, setFlash] = useState('')
   const [deleted, setDeleted] = useState<Transaction | null>(null)
   const [triage, setTriage] = useState(false)
+  const [sheetTx, setSheetTx] = useState<Transaction | null>(null)
+  const phone = useMedia(PHONE_QUERY)
   const rules = useRules()
 
   const [a, b] = monthRange(month)
@@ -142,6 +147,24 @@ export default function Transactions({ month, category, setCategory, onImport }:
           </Empty>
         ) : shown.length === 0 ? (
           <Empty>No transactions match{allTime ? '' : ` in ${monthLabel(month)}`}. Try another month, clear the filters, or tick “All months”.</Empty>
+        ) : phone ? (
+          <ul className="fin-tlist" aria-label="Transactions">
+            {shown.map((t) => (
+              <li key={t.id} data-focus-id={t.id}>
+                <SwipeRow label="Categorize" tone="accent" onCommit={() => setSheetTx(t)}>
+                  <button type="button" className="fin-trow" onClick={() => setSheetTx(t)} aria-label={`${t.description}, ${t.category}. Change category`}>
+                    <span className="fin-trow-main">
+                      <span className="fin-trow-desc">{t.description}</span>
+                      <span className="fin-trow-meta tiny">
+                        {formatDate(t.date, allTime ? { month: 'short', day: 'numeric', year: '2-digit' } : undefined)} · <span className={t.category === UNCATEGORIZED ? 'fin-trow-un' : ''}>{t.category}</span>
+                      </span>
+                    </span>
+                    <span className={`mono nowrap ${t.amount > 0 ? 'good' : ''}`}>{t.amount > 0 ? '+' : ''}{moneyExact(t.amount)}</span>
+                  </button>
+                </SwipeRow>
+              </li>
+            ))}
+          </ul>
         ) : (
           <DataTable
             label="Transactions"
@@ -169,6 +192,22 @@ export default function Transactions({ month, category, setCategory, onImport }:
       </Card>
 
       {triage && <Triage onClose={() => setTriage(false)} />}
+      {sheetTx && (
+        <BottomSheet title="Categorize" onClose={() => setSheetTx(null)}>
+          <div className="stack" style={{ gap: 12 }}>
+            <div>
+              <div>{sheetTx.description}</div>
+              <div className={`mono ${sheetTx.amount > 0 ? 'good' : ''}`} style={{ fontFamily: 'var(--serif)', fontSize: 24 }}>{sheetTx.amount > 0 ? '+' : ''}{moneyExact(sheetTx.amount)}</div>
+              <div className="tiny faint">Now: {sheetTx.category}</div>
+            </div>
+            <div className="fin-pick">
+              {CATEGORIES.map((c) => (
+                <button key={c} className="btn btn-sm" aria-pressed={sheetTx.category === c} onClick={() => { const t = sheetTx; setSheetTx(null); if (c !== t.category) void recategorize(t, c) }}>{c}</button>
+              ))}
+            </div>
+          </div>
+        </BottomSheet>
+      )}
     </div>
   )
 }

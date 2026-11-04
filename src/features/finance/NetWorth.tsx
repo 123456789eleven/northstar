@@ -6,7 +6,7 @@ import DataTable from '../../components/DataTable'
 import KpiStrip from '../../components/KpiStrip'
 import { db, logEvent, type BalanceSnapshot } from '../../db'
 import { formatDate, money, today } from '../../lib/dates'
-import { NetWorthChart } from './charts'
+import { NetWorthHero, NetWorthPath } from './NetWorthHero'
 import { netWorthSeries } from './model'
 
 export default function NetWorth() {
@@ -64,11 +64,11 @@ export default function NetWorth() {
 
   return (
     <div className="stack" style={{ gap: 16 }}>
+      {current && <NetWorthHero series={series} />}
       {current && (
         <KpiStrip
           items={[
-            { label: 'Net worth', value: money(current.net), note: `As of ${formatDate(current.date, { month: 'short', day: 'numeric', year: 'numeric' })}` },
-            { label: 'Assets', value: money(assets) },
+            { label: 'Assets', value: money(assets), note: `As of ${formatDate(current.date, { month: 'short', day: 'numeric', year: 'numeric' })}` },
             { label: 'Liabilities', value: money(liabilities) },
           ]}
         />
@@ -104,7 +104,7 @@ export default function NetWorth() {
       ) : (
         <>
           <ChartFrame
-            title="Net worth over time"
+            title="Net worth path"
             hasData={series.length >= 2}
             table={
               <table className="table">
@@ -113,7 +113,7 @@ export default function NetWorth() {
               </table>
             }
           >
-            <NetWorthChart data={series} />
+            <NetWorthPath data={series} />
           </ChartFrame>
           <Card title="Accounts · latest balance" flush>
             <DataTable

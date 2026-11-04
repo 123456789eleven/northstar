@@ -1,8 +1,8 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Progress } from '../../components/ui'
 import { useToast } from '../../components/toastContext'
 import { db, setSetting } from '../../db'
 import { TARGETS_KEY, type FoodTargets } from './foodData'
+import MacroRings from './MacroRings'
 import { behindMessage, leftToday, suggestTargets } from './foodLogic'
 
 const numOf = (v: unknown): number | undefined => {
@@ -31,22 +31,7 @@ function useWeightLb(): { lb: number; from: 'latest' | 'goal' } | undefined {
   }, [])
 }
 
-function Bar({ label, value, target, unit, left }: { label: string; value: number; target: number; unit: string; left: number }) {
-  return (
-    <div className="food-left-row">
-      <div className="food-left-head">
-        <span className="stat-label">{label}</span>
-        <span className="mono small muted">
-          {value.toLocaleString()} / {target.toLocaleString()} {unit}
-        </span>
-      </div>
-      <Progress value={(value / target) * 100} label={label} />
-      <span className="small">{left > 0 ? `${left.toLocaleString()} ${unit === 'kcal' ? 'kcal' : 'g protein'} to go` : 'Target reached'}</span>
-    </div>
-  )
-}
-
-export default function LeftToday({ targets, totals, isToday, hour, onTargets }: { targets: FoodTargets; totals: { calories: number; protein: number }; isToday: boolean; hour: number; onTargets: () => void }) {
+export default function LeftToday({ targets, totals, isToday, hour, onTargets, ready }: { targets: FoodTargets; totals: { calories: number; protein: number }; isToday: boolean; hour: number; onTargets: () => void; ready: boolean }) {
   const toast = useToast()
   const weight = useWeightLb()
   const left = leftToday(targets, totals)
@@ -94,10 +79,7 @@ export default function LeftToday({ targets, totals, isToday, hour, onTargets }:
           Targets
         </button>
       </div>
-      <div className="food-left-grid">
-        {targets.calories ? <Bar label="Calories" value={totals.calories} target={targets.calories} unit="kcal" left={left.kcal} /> : null}
-        {targets.protein ? <Bar label="Protein" value={totals.protein} target={targets.protein} unit="g" left={left.protein} /> : null}
-      </div>
+      <MacroRings targets={targets} totals={totals} ready={ready} />
       {behind && <p className="small food-behind">{behind}</p>}
     </section>
   )

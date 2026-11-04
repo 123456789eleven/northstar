@@ -1,20 +1,22 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useMemo, useState, type FormEvent } from 'react'
+import { useMemo, useState } from 'react'
 import ChartFrame from '../components/ChartFrame'
 import DataTable from '../components/DataTable'
-import KpiStrip from '../components/KpiStrip'
-import { Card, Empty, PageHeader, PageSkeleton } from '../components/ui'
+import { Card, PageHeader, PageSkeleton, Tabs } from '../components/ui'
 import { useToast } from '../components/toastContext'
 import { db } from '../db'
-import BodyChart from '../features/body/BodyChart'
-import { GoalPanel, GuidanceCard, TrainingCard } from '../features/body/BodyPanels'
-import { logWeight, readBodySettings, removeWeight } from '../features/body/bodyData'
-import { averageAt, HEALTHY_RATE, milestoneCrossings, movingAverage, projectDate, weeklyRate } from '../features/body/model'
+import BodyHero from '../features/body/BodyHero'
+import { GoalPanel, GuidanceCard } from '../features/body/BodyPanels'
+import { readBodySettings, removeWeight } from '../features/body/bodyData'
+import { checkpointFlags, ghostLine } from '../features/body/pathModel'
+import TrainingPanel from '../features/body/TrainingPanel'
+import WeighInStepper from '../features/body/WeighInStepper'
+import WeightPath from '../features/body/WeightPath'
+import { averageAt, HEALTHY_RATE, movingAverage, projectDate, weeklyRate } from '../features/body/model'
 import { addDays, daysBetween, formatDate, today } from '../lib/dates'
 import '../features/body/body.css'
 
 const fmtLong = (d: string) => formatDate(d, { month: 'short', day: 'numeric', year: 'numeric' })
-const signed = (n: number) => `${n > 0 ? '+' : n < 0 ? '-' : ''}${Math.abs(n).toFixed(1)}`
 
 export default function Body() {
   const toast = useToast()
@@ -23,9 +25,7 @@ export default function Body() {
   const habits = useLiveQuery(() => db.habits.toArray(), [])
   const logs = useLiveQuery(() => db.habitLogs.where('date').between(addDays(today(), -7), today(), true, true).toArray(), [])
   const meals = useLiveQuery(() => db.meals.where('date').between(addDays(today(), -27), today(), true, true).toArray(), [])
-  const [text, setText] = useState('')
-  const [date, setDate] = useState('')
-  const [showDate, setShowDate] = useState(false)
+  const [tab, setTab] = useState<'weight' | 'training'>('weight')
   const [range, setRange] = useState<30 | 90 | 0>(90)
 
   const s = useMemo(() => readBodySettings(settingRows ?? []), [settingRows])
@@ -52,58 +52,38 @@ export default function Body() {
   const weekAgo = averageAt(w, addDays(t, -7))
   const change = current != null && weekAgo != null ? current - weekAgo : null
   const rate = weeklyRate(w, t)
-  const priorAvg = averageAt(w, addDays(t, -14))
-  const priorChange = weekAgo != null && priorAvg != null ? weekAgo - priorAvg : null
-  const priorRate = weeklyRate(w, addDays(t, -7))
-  const changeTrend = change != null && priorChange != null ? { delta: change - priorChange, unit: ' lb', goodDirection: 'up' as const, label: 'vs prior week' } : undefined
-  const rateTrend = rate != null && priorRate != null ? { delta: rate - priorRate, unit: ' lb/wk', goodDirection: 'up' as const, label: 'vs last week' } : undefined
   const start = s.startWeight ?? w[0]?.weight
-  const toGo = current != null ? Math.max(0, s.goal - current) : null
+  const toGo = current != null ? Math.abs(s.goal - current) : null
   const projNow = current != null ? projectDate(current, s.goal, rate, t) : null
-  const projHealthy = current != null ? projectDate(current, s.goal, HEALTHY_RATE, t) : null
   const goalDateRate = current != null && s.goalDate && s.goalDate > t && toGo ? (toGo / daysBetween(t, s.goalDate)) * 7 : null
-  const crossings = start != null ? milestoneCrossings(w, start, s.goal) : []
+  const flags = start != null && current != null ? checkpointFlags(w, start, s.goal, current) : []
+  const ghost = current != null ? ghostLine(current, s.goal, t, s.goalDate) : { points: [], endDate: null, makesTarget: true }
   const shown = range ? series.filter((p) => p.date >= addDays(t, -range)) : series
   const loggedToday = w.find((x) => x.date === t)
-
-  async function submit(e: FormEvent) {
-    e.preventDefault()
-    const n = Number(text.trim().replace(/\s*lbs?$/i, ''))
-    const r = await logWeight(date || t, n)
-    if (!r) { toast({ message: 'Enter a weight between 50 and 700 lb' }); return }
-    setText('')
-    setDate('')
-    setShowDate(false)
-    toast({
-      message: r.milestones.length ? `${r.updated ? 'Updated' : 'Logged'} ${r.weight} lb. Milestone: 7-day average passed ${r.milestones.at(-1)} lb` : `${r.updated ? 'Updated' : 'Logged'} ${r.weight} lb for ${r.date === t ? 'today' : formatDate(r.date)}`,
-      undo: r.undo,
-    })
-  }
+  const sub = `Goal: ${s.goal} lb${start != null ? `, starting from ${start} lb` : ''}`
 
   return (
-    <div className="stack" style={{ gap: 16 }}>
-      <PageHeader title="Body" sub={`Lean-mass goal: ${s.goal} lb${start != null ? `, starting from ${start} lb` : ''}`} />
+    <div className="stack body-page" style={{ gap: 16 }}>
+      <PageHeader title="Body" sub={sub} />
+      <Tabs value={tab} onChange={setTab} options={[{ value: 'weight', label: 'Weight' }, { value: 'training', label: 'Training' }]} />
 
-      <form className="card body-log" onSubmit={submit}>
-        <input className="input body-log-big" inputMode="decimal" autoComplete="off" placeholder={loggedToday ? `Today: ${loggedToday.weight} lb. Type to update` : 'Today’s weight in lb, e.g. 136.4'} value={text} onChange={(e) => setText(e.target.value)} aria-label="Weight in pounds" />
-        <button className="btn btn-primary" type="submit" disabled={!text.trim()}>Log</button>
-        <div className="body-log-more">
-          {showDate ? (
-            <input className="input" type="date" max={t} value={date || t} onChange={(e) => setDate(e.target.value)} aria-label="Date of weigh-in" />
-          ) : (
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowDate(true)}>Change date</button>
-          )}
-          <span className="faint">Or in the capture bar: <span className="mono">w 136.4</span> or <span className="mono">weighed 136.4 yesterday</span></span>
+      {tab === 'training' && (
+        <div className="body-split">
+          <TrainingPanel habits={habits} target={s.trainDays} />
+          <GoalPanel s={s} firstWeight={w[0]?.weight} />
         </div>
-      </form>
+      )}
 
-      {w.length === 0 ? (
+      {tab === 'weight' && (w.length === 0 ? (
         <>
-          <Card>
-            <Empty title="No weigh-ins yet">
-              Log today&apos;s weight above, then check your goal ({s.goal} lb). A trend line appears after about two weeks of logs; weighing at the same time each morning keeps it honest.
-            </Empty>
+          <Card title="Your first weigh-in">
+            <ol className="body-first">
+              <li><strong>Weigh in.</strong> Type today&apos;s weight below and tap Save. Same time each morning keeps the trend honest.</li>
+              <li><strong>Check your goal.</strong> It is {s.goal} lb; change it under Set goal.</li>
+              <li><strong>Watch the path.</strong> A 7-day average, a pace line and a flag every 5 lb appear after about two weeks of logs.</li>
+            </ol>
           </Card>
+          <WeighInStepper first />
           <div className="body-split">
             <GoalPanel s={s} />
             <GuidanceCard s={s} weights={w} rate={null} weight={null} intake={intake} remaining={0} goalDateRate={null} />
@@ -111,18 +91,21 @@ export default function Body() {
         </>
       ) : (
         <>
-          <KpiStrip
-            items={[
-              { label: 'Current (7-day avg)', hero: true, value: `${current!.toFixed(1)} lb`, note: latest ? `Last weigh-in ${latest.weight} lb, ${formatDate(latest.date)}` : undefined },
-              { label: 'Change this week', value: change != null ? `${signed(change)} lb` : '--', trend: changeTrend, note: change == null ? 'needs a week of logs' : undefined },
-              { label: 'Rate (4 weeks)', value: rate != null ? `${signed(rate)} lb/wk` : '--', trend: rateTrend, note: rate == null ? 'needs 2 weeks of logs' : undefined },
-              { label: 'To go', value: `${toGo!.toFixed(1)} lb`, note: `Goal ${s.goal} lb` },
-              { label: 'Projected', value: projNow ? (projNow === t ? 'Reached' : fmtLong(projNow)) : '--', note: projNow ? `At ${signed(rate ?? 0)} lb/wk. At ${HEALTHY_RATE} lb/wk: ${projHealthy === t ? 'now' : projHealthy ? fmtLong(projHealthy) : '--'}` : `Needs a rising trend. At ${HEALTHY_RATE} lb/wk: ${projHealthy ? fmtLong(projHealthy) : '--'}` },
-            ]}
+          <BodyHero
+            current={current!}
+            last={latest ? { weight: latest.weight, label: formatDate(latest.date) } : undefined}
+            change={change}
+            rate={rate}
+            toGo={toGo!}
+            goal={s.goal}
+            next={flags.find((f) => f.next)}
+            projected={projNow ? (projNow === t ? 'reached' : `about ${fmtLong(projNow)} at this pace`) : undefined}
           />
 
+          <div className="wstep-dock"><WeighInStepper loggedToday={loggedToday?.weight} last={latest?.weight} /></div>
+
           <ChartFrame
-            title="Weight trend"
+            title="Weight path"
             hasData={series.length > 0}
             controls={
               <div className="row" style={{ gap: 6 }}>
@@ -131,7 +114,7 @@ export default function Body() {
                 ))}
               </div>
             }
-            legend={[{ label: '7-day average', color: '#8b7cf0' }, { label: 'Daily weigh-ins (faint)', color: 'rgba(139,124,240,0.4)' }]}
+            legend={[{ label: '7-day average', color: '#8b7cf0' }, { label: `Healthy pace (${HEALTHY_RATE} lb/wk)`, color: '#a9a7ba' }, { label: 'Daily weigh-ins (faint)', color: 'rgba(139,124,240,0.4)' }]}
             table={
               <DataTable
                 label="Weigh-ins"
@@ -154,26 +137,27 @@ export default function Body() {
               />
             }
           >
-            <BodyChart data={shown.length ? shown : series} goal={s.goal} />
+            <WeightPath data={shown.length ? shown : series} flags={flags} ghost={ghost} goal={s.goal} />
           </ChartFrame>
 
-          {crossings.length > 0 && (
-            <div className="body-ms small" aria-label="Milestones">
-              {crossings.map((c) => (
-                <span key={c.target} className={c.date ? 'chip chip-accent' : 'chip'}>{c.target} lb{c.date ? `, ${formatDate(c.date)}` : ''}</span>
+          {flags.length > 0 && (
+            <ul className="body-ms small" aria-label="Checkpoints">
+              {flags.map((f) => (
+                <li key={f.target} className={`flag-chip ${f.reached ? 'is-reached' : ''}`}>
+                  <span className="mono">{f.target} lb</span>
+                  <span>{f.reached ? (f.crossedOn ? `crossed ${formatDate(f.crossedOn)}` : 'crossed') : f.next ? `${f.lbToGo.toFixed(1)} lb to go` : 'ahead'}</span>
+                </li>
               ))}
-            </div>
+            </ul>
           )}
 
           <div className="body-split">
             <GuidanceCard s={s} weights={w} rate={rate} weight={current} intake={intake} remaining={toGo ?? 0} goalDateRate={goalDateRate} />
-            <div className="stack" style={{ gap: 'var(--gap)' }}>
-              <TrainingCard habits={habits} logs={logs} target={s.trainDays} />
-              <GoalPanel s={s} firstWeight={w[0]?.weight} />
-            </div>
+            <GoalPanel s={s} firstWeight={w[0]?.weight} />
           </div>
         </>
-      )}
+      ))}
+
     </div>
   )
 }

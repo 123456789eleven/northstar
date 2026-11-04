@@ -96,3 +96,54 @@
   .recharts-cartesian-grid line { stroke: #ddd !important; }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* G3: money hero, boss, no-spend calendar, net worth hero, phone transaction list. */
+.mhero { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: var(--sp-5); }
+.mhero-main { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.mhero-status { font-family: var(--serif); font-size: 44px; line-height: 1.05; font-weight: 500; letter-spacing: var(--track-display); }
+.mhero-status.is-over { color: var(--warn); }
+.boss { display: flex; flex-direction: column; gap: 8px; padding: var(--sp-3); border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--surface-1); }
+.boss-head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+.boss-title { font-size: var(--text-sm); font-weight: 600; }
+.boss-state { font-size: var(--text-xs); color: var(--skill-money); font-weight: 600; }
+.boss-hp { position: relative; height: 14px; border-radius: var(--radius-pill); background: var(--surface-2); overflow: hidden; }
+.boss-fill { position: absolute; inset: 0; border-radius: inherit; background: var(--skill-money); transform: translateX(calc(var(--p, 0) * 100% - 100%)); transition: transform var(--dur-spring) var(--ease-spring-soft); }
+.boss-hp.is-watch .boss-fill { background: var(--accent); }
+.boss-hp.is-beaten .boss-fill, .boss-hp.is-lost .boss-fill { background: var(--warn); }
+.boss-tick { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--ink); opacity: 0.75; }
+.boss-words { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: var(--text-sm); color: var(--ink-2); }
+.boss-words strong { color: var(--ink); }
+.mhero-side { display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
+.mhero-ring { display: flex; align-items: center; gap: var(--sp-3); }
+.mhero-ring-num { font-family: var(--serif); font-size: 20px; }
+.nsd-head { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.nsd-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; max-width: 240px; }
+.nsd-day { aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%; font-size: 10px; font-variant-numeric: tabular-nums; border: 1px solid var(--line); color: var(--ink-2); }
+.nsd-day.is-nospend { background: var(--skill-money); border-color: var(--skill-money); color: var(--accent-ink); font-weight: 600; }
+.nsd-day.is-future { border-color: var(--line-soft); color: var(--ink-3); opacity: 0.6; }
+.mhero-bills { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); padding-top: var(--sp-3); border-top: 1px solid var(--line-soft); }
+.mhero-bill-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+@media (max-width: 819px) {
+  .mhero { grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); }
+  .mhero-status { font-size: 38px; }
+}
+.fin-warn-row .hbar { margin-top: 6px; }
+
+.nhero { display: flex; justify-content: space-between; gap: var(--sp-5); flex-wrap: wrap; align-items: flex-end; }
+.nhero-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.nhero-num { font-family: var(--serif); font-size: 56px; line-height: 1; font-weight: 500; letter-spacing: var(--track-display); }
+.nhero-side { display: flex; flex-direction: column; gap: var(--sp-2); }
+@media (max-width: 819px) { .nhero-num { font-size: 44px; } }
+.wpath { width: 100%; height: 260px; }
+
+.fin-tlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.fin-tlist > li { border-top: 1px solid var(--line-soft); }
+.fin-tlist > li:first-child { border-top: 0; }
+.fin-trow { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); min-height: 56px; padding: 8px 14px; background: none; border: 0; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.fin-trow-main { display: flex; flex-direction: column; min-width: 0; }
+.fin-trow-desc { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fin-trow-meta { color: var(--ink-2); }
+.fin-trow-un { color: var(--accent-text); }
+
+@media (prefers-reduced-motion: reduce) { .boss-fill { transition: none; } }
+:root[data-motion='reduced'] .boss-fill { transition: none; }

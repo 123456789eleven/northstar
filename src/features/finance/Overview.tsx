@@ -11,6 +11,8 @@ import { useBills } from './billsData'
 import { detectRecurring, monthlyTotal } from './recurring'
 import { merchantLabel, UNCATEGORIZED } from './categories'
 import { CategoryBars, TrendChart } from './charts'
+import HealthBar from './HealthBar'
+import MoneyHero from './MoneyHero'
 import { TREND_LEGEND } from './series'
 import { monthLabel, monthRange, moneyExact, pct, shiftMonth, summarize, topMerchants, useMonthTx } from './model'
 
@@ -100,6 +102,7 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
 
   return (
     <div className="stack" style={{ gap: 16 }}>
+      <MoneyHero month={month} spent={bs.spent} totalSpent={s.spending} budgets={budgets} savingsRate={s.savingsRate} txs={txs} bills={bills} onBudgets={() => goTo('budgets')} />
       <KpiStrip
         items={[
           { label: 'Income', value: money(s.income), trend: pctTrend(s.income, prev?.income, 'up') },
@@ -124,10 +127,11 @@ export default function Overview({ month, goTo }: { month: string; goTo: (tab: '
         <Card title="Budgets near or over limit" action={<button className="btn btn-ghost btn-sm" onClick={() => goTo('budgets')}>All budgets</button>}>
           <div className="list">
             {warnings.map((w) => (
-              <div key={w.category} className="list-item small">
+              <div key={w.category} className="list-item small fin-warn-row">
                 <span className="grow">
                   {w.category}
                   {w.bill && <span className="tiny faint"> · Bill: {money(w.bill.monthly)}/mo set aside (paid {w.bill.bills.map((b) => cadenceText(b, money)).join(' + ')})</span>}
+                  <HealthBar spent={w.spent} limit={w.monthlyLimit} month={month} label={w.category} />
                 </span>
                 <span className="mono muted">
                   {moneyExact(w.spent)} of {moneyExact(w.monthlyLimit)}
