@@ -4,8 +4,14 @@ import { db, type Habit, type ISODate } from '../db'
 import { Card, Empty, PageHeader, Skeleton } from '../components/ui'
 import { today } from '../lib/dates'
 import { useFocusTarget } from '../lib/useFocusParam'
-import { HabitCard, HabitModal } from '../features/habits/HabitParts'
+import { HabitModal } from '../features/habits/HabitParts'
+import { HabitCard, HabitDetail, TodayRow } from '../features/habits/HabitRow'
+import { isDueToday } from '../features/habits/week'
+import { WeekDots } from '../features/game/ui/Meters'
+import { usePlayerState } from '../features/game/ui/playerContext'
+import '../features/goals/quest.css'
 import '../features/habits/habits.css'
+import '../features/habits/rings.css'
 
 export default function Habits() {
   const d = today()
@@ -14,6 +20,8 @@ export default function Habits() {
   const goals = useLiveQuery(() => db.goals.toArray(), [])
   const [editing, setEditing] = useState<Habit | 'new' | null>(null)
   const [showArchived, setShowArchived] = useState(false)
+  const [openId, setOpenId] = useState<number | null>(null)
+  const player = usePlayerState()
 
   const byHabit = useMemo(() => {
     const m = new Map<number, Set<ISODate>>()
@@ -32,9 +40,12 @@ export default function Habits() {
     exists: (id) => (habits ?? []).some((h) => String(h.id) === id),
     reveal: (id) => { if ((habits ?? []).find((h) => String(h.id) === id)?.archived) setShowArchived(true) },
   })
+  const dueToday = active.filter((h) => isDueToday(byHabit.get(h.id!) ?? new Set(), d, h.perWeek))
+  const opened = openId != null ? (habits ?? []).find((h) => h.id === openId) : undefined
+  const st = player.streak
   const doneToday = active.filter((h) => byHabit.get(h.id!)?.has(d)).length
   const card = (h: Habit) => (
-    <HabitCard key={h.id} habit={h} dates={byHabit.get(h.id!) ?? new Set()} today={d} goalTitle={h.goalId != null ? goalTitle.get(h.goalId) : undefined} onEdit={setEditing} />
+    <HabitCard key={h.id} habit={h} dates={byHabit.get(h.id!) ?? new Set()} today={d} goalTitle={h.goalId != null ? goalTitle.get(h.goalId) : undefined} onOpen={(x) => setOpenId(x.id ?? null)} />
   )
 
   return (
@@ -44,6 +55,17 @@ export default function Habits() {
         sub={habits === undefined ? ' ' : active.length ? `${doneToday} of ${active.length} done today` : 'Small things, repeated'}
         actions={<button className="btn btn-primary" onClick={() => setEditing('new')}>New habit</button>}
       />
+      {!player.calm && !player.loading && (
+        <div className="habit-strip" aria-label="Weekly streak">
+          <WeekDots streak={st} />
+          <span className="habit-strip-text">
+            {st.daysThisWeek} of {st.target} active days this week
+            {st.restTokens > 0 && <> · {st.restTokens} rest {st.restTokens === 1 ? 'token' : 'tokens'}</>}
+            {st.weeksInRow > 0 && <> · {st.weeksInRow} {st.weeksInRow === 1 ? 'week' : 'weeks'} in a row</>}
+          </span>
+        </div>
+      )}
+      <TodayRow habits={dueToday} byHabit={byHabit} today={d} />
       {habits === undefined && (
         <div className="habit-list" aria-busy="true">
           <Card><Skeleton lines={4} label="Loading habits" /></Card>
@@ -68,6 +90,16 @@ export default function Habits() {
           </button>
           {showArchived && <div className="habit-list" style={{ marginTop: 12 }}>{archived.map(card)}</div>}
         </div>
+      )}
+      {opened && (
+        <HabitDetail
+          habit={opened}
+          dates={byHabit.get(opened.id!) ?? new Set()}
+          today={d}
+          goalTitle={opened.goalId != null ? goalTitle.get(opened.goalId) : undefined}
+          onClose={() => setOpenId(null)}
+          onEdit={(h) => { setOpenId(null); setEditing(h) }}
+        />
       )}
       {editing && <HabitModal habit={editing === 'new' ? null : editing} goals={goals ?? []} onClose={() => setEditing(null)} />}
     </>
