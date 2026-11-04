@@ -51,9 +51,8 @@ export function FocusSheet({ itemId, title, onClose }: { itemId: number; title: 
         ) : (
           <>
             <div className="focus-clock-wrap">
-              <Ring value={mine ? p : 0} size={168} stroke={5} tone="mind" label={mine && tMin ? `${Math.round(p * 100)}% of ${tMin} minutes` : undefined}>
-                <span className="focus-clock mono" role="timer" aria-label="Elapsed focus time">{formatClock(mine ? ms : 0)}</span>
-              </Ring>
+              <Ring value={mine ? p : 0} size={168} stroke={5} tone="mind" label={mine && tMin ? `${Math.round(p * 100)}% of ${tMin} minutes` : undefined} />
+              <span className="focus-clock mono" role="timer" aria-label="Elapsed focus time">{formatClock(mine ? ms : 0)}</span>
             </div>
             <div className="row focus-targets" role="group" aria-label="Target length">
               <button type="button" className="chip jr-chip" aria-pressed={tMin == null} onClick={() => { setTarget(null); if (mine) focusDispatch({ type: 'target', targetMin: null }) }}>No target</button>

@@ -60,7 +60,8 @@
 /* Focus runs (G4) */
 .focus-sheet { display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); padding-bottom: var(--sp-3); }
 .focus-title { font-size: 15px; font-weight: 600; text-align: center; overflow-wrap: anywhere; }
-.focus-clock-wrap { padding: var(--sp-2) 0; }
+.focus-clock-wrap { padding: var(--sp-2) 0; position: relative; display: grid; place-items: center; }
+.focus-clock-wrap > .focus-clock { position: absolute; }
 .focus-clock { font-size: 34px; font-variant-numeric: tabular-nums; color: var(--ink); }
 .focus-targets, .focus-actions { justify-content: center; flex-wrap: wrap; gap: var(--sp-2); }
 .focus-actions .btn { min-height: 44px; min-width: 120px; }

@@ -184,7 +184,6 @@ export default function Learning() {
 
       {view === 'log' && <LogView items={all} />}
 
-      {focusFor && <FocusSheet itemId={focusFor.id!} title={focusFor.title} onClose={() => setFocusFor(null)} />}
       {focusFor && focusFor.id != null && <FocusSheet itemId={focusFor.id} title={focusFor.title} onClose={() => setFocusFor(null)} />}
       {modal && <ItemModal item={modal.item} defaultStatus={modal.status} onClose={() => setModal(null)} />}
     </>

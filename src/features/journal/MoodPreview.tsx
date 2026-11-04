@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import type { JournalEntry } from '../../db'
 import { monthKey, today } from '../../lib/dates'
 import { MAX_STAR, monthStars } from './constellation'
+import './journal.css'
 
 export function MoodPreview({ entries, goal }: { entries: Pick<JournalEntry, 'date' | 'text' | 'mood'>[]; goal: number }) {
   const t = today()

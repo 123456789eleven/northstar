@@ -28,3 +28,6 @@
 .ppl-else summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-family: var(--mono); font-size: var(--text-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); }
 .ppl-else-search { padding: 0 16px 10px; }
 .ppl-empty-hint { padding: var(--sp-4); }
+.ppl-board:not(.is-list) { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+@media (min-width: 981px) { .ppl-circle-card { position: sticky; top: var(--sp-4); } }
+@media (max-width: 980px) { .ppl-board:not(.is-list) { grid-template-columns: minmax(0, 1fr); } }
