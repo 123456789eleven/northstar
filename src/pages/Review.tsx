@@ -8,6 +8,8 @@ import { Digest, ReviewForm } from '../features/review/ReviewParts'
 import { RatingsTrend } from '../features/review/RatingsTrend'
 import { WeekInNumbers } from '../features/review/WeekInNumbers'
 import { InsightsWeek } from '../features/insights/InsightsCard'
+import { SeasonHeader, SeasonStories } from '../features/review/SeasonParts'
+import { useMedia, PHONE_QUERY } from '../components/useMedia'
 import '../features/review/review.css'
 
 function Chevron({ dir }: { dir: 'l' | 'r' }) {
@@ -28,6 +30,7 @@ export default function Review() {
   const thisWeek = startOfWeek(today())
   const lastWeek = addDays(thisWeek, -7)
   const [weekOf, setWeekOf] = useState(thisWeek)
+  const phone = useMedia(PHONE_QUERY)
 
   const reviews = useLiveQuery(() => db.reviews.orderBy('weekOf').reverse().toArray(), [])
   const loaded = useLiveQuery(async () => ({ weekOf, row: (await db.reviews.where('weekOf').equals(weekOf).first()) ?? null }), [weekOf])
@@ -41,12 +44,14 @@ export default function Review() {
   const streak = reviews ? reviewStreak(reviews) : 0
 
   const sub = reviews === undefined ? '' : reviews.length === 0
-    ? 'Ten minutes each week: what went well, what didn’t, what’s next.'
-    : streak > 0 ? `${streak}-week streak · ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'} in total` : `${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'} · no current streak`
+    ? 'Weekly recap: ten minutes each week on what went well, what didn’t, what’s next.'
+    : streak > 0 ? `Weekly recap · ${streak}-week streak · ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'} in total` : `Weekly recap · ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'} · no current streak`
 
   return (
     <>
-      <PageHeader title="Weekly review" sub={sub} actions={<button className="btn btn-ghost no-print" onClick={() => window.print()}>Print</button>} />
+      <PageHeader title="Season" sub={sub} actions={<button className="btn btn-ghost no-print" onClick={() => window.print()}>Print</button>} />
+
+      <SeasonHeader />
 
       {suggestLast && (
         <div className="rv-suggest">
@@ -67,8 +72,9 @@ export default function Review() {
 
       <div className="rv-layout">
         <div className="stack" style={{ gap: 16 }}>
+          {current !== undefined && phone && <SeasonStories weekOf={weekOf} snapshot={(current as LockableReview | null)?.numbers} wins={current?.wins} focusNext={current?.focusNext} planned={planned} />}
           {current !== undefined && <WeekInNumbers weekOf={weekOf} snapshot={(current as LockableReview | null)?.numbers} />}
-          <Digest weekOf={weekOf} />
+          {!phone && <Digest weekOf={weekOf} />}
           {weekOf === thisWeek && <InsightsWeek />}
           {current !== undefined && <ReviewForm key={weekOf} weekOf={weekOf} existing={current} planned={planned} />}
         </div>
@@ -76,7 +82,7 @@ export default function Review() {
           <Card title="Ratings over time">
             <RatingsTrend reviews={reviews ?? []} />
           </Card>
-          <Card title="Past reviews">
+          <Card title="Past weekly recaps">
             {reviews && reviews.length > 0 ? (
               <div className="rv-past">
                 {reviews.slice(0, 30).map((r) => {
