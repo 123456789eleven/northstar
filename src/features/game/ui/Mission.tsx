@@ -6,6 +6,7 @@ import { LevelBadge, Ring } from './Ring'
 import { WeekDots, XpBar } from './Meters'
 import { QuestCard } from './QuestCard'
 import { usePlayerState } from './playerContext'
+import { useEngineOnMount } from './engineGate'
 import type { PlayerState } from '../types'
 
 const streakLine = (p: PlayerState) =>
@@ -19,6 +20,7 @@ function TodayXp({ xp }: { xp: number }) {
 /** Top of Today: progress ring for the day, quest cards, streak strip, Day cleared state. */
 export function MissionBoard() {
   const p = usePlayerState()
+  useEngineOnMount()
   if (p.calm) return null
   if (p.loading) return <div className="card mission mission-skel skel-pulse" aria-hidden />
   const total = p.quests.length
