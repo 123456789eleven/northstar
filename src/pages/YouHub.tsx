@@ -91,6 +91,7 @@ export default function YouHub() {
         <HubCard to="/history" icon="trophy" title="Trophies" sub="Milestones and your timeline" stat={trophies} />
         <HubCard to="/review" icon="review" title="Season" sub={`${quarter()} · weekly recaps`} stat={reviews} />
         <HubCard to="/ops" icon="command" title="Intel" sub="Suggestions and briefings from your data" />
+        <HubCard to="/interview" icon="user" title="Interview" sub="Answer questions so Northstar fits you" />
         <HubCard to="/settings" icon="settings" title="Settings" sub="Game, sync, backup and preferences" />
         <HubCard to="/data" icon="data" title="Data" sub="Import, export and what is stored here" />
         <HubCard to="/ontology" icon="ontology" title="Ontology" sub="Every object type and how they link" />

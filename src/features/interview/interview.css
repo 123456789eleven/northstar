@@ -1,0 +1,6 @@
+.iv-form { gap: 16px; }
+.iv-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.iv-chips .chip { min-height: 36px; cursor: pointer; }
+.iv-chips .chip[aria-pressed='true'] { border-color: var(--accent); color: var(--ink); background: var(--accent-soft, var(--glass-bg)); }
+.iv-actions { gap: 8px; flex-wrap: wrap; }
+.iv-result { margin: 12px 0 0; padding-left: 18px; color: var(--ink-2); font-size: 0.9rem; }

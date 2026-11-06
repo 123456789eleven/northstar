@@ -27,6 +27,7 @@ export function FirstRunCard() {
 
   const steps: { done: boolean; label: string; to?: string; cta: string; optional?: boolean; onClick?: () => void }[] = [
     { done: s.setup, label: 'Set up Northstar with your real goals, habits and budgets', cta: s.setup ? 'Run again' : 'Start', onClick: openSetup },
+    { done: false, label: 'Answer the Interview: about 30 questions that fill in everything else', to: '/interview', cta: 'Open' },
     { done: s.tasks > 0, label: 'Add a task', to: '/tasks', cta: 'Tasks' },
     { done: s.goals > 0, label: 'Set a goal for this quarter', to: '/goals', cta: 'Goals' },
     { done: s.tx > 0, label: 'Import a bank CSV or add a transaction', to: '/finance', cta: 'Finance' },
