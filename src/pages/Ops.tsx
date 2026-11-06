@@ -7,7 +7,6 @@ import { Kbd } from '../components/Shortcuts'
 import { openShortcuts } from '../components/shortcutsData'
 import { useNow } from '../components/useNow'
 import KpiStrip from '../components/KpiStrip'
-import DataTable, { type Column } from '../components/DataTable'
 import SidePanel from '../components/SidePanel'
 import StatusChip from '../components/StatusChip'
 import ModuleTile from '../components/ModuleTile'
@@ -18,6 +17,7 @@ import { applyProposal, canUndo, decide, getAuto, getAutoLog, loadOpsSnapshot, r
 import { generateProposals, needsApproval, RULE_IDS, RULE_META, type Proposal } from '../features/ops/proposals'
 import { REGISTRY, resolveLinks, TYPE_LIST, typeForTable, type TypeKey } from '../ontology/registry'
 import '../features/ops/ops.css'
+import '../features/you/you.css'
 
 const WEEK_MS = 7 * 86_400_000
 
@@ -125,7 +125,8 @@ export default function Ops() {
     return m
   }, [proposals])
   const facets = TYPE_LIST.filter((t) => facetCounts.has(t.key))
-  const visible = useMemo(() => (proposals ?? []).filter((p) => !hidden.has(typeOf(p))), [proposals, hidden])
+  // Medium risk first (it waits for you), then low risk; j/k walk this same order.
+  const visible = useMemo(() => (proposals ?? []).filter((p) => !hidden.has(typeOf(p))).sort((a, b) => Number(a.risk === 'low') - Number(b.risk === 'low')), [proposals, hidden])
   const sel = closed ? null : visible.find((p) => p.id === selId) ?? (phone ? null : visible[0] ?? null)
 
   const graph = useLiveQuery(async () => {
@@ -161,13 +162,6 @@ export default function Ops() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   })
-
-  const columns: Column<Proposal>[] = [
-    { key: 'p', header: 'Proposal', primary: true, render: (p) => <span className="ops-clip">{p.title}</span> },
-    { key: 'o', header: 'Object', render: (p) => <span className="faint ops-clip">{REGISTRY[typeOf(p)].label}: {names?.get(`${p.objectRef.table}:${p.objectRef.id}`) ?? ''}</span> },
-    // Rule name is shown in the review panel.
-    { key: 'k', header: 'Risk', value: true, render: (p) => <StatusChip status={p.risk === 'low' ? 'info' : 'warn'}>{p.risk === 'low' ? 'Low' : 'Medium'}</StatusChip> },
-  ]
 
   return (
     <>
@@ -209,9 +203,31 @@ export default function Ops() {
               )}
             </Card>
           ) : (
-            <div className="card card-flush">
-              <DataTable label="Proposals" columns={columns} rows={visible} rowKey={(p) => p.id} onRow={(p) => select(p.id)} activeKey={sel?.id ?? null} />
-            </div>
+            <>
+              {(['medium', 'low'] as const).map((risk) => {
+                const group = visible.filter((p) => p.risk === risk)
+                if (!group.length) return null
+                return (
+                  <div key={risk} className="brief-group">
+                    <h2 className="brief-h"><span>{risk === 'medium' ? 'Needs your approval · medium risk' : 'Low risk'}</span><span>{group.length}</span></h2>
+                    <ul className="brief-list" aria-label={risk === 'medium' ? 'Medium risk proposals' : 'Low risk proposals'}>
+                      {group.map((p) => (
+                        <li key={p.id}>
+                          <button type="button" className="brief" aria-current={sel?.id === p.id ? 'true' : undefined} onClick={() => select(p.id)}>
+                            {TYPE_MODULE[typeOf(p)] && <ModuleTile icon={TYPE_MODULE[typeOf(p)]} size="sm" />}
+                            <span className="brief-body">
+                              <span className="brief-title">{p.title}</span>
+                              <span className="brief-why"><span className="brief-why-k">Why</span>{p.rationale.split(/(?<=\.)\s/)[0]}</span>
+                              <span className="brief-find">{REGISTRY[typeOf(p)].label}: {names?.get(`${p.objectRef.table}:${p.objectRef.id}`) ?? ''}</span>
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )
+              })}
+            </>
           )}
         </section>
 

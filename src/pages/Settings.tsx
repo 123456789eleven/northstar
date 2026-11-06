@@ -7,11 +7,11 @@ import { GameSection } from '../features/settings/GameSection'
 import '../features/settings/settings.css'
 
 const SECTIONS = [
+  { id: 'set-game', label: 'Game' },
   { id: 'set-sync', label: 'Sync' },
   { id: 'set-backup', label: 'Backup & restore' },
   { id: 'set-data', label: 'Data on this device' },
   { id: 'set-prefs', label: 'Preferences' },
-  { id: 'set-game', label: 'Game' },
   { id: 'set-about', label: 'About & privacy' },
   { id: 'set-danger', label: 'Danger zone' },
 ]
@@ -57,11 +57,11 @@ export default function Settings() {
       <div className="set-layout">
         <SectionIndex />
         <div className="set-page">
+          <div id="set-game" className="set-anchor"><GameSection /></div>
           <div id="set-sync" className="set-anchor"><SyncSection /></div>
           <div id="set-backup" className="set-anchor"><BackupSection /></div>
           <div id="set-data" className="set-anchor"><StorageSection /></div>
           <div id="set-prefs" className="set-anchor"><ProfileSection /></div>
-          <div id="set-game" className="set-anchor"><GameSection /></div>
           <div id="set-about" className="set-anchor"><AboutSection /></div>
           <div id="set-danger" className="set-anchor set-danger-wrap"><DangerSection /></div>
         </div>
