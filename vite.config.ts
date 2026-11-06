@@ -22,7 +22,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'prompt',
       injectRegister: false,
-      includeAssets: ['icon.svg', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
+      includeAssets: ['icon.svg', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'favicon-32.png', 'apple-touch-icon.png'],
       workbox: { clientsClaim: true, globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'] },
       manifest: {
         name: 'Northstar',

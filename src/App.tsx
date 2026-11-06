@@ -1,4 +1,4 @@
-import { lazy, useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { flushSync } from 'react-dom'
 import { HashRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { prefersReducedMotion } from './components/motion'
@@ -8,13 +8,13 @@ import HubLayout, { RouteFade } from './components/HubLayout'
 import { PlayerProvider } from './features/game/ui/PlayerProvider'
 import { usePlayerState } from './features/game/ui/playerContext'
 import { MissionRail } from './features/game/ui/Mission'
-import { MomentHost } from './features/game/ui/MomentHost'
 import './features/game/ui/game.css'
 import ToastProvider from './components/Toast'
 import UpdatePrompt from './components/UpdatePrompt'
 import { ShortcutsHost } from './components/Shortcuts'
 import { useDensity } from './components/density'
 
+const MomentHost = lazy(() => import('./features/game/ui/MomentHost').then((m) => ({ default: m.MomentHost })))
 const Today = lazy(() => import('./pages/Today'))
 const Ops = lazy(() => import('./pages/Ops'))
 const Ontology = lazy(() => import('./pages/Ontology'))
@@ -117,7 +117,7 @@ function Shell() {
         <MissionRail />
         <TabBar />
         <CaptureHost />
-        <MomentHost />
+        <Suspense fallback={null}><MomentHost /></Suspense>
         <UpdatePrompt />
         <ShortcutsHost />
       </div>
