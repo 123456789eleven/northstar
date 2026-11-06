@@ -109,7 +109,7 @@ export function SeasonStories({ weekOf, snapshot, wins, focusNext, planned }: { 
 
   return (
     <section className="story" aria-label="Week story" data-testid="story-cards">
-      <div className="story-track" ref={track}>
+      <div className="story-track" ref={track} tabIndex={0} role="group" aria-label="Week story cards, scroll sideways">
         {order.map((id) => (
           <article key={id} className="card story-card" data-story={id} aria-label={TITLES[id]}>
             <h3>{TITLES[id]}</h3>

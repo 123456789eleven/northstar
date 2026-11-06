@@ -24,7 +24,7 @@ export function NextTrophyRow({ max = 5, className = '' }: { max?: number; class
   const next = useNextTrophies(max)
   if (!next || next.length === 0) return null
   return (
-    <ul className={`tr-next ${className}`} aria-label="Next trophies">
+    <ul className={`tr-next ${className}`} aria-label="Next trophies" tabIndex={0}>
       {next.map((t) => (
         <li key={t.id} className="tr-next-card">
           <Link to={t.href} className="tr-next-link">
@@ -54,7 +54,7 @@ export function TrophyShelf() {
       {shown.length === 0 ? (
         <p className="small muted tr-empty">Milestones collect here: finished goals, completed courses, streaks, and anything you add with Milestone switched on.</p>
       ) : (
-        <ul className="tr-grid" aria-label="Trophies">
+        <ul className="tr-grid" aria-label="Trophies" tabIndex={0}>
           {shown.map((e: LifeEvent) => {
             const r = rarity(counts.get(e.kind) ?? 1)
             const isNew = !calm && isNewMoment(e, all, now)
