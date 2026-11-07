@@ -1,0 +1,5 @@
+/* Tasks redesign: the phone add line sits above the floating tab bar. Tokens only. */
+@media (max-width: 819px) {
+  .quick-add-sticky { bottom: calc(82px + env(safe-area-inset-bottom)); background: var(--mat-thick-bg); border-top-color: var(--line-soft); }
+  .tq-phone-pad { height: 120px; }
+}

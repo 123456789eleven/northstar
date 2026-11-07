@@ -19,6 +19,7 @@ import { useFocusTarget } from '../lib/useFocusParam'
 import { FocusBar } from '../features/tasks/FocusBar'
 import '../features/tasks/tasks.css'
 import '../features/tasks/g2a.css'
+import '../features/tasks/tasks2.css'
 
 export default function Tasks() {
   const d = today()

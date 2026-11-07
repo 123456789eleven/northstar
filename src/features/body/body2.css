@@ -4,3 +4,6 @@
 .body-hero-pace { grid-column: 1 / -1; margin: 0; color: var(--ink); }
 .body-hero-pace.tone-slow, .body-hero-pace.tone-flat { color: var(--warn); }
 .body-hero-pace strong { color: var(--ink); }
+@media (max-width: 819px) {
+  .wstep-dock { bottom: calc(82px + env(safe-area-inset-bottom)); }
+}
