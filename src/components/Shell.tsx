@@ -1,5 +1,5 @@
-// App shell v3 ("Constellation"): desktop rail (Today, Plan, Skills with level pips, You), top bar (context, capture,
-// search, sync, date; phone: player strip), phone bottom bar (Today | Plan | capture orb | Skills | You) and the capture sheet.
+// App shell: desktop rail (Today, Plan, Money, Areas, You), top bar (context, capture, search, sync, date; phone: plan pill and You),
+// and the phone bottom bar (Today | Plan | capture orb | Money | Areas) with the capture sheet.
 import { lazy, Suspense, useEffect, useState, type CSSProperties } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -12,8 +12,6 @@ import BottomSheet from './BottomSheet'
 import { Icon, type IconName } from './Icons'
 import { HUBS, hubForPath, navItemFor, NAV, tabActive, type HubId } from './nav'
 import { useMedia, PHONE_QUERY } from './useMedia'
-import { usePlayerState } from '../features/game/ui/playerContext'
-import { LevelBadge } from '../features/game/ui/Ring'
 import { PlayerStrip } from '../features/game/ui/Mission'
 import type { SkillId } from '../features/game/types'
 import './shell.css'
@@ -80,14 +78,13 @@ function useRememberHubPath() {
 
 interface RailEntry { to: string; label: string; icon: IconName; also?: string[]; skill?: SkillId }
 
-function RailLink({ e, pathname, pip }: { e: RailEntry; pathname: string; pip?: { level: number; progress: number } }) {
+function RailLink({ e, pathname }: { e: RailEntry; pathname: string }) {
   const active = tabActive(e, pathname)
   const exact = pathname === e.to
   return (
     <Link to={e.to} className={`nav-link ${active ? 'active' : ''}`} aria-current={exact ? 'page' : active ? 'true' : undefined} style={e.skill ? ({ '--pip-c': `var(--skill-${e.skill})` } as CSSProperties) : undefined}>
       <Icon name={e.icon} />
       <span className="nav-label">{e.label}</span>
-      {pip && <span className="nav-pip"><LevelBadge level={pip.level} progress={pip.progress} size={22} tone={e.skill} label={`${e.label} level ${pip.level}`} /></span>}
     </Link>
   )
 }
@@ -111,9 +108,6 @@ const RAIL_YOU: RailEntry[] = ['/you', '/history', '/review', '/ops', '/settings
 
 export function Rail() {
   const { pathname } = useLocation()
-  const p = usePlayerState()
-  const showPips = false // levels are retired from the rail (docs/redesign/DESIGN_BRIEF.md)
-  const level = Object.fromEntries(p.skills.map((s) => [s.id, s]))
   return (
     <nav className="sidebar" aria-label="Main">
       <div className="brand"><Mark />Northstar</div>
@@ -121,7 +115,7 @@ export function Rail() {
       <div className="nav-group" role="group" aria-labelledby="rail-skills">
         <div className="nav-section" id="rail-skills">Areas</div>
         {RAIL_SKILLS.map((e) => (
-          <RailLink key={e.to} e={e} pathname={pathname} pip={showPips && e.skill ? { level: level[e.skill].level, progress: level[e.skill].xpForNext ? level[e.skill].xpIntoLevel / level[e.skill].xpForNext : 0 } : undefined} />
+          <RailLink key={e.to} e={e} pathname={pathname} />
         ))}
       </div>
       <div className="nav-group" role="group" aria-labelledby="rail-you">

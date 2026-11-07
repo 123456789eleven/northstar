@@ -141,9 +141,9 @@
   --grad-violet: linear-gradient(135deg, #86b9de, #bfe0f3); /* name kept; it is the powder-blue action gradient */
   --grad-indigo: linear-gradient(135deg, #5b86b8, #86b0d8);
   --grad-slate: linear-gradient(135deg, #4a5568, #6b7a90);
-  --grad-teal: linear-gradient(135deg, #2fbf9b, #2aa9c4);
+  --grad-teal: linear-gradient(135deg, #86b9de, #bfe0f3);
   --grad-rose: linear-gradient(135deg, #e8453c, #f27a6f);
-  --grad-sky: linear-gradient(135deg, #4f86c6, #6aa6d6);
+  --grad-sky: linear-gradient(135deg, #7ea8d0, #b4d3ea);
   /* reward: XP, level-ups, trophies ONLY (never actions, focus or status) */
   --reward: #f2c46b;
   --reward-2: #e58f55;

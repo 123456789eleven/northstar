@@ -35,7 +35,7 @@ export const NAV: NavItem[] = [
   { to: '/career', label: 'Career', icon: 'career', group: 'Areas', hub: 'skills', skill: 'career', aka: 'Wins' },
   { to: '/people', label: 'People', icon: 'people', group: 'Areas', hub: 'skills', skill: 'people' },
   { to: '/you', label: 'You', icon: 'user', group: 'You', hub: 'you', aka: 'Overview' },
-  { to: '/history', label: 'Trophies', icon: 'trophy', group: 'You', hub: 'you', aka: 'History' },
+  { to: '/history', label: 'Milestones', icon: 'trophy', group: 'You', hub: 'you', aka: 'Trophies History' },
   { to: '/review', label: 'Season', icon: 'review', group: 'You', hub: 'you', aka: 'Weekly review' },
   { to: '/ops', label: 'Intel', icon: 'command', group: 'You', hub: 'you', aka: 'Command' },
   { to: '/settings', label: 'Settings', icon: 'settings', group: 'You', hub: 'you' },
@@ -68,7 +68,7 @@ export const HUBS: Record<Exclude<HubId, 'today'>, HubDef> = {
   you: {
     id: 'you', label: 'You', to: '/you', icon: 'user',
     tabs: [
-      { to: '/you', label: 'Overview' }, { to: '/history', label: 'Trophies' }, { to: '/review', label: 'Season' }, { to: '/ops', label: 'Intel' },
+      { to: '/you', label: 'Overview' }, { to: '/history', label: 'Milestones' }, { to: '/review', label: 'Season' }, { to: '/ops', label: 'Intel' },
       { to: '/settings', label: 'Settings' }, { to: '/data', label: 'Data' }, { to: '/ontology', label: 'Ontology' },
     ],
   },
