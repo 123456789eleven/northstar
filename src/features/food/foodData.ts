@@ -16,6 +16,15 @@ export interface FoodTargets {
 }
 
 export const TARGETS_KEY = 'food.targets'
+
+/** The owner's daily calorie goal until they set their own. */
+export const DEFAULT_CALORIE_TARGET = 3000
+
+/** Calorie target to use: the stored one, else the 3,000 kcal default. Shared with Today's Pulse. */
+export function effectiveCalorieTarget(targets?: FoodTargets | null): number {
+  const c = targets?.calories
+  return typeof c === 'number' && Number.isFinite(c) && c > 0 ? c : DEFAULT_CALORIE_TARGET
+}
 export { TEMPLATES_KEY }
 
 /** Parse an optional positive number from a text field; blank/invalid → undefined. */

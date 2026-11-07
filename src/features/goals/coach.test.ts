@@ -13,16 +13,19 @@ describe('expectedShare', () => {
 })
 
 describe('coachNote', () => {
+  it('stays plain without milestones', () => {
+    expect(coachNote({ goal, progress: 0.1, basis: 'tasks', today: '2026-11-15' }).text).toBe('Behind pace.')
+  })
   it('says met when complete', () => {
     expect(coachNote({ goal, progress: 1, basis: 'metric', today: '2026-11-15' })).toEqual({ tone: 'met', text: 'Goal met.' })
   })
   it('asks for tracking when nothing is tracked', () => {
     expect(coachNote({ goal, progress: 0, basis: 'none', today: '2026-11-15' }).tone).toBe('idle')
   })
-  it('flags behind pace in points', () => {
-    const n = coachNote({ goal, progress: 0.2, basis: 'milestones', today: '2026-11-15' })
+  it('flags behind pace in milestones', () => {
+    const n = coachNote({ goal, progress: 0.2, basis: 'milestones', today: '2026-11-15', milestones: 4 })
     expect(n.tone).toBe('behind')
-    expect(n.text).toMatch(/^\d+ points behind pace\.$/)
+    expect(n.text).toMatch(/^\d+ milestones? behind pace\.$/)
   })
   it('is on pace inside the band', () => {
     expect(coachNote({ goal, progress: 0.52, basis: 'tasks', today: '2026-11-15' }).tone).toBe('on')

@@ -15,6 +15,7 @@ import WeightPath from '../features/body/WeightPath'
 import { averageAt, HEALTHY_RATE, movingAverage, projectDate, weeklyRate } from '../features/body/model'
 import { addDays, daysBetween, formatDate, today } from '../lib/dates'
 import '../features/body/body.css'
+import '../features/goals/quest.css'
 import '../features/goals/season.css'
 import '../features/body/body2.css'
 

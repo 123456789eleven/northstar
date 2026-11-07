@@ -29,8 +29,10 @@ export function coachNote(args: {
   basis: 'metric' | 'milestones' | 'tasks' | 'none'
   today: ISODate
   weight?: { start: number; value: number; target: number }
+  /** Milestone count when progress is milestone-based; lets the note speak in milestones. */
+  milestones?: number
 }): CoachNote {
-  const { goal, progress, basis, today, weight } = args
+  const { goal, progress, basis, today, weight, milestones } = args
   if (goal.status === 'done' || progress >= 1) return { tone: 'met', text: 'Goal met.' }
   if (basis === 'none') return { tone: 'idle', text: 'Nothing tracked yet. Add a milestone or link a metric.' }
   const exp = expectedShare(goal, today)
@@ -44,8 +46,9 @@ export function coachNote(args: {
     return { tone: 'on', text: 'On the pace line.' }
   }
   const diff = progress - exp
-  const pts = Math.round(Math.abs(diff) * 100)
-  if (diff < -BAND) return { tone: 'behind', text: `${pts} points behind pace.` }
-  if (diff > BAND) return { tone: 'ahead', text: `${pts} points ahead of pace.` }
+  const n = milestones && basis === 'milestones' ? Math.max(1, Math.round(Math.abs(diff) * milestones)) : 0
+  const unit = `${n} milestone${n === 1 ? '' : 's'}`
+  if (diff < -BAND) return { tone: 'behind', text: n ? `${unit} behind pace.` : 'Behind pace.' }
+  if (diff > BAND) return { tone: 'ahead', text: n ? `${unit} ahead of pace.` : 'Ahead of pace.' }
   return { tone: 'on', text: 'On pace.' }
 }

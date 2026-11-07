@@ -10,3 +10,12 @@
 .food-behind { display: flex; align-items: flex-start; gap: var(--sp-2); color: var(--ink); padding-top: var(--sp-2); border-top: 1px solid var(--line-soft); }
 .food-behind-dot { flex: 0 0 8px; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--poppy); }
 @media (max-width: 620px) { .mrings { gap: var(--sp-4); } .mring.is-hero { min-width: 0; } .mring.is-side { min-width: 0; } }
+.food-day-total { margin: 0 0 var(--sp-2); font-size: var(--fs-3); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.food-day-total strong { color: var(--ink); font-size: var(--fs-4); }
+.food-default { margin-bottom: var(--sp-2); }
+.food-default-input { width: 110px; }
+.food-default-edit { text-decoration: underline; }
+.hue-rose { --tile-grad: var(--grad-violet); --tile-ink: var(--accent-ink); }
+@media (max-width: 819px) {
+  .food-quickdock { bottom: calc(82px + env(safe-area-inset-bottom)); background: var(--surface); border-color: var(--line-soft); -webkit-backdrop-filter: none; backdrop-filter: none; padding: 6px; }
+}

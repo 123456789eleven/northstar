@@ -14,7 +14,7 @@ export function CampaignRow({ goal, tasks, data, onOpen }: { goal: Goal; tasks: 
   const sub = metric ? (metric.hasData ? metric.label : 'No data yet') : p.basis === 'none' ? '' : progressLabel(p)
   return (
     <button type="button" className={`camp-row ${goal.status}`} data-focus-id={goal.id} onClick={() => onOpen(goal)}>
-      <Ring value={pct / 100} size={32} stroke={3} label={`${Math.round(pct)}% done`}>
+      <Ring value={pct / 100} size={52} stroke={4} label={`${Math.round(pct)}% done`}>
         <span className="camp-pct mono">{Math.round(pct)}</span>
       </Ring>
       <span className="camp-main">

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useToast } from '../../components/toastContext'
 import { db, setSetting } from '../../db'
@@ -31,10 +32,12 @@ function useWeightLb(): { lb: number; from: 'latest' | 'goal' } | undefined {
   }, [])
 }
 
-export default function LeftToday({ targets, totals, isToday, hour, onTargets, ready }: { targets: FoodTargets; totals: { calories: number; protein: number }; isToday: boolean; hour: number; onTargets: () => void; ready: boolean }) {
+export default function LeftToday({ targets, totals, isToday, hour, onTargets, ready, isDefault = false }: { targets: FoodTargets; totals: { calories: number; protein: number }; isToday: boolean; hour: number; onTargets: () => void; ready: boolean; isDefault?: boolean }) {
   const toast = useToast()
   const weight = useWeightLb()
   const left = leftToday(targets, totals)
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState('')
 
   if (!left) {
     const sug = weight ? suggestTargets(weight.lb) : null
@@ -70,6 +73,15 @@ export default function LeftToday({ targets, totals, isToday, hour, onTargets, r
     )
   }
 
+  const sug = isDefault && weight ? suggestTargets(weight.lb) : null
+  const saveCalories = async () => {
+    const n = Math.round(Number(draft))
+    if (!Number.isFinite(n) || n < 500 || n > 10000) { toast({ message: 'Enter calories between 500 and 10,000' }); return }
+    const cur = await db.settings.get(TARGETS_KEY)
+    await setSetting(TARGETS_KEY, { ...((cur?.value as FoodTargets | undefined) ?? {}), calories: n } satisfies FoodTargets)
+    setEditing(false)
+    toast({ message: `Daily target set to ${n.toLocaleString()} kcal` })
+  }
   const behind = isToday ? behindMessage(targets, totals, hour) : null
   return (
     <section className="card food-left">
@@ -79,6 +91,22 @@ export default function LeftToday({ targets, totals, isToday, hour, onTargets, r
           Targets
         </button>
       </div>
+      <p className="food-day-total" data-testid="food-day-total"><strong className="mono">{Math.round(totals.calories).toLocaleString()}</strong> of {(targets.calories ?? 0).toLocaleString()} kcal{totals.protein > 0 || targets.protein ? <> · <span className="mono">{Math.round(totals.protein)}</span>{targets.protein ? ` of ${targets.protein}` : ''} g protein</> : null}</p>
+      {isDefault && (
+        <div className="food-default" data-testid="food-default">
+          {editing ? (
+            <form className="row" onSubmit={(e) => { e.preventDefault(); void saveCalories() }}>
+              <input className="input food-default-input" inputMode="numeric" autoFocus aria-label="Daily calorie target" placeholder="3000" value={draft} onChange={(e) => setDraft(e.target.value)} />
+              <button className="btn btn-primary btn-sm" type="submit">Save</button>
+              <button className="btn btn-ghost btn-sm" type="button" onClick={() => setEditing(false)}>Cancel</button>
+            </form>
+          ) : (
+            <span className="small faint">Default target. <button className="btn btn-ghost btn-sm food-default-edit" onClick={() => { setDraft(String(targets.calories ?? '')); setEditing(true) }}>Change it</button>
+              {sug && <button className="btn btn-ghost btn-sm" onClick={async () => { const cur = await db.settings.get(TARGETS_KEY); await setSetting(TARGETS_KEY, { ...((cur?.value as FoodTargets | undefined) ?? {}), calories: sug.calories, protein: sug.protein } satisfies FoodTargets); toast({ message: 'Targets set from estimate' }) }}>Targets from estimate ({sug.calories.toLocaleString()})</button>}
+            </span>
+          )}
+        </div>
+      )}
       <MacroRings targets={targets} totals={totals} ready={ready} />
       {behind && <p className="small food-behind" data-testid="food-coach"><span className="food-behind-dot" aria-hidden />{behind}</p>}
     </section>

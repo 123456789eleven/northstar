@@ -38,8 +38,8 @@ function MacroRing({ label, unit, value, target, ready, size, stroke, hero }: { 
 export default function MacroRings({ targets, totals, ready }: { targets: { calories?: number; protein?: number }; totals: { calories: number; protein: number }; ready: boolean }) {
   return (
     <div className="mrings">
-      {targets.calories ? <MacroRing label="Calories" unit="kcal" value={totals.calories} target={targets.calories} ready={ready} size={156} stroke={12} hero /> : null}
-      {targets.protein ? <MacroRing label="Protein" unit="g" value={totals.protein} target={targets.protein} ready={ready} size={104} stroke={9} /> : null}
+      {targets.calories ? <MacroRing label="Calories" unit="kcal" value={totals.calories} target={targets.calories} ready={ready} size={128} stroke={11} hero /> : null}
+      {targets.protein ? <MacroRing label="Protein" unit="g" value={totals.protein} target={targets.protein} ready={ready} size={128} stroke={11} /> : null}
     </div>
   )
 }

@@ -16,7 +16,7 @@ import { defaultSlot, leftToday, type Candidate } from './foodLogic'
 
 const LIST_ID = 'food-recent-names'
 
-export default function DayView({ date, setDate, targets, onTargets }: { date: ISODate; setDate: (d: ISODate) => void; targets: FoodTargets; onTargets: () => void }) {
+export default function DayView({ date, setDate, targets, onTargets, isDefault = false }: { date: ISODate; setDate: (d: ISODate) => void; targets: FoodTargets; onTargets: () => void; isDefault?: boolean }) {
   const toast = useToast()
   const templates = useTemplates()
   const phone = useMedia(PHONE_QUERY)
@@ -117,7 +117,7 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
 
       <div className="food-cols">
       <div className="stack food-col-left">
-      <LeftToday targets={targets} totals={totals} isToday={isToday} hour={hour} onTargets={onTargets} ready={meals !== undefined} />
+      <LeftToday targets={targets} totals={totals} isToday={isToday} hour={hour} onTargets={onTargets} isDefault={isDefault} ready={meals !== undefined} />
       {left && (left.kcal > 0 || left.protein > 0) && <Suggestions remaining={remaining} own={own} date={date} slot={slot} />}
       </div>
       <div className="stack food-col-right">

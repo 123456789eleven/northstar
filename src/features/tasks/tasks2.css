@@ -3,3 +3,20 @@
   .quick-add-sticky { bottom: calc(82px + env(safe-area-inset-bottom)); background: var(--mat-thick-bg); border-top-color: var(--line-soft); }
   .tq-phone-pad { height: 120px; }
 }
+
+/* Hit areas: 32px boxes with an invisible 44px reach. */
+.task-row .check-hit, .task-row .icon-btn, .focus-slot .check-hit, .focus-slot .icon-btn { position: relative; min-width: 32px; min-height: 32px; }
+.task-row .check-hit::after, .task-row .icon-btn::after, .focus-slot .check-hit::after, .focus-slot .icon-btn::after { content: ''; position: absolute; inset: -6px; }
+.task-row.completing .check::after, .focus-slot.completing .check::after { inset: auto; position: static; }
+
+/* Phone: the numbers become one compact row so the list stays above the fold; the add line is solid, not glass. */
+@media (max-width: 819px) {
+  .tq-kpi .kpi-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: var(--sp-3); }
+  .tq-kpi .kpi-cell { padding: 8px 8px; border-top: 0; border-left: 1px solid var(--line-soft); }
+  .tq-kpi .kpi-cell:first-child { border-left: 0; }
+  .tq-kpi .kpi-note, .tq-kpi .kpi-delta { display: none; }
+  .tq-kpi .kpi-label { font-size: var(--fs-1); letter-spacing: 0; text-transform: none; white-space: normal; }
+  .tq-kpi .kpi-value { font-size: var(--fs-4); }
+  .quick-add-sticky { background: var(--surface); padding: 6px 12px; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .quick-add-sticky::before, .quick-add-sticky::after { display: none; }
+}
