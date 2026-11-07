@@ -195,3 +195,7 @@ h1, .page-title { letter-spacing: -0.02em; font-weight: 650; }
 .pulse-of { font-size: var(--fs-2); font-weight: 500; color: var(--ink-3); letter-spacing: 0; }
 .pulse-note { font-size: var(--fs-2); color: var(--ink-2); }
 .pstrip { gap: 6px; }
+
+/* ---------- refraction (Chromium only; GlassDefs sets html[data-lens]) ---------- */
+html[data-lens] .tabbar::before { -webkit-backdrop-filter: url(#ns-lens) blur(14px) saturate(1.9) brightness(1.06); backdrop-filter: url(#ns-lens) blur(14px) saturate(1.9) brightness(1.06); }
+html[data-lens] .toast { -webkit-backdrop-filter: url(#ns-lens) blur(14px) saturate(1.9); backdrop-filter: url(#ns-lens) blur(14px) saturate(1.9); }
