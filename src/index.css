@@ -8,24 +8,27 @@
 
 :root {
   /* surfaces: elevation = step + 1px line */
-  --page: #0b0b10;
-  --surface: #14141b;
-  --surface-2: #1b1b25;
-  --surface-3: #24242f;
-  --line: #2a2a36;
-  --line-strong: #3a3a4a;
+  --page: #08090c; /* raven black */
+  --surface: #0f1115;
+  --surface-2: #161920;
+  --surface-3: #1e222b;
+  --line: #252a35;
+  --line-strong: #363d4c;
   /* ink (all AA on --page and --surface) */
-  --ink: #ecebf3;
-  --ink-2: #a9a7ba;
-  --ink-3: #9391a8;
+  --ink: #edf0f5;
+  --ink-2: #a9b0be;
+  --ink-3: #8f97a8;
   /* accent */
-  --accent: #8b7cf0;
-  --accent-ink: #0e0b1f;
-  --accent-soft: rgba(139, 124, 240, 0.14);
-  --accent-text: #a99df7; /* accent-coloured TEXT on an --accent-soft tint (accent itself is 3.96:1 there) */
+  --accent: #9cc8e6; /* powder blue: the interactive colour */
+  --accent-ink: #07131c;
+  --accent-soft: rgba(156, 200, 230, 0.14);
+  --accent-text: #b4d9f1; /* accent-coloured TEXT on an --accent-soft tint (accent itself is 3.96:1 there) */
   /* status (always with a label or icon) */
   --good: #6cc49a;
-  --warn: #e07a5f;
+  --warn: #ff7d75; /* poppy, text-safe */
+  --poppy: #e8453c; /* poppy red: tertiary. Fills, urgent states, over-budget. Text uses --warn. */
+  --poppy-soft: rgba(232, 69, 60, 0.16);
+  --poppy-line: rgba(232, 69, 60, 0.5);
   --info: #7fa6d9;
   /* data palette: charts only, fixed order, never cycled. Amber is not a series color. */
   --data-1: #3987e5;
@@ -33,7 +36,7 @@
   --data-3: #199e70;
   --data-4: #c98500;
   --data-5: #d55181;
-  --data-6: #9085e9;
+  --data-6: #6fa3d4;
 
   /* space / shape */
   --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px;
@@ -64,9 +67,9 @@
   --surface-1: var(--surface);
   --line-soft: #20202a;
   /* accent states */
-  --accent-hover: #9d90f5;
-  --accent-pressed: #7a6add;
-  --accent-line: rgba(139, 124, 240, 0.45);
+  --accent-hover: #b4d9f1;
+  --accent-pressed: #7fb1d4;
+  --accent-line: rgba(156, 200, 230, 0.45);
   --accent-ring: 0 0 0 1px var(--accent);
   --ink-disabled: #6b6a7e;
   /* status soft backgrounds (with a label, never alone) */
@@ -115,8 +118,8 @@
   /* ambient layer: max 3 glows, alpha <= .14, static */
   /* palette v3 "Graphite and Violet" (docs/design/game-direction.md): violet top-left, indigo right, slate bottom, alpha <= .12.
      The v2 names (--aurora-amber/-violet/-teal) are kept as aliases so site/style.css keeps resolving; new code uses --glow-*. */
-  --glow-violet: radial-gradient(65% 55% at 18% 4%, rgba(124, 109, 240, 0.15), transparent 72%);
-  --glow-indigo: radial-gradient(55% 50% at 96% 28%, rgba(91, 107, 240, 0.13), transparent 72%);
+  --glow-violet: radial-gradient(65% 55% at 18% 4%, rgba(110, 168, 214, 0.15), transparent 72%);
+  --glow-indigo: radial-gradient(55% 50% at 96% 28%, rgba(70, 100, 160, 0.13), transparent 72%);
   --glow-slate: radial-gradient(60% 50% at 45% 100%, rgba(107, 122, 144, 0.11), transparent 72%);
   --aurora-amber: var(--glow-violet);
   --aurora-violet: var(--glow-indigo);
@@ -135,11 +138,11 @@
   /* gradients (fixed vocabulary) */
   /* --grad-amber keeps its name and value but is now REWARD-only (alias --grad-reward). Action/brand = --grad-violet. */
   --grad-amber: linear-gradient(135deg, #f2c46b, #e58f55);
-  --grad-violet: linear-gradient(135deg, #7c6df0, #a48bf5);
-  --grad-indigo: linear-gradient(135deg, #5b6bf0, #8b7cf0);
+  --grad-violet: linear-gradient(135deg, #86b9de, #bfe0f3); /* name kept; it is the powder-blue action gradient */
+  --grad-indigo: linear-gradient(135deg, #5b86b8, #86b0d8);
   --grad-slate: linear-gradient(135deg, #4a5568, #6b7a90);
   --grad-teal: linear-gradient(135deg, #2fbf9b, #2aa9c4);
-  --grad-rose: linear-gradient(135deg, #c06ad0, #9a6ae0);
+  --grad-rose: linear-gradient(135deg, #e8453c, #f27a6f);
   --grad-sky: linear-gradient(135deg, #4f86c6, #6aa6d6);
   /* reward: XP, level-ups, trophies ONLY (never actions, focus or status) */
   --reward: #f2c46b;
@@ -149,11 +152,11 @@
   --reward-line: rgba(242, 196, 107, 0.4);
   --grad-reward: var(--grad-amber);
   /* skill hues (one per constellation star; graphics, rings and tiles, not body text) */
-  --skill-body: #c06ad0;
-  --skill-money: #2fbf9b;
-  --skill-mind: #6f7bf0;
-  --skill-career: #8b7cf0;
-  --skill-people: #6aa6d6;
+  --skill-body: #f07a70;
+  --skill-money: #9cc8e6;
+  --skill-mind: #7b9ccc;
+  --skill-career: #cfe5f4;
+  --skill-people: #d9a3a0;
   --grad-sheen-hover: rgba(255, 255, 255, 0.12);
   --grad-sheen-press: rgba(0, 0, 0, 0.1);
   --grad-ink: #fff;

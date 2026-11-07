@@ -10,7 +10,7 @@ export const CHART = {
   axis: '#a9a7ba', // --ink-2 (AA on --surface)
   surface: '#14141b', // --surface (dot rings, gaps between fills)
   cursorFill: 'rgba(255, 255, 255, 0.04)',
-  accent: '#8b7cf0', // --accent (violet, palette v3)
+  accent: '#9cc8e6', // --accent (powder blue)
   data: ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#9085e9'], // --data-1..6
 } as const
 

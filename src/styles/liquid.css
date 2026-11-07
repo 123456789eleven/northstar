@@ -4,21 +4,21 @@
 
 :root {
   /* ---- living backdrop: five soft fields the glass can refract. Colour is the point, so alpha is higher than the old aurora. ---- */
-  --bd-violet: radial-gradient(64% 48% at 26% 6%, rgba(124, 109, 240, 0.44), transparent 70%);
-  --bd-indigo: radial-gradient(52% 44% at 92% 18%, rgba(80, 98, 238, 0.32), transparent 70%);
-  --bd-teal: radial-gradient(50% 40% at 78% 92%, rgba(52, 150, 168, 0.20), transparent 72%);
-  --bd-rose: radial-gradient(46% 38% at 6% 78%, rgba(168, 92, 170, 0.18), transparent 72%);
+  --bd-violet: radial-gradient(64% 48% at 26% 6%, rgba(110, 168, 214, 0.34), transparent 70%); /* powder */
+  --bd-indigo: radial-gradient(52% 44% at 92% 18%, rgba(52, 84, 150, 0.34), transparent 70%); /* deep blue */
+  --bd-teal: radial-gradient(46% 36% at 84% 96%, rgba(232, 69, 60, 0.15), transparent 72%); /* poppy ember */
+  --bd-rose: radial-gradient(46% 38% at 6% 78%, rgba(90, 110, 150, 0.18), transparent 72%);
   --bd-gold: radial-gradient(34% 26% at 52% 40%, rgba(214, 168, 92, 0.08), transparent 74%);
-  --bd-mid: radial-gradient(48% 36% at 58% 56%, rgba(96, 84, 214, 0.24), transparent 72%);
+  --bd-mid: radial-gradient(48% 36% at 58% 56%, rgba(70, 110, 170, 0.20), transparent 72%);
   /* ambient tint is set from data later (finance health, calories) as an hsl hue offset; 0 = the base palette */
   --ambient-shift: 0deg;
 
   /* ---- material tiers ---- */
-  --mat-thin-bg: rgba(24, 22, 42, 0.62);
+  --mat-thin-bg: rgba(14, 17, 24, 0.64);
   --mat-thin-blur: blur(26px) saturate(1.9) brightness(1.06);
-  --mat-regular-bg: rgba(30, 28, 50, 0.52);
+  --mat-regular-bg: rgba(18, 22, 31, 0.56);
   --mat-regular-blur: blur(18px) saturate(1.5);
-  --mat-thick-bg: rgba(22, 21, 36, 0.86);
+  --mat-thick-bg: rgba(13, 16, 22, 0.88);
   --mat-thick-blur: blur(34px) saturate(1.4);
 
   /* rim: bright on the light-facing corner, fading out, faint return on the far corner */
@@ -117,7 +117,7 @@ body::before {
   transition-duration: var(--t-snappy); transition-timing-function: var(--spring-snappy);
 }
 :where(button, [role='button'], .card-interactive, .stat-int, .kpi-link, .tab-item, .btn, .chip):not(:disabled):active { transform: scale(0.97); filter: brightness(1.12); transition-duration: 90ms; }
-.card-interactive:hover, .stat-int:hover, .kpi-strip[data-n] > .kpi-link:hover { transform: translateY(-1px); background-color: rgba(40, 37, 66, 0.62); border-color: transparent; }
+.card-interactive:hover, .stat-int:hover, .kpi-strip[data-n] > .kpi-link:hover { transform: translateY(-1px); background-color: rgba(30, 38, 54, 0.66); border-color: transparent; }
 .card-interactive:active, .stat-int:active, .kpi-strip[data-n] > .kpi-link:active { transform: scale(0.985); }
 .sheet { animation-timing-function: var(--spring-smooth); }
 
@@ -128,15 +128,15 @@ h1, .page-title { letter-spacing: -0.02em; font-weight: 650; }
 
 /* ---------- fallbacks: opaque but intentional ---------- */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass-thin, .topbar, .tabbar, .sidebar, .toast { background-color: #17161f; }
-  .glass-regular, .card, .side-panel, .kpi-strip[data-n] > .kpi-cell:nth-child(n) { background-color: #1a1925; }
-  .glass-thick, .modal, .sheet, .cp { background-color: #1d1c2a; }
+  .glass-thin, .topbar, .tabbar, .sidebar, .toast { background-color: #0f1218; }
+  .glass-regular, .card, .side-panel, .kpi-strip[data-n] > .kpi-cell:nth-child(n) { background-color: #12151c; }
+  .glass-thick, .modal, .sheet, .cp { background-color: #161a22; }
 }
 @media (prefers-reduced-transparency: reduce) {
   body::before { filter: none; animation: none; opacity: 0.5; }
-  .glass-thin, .topbar, .tabbar, .sidebar, .toast { background-color: #17161f; }
-  .glass-regular, .card, .side-panel, .kpi-strip[data-n] > .kpi-cell:nth-child(n) { background-color: #1a1925; }
-  .glass-thick, .modal, .sheet, .cp { background-color: #1d1c2a; }
+  .glass-thin, .topbar, .tabbar, .sidebar, .toast { background-color: #0f1218; }
+  .glass-regular, .card, .side-panel, .kpi-strip[data-n] > .kpi-cell:nth-child(n) { background-color: #12151c; }
+  .glass-thick, .modal, .sheet, .cp { background-color: #161a22; }
   .glass-thin::before, .glass-regular::before, .glass-thick::before, .card::before, .side-panel::before, .topbar::before, .tabbar::before, .kpi-cell::before, .modal::before, .sheet::before, .cp::before { content: none; }
   .modal-backdrop, .sheet-backdrop, .cp-backdrop, .toast, .sidebar { -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
@@ -163,7 +163,7 @@ h1, .page-title { letter-spacing: -0.02em; font-weight: 650; }
   .tab-item.active { color: var(--ink); }
   .tab-item.active .icon { color: var(--accent-text); }
   .tab-item > span { transition: opacity var(--t-snappy) var(--spring-gentle), max-height var(--t-smooth) var(--spring-smooth); max-height: 16px; }
-  .tab-orb { box-shadow: 0 0 0 4px rgba(14, 13, 22, 0.55), var(--inner-light), var(--elev-2); }
+  .tab-orb { box-shadow: 0 0 0 4px rgba(8, 10, 14, 0.6), var(--inner-light), var(--elev-2); }
   /* scrolling down: the bar narrows and drops its labels, so content gets the room; any scroll up brings it back */
   .tabbar.is-compact { left: 56px; right: 56px; }
   .tabbar.is-compact .tab-item > span { opacity: 0; max-height: 0; }
