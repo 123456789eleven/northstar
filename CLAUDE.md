@@ -19,9 +19,9 @@ Vite + React 19 + TypeScript, react-router-dom (HashRouter), Dexie + `dexie-reac
 - One page per route in `src/pages/`. Page-specific components go in `src/features/<module>/`.
 
 ## Design rules (owner is sensitive to "AI-generated / tacky" UI)
-- Dark only. Brand accent is violet (`--accent`, palette v3 "Graphite and Violet", `docs/design/game-direction.md`); amber/gold (`--reward*`) is reward-only (XP, levels, trophies), skill hues are `--skill-*`. **"Aurora" direction (owner-approved 2026-11-02): gradients, soft ambient glow and glass surfaces are wanted**, but only as tokens defined in `docs/design/aurora.md` (aurora layer, `--glass-*`, `--grad-*`); no ad-hoc gradients/blurs/colors in components. Guardrails there: alpha caps, AA contrast on worst-case glass, blur only on top-level cards/overlays (never rows or lists), reduced-motion/transparency fallbacks.
+- Dark only. Palette (owner decision 2026-11-06, `docs/redesign/DESIGN_BRIEF.md`): **raven black** main (`--page`, `--surface*`), **powder blue** secondary and the interactive colour (`--accent`), **poppy red** tertiary (`--poppy`, `--warn` for text; overdue, over budget, behind pace, one or two highlights per screen, never a large fill). Gold (`--reward*`) marks only what was earned. No violet. Glass is a layer (`src/styles/liquid.css`): thin tier for chrome, regular for cards at half strength, thick for sheets; never on list rows, tables or chart plots; tokens only (`--mat-*`, `--rim*`, `--elev-*`, `--spring-*`). Copy: sentence case, dry and direct; banned words are XP, level up, quest, loot, trophy case; no emoji, confetti or exclamation marks.
 - Still banned: emoji icons, dashed badge borders, a random accent per card (module hues follow the documented mapping), animated gradients on UI chrome.
-- Fraunces serif only for page titles and big numbers; Inter for everything else.
+- Inter (system look) with tabular numerals for figures. Fraunces is retired.
 - Dense, calm, legible. Cut decoration before adding polish.
 - Must work at phone width (≥360px): no horizontal page scroll, tap targets ≥ 32px.
 

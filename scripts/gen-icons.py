@@ -1,4 +1,4 @@
-"""Regenerates the violet-brand PNG icons from the geometry of public/icon.svg (needs Pillow).
+"""Regenerates the powder-blue-brand PNG icons from the geometry of public/icon.svg (needs Pillow).
 
 Writes public/icon-192.png, icon-512.png, icon-maskable-512.png, favicon-32.png and apple-touch-icon.png (180, opaque),
 plus the copies in site/ (favicon-32.png, apple-touch-icon.png, icons/icon-192.png, icons/icon-512.png).
@@ -6,9 +6,9 @@ Run from the repo root: python scripts/gen-icons.py
 """
 from PIL import Image, ImageDraw
 
-BG = (11, 11, 16, 255)        # graphite #0b0b10 (--page)
-AC = (139, 124, 240, 255)     # violet #8b7cf0 (--accent)
-LINE = tuple(int(b + (a - b) * .4) for a, b in zip(AC[:3], BG[:3])) + (255,)  # the 40% crossbar, pre-blended on graphite
+BG = (8, 9, 12, 255)          # raven black #08090c (--page)
+AC = (156, 200, 230, 255)     # powder blue #9cc8e6 (--accent)
+LINE = tuple(int(b + (a - b) * .4) for a, b in zip(AC[:3], BG[:3])) + (255,)  # the 40% crossbar, pre-blended on raven
 
 
 def render(size, kind):
