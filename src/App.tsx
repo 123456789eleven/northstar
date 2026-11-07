@@ -7,7 +7,6 @@ import { CaptureHost, Rail, TabBar, TopBar } from './components/Shell'
 import HubLayout, { RouteFade } from './components/HubLayout'
 import { GlassDefs } from './components/GlassDefs'
 import { PlayerProvider } from './features/game/ui/PlayerProvider'
-import { usePlayerState } from './features/game/ui/playerContext'
 import { MissionRail } from './features/game/ui/Mission'
 import './features/game/ui/game.css'
 import ToastProvider from './components/Toast'
@@ -72,12 +71,11 @@ function useNavTransitions() {
 
 function Shell() {
   const { pathname } = useLocation()
-  const player = usePlayerState()
   useEffect(() => { document.title = routeTitle(pathname) }, [pathname])
   useNavTransitions()
   useDensity()
   return (
-      <div className={`shell ${player.calm ? '' : 'has-mission'}`}>
+      <div className={`shell ${pathname === '/' ? 'has-mission' : ''}`}>
         <a className="skip-link" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus() }}>Skip to content</a>
         <GlassDefs />
         <Rail />

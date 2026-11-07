@@ -1,6 +1,6 @@
 // Module-to-hue mapping, palette v3 (docs/design/system.md, "Module hues"). The same module is always the same hue.
 // violet = Today + Plan + Career (the action colour), rose = Body/Food, teal = Money, indigo = Mind (Journal, Learning),
-// sky = People, slate = You/system pages, amber = Trophies only (amber is reward-only in v3).
+// sky = People, slate = You/system pages, gold marks only earned milestones; no module uses rose or amber tiles.
 import type { IconName } from './Icons'
 import { navItemFor } from './nav'
 
@@ -8,12 +8,12 @@ export type Hue = 'amber' | 'violet' | 'indigo' | 'teal' | 'rose' | 'sky' | 'sla
 
 export const MODULE_HUE: Record<string, Hue> = {
   today: 'violet', planner: 'violet', calendar: 'violet', tasks: 'violet', goals: 'violet', habits: 'violet', star: 'violet', career: 'violet',
-  body: 'rose', food: 'rose',
+  body: 'teal', food: 'teal',
   finance: 'teal',
   mind: 'indigo', journal: 'indigo', learning: 'indigo',
   people: 'sky',
   user: 'slate', review: 'slate', command: 'slate', settings: 'slate', data: 'slate', ontology: 'slate', history: 'slate',
-  trophy: 'amber',
+  trophy: 'slate',
 }
 
 export const hueFor = (icon: string): Hue => MODULE_HUE[icon] ?? 'violet'

@@ -10,7 +10,7 @@ import { useEngineOnMount } from './engineGate'
 import type { PlayerState } from '../types'
 
 const streakLine = (p: PlayerState) =>
-  `${p.streak.daysThisWeek} of ${p.streak.target} days this week${p.streak.restTokens ? ` · ${p.streak.restTokens} grace ${p.streak.restTokens === 1 ? 'day' : 'days'}` : ''}${p.streak.weeksInRow > 0 ? ` · ${p.streak.weeksInRow}-week run` : ''}`
+  `${p.streak.daysThisWeek} of ${p.streak.target} days this week${p.streak.restTokens ? ` · ${p.streak.restTokens} grace ${p.streak.restTokens === 1 ? 'day' : 'days'}` : ''}${p.streak.weeksInRow > 0 ? ` · ${p.streak.weeksInRow}‑week run` : ''}`
 
 /** Top of Today: the day's plan. Items tick themselves off from real logs; a coach line names the next one. */
 export function MissionBoard() {
@@ -58,6 +58,7 @@ export function MissionRail() {
   const { pathname } = useLocation()
   if (p.calm) return null
   const onToday = pathname === '/'
+  if (!onToday) return null // the rail belongs to Today; other pages keep the room
   const season = seasonOf(today())
   return (
     <aside className="mission-rail" aria-label="Plan and week">
@@ -69,17 +70,6 @@ export function MissionRail() {
             <span className="mr-note" style={{ margin: 0 }}>{season.daysLeft === 0 ? 'Last day' : `${season.daysLeft} days left`}</span>
           </div>
         </Link>
-        {!onToday && (
-          <section className="mr-sec" aria-labelledby="mr-q">
-            <h2 className="mr-head" id="mr-q"><span>Today's plan</span><span className="mono muted">{p.questsDone}/{p.quests.length}</span></h2>
-            {p.loading ? null : p.quests.length ? (
-              <div className="mr-quests">{p.quests.map((q) => <QuestCard key={q.id} quest={q} compact />)}</div>
-            ) : (
-              <p className="mr-empty">Nothing planned yet. <Link to="/goals">Set a goal</Link> to fill it.</p>
-            )}
-            {p.cleared && <p className="mr-cleared">Plan done</p>}
-          </section>
-        )}
         <section className="mr-sec" aria-labelledby="mr-w">
           <h2 className="mr-head" id="mr-w"><span>This week</span></h2>
           <WeekDots streak={p.streak} />

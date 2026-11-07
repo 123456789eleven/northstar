@@ -304,7 +304,7 @@ const backupAge: Rule = (s) => {
   const limit = s.backupReminderDays ?? 14
   if (limit === 0) return []
   if (!s.lastBackupAt) {
-    return [{ id: 'backup', severity: 'nudge', text: 'You have never exported a backup. Your data lives only in this browser. An encrypted backup is the safer kind.', href: '/settings', score: 68 }]
+    return [{ id: 'backup', severity: 'nudge', text: 'No backup yet. Your data lives only in this browser, so an encrypted backup is worth making.', href: '/settings', score: 68 }]
   }
   const age = Math.floor((new Date(`${s.today}T12:00:00`).getTime() - new Date(s.lastBackupAt).getTime()) / 86_400_000)
   if (age <= limit) return []

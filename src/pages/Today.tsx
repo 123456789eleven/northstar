@@ -4,7 +4,6 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Task } from '../db'
 import { Card, Empty, PageHeader, Progress, Skeleton } from '../components/ui'
 import KpiStrip from '../components/KpiStrip'
-import { useMedia, PHONE_QUERY } from '../components/useMedia'
 import { addDays, formatDate, today } from '../lib/dates'
 import { useNow } from '../components/useNow'
 import { fmtTime, sortedUpcoming, toMin } from '../features/planner/layout'
@@ -29,7 +28,6 @@ import '../features/today/g2a.css'
 
 export default function Today() {
   const d = today()
-  const phone = useMedia(PHONE_QUERY)
   const tasks = useLiveQuery(() => db.tasks.toArray(), [])
   const goals = useLiveQuery(() => db.goals.toArray(), [])
   const habits = useLiveQuery(() => db.habits.filter((h) => !h.archived).toArray(), [])
@@ -114,11 +112,44 @@ export default function Today() {
         </div>
       )}
 
-      <DailyFind />
+      {!loaded && <div className="skel skel-strip skel-pulse kpi-skel" aria-hidden />}
 
-      {(
-        <>
-          {!loaded && <div className="skel skel-strip skel-pulse kpi-skel" aria-hidden />}
+      <div className="today-grid">
+        <div className="today-col">
+          <Card title="Your day" action={<Link className="card-link" to="/tasks">All tasks</Link>}>
+            {dueList.length > 0 && (
+              <>
+                <div className="sub-head">Due today and overdue</div>
+                <div className="list">{dueList.map(row)}</div>
+              </>
+            )}
+            {v.done.length > 0 && (
+              <>
+                <div className="sub-head">Done today</div>
+                <div className="list">{v.done.map(row)}</div>
+              </>
+            )}
+            {!loaded && <Skeleton rows={5} label="Loading your day" />}
+            {loaded && listed === 0 && (
+              <Empty
+                title="Nothing due today"
+                action={<button className="btn btn-sm" onClick={() => window.dispatchEvent(new Event('ns:capture'))}>Add a task</button>}
+              >
+                Type one into the capture line, e.g. "call dentist tmr !1". Press / to jump there.
+              </Empty>
+            )}
+            {note && <div className="focus-note">{note}</div>}
+          </Card>
+        </div>
+        <div className="today-col">
+          <HabitsTile />
+        </div>
+      </div>
+
+      <details className="card today-more">
+        <summary><span>More</span><span className="faint">Counts, quarter goals, insights, across your life</span></summary>
+        <div className="today-more-body">
+          <DailyFind />
           {loaded && (
             <KpiStrip
               items={[
@@ -129,63 +160,12 @@ export default function Today() {
               ]}
             />
           )}
-
-          <div className="today-grid">
-            <div className="today-col">
-              <Card title="Your day" action={<Link className="card-link" to="/tasks">All tasks</Link>}>
-                {dueList.length > 0 && (
-                  <>
-                    <div className="sub-head">Due today and overdue</div>
-                    <div className="list">{dueList.map(row)}</div>
-                  </>
-                )}
-                {v.done.length > 0 && (
-                  <>
-                    <div className="sub-head">Done today</div>
-                    <div className="list">{v.done.map(row)}</div>
-                  </>
-                )}
-                {!loaded && <Skeleton rows={5} label="Loading your day" />}
-                {loaded && listed === 0 && (
-                  <Empty
-                    title="Nothing due today"
-                    action={<button className="btn btn-sm" onClick={() => window.dispatchEvent(new Event('ns:capture'))}>Add a task</button>}
-                  >
-                    Type one into the capture line, e.g. "call dentist tmr !1". Press / to jump there.
-                  </Empty>
-                )}
-                {note && <div className="focus-note">{note}</div>}
-              </Card>
-              {!phone && <HabitsTile />}
-            </div>
-
-            <div className="today-col">
-              {phone && (
-                <>
-                  <HabitsTile />
-                  <NextUp />
-                  <details className="card today-more">
-                    <summary><span>More</span><span className="faint">Quarter goals, insights, across your life</span></summary>
-                    <div className="today-more-body">
-                      {quarterCard}
-                      <InsightsCard />
-                      <GlanceTiles />
-                    </div>
-                  </details>
-                </>
-              )}
-              {!phone && (
-                <>
-                  {quarterCard}
-                  <NextUp />
-                  <InsightsCard />
-                  <GlanceTiles />
-                </>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+          {quarterCard}
+          <NextUp />
+          <InsightsCard />
+          <GlanceTiles />
+        </div>
+      </details>
 
       {editing && <TaskEditor task={editing} goals={goals ?? []} onClose={() => setEditing(null)} />}
     </>
