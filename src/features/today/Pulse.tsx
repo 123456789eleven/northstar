@@ -5,7 +5,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, getSetting } from '../../db'
 import { useNow } from '../../components/useNow'
 import { Ring } from '../game/ui/Ring'
-import { TARGETS_KEY, type FoodTargets } from '../food/foodData'
+import { effectiveCalorieTarget, TARGETS_KEY, type FoodTargets } from '../food/foodData'
 import { isSpend } from '../finance/categories'
 import { monthKey, money, today } from '../../lib/dates'
 
@@ -27,10 +27,9 @@ function Calories() {
   const d = useLiveQuery(async () => {
     const meals = await db.meals.where('date').equals(today()).toArray()
     const t = await getSetting<FoodTargets>(TARGETS_KEY, {})
-    return { cal: meals.reduce((s, m) => s + (m.calories ?? 0), 0), protein: meals.reduce((s, m) => s + (m.protein ?? 0), 0), target: t.calories, pTarget: t.protein, count: meals.length }
+    return { cal: meals.reduce((s, m) => s + (m.calories ?? 0), 0), protein: meals.reduce((s, m) => s + (m.protein ?? 0), 0), target: effectiveCalorieTarget(t), pTarget: t.protein, count: meals.length }
   }, [])
   if (!d) return <div className="card pulse-card skel-pulse" aria-hidden />
-  if (!d.target) return <Gauge to="/food" label="Calories" value={d.cal ? d.cal.toLocaleString() : 'No target'} note="Set a daily calorie target on Food" ring={0} tone="body" />
   const left = d.target - d.cal
   const behind = d.cal / d.target < Math.max(0, (hour - 8) / 14) - 0.2
   const note = left <= 0 ? 'Target reached' : behind && d.count > 0 ? `${left.toLocaleString()} to go. Behind pace for this hour` : `${left.toLocaleString()} to go${d.pTarget ? ` · ${Math.round(d.protein)} of ${d.pTarget} g protein` : ''}`
