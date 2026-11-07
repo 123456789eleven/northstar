@@ -15,6 +15,8 @@ import WeightPath from '../features/body/WeightPath'
 import { averageAt, HEALTHY_RATE, movingAverage, projectDate, weeklyRate } from '../features/body/model'
 import { addDays, daysBetween, formatDate, today } from '../lib/dates'
 import '../features/body/body.css'
+import '../features/goals/season.css'
+import '../features/body/body2.css'
 
 const fmtLong = (d: string) => formatDate(d, { month: 'short', day: 'numeric', year: 'numeric' })
 
@@ -93,6 +95,9 @@ export default function Body() {
         <>
           <BodyHero
             current={current!}
+            start={start ?? current!}
+            flags={flags}
+            neededRate={goalDateRate}
             last={latest ? { weight: latest.weight, label: formatDate(latest.date) } : undefined}
             change={change}
             rate={rate}
@@ -114,7 +119,7 @@ export default function Body() {
                 ))}
               </div>
             }
-            legend={[{ label: '7-day average', color: '#9cc8e6' }, { label: `Healthy pace (${HEALTHY_RATE} lb/wk)`, color: '#a9a7ba' }, { label: 'Daily weigh-ins (faint)', color: 'rgba(156,200,230,0.4)' }]}
+            legend={[{ label: '7-day average', color: 'var(--accent)' }, { label: `Healthy pace (${HEALTHY_RATE} lb/wk)`, color: 'var(--ink-2)' }, { label: 'Daily weigh-ins (faint)', color: 'var(--accent-line)' }]}
             table={
               <DataTable
                 label="Weigh-ins"

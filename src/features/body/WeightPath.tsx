@@ -7,7 +7,7 @@ import { formatDate, parseISODate } from '../../lib/dates'
 import type { AvgPoint } from './model'
 import type { CheckpointFlag, GhostLine } from './pathModel'
 
-const REWARD = '#f2c46b' // --reward
+const REWARD = 'var(--reward)'
 const MUTED = CHART.axis
 const t = (d: string) => parseISODate(d).getTime()
 const iso = (ms: number) => {

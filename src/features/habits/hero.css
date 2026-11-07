@@ -1,0 +1,31 @@
+/* Habits hero: weekly ring + consistency grid (contribution-grid style). Tokens only; no blur on cells. */
+.habit-hero { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--sp-6); align-items: center; margin-bottom: var(--sp-4); }
+.habit-hero-ring { display: flex; align-items: center; gap: var(--sp-4); }
+.habit-hero-center { display: flex; flex-direction: column; align-items: center; line-height: 1; }
+.habit-hero-big { font-size: var(--fs-5); }
+.habit-hero-of { font-size: var(--fs-1); color: var(--ink-2); margin-top: 2px; }
+.habit-hero-text { display: flex; flex-direction: column; gap: 2px; font-size: var(--fs-2); color: var(--ink-2); max-width: 24ch; }
+.habit-hero-text strong { font-size: var(--fs-3); color: var(--ink); }
+.cgrid-wrap { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; align-items: flex-end; }
+.cgrid { display: flex; gap: 4px; justify-content: flex-end; max-width: 100%; }
+.cgrid-col { display: flex; flex-direction: column; gap: 4px; }
+.cgrid-cell { display: block; width: 16px; height: 16px; border-radius: 4px; background: var(--surface-3); }
+.cgrid-cell.l1 { background: color-mix(in srgb, var(--accent) 30%, var(--surface-3)); }
+.cgrid-cell.l2 { background: color-mix(in srgb, var(--accent) 60%, var(--surface-3)); }
+.cgrid-cell.l3 { background: var(--accent); }
+.cgrid-cell.is-future { opacity: 0.35; }
+.cgrid-cell.is-today { outline: 1px solid var(--ink-2); outline-offset: 1px; }
+.cgrid-legend { display: flex; align-items: center; gap: 4px; font-size: var(--fs-1); color: var(--ink-2); }
+.cgrid-legend .cgrid-cell { width: 12px; height: 12px; border-radius: 3px; }
+.habit-hero .cgrid-cell { transition: background-color var(--t-snappy) var(--spring-gentle); }
+
+@media (max-width: 819px) {
+  .habit-hero { grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); }
+  .cgrid-wrap { align-items: stretch; }
+  .cgrid { justify-content: space-between; gap: 3px; }
+  .cgrid-col { gap: 3px; flex: 1 1 0; min-width: 0; }
+  .cgrid-cell { width: 100%; height: auto; aspect-ratio: 1; max-width: 22px; margin-inline: auto; }
+  .cgrid-legend { justify-content: flex-end; }
+  .cgrid-legend .cgrid-cell { width: 12px; height: 12px; aspect-ratio: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .habit-hero .cgrid-cell { transition: none; } }

@@ -18,6 +18,7 @@ import { GCAL_DISMISS_KEY } from '../features/gcal/help'
 import '../features/gcal/gcal.css'
 import '../features/planner/planner.css'
 import '../features/planner/g2a.css'
+import '../features/planner/planner2.css'
 
 type View = 'week' | 'day'
 type Editing = { event: CalendarEvent | null; date: ISODate; start?: string }

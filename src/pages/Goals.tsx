@@ -14,13 +14,13 @@ import { CHILD_HORIZON } from '../features/goals/progress'
 import { SuggestedLinks } from '../features/goals/SuggestedLinks'
 import { goalMetric } from '../features/progress/metrics'
 import { loadMetricData } from '../features/progress/metricsData'
-import { usePlayerState } from '../features/game/ui/playerContext'
 import { today } from '../lib/dates'
 import { useFocusTarget } from '../lib/useFocusParam'
 import { TaskEditor } from '../features/tasks/TaskEditor'
 import '../features/tasks/tasks.css'
 import '../features/goals/goals.css'
 import '../features/goals/quest.css'
+import '../features/goals/season.css'
 
 type StatusFilter = 'active' | 'paused' | 'done' | 'all'
 const RANK: Record<Goal['horizon'], number> = { life: 0, year: 1, quarter: 2 }
@@ -49,7 +49,6 @@ export default function Goals() {
   const learning = useLiveQuery(() => db.learning.toArray(), [])
   const metricData = useLiveQuery(() => loadMetricData(), [])
   const bodyGoal = useLiveQuery(() => getSetting<number>('body.goal', 165), [])
-  const calm = usePlayerState().calm
   const toast = useToast()
   const d = today()
   const [area, setArea] = useState<Area | 'all'>('all')
@@ -106,7 +105,7 @@ export default function Goals() {
   async function adopt(i: number) {
     const ex = exampleBosses(d)[i]
     const id = await adoptExample(ex)
-    toast({ message: `Boss added: ${ex.title}.`, undo: async () => { await db.goals.delete(id) } })
+    toast({ message: `Season goal added: ${ex.title}.`, undo: async () => { await db.goals.delete(id) } })
   }
 
   const counts = `${active.length} active${all.some((g) => g.status === 'done') ? ` · ${all.filter((g) => g.status === 'done').length} done` : ''}`
@@ -115,7 +114,7 @@ export default function Goals() {
     <>
       <PageHeader
         title="Goals"
-        sub={goals === undefined ? ' ' : all.length ? counts : 'Quest log'}
+        sub={goals === undefined ? ' ' : all.length ? counts : 'No goals yet'}
         actions={
           all.length > 0 && (
             <button className="btn btn-primary" onClick={() => setEditing({ horizon: lifeGoals.length || hasQuarter ? 'quarter' : 'life' })}>
@@ -130,14 +129,14 @@ export default function Goals() {
       ) : all.length === 0 ? (
         <Card>
           <div className="goal-start">
-            <div className="card-title">Create your first boss</div>
-            <p className="quest-lede">A boss is a goal you can finish this quarter. Adopt an example in one tap, then make it yours, or write your own.</p>
+            <div className="card-title">Set your first season goal</div>
+            <p className="quest-lede">A season goal is one you can finish this quarter. Adopt an example in one tap, then make it yours, or write your own.</p>
             <div className="quest-examples">
               {exampleBosses(d).map((ex, i) => (
                 <div key={ex.title} className="quest-example">
                   <div className="quest-example-title">{ex.title}</div>
                   <div className="quest-example-sub">{ex.milestones.length} milestones · {ex.why}</div>
-                  <button className="btn btn-primary btn-sm" onClick={() => void adopt(i)}>Adopt this boss</button>
+                  <button className="btn btn-primary btn-sm" onClick={() => void adopt(i)}>Adopt this goal</button>
                 </div>
               ))}
             </div>
@@ -161,7 +160,7 @@ export default function Goals() {
 
           {bosses.length > 0 && (
             <section aria-labelledby="bosses-h" className="quest-section">
-              <h2 className="quest-h" id="bosses-h">{calm ? 'This quarter' : 'Season bosses'}</h2>
+              <h2 className="quest-h" id="bosses-h">Season goals</h2>
               <div className="boss-grid">
                 {bosses.map((g) => (
                   <BossCard
@@ -171,7 +170,6 @@ export default function Goals() {
                     metric={g.metric && metricData ? goalMetric(g, metricData) : null}
                     data={metricData}
                     today={d}
-                    calm={calm}
                     onOpen={(x) => setOpenId(x.id ?? null)}
                   />
                 ))}
@@ -183,7 +181,7 @@ export default function Goals() {
 
           <section aria-labelledby="camp-h" className="quest-section">
             <div className="quest-h-row">
-              <h2 className="quest-h" id="camp-h">Campaign</h2>
+              <h2 className="quest-h" id="camp-h">All goals</h2>
               <button className="btn btn-ghost btn-sm" aria-expanded={campaignOpen} aria-controls="camp-body" onClick={toggleCampaign}>
                 {campaignOpen ? 'Collapse' : 'Expand'}
               </button>

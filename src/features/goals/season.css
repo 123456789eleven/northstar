@@ -1,0 +1,11 @@
+/* Season goals: progress ring + bar, coach note, gold mark only when met. Loaded after quest.css. Tokens only. */
+.boss-head { display: flex; align-items: center; gap: var(--sp-4); min-width: 0; }
+.boss-head-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.boss-ring-n { font-size: var(--fs-2); }
+.boss-coach { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-2); color: var(--ink-2); }
+.boss-coach.tone-behind { color: var(--warn); }
+.boss-coach.tone-met { color: var(--reward); }
+.boss-met-mark { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 50%; background: var(--reward); }
+.boss.is-met { border-color: var(--reward-line); }
+.bossbar-flag.is-reached { background: var(--accent); }
+:is(.quest-section, .plan-over, .today-row, .habit-hero, .habit-detail) .quest-h { font-family: var(--font); letter-spacing: 0; text-transform: none; font-size: var(--fs-3); font-weight: 600; color: var(--ink); }

@@ -4,9 +4,11 @@ import { useState } from 'react'
 import { db, type Task } from '../../db'
 import { useToast } from '../../components/toastContext'
 import { DUR, prefersReducedMotion } from '../../components/motion'
+import { today } from '../../lib/dates'
 import { haptic } from '../../lib/haptics'
 import { completeTask, reopenTask } from './taskActions'
 import { forgetCompletion, recordCompletion } from './combo'
+import { doneMessage } from './winCopy'
 
 export function useTaskToggle(task: Task) {
   const toast = useToast()
@@ -31,8 +33,9 @@ export function useTaskToggle(task: Task) {
     recordCompletion()
     setCompleting(false)
     setLeaving(false)
+    const doneToday = await db.tasks.filter((t) => t.status === 'done' && (t.doneAt ?? '').slice(0, 10) === today()).count()
     toast({
-      message: `Completed "${task.title}"`,
+      message: doneMessage(task.title, doneToday),
       undo: async () => {
         forgetCompletion()
         const fresh = await db.tasks.get(task.id!)

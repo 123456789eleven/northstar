@@ -7,11 +7,12 @@ import { useFocusTarget } from '../lib/useFocusParam'
 import { HabitModal } from '../features/habits/HabitParts'
 import { HabitCard, HabitDetail, TodayRow } from '../features/habits/HabitRow'
 import { isDueToday } from '../features/habits/week'
-import { WeekDots } from '../features/game/ui/Meters'
-import { usePlayerState } from '../features/game/ui/playerContext'
+import { HabitHero } from '../features/habits/HabitHero'
 import '../features/goals/quest.css'
 import '../features/habits/habits.css'
 import '../features/habits/rings.css'
+import '../features/habits/hero.css'
+import '../features/goals/season.css'
 
 export default function Habits() {
   const d = today()
@@ -21,7 +22,6 @@ export default function Habits() {
   const [editing, setEditing] = useState<Habit | 'new' | null>(null)
   const [showArchived, setShowArchived] = useState(false)
   const [openId, setOpenId] = useState<number | null>(null)
-  const player = usePlayerState()
 
   const byHabit = useMemo(() => {
     const m = new Map<number, Set<ISODate>>()
@@ -42,7 +42,6 @@ export default function Habits() {
   })
   const dueToday = active.filter((h) => isDueToday(byHabit.get(h.id!) ?? new Set(), d, h.perWeek))
   const opened = openId != null ? (habits ?? []).find((h) => h.id === openId) : undefined
-  const st = player.streak
   const doneToday = active.filter((h) => byHabit.get(h.id!)?.has(d)).length
   const card = (h: Habit) => (
     <HabitCard key={h.id} habit={h} dates={byHabit.get(h.id!) ?? new Set()} today={d} goalTitle={h.goalId != null ? goalTitle.get(h.goalId) : undefined} onOpen={(x) => setOpenId(x.id ?? null)} />
@@ -52,19 +51,10 @@ export default function Habits() {
     <>
       <PageHeader
         title="Habits"
-        sub={habits === undefined ? ' ' : active.length ? `${doneToday} of ${active.length} done today` : 'Small things, repeated'}
+        sub={habits === undefined ? ' ' : active.length ? `${doneToday} of ${active.length} done today` : 'No habits yet'}
         actions={<button className="btn btn-primary" onClick={() => setEditing('new')}>New habit</button>}
       />
-      {!player.calm && !player.loading && (
-        <div className="habit-strip" aria-label="Weekly streak">
-          <WeekDots streak={st} />
-          <span className="habit-strip-text">
-            {st.daysThisWeek} of {st.target} active days this week
-            {st.restTokens > 0 && <> · {st.restTokens} rest {st.restTokens === 1 ? 'token' : 'tokens'}</>}
-            {st.weeksInRow > 0 && <> · {st.weeksInRow} {st.weeksInRow === 1 ? 'week' : 'weeks'} in a row</>}
-          </span>
-        </div>
-      )}
+      {habits !== undefined && logs !== undefined && active.length > 0 && <HabitHero habits={active} byHabit={byHabit} today={d} />}
       <TodayRow habits={dueToday} byHabit={byHabit} today={d} />
       {habits === undefined && (
         <div className="habit-list" aria-busy="true">
@@ -78,7 +68,7 @@ export default function Habits() {
             title="No habits yet"
             action={<button className="btn btn-primary" onClick={() => setEditing('new')}>New habit</button>}
           >
-            Start with one you can finish in two minutes, like a 10-minute walk. Check it off here or on Today.
+            Pick one you can finish in two minutes, like a 10-minute walk. Check it off here or on Today.
           </Empty>
         </Card>
       )}
