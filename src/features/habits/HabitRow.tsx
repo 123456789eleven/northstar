@@ -47,13 +47,13 @@ const asStreak = (w: WeekRing): StreakState => ({ target: w.target, daysThisWeek
 export function HabitCard({ habit, dates, today, goalTitle, onOpen }: { habit: Habit; dates: Set<ISODate>; today: ISODate; goalTitle?: string; onOpen: (h: Habit) => void }) {
   const { pop, tick } = useTick(habit)
   const w = weekRing(dates, today, habit.perWeek)
-  const wt = weekCountText(w.done, w.target)
+  const wt = weekCountText(Math.min(w.done, w.target), w.target)
   const doneToday = dates.has(today)
   return (
     <section data-focus-id={habit.id} data-testid="habit-card" className={`card habit ${habit.archived ? 'archived' : ''}`}>
       <div className="habit-top">
-        <Ring value={w.pct} size={52} stroke={4} tone={w.pct >= 1 ? 'reward' : undefined} label={`${w.done} of ${w.target} this week`} className="habit-ring">
-          <span className="habit-ring-n mono" data-testid="habit-ring-count">{w.done}</span>
+        <Ring value={w.pct} size={52} stroke={4} label={`${Math.min(w.done, w.target)} of ${w.target} this week`} className="habit-ring">
+          <span className="habit-ring-n mono" data-testid="habit-ring-count">{Math.min(w.done, w.target)}</span>
         </Ring>
         <button type="button" className="habit-open" onClick={() => onOpen(habit)}>
           <span className="habit-name">{habit.name}</span>
@@ -89,7 +89,7 @@ function TodayItem({ habit, dates, today }: { habit: Habit; dates: Set<ISODate>;
     <button type="button" className={`today-habit ${on ? 'is-on' : ''}`} aria-pressed={on} onClick={() => void tick(today)} data-testid="today-habit">
       <span className="today-habit-box"><Check on={on} pop={pop} /></span>
       <span className="today-habit-name">{habit.name}</span>
-      <span className="today-habit-week">{w.done}/{w.target}</span>
+      <span className="today-habit-week">{Math.min(w.done, w.target)}/{w.target}</span>
     </button>
   )
 }
@@ -140,13 +140,13 @@ function MonthHeat({ habit, dates, today }: { habit: Habit; dates: Set<ISODate>;
 
 export function HabitDetail({ habit, dates, today, goalTitle, onClose, onEdit }: { habit: Habit; dates: Set<ISODate>; today: ISODate; goalTitle?: string; onClose: () => void; onEdit: (h: Habit) => void }) {
   const w = weekRing(dates, today, habit.perWeek)
-  const wt = weekCountText(w.done, w.target)
+  const wt = weekCountText(Math.min(w.done, w.target), w.target)
   return (
     <SidePanel title={habit.name} onClose={onClose}>
       <div className="stack">
         <div className="habit-detail-head">
-          <Ring value={w.pct} size={64} stroke={5} tone={w.pct >= 1 ? 'reward' : undefined} label={`${w.done} of ${w.target} this week`}>
-            <span className="habit-ring-n mono">{w.done}</span>
+          <Ring value={w.pct} size={52} stroke={4} label={`${Math.min(w.done, w.target)} of ${w.target} this week`}>
+            <span className="habit-ring-n mono">{Math.min(w.done, w.target)}</span>
           </Ring>
           <div className="habit-streak is-left">
             <strong className={wt.met ? 'is-met' : ''}>{wt.main}</strong>

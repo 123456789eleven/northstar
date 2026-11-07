@@ -8,5 +8,5 @@ export function goalCoach(goal: Goal, tasks: Task[], metric: MetricResult | null
   const hp = bossHp(goal, tasks, metric)
   const start = goal.metric?.source === 'weight' && metric?.hasData && data ? weightStart(data) : null
   const weight = start != null && metric?.value != null ? { start, value: metric.value, target: goal.metric!.target } : undefined
-  return { hp, note: coachNote({ goal, progress: hp.progress, basis: hp.basis, today, weight }) }
+  return { hp, note: coachNote({ goal, progress: hp.progress, basis: hp.basis, today, weight, milestones: goal.milestones.length }) }
 }

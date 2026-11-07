@@ -30,7 +30,7 @@ export function BossCard({ goal, tasks, metric, data, today, onOpen }: {
         <span className="boss-days">{left === 0 ? 'Last day of the quarter' : `${left} ${left === 1 ? 'day' : 'days'} left`}</span>
       </span>
       <span className="boss-head">
-        <Ring value={hp.progress} size={64} stroke={6} tone={met ? 'reward' : undefined} label={`${pct}% done`}>
+        <Ring value={hp.progress} size={52} stroke={5} tone={met ? 'reward' : undefined} label={`${pct}% done`}>
           <span className="boss-ring-n mono">{pct}%</span>
         </Ring>
         <span className="boss-head-text">

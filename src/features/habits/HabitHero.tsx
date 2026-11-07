@@ -17,7 +17,7 @@ export function HabitHero({ habits, byHabit, today }: { habits: Habit[]; byHabit
   return (
     <section className="card habit-hero" aria-label="This week">
       <div className="habit-hero-ring">
-        <Ring value={pct} size={112} stroke={9} tone={pct >= 1 ? 'reward' : undefined} label={`${week.done} of ${week.target} check-ins this week`}>
+        <Ring value={pct} size={128} stroke={10} label={`${week.done} of ${week.target} check-ins this week`}>
           <span className="habit-hero-center"><span className="habit-hero-big mono" data-testid="habit-week-done">{done}</span><span className="habit-hero-of">of {week.target}</span></span>
         </Ring>
         <div className="habit-hero-text">

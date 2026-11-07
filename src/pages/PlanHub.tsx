@@ -106,7 +106,7 @@ export default function PlanHub() {
                     return (
                       <li key={g.id}>
                         <Link to="/goals" className="plan-season">
-                          <Ring value={hp.progress} size={44} stroke={4} tone={note.tone === 'met' ? 'reward' : undefined} label={`${g.title}: ${pct}% done`}>
+                          <Ring value={hp.progress} size={52} stroke={4} tone={note.tone === 'met' ? 'reward' : undefined} label={`${g.title}: ${pct}% done`}>
                             <span className="mono plan-ring-n">{pct}</span>
                           </Ring>
                           <span className="plan-season-text">
@@ -143,7 +143,7 @@ export default function PlanHub() {
             <div className="plan-head"><h2 id="ph-h" className="quest-h">Habits this week</h2><Link to="/habits" className="plan-more">Habits</Link></div>
             {ring.target > 0 ? (
               <div className="plan-habits-body">
-                <Ring value={ring.target ? ring.done / ring.target : 0} size={64} stroke={5} label={`${ring.done} of ${ring.target} check-ins this week`}>
+                <Ring value={ring.target ? ring.done / ring.target : 0} size={52} stroke={4} label={`${ring.done} of ${ring.target} check-ins this week`}>
                   <span className="mono plan-ring-n" data-testid="plan-ring">{ring.done}/{ring.target}</span>
                 </Ring>
                 <div className="plan-habits-text">

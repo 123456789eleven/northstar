@@ -153,14 +153,14 @@ export default function Tasks() {
 
       {!loaded && <div className="skel skel-strip skel-pulse" style={{ marginBottom: 16 }} aria-hidden />}
       {loaded && order.length > 0 && (
-        <KpiStrip
+        <div className="tq-kpi"><KpiStrip
           items={[
             { label: 'Open', value: order.length },
             { label: 'Overdue', value: overdueCount, deltaTone: overdueCount ? 'warn' : 'neutral', note: overdueCount ? 'Reschedule or finish' : 'None late' },
             { label: 'Due today', value: todayCount },
             { label: 'Done in 14 days', value: done.length },
           ]}
-        />
+        /></div>
       )}
 
       {loaded && <div className="tq-focus"><FocusBar tasks={tasks} d={d} onEdit={(t) => pick(t.id!)} /></div>}
