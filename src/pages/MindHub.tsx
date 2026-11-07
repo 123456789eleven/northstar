@@ -1,4 +1,4 @@
-// Mind hub (/mind): Journal and Learning side by side, with the Mind skill level when the game layer is on.
+// Mind hub (/mind): Journal and Learning side by side, with this week's rings.
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
 import { formatDate, startOfWeek, today } from '../lib/dates'
@@ -11,8 +11,6 @@ import { wordCount } from '../features/journal/stats'
 import { fmtMinutes } from '../features/learning/learningData'
 import { PageHeader, Progress } from '../components/ui'
 import { usePlayerState } from '../features/game/ui/playerContext'
-import { LevelBadge } from '../features/game/ui/Ring'
-import { XpBar } from '../features/game/ui/Meters'
 import { HubCard } from '../features/hubs/HubCard'
 import '../features/hubs/hubs.css'
 
@@ -20,7 +18,6 @@ export default function MindHub() {
   const d = today()
   const wk = startOfWeek(d)
   const p = usePlayerState()
-  const mind = p.skills.find((s) => s.id === 'mind')!
   const entries = useLiveQuery(() => db.journal.where('date').aboveOrEqual(wk).toArray(), [wk])
   const last = useLiveQuery(() => db.journal.orderBy('date').last(), [])
   const items = useLiveQuery(() => db.learning.where('status').equals('active').toArray(), [])
@@ -37,13 +34,7 @@ export default function MindHub() {
   const target = Number(studyTarget) > 0 ? Number(studyTarget) : 120
   return (
     <>
-      <PageHeader title="Mind" sub="Writing and learning: what you think, and what you are getting better at." />
-      {!p.calm && (
-        <div className="card hub-section hub-meter">
-          <LevelBadge level={mind.level} progress={mind.xpForNext ? mind.xpIntoLevel / mind.xpForNext : 0} size={44} tone="mind" label={`Mind level ${mind.level}`} />
-          <XpBar info={mind} label={`Mind level ${mind.level}`} />
-        </div>
-      )}
+      <PageHeader title="Mind" sub="Writing and learning, with this week's rings." />
       <section className="card hub-section mind-overview" aria-label="Mind this week" data-testid="mind-overview">
         <div className="mind-ov-item">
           <Ring value={fraction(days, weekTarget)} size={64} stroke={5} tone="mind" label={`${days} of ${weekTarget} writing days this week`}><span className="mind-ov-num">{days}</span></Ring>
@@ -55,7 +46,7 @@ export default function MindHub() {
         </div>
         <div className="mind-ov-item mind-ov-mood">
           <MoodPreview entries={monthEntries ?? []} goal={goal} />
-          <span className="mind-ov-text"><span className="mind-ov-label">Mood constellation</span><span className="small muted">This month, by day</span></span>
+          <span className="mind-ov-text"><span className="mind-ov-label">Mood map</span><span className="small muted">This month, by day</span></span>
         </div>
       </section>
       <div className="hub-grid">

@@ -157,12 +157,12 @@ export function Achievements({ onAdd }: { onAdd: () => void }) {
     return out
   }, [items])
 
-  if (!all) return <section className="card"><Skeleton rows={6} label="Loading achievements" /></section>
+  if (!all) return <section className="card"><Skeleton rows={6} label="Loading the logbook" /></section>
   if (all.length === 0)
     return (
       <section className="card">
         <Empty title="No milestones yet" action={<button className="btn btn-primary" onClick={onAdd}>Add a milestone</button>}>
-          Milestones collect here: finished goals, completed courses, streaks, and anything you add with “Milestone” switched on.
+          Finished goals, completed courses and anything you add with Milestone switched on are logged here, with the date.
         </Empty>
       </section>
     )
@@ -193,6 +193,7 @@ export function Achievements({ onAdd }: { onAdd: () => void }) {
               <div className="ach-list">
                 {m.items.map((e) => (
                   <div className="ach-entry" key={e.id}>
+                    <span className="ach-mark" aria-hidden />
                     <span className="ach-entry-date">{formatDate(dayOf(e))}</span>
                     <span className="ach-entry-title">{e.title}</span>
                     <span className="ach-entry-meta">{AREA_LABEL[e.area] ?? e.area}</span>
@@ -264,7 +265,7 @@ export function AddEntry({ onClose }: { onClose: () => void }) {
         </div>
         <label className="hist-toggle">
           <input type="checkbox" className="check" checked={milestone} onChange={(e) => setMilestone(e.target.checked)} />
-          <span>Milestone <span className="faint small">— also show it on Achievements</span></span>
+          <span>Milestone <span className="faint small">— also add it to the logbook</span></span>
         </label>
         <div className="row" style={{ justifyContent: 'flex-end' }}>
           <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>

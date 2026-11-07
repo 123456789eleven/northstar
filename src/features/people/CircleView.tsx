@@ -1,5 +1,5 @@
 // The circle: concentric orbits by contact cadence, one dot per person. Glow fades gently as the cadence approaches;
-// past it a soft violet ring appears (never red, no guilt copy). Tap a dot to open the person.
+// past it a soft powder ring appears (never red, no guilt copy). Tap a dot to open the person.
 import { useMemo } from 'react'
 import type { Person } from '../../db'
 import { today } from '../../lib/dates'

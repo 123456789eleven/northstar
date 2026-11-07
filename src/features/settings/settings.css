@@ -13,7 +13,7 @@
 .set-counts div { display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding: 4px 0; }
 .set-error { color: var(--warn); font-size: 14px; margin: 8px 0 0; }
 .set-ok { color: var(--good); font-size: 14px; margin: 8px 0 0; }
-.set-danger { border-color: rgba(224, 122, 95, 0.35); }
+.set-danger { border-color: var(--poppy-line); }
 .set-danger .card-title { color: var(--warn); }
 .set-file { display: none; }
 .set-profile-row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }

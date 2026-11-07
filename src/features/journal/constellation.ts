@@ -13,7 +13,7 @@ export function moodStarSize(words: number, goal: number): number {
   return Math.round((MIN_STAR + (MAX_STAR - MIN_STAR) * Math.sqrt(r)) * 100) / 100
 }
 
-/** Mood 1..5 maps to violet scale step 1..5; unrated = 0 (neutral grey star). */
+/** Mood 1..5 maps to powder blue scale step 1..5; unrated = 0 (neutral grey star). */
 export function moodStep(mood: number | undefined | null): 0 | 1 | 2 | 3 | 4 | 5 {
   if (mood == null || !Number.isFinite(mood) || mood < 1) return 0
   return Math.min(5, Math.round(mood)) as 1 | 2 | 3 | 4 | 5

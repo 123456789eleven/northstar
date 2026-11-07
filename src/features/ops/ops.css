@@ -1,4 +1,4 @@
-/* Command + Ontology pages. Dense, flat, 1px borders; violet is the only accent. */
+/* Command + Ontology pages. Dense, flat, 1px borders; powder blue is the only accent. */
 .ops-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); }
 .ops-mono { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
 

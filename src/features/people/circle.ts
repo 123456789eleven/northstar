@@ -92,3 +92,10 @@ export function mostOverdue<T extends Pick<Person, 'cadenceDays' | 'lastContact'
   }
   return best
 }
+
+/** Plain reminder line: "Aisha, 22 days since you spoke". */
+export function reminderLine(p: Pick<Person, 'name' | 'lastContact'>, now: ISODate): string {
+  if (!p.lastContact) return `${p.name}, no contact logged yet`
+  const n = Math.max(0, daysBetween(p.lastContact, now))
+  return `${p.name}, ${n === 0 ? 'you spoke today' : `${n} ${n === 1 ? 'day' : 'days'} since you spoke`}`
+}

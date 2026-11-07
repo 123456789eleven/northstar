@@ -86,7 +86,7 @@ export default function Journal() {
     <>
       <PageHeader
         title="Journal"
-        sub={entries === undefined ? ' ' : `${stats.streak ? `${stats.streak}-day streak · ` : ''}${written} ${written === 1 ? 'entry' : 'entries'} · private to this device`}
+        sub={entries === undefined ? ' ' : `${stats.streak ? `${stats.streak} ${stats.streak === 1 ? 'day' : 'days'} in a row · ` : ''}${written} ${written === 1 ? 'entry' : 'entries'} · private to this device`}
               />
       {entries !== undefined && <WritingHero entries={entries} goal={prefs.goal} target={weekTarget} streak={stats.streak} />}
       <div className="jr-grid">

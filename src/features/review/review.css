@@ -79,7 +79,7 @@
   .rv-layout > .stack:last-child, .rv-suggest, .rv-weeknav .btn, .rv-save, .insights-week { display: none !important; }
   .rv-weeknav { border: 0; padding: 0; margin: 0 0 12pt; }
   .rv-layout textarea { display: none; }
-  .rv-print-text { white-space: pre-wrap; font-size: 11pt; line-height: 1.5; padding: 2pt 0 8pt; color: #111; }
+  .rv-print-text { white-space: pre-wrap; font-size: 11pt; line-height: 1.5; padding: 2pt 0 8pt; color: black; }
   .rv-rate-btns { display: none; }
   .rv-fact-value { font-size: 14pt; }
 }

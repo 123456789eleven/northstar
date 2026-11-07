@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { GLOW_FLOOR, glowFor, layoutCircle, mostOverdue, orbitFor } from './circle'
+import { GLOW_FLOOR, glowFor, layoutCircle, mostOverdue, orbitFor, reminderLine } from './circle'
 
 const NOW = '2026-11-02'
 
@@ -63,5 +63,13 @@ describe('mostOverdue', () => {
     expect(mostOverdue([a, z], NOW)).toBeNull()
     expect(mostOverdue([a, b, c], NOW)).toBe(c)
     expect(mostOverdue([a, b, { cadenceDays: 14 }], NOW)).toEqual({ cadenceDays: 14 })
+  })
+})
+
+describe('reminderLine', () => {
+  it('states the gap plainly', () => {
+    expect(reminderLine({ name: 'Aisha', lastContact: '2026-10-15' }, '2026-11-06')).toBe('Aisha, 22 days since you spoke')
+    expect(reminderLine({ name: 'Aisha', lastContact: '2026-11-05' }, '2026-11-06')).toBe('Aisha, 1 day since you spoke')
+    expect(reminderLine({ name: 'Aisha' }, '2026-11-06')).toBe('Aisha, no contact logged yet')
   })
 })

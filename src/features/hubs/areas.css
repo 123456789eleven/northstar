@@ -1,0 +1,16 @@
+/* Areas hub: five rings with their inputs. Cards are the one regular-glass card; rows inside are plain. */
+.area-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: var(--gap); }
+.area-card { display: flex; flex-direction: column; gap: var(--sp-4); color: inherit; text-decoration: none; min-width: 0; }
+.area-head { display: flex; align-items: center; gap: var(--sp-4); min-width: 0; }
+.area-name { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0; }
+.area-title { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-3); font-weight: 600; }
+.area-sub { font-size: var(--fs-1); color: var(--ink-2); }
+.area-days { display: inline-flex; align-items: baseline; font-size: var(--fs-1); color: var(--ink-2); }
+.area-days b { font-size: var(--fs-4); font-weight: 600; color: var(--ink); }
+.area-fed { display: flex; flex-direction: column; gap: var(--sp-1); border-top: 1px solid var(--line-soft); padding-top: var(--sp-3); }
+.area-fed-h { font-size: var(--fs-1); color: var(--ink-2); }
+.area-inputs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; font-size: var(--fs-2); }
+.area-inputs b { display: inline-block; min-width: 1.6em; font-weight: 600; font-variant-numeric: tabular-nums; }
+.area-note { margin: 0 0 var(--gap); }
+.area-table { margin-bottom: var(--gap); }
+.area-table .num { text-align: right; }

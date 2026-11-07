@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { seasonOf, storyOrder } from './season'
+import { paceNote, seasonOf, storyOrder } from './season'
 
 describe('seasonOf', () => {
   it('names the quarter and counts days left', () => {
@@ -24,5 +24,13 @@ describe('storyOrder', () => {
   it('puts cards with content first', () => {
     expect(storyOrder({ wins: false, slipped: true, numbers: true })).toEqual(['summary', 'slipped', 'numbers', 'wins', 'next'])
     expect(storyOrder({ wins: true, slipped: true, numbers: true })).toEqual(['summary', 'wins', 'slipped', 'numbers', 'next'])
+  })
+})
+
+describe('paceNote', () => {
+  it('names the gap in plain words', () => {
+    expect(paceNote(1, 0.5, 40)).toBe('Season goal met.')
+    expect(paceNote(0.5, 0.52, 40)).toBe('On pace: 50% done with 52% of the season gone.')
+    expect(paceNote(0.2, 0.6, 1)).toBe('Behind pace: 20% done with 60% of the season gone. 1 day left.')
   })
 })

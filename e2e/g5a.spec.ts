@@ -37,20 +37,18 @@ for (const vp of [{ name: '390', size: { width: 390, height: 844 }, touch: true 
   test.describe(`G5a at ${vp.name}`, () => {
     test.use({ viewport: vp.size, hasTouch: vp.touch })
 
-    test('Trophies: shelf renders seeded milestones with rarity words and next trophies', async ({ page }) => {
+    test('Milestones: logbook renders seeded milestones with date and next milestones, no rarity or New tags', async ({ page }) => {
       await seed(page, { events: milestones })
       await page.goto('/#/history')
-      await expect(page.getByRole('heading', { name: 'Trophy shelf' })).toBeVisible()
-      await expect(page.getByTestId('trophy-card')).toHaveCount(3)
-      await expect(page.getByTestId('trophy-card').filter({ hasText: 'first 5 lb down' })).toContainText('Rare')
-      await expect(page.getByTestId('trophy-card').filter({ hasText: 'onboarding guide' })).toContainText('Uncommon')
-      await expect(page.getByTestId('trophy-card').filter({ hasText: 'first 5 lb down' })).toContainText('New')
-      await expect(page.getByRole('list', { name: 'Next trophies' })).toBeVisible()
+      await expect(page.getByRole('heading', { name: 'Latest milestones' })).toBeVisible()
+      await expect(page.getByTestId('milestone-row')).toHaveCount(3)
+      await expect(page.getByTestId('milestone-row').filter({ hasText: 'first 5 lb down' })).not.toContainText(/Rare|New/)
+      await expect(page.getByRole('list', { name: 'Next milestones' })).toBeVisible()
       await expect(page.getByRole('tab', { name: 'Timeline' })).toBeVisible()
       await noHScroll(page)
     })
 
-    test('Season: boss header and story cards', async ({ page }) => {
+    test('Season: season goal header, story cards and share card', async ({ page }) => {
       await seed(page, {
         goals: [{ title: 'Fixture quarter goal', area: 'career', horizon: 'quarter', status: 'active', milestones: [{ id: 'm1', title: 'Step one', done: true }, { id: 'm2', title: 'Step two', done: false }], createdAt: new Date().toISOString() }],
       })
@@ -60,6 +58,8 @@ for (const vp of [{ name: '390', size: { width: 390, height: 844 }, touch: true 
       await expect(header).toContainText(/Q[1-4] \d{4}/)
       await expect(header).toContainText('Fixture quarter goal')
       await expect(header.getByRole('progressbar')).toBeVisible()
+      await expect(header).toContainText(/pace/)
+      await expect(page.getByTestId('story-cards').getByRole('button', { name: 'Share card' })).toBeVisible()
       if (vp.touch) {
         const stories = page.getByTestId('story-cards')
         await expect(stories.locator('article')).toHaveCount(5)
@@ -93,11 +93,12 @@ for (const vp of [{ name: '390', size: { width: 390, height: 844 }, touch: true 
       await noHScroll(page)
     })
 
-    test('Settings: Game is the first section card', async ({ page }) => {
+    test('Settings: Progress is the first section card and Calm mode is gone', async ({ page }) => {
       await page.goto('/#/settings')
       const first = page.locator('.set-page .set-anchor').first()
       await expect(first).toHaveAttribute('id', 'set-game')
-      await expect(first.getByText('Calm mode')).toBeVisible()
+      await expect(first.getByText('Progress', { exact: true })).toBeVisible()
+      await expect(page.getByRole('switch', { name: 'Calm mode' })).toHaveCount(0)
       await noHScroll(page)
     })
   })

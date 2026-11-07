@@ -8,7 +8,7 @@ export interface RingProps {
   value: number
   size?: number
   stroke?: number
-  /** Skill hue, 'reward' (gold) or undefined (accent violet). */
+  /** Area hue, 'reward' (gold, earned) or undefined (powder blue). */
   tone?: SkillId | 'reward'
   /** Accessible label; without it the ring is decorative. */
   label?: string
@@ -43,7 +43,7 @@ export function Ring({ value, size = 40, stroke = 3, tone, label, children, clas
   )
 }
 
-/** Level number inside its progress ring (XP into the level). `size` 20-24 for rail pips, 40-56 for headers. */
+/** Level number inside its progress ring. Kept only for the shell's rail pips (lead owns those). */
 export function LevelBadge({ level, progress, size = 40, tone, label }: { level: number; progress: number; size?: number; tone?: SkillId | 'reward'; label?: string }) {
   return (
     <Ring value={progress} size={size} stroke={size <= 24 ? 2 : 3} tone={tone} label={label ?? `Level ${level}`} className={`level-badge ${size <= 24 ? 'is-pip' : size <= 32 ? 'is-sm' : ''}`}>

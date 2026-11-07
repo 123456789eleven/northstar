@@ -49,6 +49,6 @@ export async function loadSnapshot(): Promise<Snapshot> {
   const g: GameSettings = parseGameSettings(Object.fromEntries(settingRows.map((r) => [r.key, r.value])))
   return {
     tasks, goals, habits, habitLogs, weights, meals, targets: targets ?? {}, journal, people, interactions, learning, studySessions,
-    transactions, budgets, balances, events, reviews, weekTarget: g.weekTarget, calm: g.calm,
+    transactions, budgets, balances, events, reviews, weekTarget: g.weekTarget, calm: false, // game.calm is retired (owner request): never hide surfaces
   }
 }

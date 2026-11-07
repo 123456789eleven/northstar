@@ -1,33 +1,6 @@
-// XP bar (reward-coloured fill, number roll) and the weekly streak dots.
-import type { CSSProperties } from 'react'
-import { useEffect, useState } from 'react'
-import { useNumberRoll } from '../../../components/motion'
-import type { LevelInfo, StreakState } from '../types'
+// The weekly consistency dots.
+import type { StreakState } from '../types'
 import { parseISODate, today } from '../../../lib/dates'
-
-export function XpBar({ info, label, compact = false }: { info: LevelInfo; label?: string; compact?: boolean }) {
-  const pct = info.xpForNext > 0 ? Math.min(100, (info.xpIntoLevel / info.xpForNext) * 100) : 0
-  const into = useNumberRoll(info.xpIntoLevel)
-  const [shown, setShown] = useState(0)
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setShown(pct))
-    return () => cancelAnimationFrame(id)
-  }, [pct])
-  const name = label ?? `Level ${info.level}`
-  return (
-    <div className={`xpbar ${compact ? 'is-compact' : ''}`}>
-      {!compact && (
-        <div className="xpbar-head">
-          <span className="xpbar-label">{name}</span>
-          <span className="xpbar-num"><span className="mono">{into}</span> / <span className="mono">{info.xpForNext}</span> XP</span>
-        </div>
-      )}
-      <div className="xpbar-track" role="progressbar" aria-label={`${name}: ${info.xpIntoLevel} of ${info.xpForNext} XP to level ${info.level + 1}`} aria-valuenow={info.xpIntoLevel} aria-valuemin={0} aria-valuemax={info.xpForNext}>
-        <div className="xpbar-fill" style={{ '--p': shown } as CSSProperties} />
-      </div>
-    </div>
-  )
-}
 
 const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']

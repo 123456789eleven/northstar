@@ -62,7 +62,7 @@
 .focus-title { font-size: 15px; font-weight: 600; text-align: center; overflow-wrap: anywhere; }
 .focus-clock-wrap { padding: var(--sp-2) 0; position: relative; display: grid; place-items: center; }
 .focus-clock-wrap > .focus-clock { position: absolute; }
-.focus-clock { font-size: 34px; font-variant-numeric: tabular-nums; color: var(--ink); }
+.focus-clock { font-size: var(--fs-6); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
 .focus-targets, .focus-actions { justify-content: center; flex-wrap: wrap; gap: var(--sp-2); }
 .focus-actions .btn { min-height: 44px; min-width: 120px; }
 .focus-chip { min-height: 32px; gap: 6px; cursor: pointer; font: inherit; font-size: 13px; }

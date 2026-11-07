@@ -4,7 +4,7 @@ import { db } from '../db'
 import { useFocusParam, useFocusTarget } from '../lib/useFocusParam'
 import { PageHeader, Tabs } from '../components/ui'
 import { Achievements, AddEntry, OnThisDay, Timeline } from '../features/history/history'
-import { TrophyShelf } from '../features/history/TrophyShelf'
+import { MilestoneShelf } from '../features/history/MilestoneShelf'
 import '../features/history/history.css'
 
 type Tab = 'timeline' | 'achievements'
@@ -23,14 +23,14 @@ export default function History() {
   return (
     <>
       <PageHeader
-        title="Trophies"
-        sub="Milestones, and everything you have done, in one place."
+        title="Milestones"
+        sub="What you finished, dated, and everything else you did."
         actions={<button className="btn btn-primary" onClick={() => setAdding(true)}>Add entry</button>}
       />
 
-      <TrophyShelf />
+      <MilestoneShelf />
 
-      <Tabs<Tab> value={tab} onChange={setTab} options={[{ value: 'timeline', label: 'Timeline' }, { value: 'achievements', label: 'Achievements' }]} />
+      <Tabs<Tab> value={tab} onChange={setTab} options={[{ value: 'timeline', label: 'Timeline' }, { value: 'achievements', label: 'Logbook' }]} />
       {tab === 'timeline' ? <><OnThisDay /><Timeline onAdd={() => setAdding(true)} revealAt={revealAt} /></> : <Achievements onAdd={() => setAdding(true)} />}
       {adding && <AddEntry onClose={() => setAdding(false)} />}
     </>

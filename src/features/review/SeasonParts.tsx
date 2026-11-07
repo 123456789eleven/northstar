@@ -1,4 +1,5 @@
-// Season page parts: the quarter header (boss bar of the top quarter goal) and the phone story cards for the week.
+// Season page parts: the quarter header (the top season goal with a coach note) and the swipeable story cards for the week,
+// with a share card drawn on-device.
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -9,15 +10,14 @@ import { bossCheckpoints, bossHp, bossNumber, pickBosses } from '../goals/boss'
 import { BossBar } from '../goals/BossBar'
 import { goalMetric } from '../progress/metrics'
 import { loadMetricData } from '../progress/metricsData'
-import { usePlayerState } from '../game/ui/playerContext'
-import { seasonOf, storyOrder, type StoryId } from '../you/season'
+import { paceNote, seasonOf, storyOrder, type StoryId } from '../you/season'
 import { weekDigest } from './summary'
+import { buildShareModel, renderShareCard, saveShareCard } from './shareCard'
 import { loadWeekNumbers, type NumberItem, type WeekSnapshot } from './weekNumbers'
 import '../goals/quest.css'
 import '../you/you.css'
 
 export function SeasonHeader() {
-  const calm = usePlayerState().calm
   const d = today()
   const season = seasonOf(d)
   const goals = useLiveQuery(() => db.goals.toArray(), [])
@@ -26,6 +26,7 @@ export function SeasonHeader() {
   const boss = useMemo(() => pickBosses(goals ?? [], 1)[0], [goals])
   const metric = boss?.metric && data ? goalMetric(boss, data) : null
   const loaded = goals !== undefined && tasks !== undefined
+  const hp = boss && tasks ? bossHp(boss, tasks, metric) : null
   return (
     <section className="card ssn-head" aria-label="This season" data-testid="season-header">
       <div className="ssn-top">
@@ -35,24 +36,27 @@ export function SeasonHeader() {
       {!loaded ? <Skeleton lines={2} label="Loading season" /> : boss ? (
         <>
           <div className="ssn-boss-title">{boss.title}</div>
-          <BossBar hp={bossHp(boss, tasks, metric)} flags={bossCheckpoints(boss, metric, data)} label={boss.title} calm={calm} />
+          <BossBar hp={hp!} flags={bossCheckpoints(boss, metric, data)} label={boss.title} calm />
           <div className="ssn-boss-meta">
             <span>{bossNumber(boss, tasks, metric)}</span>
-            <span>{calm ? `${Math.round(bossHp(boss, tasks, metric).progress * 100)}% done` : `Boss HP ${Math.round(bossHp(boss, tasks, metric).hp * 100)}%`}</span>
+            <span>{Math.round(hp!.progress * 100)}% done</span>
           </div>
+          <p className="ssn-coach">{paceNote(hp!.progress, season.elapsed, season.daysLeft)}</p>
         </>
       ) : (
-        <p className="small muted" style={{ margin: 0 }}>No quarter goal yet. <Link to="/goals">Create this season&apos;s boss</Link> and it shows up here.</p>
+        <p className="small muted" style={{ margin: 0 }}>No season goal yet. <Link to="/goals">Set one for this quarter</Link> and it shows up here.</p>
       )}
     </section>
   )
 }
 
-const TITLES: Record<StoryId, string> = { summary: 'The week', wins: 'Wins', slipped: 'Slipped', numbers: 'Body and money', next: 'Next week' }
+const TITLES: Record<StoryId, string> = { summary: 'The week', wins: 'Wins', slipped: 'Missed', numbers: 'Body and money', next: 'Next week' }
 
 export function SeasonStories({ weekOf, snapshot, wins, focusNext, planned }: { weekOf: ISODate; snapshot?: WeekSnapshot; wins?: string; focusNext?: string; planned?: string }) {
   const res = useLiveQuery(async () => ({ weekOf, d: await weekDigest(weekOf), items: snapshot ? snapshot.items : await loadWeekNumbers(weekOf) }), [weekOf, snapshot])
   const [idx, setIdx] = useState(0)
+  const [shareMsg, setShareMsg] = useState('')
+  const [busy, setBusy] = useState(false)
   const track = useRef<HTMLDivElement>(null)
   const ready = !!res && res.weekOf === weekOf
   const d = ready ? res.d : undefined
@@ -91,7 +95,7 @@ export function SeasonStories({ weekOf, snapshot, wins, focusNext, planned }: { 
       case 'slipped':
         return d.slipped.length ? (
           <ul className="story-list">{d.slipped.slice(0, 5).map((t) => <li key={t.id}><span className="faint small">{formatDate(t.due!)} </span>{t.title}</li>)}</ul>
-        ) : <p className="small muted" style={{ margin: 0 }}>Nothing slipped. Every task due this week is done.</p>
+        ) : <p className="small muted" style={{ margin: 0 }}>Nothing missed. Every task due this week is done.</p>
       case 'numbers':
         return bodyMoney.length ? (
           <ul className="story-list">{bodyMoney.map((i) => <li key={i.key}><b>{i.label}</b> {i.empty ? <span className="faint small">{i.note}</span> : <>{i.value} <span className="faint small">{i.note}</span></>}</li>)}</ul>
@@ -107,6 +111,17 @@ export function SeasonStories({ weekOf, snapshot, wins, focusNext, planned }: { 
     if (el && card) el.scrollTo({ left: card.offsetLeft - (el.clientWidth - card.offsetWidth) / 2, behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
   }
 
+  const share = async () => {
+    setBusy(true); setShareMsg('')
+    try {
+      const blob = await renderShareCard(buildShareModel({ weekOf, digest: d, items, wins, focusNext, planned }))
+      if (!blob) { setShareMsg('This browser cannot draw the card.'); return }
+      const r = await saveShareCard(blob, `northstar-week-${weekOf}.png`)
+      setShareMsg(r === 'shared' ? 'Card ready to share.' : 'Card saved to your downloads.')
+    } catch { setShareMsg('Could not make the card. Try again.') } finally { setBusy(false) }
+  }
+  const step = (n: number) => go(Math.max(0, Math.min(order.length - 1, idx + n)))
+
   return (
     <section className="story" aria-label="Week story" data-testid="story-cards">
       <div className="story-track" ref={track} tabIndex={0} role="group" aria-label="Week story cards, scroll sideways">
@@ -119,6 +134,12 @@ export function SeasonStories({ weekOf, snapshot, wins, focusNext, planned }: { 
       </div>
       <div className="story-dots" role="group" aria-label="Story cards">
         {order.map((id, i) => <button key={id} type="button" className="story-dot" aria-label={`Show ${TITLES[id]}`} aria-current={idx === i ? 'true' : undefined} onClick={() => go(i)} />)}
+      </div>
+      <div className="story-actions">
+        <button type="button" className="btn btn-sm story-step" aria-label="Previous card" disabled={idx <= 0} onClick={() => step(-1)}>Back</button>
+        <button type="button" className="btn btn-sm story-step" aria-label="Next card" disabled={idx >= order.length - 1} onClick={() => step(1)}>Next</button>
+        <button type="button" className="btn btn-primary btn-sm story-share" disabled={busy} onClick={() => void share()}>{busy ? 'Drawing...' : 'Share card'}</button>
+        <span className="small muted" role="status">{shareMsg}</span>
       </div>
     </section>
   )

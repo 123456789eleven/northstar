@@ -1,15 +1,15 @@
-// Settings > Game: Calm mode, haptics, sound, motion, weekly target and the XP table ("Why do I earn XP?").
+// Settings > Progress: haptics, sound, motion, weekly target and the counting table ("How activity is counted").
 // All device-local (`game.*` settings, never synced). Nothing here asks for a permission.
 import { useState } from 'react'
 import { Card } from '../../components/ui'
-import { useGameSettings, type GameSettings } from '../game/gameSettings'
+import { useGameSettings } from '../game/gameSettings'
 import { XP_TABLE } from '../game/engine/xpTable'
 import { SKILLS } from '../game/types'
 import { haptic, setHapticsEnabled } from '../../lib/haptics'
 import { setSoundEnabled, tick } from '../../lib/sound'
 
 const SKILL_LABEL: Record<string, string> = Object.fromEntries(SKILLS.map((s) => [s.id, s.label]))
-const skillText = (r: (typeof XP_TABLE)[number]) => (r.skill === 'goal' ? `Goal's skill (else ${SKILL_LABEL[r.fallback ?? 'mind']})` : r.skill === 'top' ? 'Your top skill that day' : SKILL_LABEL[r.skill])
+const skillText = (r: (typeof XP_TABLE)[number]) => (r.skill === 'goal' ? `Goal's area (else ${SKILL_LABEL[r.fallback ?? 'mind']})` : r.skill === 'top' ? 'Your busiest area that day' : SKILL_LABEL[r.skill])
 
 function Switch({ id, label, help, checked, onChange }: { id: string; label: string; help: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -28,17 +28,15 @@ function Switch({ id, label, help, checked, onChange }: { id: string; label: str
 export function GameSection() {
   const g = useGameSettings()
   const [showTable, setShowTable] = useState(false)
-  const set = <K extends keyof GameSettings>(k: K) => (v: GameSettings[K]) => void g.set(k, v)
   return (
-    <Card title="Game">
-      <p className="set-text small muted">XP, levels and daily quests come only from things you already log. Nothing is ever taken away. These settings stay on this device.</p>
-      <Switch id="g-calm" label="Calm mode" help="Hide levels, quests, XP and moments. The layout and every page stay the same." checked={g.calm} onChange={set('calm')} />
-      <Switch id="g-haptics" label="Haptics" help="A light tick when a quest completes, a double tick on a level-up. Phones that support vibration only." checked={g.haptics} onChange={(v) => { setHapticsEnabled(v); if (v) haptic('tick'); void g.set('haptics', v) }} />
-      <Switch id="g-sound" label="Sound" help="A tiny synthesized tick on the same moments. Off by default." checked={g.sound} onChange={(v) => { setSoundEnabled(v); if (v) tick('tick'); void g.set('sound', v) }} />
+    <Card title="Progress">
+      <p className="set-text small muted">Rings, the plan and your week come only from things you already log. Nothing is ever taken away. These settings stay on this device.</p>
+      <Switch id="g-haptics" label="Haptics" help="A light tick when a plan item completes. Phones that support vibration only." checked={g.haptics} onChange={(v) => { setHapticsEnabled(v); if (v) haptic('tick'); void g.set('haptics', v) }} />
+      <Switch id="g-sound" label="Sound" help="A quiet tick on the same moments. Off by default." checked={g.sound} onChange={(v) => { setSoundEnabled(v); if (v) tick('tick'); void g.set('sound', v) }} />
       <div className="set-pref-row">
         <div className="set-pref-text">
           <span className="set-pref-label" id="g-motion">Motion</span>
-          <span className="small muted">Reduced turns off springs, count-ups and moments app-wide (your system setting is always respected).</span>
+          <span className="small muted">Reduced turns off springs, count-ups and the completion toast app-wide (your system setting is always respected).</span>
         </div>
         <div className="seg" role="radiogroup" aria-labelledby="g-motion">
           {(['full', 'reduced'] as const).map((m) => (
@@ -49,7 +47,7 @@ export function GameSection() {
       <div className="set-pref-row">
         <div className="set-pref-text">
           <label className="set-pref-label" htmlFor="g-week">Active days a week</label>
-          <span className="small muted">Your weekly streak target. Two rest tokens a week cover days off; a streak never resets in a day.</span>
+          <span className="small muted">How many days a week fill your rings. Two grace days a week cover days off, and a run never resets in a day.</span>
         </div>
         <select id="g-week" className="select set-week" value={g.weekTarget} onChange={(e) => void g.set('weekTarget', Number(e.target.value))}>
           {[1, 2, 3, 4, 5, 6, 7].map((n) => <option key={n} value={n}>{n} {n === 1 ? 'day' : 'days'}</option>)}
@@ -57,16 +55,16 @@ export function GameSection() {
       </div>
       <div className="set-pref-row">
         <div className="set-pref-text">
-          <span className="set-pref-label">Why do I earn XP?</span>
-          <span className="small muted">Every rule, its skill, its XP and its daily cap. The same table drives the engine.</span>
+          <span className="set-pref-label">How activity is counted</span>
+          <span className="small muted">Every rule, its area, its weight and its daily cap. The same table drives the rings.</span>
         </div>
-        <button type="button" className="btn btn-sm" aria-expanded={showTable} aria-controls="xp-table" onClick={() => setShowTable((v) => !v)}>{showTable ? 'Hide XP table' : 'Show XP table'}</button>
+        <button type="button" className="btn btn-sm" aria-expanded={showTable} aria-controls="count-table" onClick={() => setShowTable((v) => !v)}>{showTable ? 'Hide counting table' : 'Show counting table'}</button>
       </div>
       {showTable && (
-        <div className="table-wrap set-xp" id="xp-table">
+        <div className="table-wrap set-xp" id="count-table">
           <table className="table">
-            <caption className="sr-only">XP table</caption>
-            <thead><tr><th scope="col">Action</th><th scope="col">Skill</th><th scope="col" className="num">XP</th><th scope="col" className="num">Daily cap</th><th scope="col">Rule</th></tr></thead>
+            <caption className="sr-only">Counting table</caption>
+            <thead><tr><th scope="col">Action</th><th scope="col">Area</th><th scope="col" className="num">Weight</th><th scope="col" className="num">Daily cap</th><th scope="col">Rule</th></tr></thead>
             <tbody>
               {XP_TABLE.map((r) => (
                 <tr key={r.kind}>
