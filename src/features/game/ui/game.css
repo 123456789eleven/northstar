@@ -112,11 +112,15 @@ a.quest.is-compact:hover { background: var(--glass-bg-hover); border-color: tran
 .pstrip-xp { width: 44px; }
 .pstrip-streak { font-size: var(--text-xs); color: var(--ink-2); }
 
-/* Reduced motion (OS or Settings > Game > Motion: reduced): everything lands instantly. */
+/* Reduced motion (OS or Settings > Progress > Motion: reduced): everything lands instantly. */
 @media (prefers-reduced-motion: reduce) {
-  .ring-fill,   .quest-ring.is-pulsing, .quest-check.is-drawing path, .moment, .moment-ripple, .moment-tick path { animation: none; }
+  .ring-fill { transition: none; }
+  .quest-ring.is-pulsing, .quest-check.is-drawing path, .moment, .moment-ripple, .moment-tick path { animation: none; }
+  .moment-ripple { display: none; }
 }
-:root[data-motion='reduced'] :is(.ring-fill, :root[data-motion='reduced'] :is(.quest-ring.is-pulsing, .quest-check.is-drawing path, .moment, .moment-ripple, .moment-tick path) { animation: none; }
+:root[data-motion='reduced'] .ring-fill { transition: none; }
+:root[data-motion='reduced'] :is(.quest-ring.is-pulsing, .quest-check.is-drawing path, .moment, .moment-ripple, .moment-tick path) { animation: none; }
+:root[data-motion='reduced'] .moment-ripple { display: none; }
 @media (prefers-reduced-transparency: reduce) { .moment { background: var(--surface-3); } .moment::before { content: none; } .mission-rail { background: var(--surface-1); } }
 @media (forced-colors: active) {
   .ring-fill { stroke: Highlight; } .ring-track { stroke: GrayText; }
