@@ -61,12 +61,13 @@ test('desktop 1440: rail with area groups and the plan rail are visible; old URL
   for (const name of ['Today', 'Plan', 'Body', 'Money', 'Mind', 'Career', 'People', 'Milestones', 'Settings']) {
     await expect(rail.getByRole('link', { name, exact: false }).first()).toBeVisible()
   }
-  // The plan rail shows on every page except Today (where the plan is the page itself).
-  await page.goto('/#/body')
+  // The season and week rail belongs to Today; other pages keep the room.
   const mission = page.getByRole('complementary', { name: 'Plan and week' })
   await expect(mission).toBeVisible()
   await expect(mission.getByText('Season', { exact: true })).toBeVisible()
-  await expect(mission.getByRole('heading', { name: /Today's plan/ })).toBeVisible()
+  await expect(mission.getByRole('heading', { name: 'This week' })).toBeVisible()
+  await page.goto('/#/body')
+  await expect(mission).toBeHidden()
 
   // /food keeps working and lights Body in the hub strip and Food in the sub-strip.
   await page.goto('/#/food')
@@ -74,7 +75,9 @@ test('desktop 1440: rail with area groups and the plan rail are visible; old URL
   await expect(page.getByRole('navigation', { name: 'Body pages' }).getByRole('link', { name: 'Food' })).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Food | Northstar')
 
-  // Below 1280px the mission rail collapses.
+  // Below 1280px the Today rail collapses.
+  await page.goto('/#/')
+  await expect(mission).toBeVisible()
   await page.setViewportSize({ width: 1180, height: 900 })
   await expect(mission).toBeHidden()
 })
