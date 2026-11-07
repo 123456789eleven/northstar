@@ -16,7 +16,7 @@ export function nextStepAfterGoal(goal: Goal, all: Goal[]): NextStep {
   const siblings = open.filter((g) => (parent ? g.parentId === parent.id : g.parentId == null && g.horizon === goal.horizon)).sort(byTarget)
   if (siblings.length) return { kind: 'sibling', text: `Next: ${siblings[0].title}` }
   if (parent) return { kind: 'add-child', text: `Nothing else open under ${parent.title}.`, parent }
-  return { kind: 'none', text: goal.horizon === 'life' ? 'Set the next direction when you are ready.' : 'On your Achievements wall.' }
+  return { kind: 'none', text: goal.horizon === 'life' ? 'Set the next direction when you are ready.' : 'Logged under Milestones.' }
 }
 
 /** After a milestone is checked: progress so far and the next open milestone, or the cue to finish the goal. */

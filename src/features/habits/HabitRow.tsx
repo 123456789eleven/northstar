@@ -9,7 +9,7 @@ import { Ring } from '../game/ui/Ring'
 import { WeekDots } from '../game/ui/Meters'
 import type { StreakState } from '../game/types'
 import { HeatStrip } from './HabitParts'
-import { perWeekLabel, streak, weekCountText } from './stats'
+import { perWeekLabel, weekCountText } from './stats'
 import { useHabitCheckIn } from './useHabitCheckIn'
 import { monthGrid, weekRing, type WeekRing } from './week'
 
@@ -47,7 +47,6 @@ const asStreak = (w: WeekRing): StreakState => ({ target: w.target, daysThisWeek
 export function HabitCard({ habit, dates, today, goalTitle, onOpen }: { habit: Habit; dates: Set<ISODate>; today: ISODate; goalTitle?: string; onOpen: (h: Habit) => void }) {
   const { pop, tick } = useTick(habit)
   const w = weekRing(dates, today, habit.perWeek)
-  const s = streak(dates, today, habit.perWeek)
   const wt = weekCountText(w.done, w.target)
   const doneToday = dates.has(today)
   return (
@@ -74,7 +73,7 @@ export function HabitCard({ habit, dates, today, goalTitle, onOpen }: { habit: H
         <WeekDots streak={asStreak(w)} />
         <div className="habit-streak">
           <strong className={wt.met ? 'is-met' : ''}>{wt.main}</strong>
-          <span>{wt.caption}{s.count >= 1 ? ` · ${s.count} ${s.unit}${s.count === 1 ? '' : 's'} streak` : ''}</span>
+          <span>{wt.caption}</span>
         </div>
       </div>
     </section>
@@ -99,7 +98,7 @@ export function TodayRow({ habits, byHabit, today }: { habits: Habit[]; byHabit:
   if (!habits.length) return null
   return (
     <section className="today-row" aria-label="Habits due today">
-      <h2 className="quest-h">Today</h2>
+      <h2 className="quest-h">Due today</h2>
       <div className="today-habits">
         {habits.map((h) => <TodayItem key={h.id} habit={h} dates={byHabit.get(h.id!) ?? new Set()} today={today} />)}
       </div>
@@ -141,7 +140,6 @@ function MonthHeat({ habit, dates, today }: { habit: Habit; dates: Set<ISODate>;
 
 export function HabitDetail({ habit, dates, today, goalTitle, onClose, onEdit }: { habit: Habit; dates: Set<ISODate>; today: ISODate; goalTitle?: string; onClose: () => void; onEdit: (h: Habit) => void }) {
   const w = weekRing(dates, today, habit.perWeek)
-  const s = streak(dates, today, habit.perWeek)
   const wt = weekCountText(w.done, w.target)
   return (
     <SidePanel title={habit.name} onClose={onClose}>
@@ -154,7 +152,6 @@ export function HabitDetail({ habit, dates, today, goalTitle, onClose, onEdit }:
             <strong className={wt.met ? 'is-met' : ''}>{wt.main}</strong>
             <span>{wt.caption}</span>
             <span>{AREA_LABEL[habit.area]} · {perWeekLabel(habit.perWeek)}{goalTitle ? ` · ${goalTitle}` : ''}</span>
-            <span>{s.count >= 1 ? `${s.count} ${s.unit}${s.count === 1 ? '' : 's'} streak` : 'No streak yet'}</span>
           </div>
         </div>
         <div>

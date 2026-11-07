@@ -88,7 +88,7 @@ export function behindMessage(targets: FoodTargets, totals: { calories: number; 
   if (totals.calories / targets.calories >= dayFraction - 0.1) return null
   const n = mealsLeft(hour)
   const per = Math.round(left / n / 10) * 10
-  return `${left.toLocaleString()} kcal to go, ${n} meal${n === 1 ? '' : 's'} of ${per.toLocaleString()}`
+  return `${left.toLocaleString()} kcal to go. ${n} meal${n === 1 ? '' : 's'} of ${per.toLocaleString()} would close it.`
 }
 
 export function defaultSlot(hour: number): MealSlot {

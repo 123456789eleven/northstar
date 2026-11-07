@@ -18,7 +18,7 @@ describe('left today', () => {
     expect(leftToday({}, { calories: 1, protein: 1 })).toBeNull()
   })
   it('says behind plainly late in the day only', () => {
-    expect(behindMessage({ calories: 2500 }, { calories: 1400, protein: 0 }, 17)).toBe('1,100 kcal to go, 2 meals of 550')
+    expect(behindMessage({ calories: 2500 }, { calories: 1400, protein: 0 }, 17)).toBe('1,100 kcal to go. 2 meals of 550 would close it.')
     expect(behindMessage({ calories: 2500 }, { calories: 1400, protein: 0 }, 9)).toBeNull()
     expect(behindMessage({ calories: 2500 }, { calories: 2400, protein: 0 }, 17)).toBeNull()
   })

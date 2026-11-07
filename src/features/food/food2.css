@@ -1,0 +1,12 @@
+/* Food redesign: calorie ring is the hero, protein ring beside it, coach line with a poppy mark when behind. Tokens only. */
+.mrings { align-items: flex-end; justify-content: center; gap: var(--sp-6); }
+.mring.is-hero { min-width: 156px; }
+.mring.is-side { min-width: 104px; }
+.mring.is-hero .mring-big { font-size: var(--fs-5); }
+.mring.is-side .mring-big { font-size: var(--fs-4); }
+.mring.is-side .mring-center { max-width: 72px; }
+.mring.is-hero .mring-center { max-width: 112px; }
+.mring.is-side .mring-of { font-size: var(--fs-1); }
+.food-behind { display: flex; align-items: flex-start; gap: var(--sp-2); color: var(--ink); padding-top: var(--sp-2); border-top: 1px solid var(--line-soft); }
+.food-behind-dot { flex: 0 0 8px; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--poppy); }
+@media (max-width: 620px) { .mrings { gap: var(--sp-4); } .mring.is-hero { min-width: 0; } .mring.is-side { min-width: 0; } }

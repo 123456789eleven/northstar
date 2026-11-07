@@ -10,9 +10,6 @@ import { formatDate } from '../../lib/dates'
 import { TaskRow } from '../tasks/TaskRow'
 import { CHILD_HORIZON, HORIZON_LABEL, goalProgress, progressLabel } from './progress'
 import { RowMenu } from './GoalMenu'
-import { XpChip } from '../game/ui/QuestCard'
-import { usePlayerState } from '../game/ui/playerContext'
-import { RULES } from '../game/engine/xpTable'
 import { goalMetric, type MetricData } from '../progress/metrics'
 import { addMilestone, autoCompleteGoal, completeGoal, undoAutoComplete, removeMilestone, reopenGoal, setPaused, toggleMilestone, undoMilestone } from './goalActions'
 
@@ -68,7 +65,6 @@ export function GoalCard({
   const openLinked = linked.filter((t) => t.status === 'open')
   const learnCount = learning.filter((l) => l.goalId === goal.id).length
   const toast = useToast()
-  const calm = usePlayerState().calm
   const [completing, setCompleting] = useState(false)
   const real = goalProgress(goal, tasks)
   // While completing, the bar settles at 100% and the check draws, then the goal moves to Done.
@@ -129,7 +125,7 @@ export function GoalCard({
       <article data-focus-id={goal.id} className={`goal goal-${goal.horizon} ${goal.status} ${completing ? 'is-done-moment' : ''}`}>
         <div className="goal-head">
           <div className="grow">
-            <div className="goal-title">{completing && <DoneMark />}{goal.title}{completing && !calm && <> <XpChip xp={RULES['goal-done'].xp} rolling /></>}</div>
+            <div className="goal-title">{completing && <DoneMark />}{goal.title}</div>
             <div className="goal-tags">
               <span className="chip">{AREA_LABEL[goal.area]}</span>
               <span>{HORIZON_LABEL[goal.horizon]}</span>

@@ -1,0 +1,28 @@
+/* Plan hub redesign: hero overview and tool tiles. Loaded after planhub.css. Tokens only. */
+.plan-over > .plan-hero { grid-column: 1 / -1; order: -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: var(--sp-5); align-items: start; }
+.plan-over > .plan-focus { grid-row: auto; }
+.plan-hero-main { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.plan-hero-num { display: flex; align-items: baseline; gap: var(--sp-2); }
+.plan-hero-big { font-size: 64px; line-height: 1; font-weight: 500; letter-spacing: var(--track-display); }
+.plan-hero-unit { font-size: var(--fs-4); color: var(--ink-2); }
+.plan-hero-line { display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-4); font-size: var(--fs-3); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.plan-overdue { color: var(--warn); font-weight: 600; }
+.plan-hero-next { display: flex; flex-direction: column; gap: 2px; margin-top: var(--sp-2); padding-top: var(--sp-3); border-top: 1px solid var(--line-soft); font-size: var(--fs-3); overflow-wrap: anywhere; }
+.plan-hero-seasons { min-width: 0; display: flex; flex-direction: column; gap: var(--sp-3); }
+.plan-season-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.plan-season { display: flex; align-items: center; gap: var(--sp-3); min-height: 56px; padding: var(--sp-2) 0; text-decoration: none; color: inherit; border-top: 1px solid var(--line-soft); }
+.plan-season-list li:first-child .plan-season { border-top: 0; }
+.plan-season-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.plan-season-title { font-size: var(--fs-3); font-weight: 600; overflow-wrap: anywhere; }
+.plan-season-num { font-size: var(--fs-2); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+.plan-tools { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
+.plan-over > .plan-tools .plan-tool { display: flex; flex-direction: column; gap: 2px; min-height: 64px; justify-content: center; text-decoration: none; color: var(--ink); }
+.plan-tool-name { font-size: var(--fs-3); font-weight: 600; }
+.plan-tool-note { font-size: var(--fs-2); color: var(--ink-2); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.plan-tool-note.is-warn { color: var(--warn); }
+@media (max-width: 819px) {
+  .plan-over > .plan-hero { grid-template-columns: minmax(0, 1fr); }
+  .plan-hero-big { font-size: 56px; }
+  .plan-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

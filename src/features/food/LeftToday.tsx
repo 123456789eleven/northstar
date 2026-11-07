@@ -40,9 +40,9 @@ export default function LeftToday({ targets, totals, isToday, hour, onTargets, r
     const sug = weight ? suggestTargets(weight.lb) : null
     return (
       <section className="card food-left">
-        <div className="card-title">Left today</div>
+        <div className="card-title">Today</div>
         <p className="small muted" style={{ margin: 0 }}>
-          Set a calorie and protein target to see what is left to eat. Gaining weight is mostly about eating enough every day.
+          Set a calorie and protein target to see what is left today. Gaining weight comes down to eating enough, every day.
         </p>
         {sug && weight && (
           <p className="small" style={{ margin: '8px 0 0' }}>
@@ -74,13 +74,13 @@ export default function LeftToday({ targets, totals, isToday, hour, onTargets, r
   return (
     <section className="card food-left">
       <div className="card-title">
-        <span>Left today</span>
+        <span>Today</span>
         <button className="btn btn-ghost btn-sm" onClick={onTargets}>
           Targets
         </button>
       </div>
       <MacroRings targets={targets} totals={totals} ready={ready} />
-      {behind && <p className="small food-behind">{behind}</p>}
+      {behind && <p className="small food-behind" data-testid="food-coach"><span className="food-behind-dot" aria-hidden />{behind}</p>}
     </section>
   )
 }
