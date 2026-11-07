@@ -79,3 +79,15 @@ export function detectRecurring(txs: Transaction[], today: ISODate): Recurring[]
 }
 
 export const monthlyTotal = (r: Recurring[]) => Math.round(r.reduce((s, x) => s + x.monthly, 0) * 100) / 100
+
+/** Fixed bills (rent, utilities, insurance...) are not subscriptions. Everything else repeating is discretionary. */
+export const FIXED_BILL_CATEGORIES = new Set(['Housing', 'Utilities', 'Insurance', 'Debt payment', 'Education', 'Transport', 'Health'])
+
+export function splitRecurring(rec: Recurring[], txs: Transaction[]): { subscriptions: Recurring[]; bills: Recurring[] } {
+  const catOf = new Map<string, string>()
+  for (const t of [...txs].sort((a, b) => a.date.localeCompare(b.date))) if (isSpend(t)) catOf.set(merchantKey(t.description), t.category)
+  const subscriptions: Recurring[] = []
+  const bills: Recurring[] = []
+  for (const r of rec) (FIXED_BILL_CATEGORIES.has(catOf.get(r.merchant) ?? '') ? bills : subscriptions).push(r)
+  return { subscriptions, bills }
+}

@@ -7,7 +7,7 @@ import { budgetSpend } from './bills'
 import { useBills } from './billsData'
 import { merchantLabel, UNCATEGORIZED } from './categories'
 import { CategoryBars, TrendChart } from './charts'
-import { BillsCard, BudgetsCard, CashFlowCard, GoalsCard, InvestmentsCard, NetWorthCard, RecapCard, SubscriptionsCard, type Go } from './OverviewCards'
+import { BillsCard, BudgetsCard, MonthStrip, CashFlowCard, GoalsCard, InvestmentsCard, NetWorthCard, RecapCard, SubscriptionsCard, type Go } from './OverviewCards'
 import SafeHero from './SafeHero'
 import { safeToSpend } from './safeToSpend'
 import { TREND_LEGEND } from './series'
@@ -66,6 +66,7 @@ export default function Overview({ month, goTo }: { month: string; goTo: Go }) {
   return (
     <div className="stack mn-page">
       <SafeHero month={month} safe={safe} onBudgets={() => goTo('budgets')} />
+      <MonthStrip month={month} txs={txs} bills={bills} />
 
       {uncategorized > 0 && (
         <div className="card row-between wrap">
