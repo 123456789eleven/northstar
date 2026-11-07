@@ -152,10 +152,10 @@
   --reward-line: rgba(242, 196, 107, 0.4);
   --grad-reward: var(--grad-amber);
   /* skill hues (one per constellation star; graphics, rings and tiles, not body text) */
-  --skill-body: #f07a70;
+  --skill-body: #b9d6ec;
   --skill-money: #9cc8e6;
   --skill-mind: #7b9ccc;
-  --skill-career: #cfe5f4;
+  --skill-career: #6f93bf;
   --skill-people: #d9a3a0;
   --grad-sheen-hover: rgba(255, 255, 255, 0.12);
   --grad-sheen-press: rgba(0, 0, 0, 0.1);
