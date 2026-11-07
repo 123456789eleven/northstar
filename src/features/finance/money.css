@@ -78,3 +78,23 @@
 
 @media (prefers-reduced-motion: reduce) { .mn-ring-btn, .mn-bar > span { transition: none; } }
 :root[data-motion='reduced'] :is(.mn-ring-btn, .mn-bar > span) { transition: none; }
+
+/* Review fixes */
+.mn-empty-title { font-size: var(--fs-4); font-weight: 650; letter-spacing: -0.02em; }
+.mn-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding: 0 4px; }
+.mn-strip-item { display: inline-flex; align-items: baseline; gap: 8px; font-size: var(--fs-2); }
+.mn-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.mn-fixed { margin-top: 8px; border-top: 1px solid var(--line-soft); }
+.mn-fixed > summary { display: flex; justify-content: space-between; gap: 12px; align-items: center; min-height: 44px; cursor: pointer; font-size: var(--fs-2); color: var(--ink-2); list-style: none; }
+.mn-fixed > summary::-webkit-details-marker { display: none; }
+
+/* Phone: all six sections visible in two rows instead of a clipped scroll strip. */
+@media (max-width: 560px) {
+  .mn-scope .tabs { flex-wrap: wrap; overflow: visible; row-gap: 0; scroll-snap-type: none; }
+  .mn-scope .tab { flex: 1 0 30%; text-align: center; padding: 0 8px; }
+  .mn-scope .tabs-ind { display: none; }
+  .mn-scope .tabs.has-ind .tab.active { border-bottom-color: var(--accent); }
+}
+
+/* Inside Money, "good" is powder blue (no green in the palette). */
+.mn-scope .good, .mn-scope .pos { color: var(--accent-text); }

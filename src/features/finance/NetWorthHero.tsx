@@ -1,4 +1,5 @@
 // Net worth hero (big number, change, next milestone) and the path chart with a flag at every $5k crossed plus the previous high.
+import { useState } from 'react'
 import { CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { ChartTip } from '../../components/ChartTip'
 import { ACTIVE_DOT, CHART, GRID_PROPS, MARGIN, X_AXIS, Y_AXIS, tooltipProps } from '../../components/chartTheme'
@@ -31,11 +32,24 @@ export function NetWorthHero({ series, label = 'Net worth', testId = 'networth-h
         </span>
       </div>
       <div className="nhero-side small">
-        {ms.toNext != null && <div><span className="stat-label">Next milestone</span><div className="mono">{money(ms.flags.find((f) => f.next)!.target)}, {money(ms.toNext)} to go</div></div>}
+        {ms.toNext != null && <div><span className="stat-label">Next milestone</span><div className="mono">{money(ms.flags.find((f) => f.next)!.target)}, {whole(ms.toNext)} to go</div></div>}
         {ms.high && <div><span className="stat-label">Previous high</span><div className="mono">{money(ms.high.net)} <span className="faint">{formatDate(ms.high.date, { month: 'short', year: '2-digit' })}</span></div></div>}
       </div>
     </section>
   )
+}
+
+const whole = (n: number) => Math.round(n).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+
+/** Axis ticks in clean 1/2/5 steps covering [lo, hi]. */
+export function niceTicks(lo: number, hi: number, count = 5): number[] {
+  const span = Math.max(1, hi - lo)
+  const raw = span / Math.max(1, count - 1)
+  const mag = 10 ** Math.floor(Math.log10(raw))
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((x) => x >= raw) ?? 10 * mag
+  const out: number[] = []
+  for (let v = Math.floor(lo / step) * step; v <= Math.ceil(hi / step) * step + 1e-9; v += step) out.push(Math.round(v))
+  return out
 }
 
 export function NetWorthPath({ data, name = 'Net worth' }: { data: { date: string; net: number }[]; name?: string }) {
@@ -44,18 +58,20 @@ export function NetWorthPath({ data, name = 'Net worth' }: { data: { date: strin
   const vals = rows.map((r) => r.net)
   const lo = Math.min(...vals)
   const hi = Math.max(...vals, ms.flags.find((f) => f.next)?.target ?? -Infinity)
+  const [hover, setHover] = useState(false)
+  const ticks = niceTicks(lo, hi)
   const fmt = (v: number) => formatDate(iso(v), { month: 'short', day: 'numeric', year: '2-digit' })
   return (
     <div className="wpath" role="img" aria-label={`${name} path, now ${money(data.at(-1)?.net ?? 0)}, ${ms.flags.filter((f) => f.reached).length} milestones crossed`}>
       <ResponsiveContainer>
-        <ComposedChart data={rows} margin={{ ...MARGIN, right: 12 }}>
+        <ComposedChart data={rows} margin={{ ...MARGIN, right: 12 }} onMouseMove={() => !hover && setHover(true)} onMouseLeave={() => setHover(false)}>
           <CartesianGrid {...GRID_PROPS} />
           <XAxis {...X_AXIS} dataKey="x" type="number" scale="time" domain={['dataMin', 'dataMax']} tickFormatter={fmt} minTickGap={32} />
-          <YAxis {...Y_AXIS} tickFormatter={(v: number) => compactMoney(v)} width={60} domain={[Math.floor(lo * 0.98), Math.ceil(hi * 1.02)]} />
-          <Tooltip {...tooltipProps(<ChartTip fmt={money} labelFmt={(l) => fmt(Number(l))} />)} />
+          <YAxis {...Y_AXIS} tickFormatter={(v: number) => compactMoney(v)} width={60} ticks={ticks} domain={[ticks[0], ticks[ticks.length - 1]]} interval={0} />
+          <Tooltip active={hover ? undefined : false} {...tooltipProps(<ChartTip fmt={money} labelFmt={(l) => fmt(Number(l))} />)} />
           {ms.flags.map((f) => (
             <ReferenceLine key={f.target} y={f.target} ifOverflow="hidden" stroke={f.reached ? MONEY : MUTED} strokeOpacity={f.reached ? 0.8 : 0.5} strokeDasharray={f.reached ? undefined : '4 4'}
-              label={{ value: f.reached ? compactMoney(f.target) : `${compactMoney(f.target)}, ${money(f.target - (data.at(-1)?.net ?? 0))} to go`, position: 'insideTopLeft', fill: f.reached ? MONEY : MUTED, fontSize: 12 }} />
+              label={{ value: f.reached ? compactMoney(f.target) : `${compactMoney(f.target)}, ${whole(f.target - (data.at(-1)?.net ?? 0))} to go`, position: 'insideTopLeft', fill: f.reached ? MONEY : MUTED, fontSize: 12 }} />
           ))}
           {ms.high && data.length > 1 && <ReferenceLine y={ms.high.net} ifOverflow="hidden" stroke={MUTED} strokeDasharray="2 4" label={{ value: 'High', position: 'insideBottomRight', fill: MUTED, fontSize: 12 }} />}
           <Line type="monotone" dataKey="net" name={name} stroke={MONEY} strokeWidth={2.5} dot={data.length <= 24 ? { r: 3, fill: MONEY, stroke: CHART.surface, strokeWidth: 2 } : false} activeDot={ACTIVE_DOT(MONEY)} isAnimationActive={false} />

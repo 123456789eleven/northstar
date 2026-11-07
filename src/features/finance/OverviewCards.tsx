@@ -10,12 +10,12 @@ import { Ring } from '../game/ui/Ring'
 import { DEFAULT_IRA_LIMIT, holdingValue, monthlyToMax, remainingRoom, ytdContributions } from '../investments/model'
 import { goalMetric } from '../progress/metrics'
 import { loadMetricData } from '../progress/metricsData'
-import { accrued, nextDue, type Bill } from './bills'
+import { accrued, daysToDue, monthlySetAside, nextDue, type Bill } from './bills'
 import { merchantLabel } from './categories'
 import { NetWorthPath } from './NetWorthHero'
-import { dayOfMonthFor, daysInMonthOf } from './moneyGame'
+import { dayOfMonthFor, daysInMonthOf, noSpendCount, noSpendDays } from './moneyGame'
 import { moneyExact, monthLabel, netWorthSeries, pct, shiftMonth, topMerchants, type MonthSummary } from './model'
-import { detectRecurring, monthlyTotal } from './recurring'
+import { detectRecurring, monthlyTotal, splitRecurring } from './recurring'
 import { dueText } from './safeToSpend'
 
 export type Go = (tab: 'transactions' | 'import' | 'budgets' | 'networth' | 'investments', category?: string) => void
@@ -61,7 +61,7 @@ function Delta({ cur, before, good }: { cur: number; before: number | undefined;
 export function CashFlowCard({ month, s, prev }: { month: string; s: MonthSummary; prev: MonthSummary | null }) {
   const inProgress = month === today().slice(0, 7)
   return (
-    <Card title="Cash flow" sub={`${monthLabel(month)}${inProgress ? ' so far' : ''} ${inProgress ? 'compared with the same days of' : 'compared with'} ${monthLabel(shiftMonth(month, -1), true)}`}>
+    <Card title="Cash flow" sub={`All spending, budgeted or not. ${monthLabel(month)}${inProgress ? ' so far' : ''} ${inProgress ? 'compared with the same days of' : 'compared with'} ${monthLabel(shiftMonth(month, -1), true)}`}>
       <div className="mn-trio">
         <div><span className="mn-label">Income</span><span className="mn-fig mn-num">{money(s.income)}</span><Delta cur={s.income} before={prev?.income} good="up" /></div>
         <div><span className="mn-label">Spending</span><span className="mn-fig mn-num">{money(s.spending)}</span><Delta cur={s.spending} before={prev?.spending} good="down" /></div>
@@ -166,31 +166,70 @@ export function BillsCard({ month, bills, go }: { month: string; bills: Bill[]; 
 }
 
 /* ---------- Subscriptions found in transactions ---------- */
+function RecRows({ rows }: { rows: ReturnType<typeof detectRecurring> }) {
+  return (
+    <ul className="mn-list">
+      {rows.map((r) => (
+        <li key={`${r.merchant}-${r.amount}`} className="mn-li">
+          <span className="mn-li-main">
+            <span>{merchantLabel(r.merchant)}</span>
+            <span className="mn-sub mn-num">{r.cadence}, last {formatDate(r.last)}, next about {formatDate(r.next)}</span>
+          </span>
+          <span className="mn-num">{moneyExact(r.amount)}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 export function SubscriptionsCard({ allTx }: { allTx: Transaction[] }) {
   const [all, setAll] = useState(false)
-  const rec = detectRecurring(allTx, today())
-  const shown = all ? rec : rec.slice(0, 5)
+  const { subscriptions, bills } = splitRecurring(detectRecurring(allTx, today()), allTx)
+  const shown = all ? subscriptions : subscriptions.slice(0, 5)
   return (
-    <Card title="Subscriptions" action={rec.length > 0 ? <span className="mn-sub mn-num">{moneyExact(monthlyTotal(rec))} a month</span> : undefined}>
-      {rec.length === 0 ? (
-        <Empty>Repeating charges show up here once a merchant has billed you three times at a steady interval.</Empty>
+    <Card title="Subscriptions" action={subscriptions.length > 0 ? <span className="mn-sub mn-num">{moneyExact(monthlyTotal(subscriptions))} a month</span> : undefined}>
+      {subscriptions.length === 0 ? (
+        <Empty>No repeating discretionary charges found. A merchant shows up once it has billed you at a steady interval.</Empty>
       ) : (
         <>
-          <ul className="mn-list">
-            {shown.map((r) => (
-              <li key={`${r.merchant}-${r.amount}`} className="mn-li">
-                <span className="mn-li-main">
-                  <span>{merchantLabel(r.merchant)}</span>
-                  <span className="mn-sub mn-num">{r.cadence}, last {formatDate(r.last)}, next about {formatDate(r.next)}</span>
-                </span>
-                <span className="mn-num">{moneyExact(r.amount)}</span>
-              </li>
-            ))}
-          </ul>
-          {rec.length > 5 && <button className="btn btn-ghost btn-sm" onClick={() => setAll((v) => !v)}>{all ? 'Show fewer' : `Show all ${rec.length}`}</button>}
+          <RecRows rows={shown} />
+          {subscriptions.length > 5 && <button className="btn btn-ghost btn-sm" onClick={() => setAll((v) => !v)}>{all ? 'Show fewer' : `Show all ${subscriptions.length}`}</button>}
         </>
       )}
+      {bills.length > 0 && (
+        <details className="mn-fixed">
+          <summary>
+            <span>Fixed bills found, {bills.length}</span>
+            <span className="mn-sub mn-num">{moneyExact(monthlyTotal(bills))} a month</span>
+          </summary>
+          <RecRows rows={bills} />
+        </details>
+      )}
     </Card>
+  )
+}
+
+/* ---------- Secondary month strip: bills set aside, no-spend days ---------- */
+export function MonthStrip({ month, txs, bills }: { month: string; txs: Transaction[]; bills: Bill[] }) {
+  const t = today()
+  const days = noSpendDays(txs, month, t)
+  const ns = noSpendCount(days)
+  const setAside = monthlySetAside(bills)
+  const upcoming = [...bills].sort((a, b) => daysToDue(a, t) - daysToDue(b, t)).slice(0, 4)
+  return (
+    <div className="mn-strip">
+      <span className="mn-strip-item"><span className="mn-label">No-spend days</span><span className="mn-num" data-testid="nospend-count">{ns}</span></span>
+      {bills.length > 0 && (
+        <>
+          <span className="mn-strip-item"><span className="mn-label">Bills set aside</span><span className="mn-num">{money(setAside)} a month</span></span>
+          <ul className="mn-chips" aria-label="Next bills">
+            {upcoming.map((b) => (
+              <li key={b.id} className="chip">{b.name} <span className="mn-num faint">{daysToDue(b, t) < 0 ? 'due' : `${daysToDue(b, t)}d`}</span></li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
   )
 }
 
