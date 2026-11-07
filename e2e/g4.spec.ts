@@ -47,7 +47,7 @@ for (const s of sizes) {
       await page.goto('/#/career')
       const score = page.getByTestId('case-score')
       await expect(score).toHaveAttribute('data-score', '0')
-      await expect(page.getByText('Next to strengthen')).toBeVisible()
+      await expect(page.getByText('Next: ')).toBeVisible()
       await page.getByRole('button', { name: 'Log a win' }).first().click()
       await page.getByLabel('Log a win', { exact: true }).fill('Fixture: shipped the handoff checklist #reliability')
       await page.getByRole('button', { name: 'Log win', exact: true }).click()

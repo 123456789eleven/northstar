@@ -5,7 +5,7 @@ import { expect, test } from '@playwright/test'
 test.describe('phone 390x844', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true })
 
-  test('bottom bar reaches all five items and the capture orb opens the sheet', async ({ page }) => {
+  test('bottom bar reaches its four tabs, You from the top bar, and the capture orb opens the sheet', async ({ page }) => {
     await page.goto('/')
     const bar = page.getByRole('navigation', { name: 'Main mobile' })
     await expect(bar).toBeVisible()
@@ -20,7 +20,7 @@ test.describe('phone 390x844', () => {
     await expect(page).toHaveURL(/#\/skills$/)
     await expect(page.getByRole('heading', { level: 1, name: 'Areas' })).toBeVisible()
 
-    await bar.getByRole('link', { name: 'You' }).click()
+    await page.getByRole('link', { name: 'You', exact: true }).click()
     await expect(page).toHaveURL(/#\/you$/)
     await expect(page.getByRole('heading', { level: 1, name: 'You' })).toBeVisible()
 
@@ -54,21 +54,23 @@ test.describe('phone 390x844', () => {
   })
 })
 
-test('desktop 1440: rail with skill groups and the mission rail are visible; old URLs sit inside their hub', async ({ page }) => {
+test('desktop 1440: rail with area groups and the plan rail are visible; old URLs sit inside their hub', async ({ page }) => {
   await page.goto('/')
   const rail = page.getByRole('navigation', { name: 'Main' })
   await expect(rail).toBeVisible()
-  for (const name of ['Today', 'Plan', 'Body', 'Money', 'Mind', 'Career', 'People', 'Trophies', 'Settings']) {
+  for (const name of ['Today', 'Plan', 'Body', 'Money', 'Mind', 'Career', 'People', 'Milestones', 'Settings']) {
     await expect(rail.getByRole('link', { name, exact: false }).first()).toBeVisible()
   }
-  const mission = page.getByRole('complementary', { name: 'Mission' })
+  // The plan rail shows on every page except Today (where the plan is the page itself).
+  await page.goto('/#/body')
+  const mission = page.getByRole('complementary', { name: 'Plan and week' })
   await expect(mission).toBeVisible()
-  await expect(mission.getByText('Northstar level')).toBeVisible()
-  await expect(mission.getByRole('progressbar').first()).toBeVisible()
+  await expect(mission.getByText('Season', { exact: true })).toBeVisible()
+  await expect(mission.getByRole('heading', { name: /Today's plan/ })).toBeVisible()
 
   // /food keeps working and lights Body in the hub strip and Food in the sub-strip.
   await page.goto('/#/food')
-  await expect(page.getByRole('navigation', { name: 'Skills sections' }).getByRole('link', { name: 'Body' })).toHaveAttribute('aria-current', 'true')
+  await expect(page.getByRole('navigation', { name: 'Areas sections' }).getByRole('link', { name: 'Body' })).toHaveAttribute('aria-current', 'true')
   await expect(page.getByRole('navigation', { name: 'Body pages' }).getByRole('link', { name: 'Food' })).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Food | Northstar')
 
@@ -94,7 +96,7 @@ test('a weigh-in quest completes itself when you log a weight', async ({ page })
   await capture.press('Enter')
   await expect(page.locator('.topbar .qc-saved')).toBeVisible()
   await page.goto('/')
-  const quest = page.locator('.mission [data-quest="weigh-in"]')
+  const quest = page.locator('[data-quest="weigh-in"]')
   await expect(quest).toBeVisible()
   await expect(quest).not.toHaveClass(/is-done/)
   await expect(quest).toContainText('not done yet')
@@ -103,7 +105,6 @@ test('a weigh-in quest completes itself when you log a weight', async ({ page })
   await capture.press('Enter')
   await expect(quest).toHaveClass(/is-done/)
   await expect(quest).toContainText('(done)')
-  await expect(quest).toContainText('+15')
 })
 
 test('Settings > Progress: counting table and settings', async ({ page }) => {
