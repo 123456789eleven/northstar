@@ -99,7 +99,7 @@ export default function NetWorth() {
 
       {accounts.length === 0 ? (
         <Card>
-          <Empty>Add each account's current balance above — checking, savings, retirement, and anything you owe like a credit card or car loan. Update them once a month to see your net worth trend.</Empty>
+          <Empty>Add each account's current balance above: checking, savings, retirement, and what you owe, like a card or car loan. Update monthly and the path draws itself.</Empty>
         </Card>
       ) : (
         <>

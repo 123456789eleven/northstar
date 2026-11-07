@@ -14,6 +14,7 @@ import Transactions from '../features/finance/Transactions'
 import { UNCATEGORIZED } from '../features/finance/categories'
 import { monthLabel, shiftMonth } from '../features/finance/model'
 import '../features/finance/finance.css'
+import '../features/finance/money.css'
 
 type Tab = 'overview' | 'transactions' | 'budgets' | 'networth' | 'investments' | 'import'
 
@@ -44,7 +45,7 @@ export default function Finance() {
     if (latest && latest.date.slice(0, 7) < monthKey()) setMonth(latest.date.slice(0, 7))
   }
 
-  const go = (t: 'transactions' | 'import' | 'budgets', c?: string) => {
+  const go = (t: 'transactions' | 'import' | 'budgets' | 'networth' | 'investments', c?: string) => {
     if (t === 'transactions') setCategory(c ?? '')
     setTab(t)
   }
@@ -52,10 +53,10 @@ export default function Finance() {
   const showMonth = tab === 'overview' || tab === 'transactions' || tab === 'budgets'
 
   return (
-    <>
+    <div className="mn-scope">
       <PageHeader
         title="Money"
-        sub="Stays on this device. Import OFX or CSV files from your bank. No logins, no syncing."
+        sub="What is safe to spend, what is coming, and whether net worth is growing. Data stays on this device."
         actions={
           showMonth && (
             <div className="row fin-month" role="group" aria-label="Month">
@@ -99,6 +100,6 @@ export default function Finance() {
             go('transactions', c)
           }}
         />}
-    </>
+    </div>
   )
 }

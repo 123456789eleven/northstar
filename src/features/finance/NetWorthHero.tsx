@@ -8,7 +8,7 @@ import '../g3/g3.css'
 import { compactMoney } from './model'
 import { netWorthMilestones } from './moneyGame'
 
-const MONEY = '#2fbf9b' // --skill-money
+const MONEY = 'var(--accent)'
 const MUTED = CHART.axis
 const iso = (ms: number) => {
   const d = new Date(ms)

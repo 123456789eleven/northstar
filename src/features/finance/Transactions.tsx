@@ -293,7 +293,7 @@ function Triage({ onClose }: { onClose: () => void }) {
       {!queue ? null : !current ? (
         <div className="stack">
           <p className="muted" style={{ margin: 0 }}>
-            {done > 0 ? `Done — ${done} categorized.` : 'Nothing left to categorize.'}
+            {done > 0 ? `${done} categorized.` : 'Nothing left to categorize.'}
             {skipped.length > 0 && ` ${skipped.length} skipped.`}
           </p>
           <div className="row">

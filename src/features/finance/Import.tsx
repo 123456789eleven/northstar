@@ -143,7 +143,7 @@ export default function Import({ onDone }: { onDone: (category?: string, month?:
     map && (
       <Field label={label}>
         <select className="select" value={map[key]} onChange={(e) => setMap({ ...map, [key]: Number(e.target.value) })}>
-          <option value={-1}>{optional ? '(none)' : '— choose —'}</option>
+          <option value={-1}>{optional ? '(none)' : 'Choose a column'}</option>
           {file.headers.map((h, i) => (
             <option key={i} value={i}>
               {h}

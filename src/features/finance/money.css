@@ -1,0 +1,80 @@
+/* Money (overview). Tokens only; cards are already regular glass, rows and plots stay solid. */
+.mn-scope .mn-num, .mn-num { font-variant-numeric: tabular-nums; }
+.mn-page { gap: var(--gap); }
+.mn-label { font-size: var(--fs-1); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); font-weight: 600; }
+.mn-sub { font-size: var(--fs-2); color: var(--ink-2); }
+.mn-note { font-size: var(--fs-2); color: var(--ink-2); margin: 0; max-width: 56ch; }
+.mn-row + .wpath { margin-top: 12px; }
+.mn-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.mn-big { font-size: var(--fs-5); font-weight: 650; letter-spacing: -0.03em; line-height: 1.1; }
+.mn-fig { display: block; font-size: var(--fs-4); font-weight: 650; letter-spacing: -0.02em; line-height: 1.2; }
+.mn-delta { font-size: var(--fs-2); color: var(--ink-2); }
+.mn-delta.is-down, .is-bad { color: var(--warn); }
+.mn-stack { display: flex; flex-direction: column; gap: 16px; }
+.mn-section { font-size: var(--fs-3); font-weight: 600; color: var(--ink-2); margin: 8px 0 -4px; }
+.mn-skel { min-height: 120px; animation: skel-pulse 1.4s var(--ease-out) infinite; }
+
+/* Hero */
+.mn-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: center; padding: 22px 24px; }
+.mn-hero-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.mn-hero-num { font-size: var(--fs-6); font-weight: 650; letter-spacing: -0.035em; line-height: 1.05; }
+.mn-inputs { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: var(--fs-2); color: var(--ink-2); }
+.mn-pace { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line-soft); display: flex; flex-direction: column; gap: 2px; }
+.mn-pace-label { font-size: var(--fs-2); font-weight: 600; color: var(--accent-text); }
+.mn-pace.is-over .mn-pace-label, .mn-pace.is-watch .mn-pace-label { color: var(--warn); }
+.mn-pace-note { font-size: var(--fs-2); color: var(--ink-2); }
+.mn-hero-ring { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.mn-ring-pct { font-size: var(--fs-3); font-weight: 600; }
+.ring.mn-ring-hot { --ring-c: var(--poppy); }
+@media (max-width: 560px) {
+  .mn-hero { grid-template-columns: minmax(0, 1fr); padding: 18px; }
+  .mn-hero-ring { flex-direction: row; justify-content: flex-start; }
+  .mn-hero-num { font-size: var(--fs-5); font-size: 38px; }
+}
+
+/* Cash flow */
+.mn-trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.mn-trio > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+@media (max-width: 560px) { .mn-trio { grid-template-columns: minmax(0, 1fr); gap: 12px; } .mn-trio > div { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; } .mn-trio .mn-label { flex: 1 0 100%; } }
+
+/* Budget rings */
+.mn-rings { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 4px 12px; }
+.mn-ring-btn { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 6px 8px; background: none; border: 0; border-radius: var(--r-inner); color: inherit; font: inherit; text-align: left; cursor: pointer; transition: transform var(--t-snappy) var(--spring-snappy), background-color var(--t-snappy) var(--spring-gentle); }
+.mn-ring-btn:hover { background: var(--surface-2); }
+.mn-ring-btn:active { transform: scale(0.97); }
+.mn-ring-text { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
+.mn-ring-name { font-size: var(--fs-3); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mn-limit { display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line-soft); }
+
+/* Lists */
+.mn-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.mn-li { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 6px 0; border-top: 1px solid var(--line-soft); }
+.mn-li:first-child { border-top: 0; }
+.mn-li-main { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+.mn-li-end { display: flex; flex-direction: column; align-items: flex-end; flex: 0 0 auto; }
+.mn-list > li.mn-sub { padding: 6px 0 0; }
+.mn-recap { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: var(--fs-3); }
+.mn-goal { display: flex; flex-direction: column; gap: 6px; padding: 8px 0; border-top: 1px solid var(--line-soft); }
+.mn-goal:first-child { border-top: 0; }
+.mn-bar { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.mn-bar > span { display: block; height: 100%; background: var(--accent); transform-origin: 0 50%; transition: transform var(--t-smooth) var(--spring-smooth); }
+
+/* Bills calendar */
+.mn-bills { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 700px) { .mn-bills { grid-template-columns: minmax(0, 1fr); } }
+.mn-cal { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.mn-cal-day { aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%; font-size: var(--fs-1); color: var(--ink-3); border: 1px solid transparent; }
+.mn-cal-day.is-today { border-color: var(--line-strong, var(--line)); color: var(--ink); }
+.mn-cal-day.has-bill { background: var(--accent); color: var(--accent-ink, var(--page)); font-weight: 650; }
+
+.mn-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 4px 0 8px; }
+
+/* Budget bars elsewhere in Money: powder blue on pace, poppy only when ahead of pace or over. */
+.mn-scope .hbar.is-on-track { --hb-c: var(--accent-text); }
+.mn-scope .hbar.is-on-track .hbar-fill { background: var(--accent); }
+.mn-scope .hbar.is-watch { --hb-c: var(--warn); }
+.mn-scope .hbar.is-watch .hbar-fill { background: var(--poppy); }
+.mn-scope .hbar.is-over .hbar-fill { background: var(--poppy); }
+
+@media (prefers-reduced-motion: reduce) { .mn-ring-btn, .mn-bar > span { transition: none; } }
+:root[data-motion='reduced'] :is(.mn-ring-btn, .mn-bar > span) { transition: none; }

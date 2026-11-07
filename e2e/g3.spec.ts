@@ -82,16 +82,15 @@ for (const vp of viewports) {
       await expect(page.getByTestId('ring-protein-value')).toHaveText('40')
     })
 
-    test('Money: overview boss renders with seeded budgets', async ({ page }) => {
+    test('Money: overview shows safe to spend with seeded budgets', async ({ page }) => {
       await seed(page, {
         budgets: [{ category: 'Groceries', monthlyLimit: 400 }, { category: 'Dining', monthlyLimit: 200 }],
         transactions: [{ date: iso(new Date()), amount: -50, description: 'Fictional Market', category: 'Groceries' }],
       })
       await page.goto('/#/finance')
-      await expect(page.getByTestId('boss-card')).toBeVisible()
-      await expect(page.getByTestId('month-status')).toHaveText('On budget')
-      await expect(page.getByTestId('boss-hp')).toContainText('550')
-      await expect(page.getByTestId('nospend-count')).toBeVisible()
+      await expect(page.getByTestId('safe-hero')).toBeVisible()
+      await expect(page.getByTestId('safe-inputs')).toContainText('$600 budget')
+      await expect(page.getByTestId('safe-left')).toContainText('550')
       // Budgets tab shows the health bars with a state in words.
       await page.getByRole('tab', { name: 'Budgets' }).click()
       await expect(page.getByText('On pace').first()).toBeVisible()
