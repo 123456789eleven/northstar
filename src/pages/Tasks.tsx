@@ -13,10 +13,10 @@ import { TaskRow } from '../features/tasks/TaskRow'
 import { TaskForm } from '../features/tasks/TaskEditor'
 import { MAX_FOCUS, addTask, completeTask, reopenTask } from '../features/tasks/taskActions'
 import { groupForList, groupOpenTasks, queueOrder, selectionAfterRemoval, stepSelection } from '../features/tasks/queue'
+import { doneMessage } from '../features/tasks/winCopy'
 import { useToast } from '../components/toastContext'
 import { useFocusTarget } from '../lib/useFocusParam'
 import { FocusBar } from '../features/tasks/FocusBar'
-import { ComboChip } from '../features/tasks/ComboChip'
 import '../features/tasks/tasks.css'
 import '../features/tasks/g2a.css'
 
@@ -75,7 +75,7 @@ export default function Tasks() {
         const sel = selected
         void completeTask(sel).then(() => {
           pick(selectionAfterRemoval(order, sel.id!, order.filter((id) => id !== sel.id)))
-          toast({ message: `Completed "${sel.title}"`, undo: async () => { const f = await db.tasks.get(sel.id!); if (f) await reopenTask(f) } })
+          toast({ message: doneMessage(sel.title, (tasks ?? []).filter((t) => t.status === 'done' && (t.doneAt ?? '').slice(0, 10) === d).length + 1), undo: async () => { const f = await db.tasks.get(sel.id!); if (f) await reopenTask(f) } })
         })
       }
     }
@@ -173,7 +173,7 @@ export default function Tasks() {
             {!loaded && <Skeleton rows={8} label="Loading tasks" />}
             {loaded && order.length === 0 && (
               <Empty title={done.length ? 'All clear' : 'No tasks yet'}>
-                Type a task in the add line. Add a day like "fri" or "in 3d" and a priority like "!1"; it lands in the right group.
+                Type a task in the add line. Add a day (fri, in 3d) and a priority (!1) and it lands in the right group.
               </Empty>
             )}
 
@@ -225,7 +225,6 @@ export default function Tasks() {
       </div>
       {phone && <div className="tq-phone-pad" aria-hidden />}
       {phone && <div className="quick-add-sticky">{quickAdd}</div>}
-      <ComboChip />
     </>
   )
 }

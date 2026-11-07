@@ -39,7 +39,7 @@ test.describe('phone 390x844', () => {
     const kb = page.getByRole('checkbox', { name: 'Complete Fixture keyboard task' })
     await kb.focus()
     await page.keyboard.press('Space')
-    await expect(page.getByText('Completed "Fixture keyboard task"')).toBeVisible()
+    await expect(page.getByText('Done: "Fixture keyboard task"')).toBeVisible()
     await expect(kb).toBeHidden()
 
     // Swipe: a short pull and a vertical drag leave the task open.
@@ -49,7 +49,7 @@ test.describe('phone 390x844', () => {
     await expect(page.getByRole('checkbox', { name: 'Complete Fixture swipe task' })).toBeVisible()
     // A full swipe completes it, and Undo brings it back.
     await swipe(page, row, 120)
-    await expect(page.getByText('Completed "Fixture swipe task"')).toBeVisible()
+    await expect(page.getByText('Done: "Fixture swipe task"')).toBeVisible()
     await expect(page.getByRole('checkbox', { name: 'Complete Fixture swipe task' })).toBeHidden()
     await page.getByRole('button', { name: 'Undo' }).click()
     await expect(page.getByRole('checkbox', { name: 'Complete Fixture swipe task' })).toBeVisible()

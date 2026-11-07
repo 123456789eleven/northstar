@@ -124,7 +124,7 @@ export default function DayView({ date, setDate, targets, onTargets }: { date: I
 
       {meals && meals.length === 0 && (favorites?.length ?? 0) === 0 && (
         <Card>
-          <Empty title="Nothing logged yet">Type what you ate into a slot below; numbers are optional. Tick “Fav” on meals you repeat and they become one-tap chips.</Empty>
+          <Empty title="Nothing logged yet">Type what you ate into a slot below; numbers are optional. Tick Fav on meals you repeat and they become one-tap chips.</Empty>
         </Card>
       )}
 

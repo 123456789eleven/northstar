@@ -1,0 +1,4 @@
+/* Planner redesign: the current-time marker is poppy, with a dot at the axis. Tokens only. */
+.pl-now { background: var(--poppy); height: 2px; }
+.pl-now::before { content: ''; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--poppy); }
+.pl-day.today .pl-day-head b, .pl-wk-head.today b { color: var(--accent-text); }

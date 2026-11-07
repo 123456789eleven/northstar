@@ -12,6 +12,7 @@ import TemplatesModal from '../features/food/TemplatesModal'
 import { FavoritesModal, TargetsModal } from '../features/food/FoodModals'
 import { TARGETS_KEY, type FoodTargets } from '../features/food/foodData'
 import '../features/food/food.css'
+import '../features/food/food2.css'
 
 type View = 'day' | 'week'
 
@@ -29,12 +30,14 @@ export default function Food() {
     reveal: (id) => { setDate(id); setView('day') },
   })
   const targets = (targetsRow?.value as FoodTargets | undefined) ?? {}
+  const dayKcal = useLiveQuery(async () => (await db.meals.where('date').equals(date).toArray()).reduce((s, m) => s + (m.calories ?? 0), 0), [date])
+  const sub = targets.calories ? `${(dayKcal ?? 0).toLocaleString()} of ${targets.calories.toLocaleString()} kcal${date === today() ? ' today' : ''}` : 'Set a daily calorie target to see your day as a ring.'
 
   return (
     <>
       <PageHeader
         title="Food"
-        sub="Log what you eat in a tap or a line."
+        sub={sub}
         actions={
           <>
             <button className="btn" onClick={() => setModal('favorites')}>
