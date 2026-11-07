@@ -95,11 +95,11 @@ function RailLink({ e, pathname, pip }: { e: RailEntry; pathname: string; pip?: 
 const RAIL_TOP: RailEntry[] = [
   { to: '/', label: 'Today', icon: 'today' },
   { to: '/plan', label: 'Plan', icon: 'planner', also: HUBS.plan.tabs.map((t) => t.to) },
+  { to: '/finance', label: 'Money', icon: 'finance', skill: 'money' },
 ]
 const RAIL_SKILLS: RailEntry[] = [
-  { to: '/skills', label: 'Constellation', icon: 'star' },
+  { to: '/skills', label: 'Overview', icon: 'star' },
   { to: '/body', label: 'Body', icon: 'body', also: ['/food'], skill: 'body' },
-  { to: '/finance', label: 'Money', icon: 'finance', skill: 'money' },
   { to: '/mind', label: 'Mind', icon: 'mind', also: ['/journal', '/learning'], skill: 'mind' },
   { to: '/career', label: 'Career', icon: 'career', skill: 'career' },
   { to: '/people', label: 'People', icon: 'people', skill: 'people' },
@@ -112,14 +112,14 @@ const RAIL_YOU: RailEntry[] = ['/you', '/history', '/review', '/ops', '/settings
 export function Rail() {
   const { pathname } = useLocation()
   const p = usePlayerState()
-  const showPips = !p.calm && !p.loading
+  const showPips = false // levels are retired from the rail (docs/redesign/DESIGN_BRIEF.md)
   const level = Object.fromEntries(p.skills.map((s) => [s.id, s]))
   return (
     <nav className="sidebar" aria-label="Main">
       <div className="brand"><Mark />Northstar</div>
       <div className="nav-group">{RAIL_TOP.map((e) => <RailLink key={e.to} e={e} pathname={pathname} />)}</div>
       <div className="nav-group" role="group" aria-labelledby="rail-skills">
-        <div className="nav-section" id="rail-skills">Skills</div>
+        <div className="nav-section" id="rail-skills">Areas</div>
         {RAIL_SKILLS.map((e) => (
           <RailLink key={e.to} e={e} pathname={pathname} pip={showPips && e.skill ? { level: level[e.skill].level, progress: level[e.skill].xpForNext ? level[e.skill].xpIntoLevel / level[e.skill].xpForNext : 0 } : undefined} />
         ))}
@@ -201,6 +201,7 @@ export function TopBar() {
       <div className="topbar-right">
         {phone && <PlayerStrip />}
         <SearchButton compact={phone} />
+        {phone && <Link to="/you" className="icon-btn" aria-label="You"><Icon name="user" size={18} /></Link>}
         <SyncChip dotOnly={phone} />
         {!phone && <span className="topbar-date mono">{dateLabel()}</span>}
       </div>
@@ -251,13 +252,31 @@ export function CaptureHost() {
 const BAR: Array<{ hub: HubId; to: string; label: string; icon: IconName }> = [
   { hub: 'today', to: '/', label: 'Today', icon: 'today' },
   { hub: 'plan', to: '/plan', label: 'Plan', icon: 'planner' },
-  { hub: 'skills', to: '/skills', label: 'Skills', icon: 'star' },
-  { hub: 'you', to: '/you', label: 'You', icon: 'user' },
+  { hub: 'money', to: '/finance', label: 'Money', icon: 'finance' },
+  { hub: 'skills', to: '/skills', label: 'Areas', icon: 'star' },
 ]
+
+/** True while the page is being scrolled down; the phone tab bar shrinks to icons then and returns on scroll up or near the top. */
+function useScrollingDown(): boolean {
+  const [down, setDown] = useState(false)
+  useEffect(() => {
+    let last = window.scrollY
+    const on = () => {
+      const y = window.scrollY
+      if (Math.abs(y - last) < 8) return
+      setDown(y > last && y > 80)
+      last = y
+    }
+    window.addEventListener('scroll', on, { passive: true })
+    return () => window.removeEventListener('scroll', on)
+  }, [])
+  return down
+}
 
 export function TabBar() {
   const { pathname } = useLocation()
   useRememberHubPath()
+  const compact = useScrollingDown()
   const hub = hubForPath(pathname)
   const item = (b: (typeof BAR)[number]) => {
     const active = hub === b.hub
@@ -271,7 +290,7 @@ export function TabBar() {
     )
   }
   return (
-    <nav className="tabbar" aria-label="Main mobile">
+    <nav className={`tabbar ${compact ? 'is-compact' : ''}`} aria-label="Main mobile" data-spec>
       {item(BAR[0])}
       {item(BAR[1])}
       <div className="tab-orb-slot">

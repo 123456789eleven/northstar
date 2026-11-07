@@ -23,6 +23,7 @@ const Goals = lazy(() => import('./pages/Goals'))
 const Food = lazy(() => import('./pages/Food'))
 const Body = lazy(() => import('./pages/Body'))
 const Interview = lazy(() => import('./pages/Interview'))
+const StyleTile = lazy(() => import('./pages/StyleTile'))
 const Finance = lazy(() => import('./pages/Finance'))
 const Learning = lazy(() => import('./pages/Learning'))
 const People = lazy(() => import('./pages/People'))
@@ -92,12 +93,15 @@ function Shell() {
               <Route path="/goals" element={<Goals />} />
               <Route path="/habits" element={<Habits />} />
             </Route>
+            <Route element={<RouteFade />}>
+              <Route path="/finance" element={<Finance />} />
+            </Route>
             <Route element={<HubLayout hub="skills" />}>
               <Route path="/skills" element={<SkillsHub />} />
               <Route path="/body" element={<Body />} />
               <Route path="/interview" element={<Interview />} />
+              <Route path="/style" element={<StyleTile />} />
               <Route path="/food" element={<Food />} />
-              <Route path="/finance" element={<Finance />} />
               <Route path="/mind" element={<MindHub />} />
               <Route path="/journal" element={<Journal />} />
               <Route path="/learning" element={<Learning />} />

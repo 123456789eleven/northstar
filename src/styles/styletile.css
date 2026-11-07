@@ -1,0 +1,13 @@
+.st-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--gap); }
+.st-tier { display: grid; gap: 6px; padding: 22px; min-height: 120px; border-radius: var(--r-card); align-content: end; }
+.st-figs { display: flex; gap: 28px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 14px; }
+.st-fig { font-size: var(--fs-6); font-weight: 650; letter-spacing: -0.03em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.st-unit { font-size: var(--fs-4); color: var(--ink-3); font-weight: 500; }
+.st-rings { display: flex; gap: 14px; margin-left: auto; }
+.st-controls { gap: 8px; flex-wrap: wrap; }
+.st-type { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.st-type li { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.st-type-s { font-variant-numeric: tabular-nums; }
+.st-sw { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+.st-chip { height: 48px; border-radius: var(--r-control); border: 1px solid rgba(255, 255, 255, 0.12); display: flex; align-items: flex-end; padding: 4px 6px; }
+.st-chip i { font-style: normal; font-size: 10px; color: #fff; mix-blend-mode: difference; }

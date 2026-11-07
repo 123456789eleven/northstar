@@ -56,7 +56,6 @@ export function QuestCard({ quest, compact = false }: { quest: Quest; compact?: 
         {quest.hint && !compact && <span className="quest-hint">{quest.hint}</span>}
         <span className="sr-only">{quest.done ? ' (done)' : ' (not done yet)'}</span>
       </span>
-      {playing || !quest.done ? <XpChip key={playing ? 'roll' : 'still'} xp={quest.xp} rolling={playing} /> : <span className="xp-chip is-earned"><span className="mono">+{quest.xp}</span> XP</span>}
     </>
   )
   const cls = `quest ${compact ? 'is-compact' : ''} ${quest.done ? 'is-done' : ''} ${playing ? 'is-completing' : ''}`

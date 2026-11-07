@@ -1,0 +1,197 @@
+/* Liquid glass system (docs/redesign/DESIGN_BRIEF.md). Loaded after index.css, so it supersedes the Aurora layer by cascade order.
+   Glass is a layer: chrome (tab bar, top bar, rails, sheets, toasts) is the full recipe; cards are the regular tier at half strength;
+   rows, tables and chart plots never get glass. All values below are tokens; components use the tier classes, never raw blurs. */
+
+:root {
+  /* ---- living backdrop: five soft fields the glass can refract. Colour is the point, so alpha is higher than the old aurora. ---- */
+  --bd-violet: radial-gradient(64% 48% at 26% 6%, rgba(124, 109, 240, 0.44), transparent 70%);
+  --bd-indigo: radial-gradient(52% 44% at 92% 18%, rgba(80, 98, 238, 0.32), transparent 70%);
+  --bd-teal: radial-gradient(50% 40% at 78% 92%, rgba(52, 150, 168, 0.20), transparent 72%);
+  --bd-rose: radial-gradient(46% 38% at 6% 78%, rgba(168, 92, 170, 0.18), transparent 72%);
+  --bd-gold: radial-gradient(34% 26% at 52% 40%, rgba(214, 168, 92, 0.08), transparent 74%);
+  --bd-mid: radial-gradient(48% 36% at 58% 56%, rgba(96, 84, 214, 0.24), transparent 72%);
+  /* ambient tint is set from data later (finance health, calories) as an hsl hue offset; 0 = the base palette */
+  --ambient-shift: 0deg;
+
+  /* ---- material tiers ---- */
+  --mat-thin-bg: rgba(24, 22, 42, 0.62);
+  --mat-thin-blur: blur(26px) saturate(1.9) brightness(1.06);
+  --mat-regular-bg: rgba(30, 28, 50, 0.52);
+  --mat-regular-blur: blur(18px) saturate(1.5);
+  --mat-thick-bg: rgba(22, 21, 36, 0.86);
+  --mat-thick-blur: blur(34px) saturate(1.4);
+
+  /* rim: bright on the light-facing corner, fading out, faint return on the far corner */
+  --rim: linear-gradient(145deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.10) 32%, rgba(255, 255, 255, 0.03) 58%, rgba(255, 255, 255, 0.16));
+  --rim-soft: linear-gradient(145deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.06) 34%, rgba(255, 255, 255, 0.02) 60%, rgba(255, 255, 255, 0.10));
+  --inner-light: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -1px 0 rgba(0, 0, 0, 0.28), inset 0 0 28px rgba(255, 255, 255, 0.025);
+  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -10px rgba(0, 0, 0, 0.55);
+  --elev-2: 0 2px 4px rgba(0, 0, 0, 0.32), 0 18px 44px -12px rgba(0, 0, 0, 0.65);
+  --elev-3: 0 4px 10px rgba(0, 0, 0, 0.35), 0 30px 70px -18px rgba(0, 0, 0, 0.75);
+  /* the specular highlight follows the pointer (--mx, --my set by useSpecular); resting position is the top-left */
+  --spec: radial-gradient(240px 160px at var(--mx, 12%) var(--my, 0%), rgba(255, 255, 255, 0.10), transparent 70%);
+
+  /* ---- springs: three only. linear() is an overshooting spring; the cubic-bezier is the fallback. ---- */
+  --spring-snappy: cubic-bezier(0.3, 1.5, 0.5, 1);
+  --spring-smooth: cubic-bezier(0.25, 1.15, 0.4, 1);
+  --spring-gentle: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-snappy: 220ms;
+  --t-smooth: 380ms;
+  --t-gentle: 700ms;
+
+  /* ---- type: six sizes, tabular numerals for figures ---- */
+  --serif: var(--font); /* Fraunces is retired from titles (brief) */
+  --fs-1: 11px; --fs-2: 13px; --fs-3: 15px; --fs-4: 20px; --fs-5: 28px; --fs-6: 44px;
+
+  /* ---- shape: concentric. inner radius = outer radius - padding. ---- */
+  --r-chrome: 28px;
+  --r-card: 20px;
+  --r-inner: 14px;
+  --r-control: 12px;
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --spring-snappy: linear(0, 0.34 7%, 0.78 15%, 1.08 26%, 1.07 33%, 0.99 45%, 1.01 58%, 1);
+    --spring-smooth: linear(0, 0.2 6%, 0.58 14%, 0.92 25%, 1.05 36%, 1.02 48%, 0.995 62%, 1);
+    --spring-gentle: linear(0, 0.12 6%, 0.42 16%, 0.78 30%, 0.96 46%, 1.01 62%, 1);
+  }
+}
+
+/* ---------- backdrop ---------- */
+html { background: var(--bg); }
+body::before {
+  content: ''; position: fixed; inset: -6%; z-index: -1; pointer-events: none;
+  background: var(--bd-violet), var(--bd-indigo), var(--bd-mid), var(--bd-teal), var(--bd-rose), var(--bd-gold);
+  filter: hue-rotate(var(--ambient-shift));
+  animation: bd-drift 90s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes bd-drift { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(-2%, 1.5%, 0) scale(1.06); } }
+
+/* ---------- tiers ---------- */
+/* One recipe, three strengths. ::before blurs the backdrop (never the element itself, so fixed-position children keep working),
+   ::after paints the rim, the element carries tint, inner light and elevation. */
+.glass-thin, .glass-regular, .glass-thick, .card, .kpi-strip[data-n] > .kpi-cell:nth-child(n), .side-panel { position: relative; isolation: isolate; }
+.glass-thin::before, .glass-regular::before, .glass-thick::before,
+.card::before, .side-panel::before, .topbar::before, .tabbar::before, .kpi-cell::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+}
+.glass-thin::after, .glass-regular::after, .glass-thick::after, .card::after, .side-panel::after, .topbar::after, .tabbar::after, .kpi-cell::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; padding: 1px;
+  background: var(--rim); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+}
+
+.glass-thin, .topbar, .tabbar { background-color: var(--mat-thin-bg); border-color: transparent; box-shadow: var(--inner-light), var(--elev-2); }
+.glass-thin::before, .topbar::before, .tabbar::before { -webkit-backdrop-filter: var(--mat-thin-blur); backdrop-filter: var(--mat-thin-blur); }
+
+.glass-regular, .card, .side-panel, .kpi-strip[data-n] > .kpi-cell:nth-child(n) {
+  background-color: var(--mat-regular-bg); background-image: none; border-color: transparent; border-radius: var(--r-card); box-shadow: var(--inner-light), var(--elev-1);
+}
+.glass-regular::before, .card::before, .side-panel::before, .kpi-cell::before { -webkit-backdrop-filter: var(--mat-regular-blur); backdrop-filter: var(--mat-regular-blur); }
+.card::after, .side-panel::after, .kpi-cell::after, .glass-regular::after { background: var(--rim-soft); }
+
+.glass-thick, .modal, .sheet, .cp { background-color: var(--mat-thick-bg); border-color: transparent; box-shadow: var(--inner-light), var(--elev-3); }
+.glass-thick::before, .modal::before, .sheet::before, .cp::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; -webkit-backdrop-filter: var(--mat-thick-blur); backdrop-filter: var(--mat-thick-blur); }
+.modal, .sheet, .cp { position: relative; isolation: isolate; }
+
+/* Specular: only on elements that opt in (the tab bar and hero cards), tracks the pointer. */
+[data-spec] { background-image: var(--spec); }
+
+/* Nested glass flattens, as before. */
+:is(.card, .side-panel, .modal, .sheet, .cp) :is(.card, .kpi-cell) { background: transparent; box-shadow: none; }
+:is(.card, .side-panel, .modal, .sheet, .cp) :is(.card, .kpi-cell)::before, :is(.card, .side-panel, .modal, .sheet, .cp) :is(.card, .kpi-cell)::after { content: none; }
+
+/* Chrome shape: the phone tab bar floats as a pill above the bottom edge; the top bar stays full width. */
+.topbar { border-radius: 0; box-shadow: var(--inner-light), var(--elev-1); }
+.topbar::after { background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.10)); -webkit-mask: none; mask: none; padding: 0; inset: auto 0 0 0; height: 1px; }
+.sidebar { background: var(--mat-thin-bg); -webkit-backdrop-filter: var(--mat-thin-blur); backdrop-filter: var(--mat-thin-blur); border-right-color: rgba(255, 255, 255, 0.07); }
+
+/* Sheets, modals and scrims */
+.modal-backdrop, .sheet-backdrop, .cp-backdrop { background: rgba(8, 8, 14, 0.42); -webkit-backdrop-filter: blur(10px) saturate(1.2); backdrop-filter: blur(10px) saturate(1.2); }
+.toast { background-color: var(--mat-thin-bg); border-color: transparent; -webkit-backdrop-filter: var(--mat-thin-blur); backdrop-filter: var(--mat-thin-blur); box-shadow: var(--inner-light), var(--elev-2); border-radius: var(--r-inner); }
+.modal, .sheet { border-radius: var(--r-card); }
+
+/* ---------- press, hover, motion ---------- */
+:where(a, button, [role='button'], .card-interactive, .stat-int, .kpi-link, .tab-item, .nav-link, .chip, .btn):not(:disabled) {
+  transition-property: transform, background-color, border-color, box-shadow, color, opacity;
+  transition-duration: var(--t-snappy); transition-timing-function: var(--spring-snappy);
+}
+:where(button, [role='button'], .card-interactive, .stat-int, .kpi-link, .tab-item, .btn, .chip):not(:disabled):active { transform: scale(0.97); filter: brightness(1.12); transition-duration: 90ms; }
+.card-interactive:hover, .stat-int:hover, .kpi-strip[data-n] > .kpi-link:hover { transform: translateY(-1px); background-color: rgba(40, 37, 66, 0.62); border-color: transparent; }
+.card-interactive:active, .stat-int:active, .kpi-strip[data-n] > .kpi-link:active { transform: scale(0.985); }
+.sheet { animation-timing-function: var(--spring-smooth); }
+
+/* ---------- type ---------- */
+:where(.stat-value, .kpi-value, .num, .mono-num, td.num, .money) { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum', 'cv11'; }
+h1, h2, h3, .page-title, .serif { font-family: var(--font); }
+h1, .page-title { letter-spacing: -0.02em; font-weight: 650; }
+
+/* ---------- fallbacks: opaque but intentional ---------- */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-thin, .topbar, .tabbar, .sidebar, .toast { background-color: #17161f; }
+  .glass-regular, .card, .side-panel, .kpi-strip[data-n] > .kpi-cell:nth-child(n) { background-color: #1a1925; }
+  .glass-thick, .modal, .sheet, .cp { background-color: #1d1c2a; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  body::before { filter: none; animation: none; opacity: 0.5; }
+  .glass-thin, .topbar, .tabbar, .sidebar, .toast { background-color: #17161f; }
+  .glass-regular, .card, .side-panel, .kpi-strip[data-n] > .kpi-cell:nth-child(n) { background-color: #1a1925; }
+  .glass-thick, .modal, .sheet, .cp { background-color: #1d1c2a; }
+  .glass-thin::before, .glass-regular::before, .glass-thick::before, .card::before, .side-panel::before, .topbar::before, .tabbar::before, .kpi-cell::before, .modal::before, .sheet::before, .cp::before { content: none; }
+  .modal-backdrop, .sheet-backdrop, .cp-backdrop, .toast, .sidebar { -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
+  :where(a, button, [role='button'], .card-interactive, .stat-int, .kpi-link, .tab-item, .btn, .chip):active { transform: none; }
+  .card-interactive:hover, .stat-int:hover, .kpi-strip[data-n] > .kpi-link:hover { transform: none; }
+}
+@media (forced-colors: active) {
+  body::before { content: none; }
+  .glass-thin::after, .glass-regular::after, .glass-thick::after, .card::after, .side-panel::after, .topbar::after, .tabbar::after, .kpi-cell::after { content: none; }
+}
+
+/* ---------- phone: floating glass tab bar ---------- */
+@media (max-width: 819px) {
+  .main { padding-bottom: 112px; }
+  .tabbar {
+    left: 12px; right: 12px; bottom: calc(10px + env(safe-area-inset-bottom)); padding-bottom: 0; border: 0; border-radius: var(--r-chrome);
+    transition: transform var(--t-smooth) var(--spring-smooth), left var(--t-smooth) var(--spring-smooth), right var(--t-smooth) var(--spring-smooth), box-shadow var(--t-smooth) var(--spring-smooth);
+  }
+  .tabbar::before { inset: 0; border-radius: inherit; }
+  .tab-item { min-height: 54px; }
+  .tab-item.active::before { display: none; }
+  .tab-item.active { color: var(--ink); }
+  .tab-item.active .icon { color: var(--accent-text); }
+  .tab-item > span { transition: opacity var(--t-snappy) var(--spring-gentle), max-height var(--t-smooth) var(--spring-smooth); max-height: 16px; }
+  .tab-orb { box-shadow: 0 0 0 4px rgba(14, 13, 22, 0.55), var(--inner-light), var(--elev-2); }
+  /* scrolling down: the bar narrows and drops its labels, so content gets the room; any scroll up brings it back */
+  .tabbar.is-compact { left: 56px; right: 56px; }
+  .tabbar.is-compact .tab-item > span { opacity: 0; max-height: 0; }
+  .tabbar.is-compact .tab-item { min-height: 44px; }
+  .tabbar.is-compact .tab-orb { transform: translateY(-4px) scale(0.86); }
+}
+
+/* ---------- Today (reference tab) ---------- */
+.mission { padding: 22px; border-radius: var(--r-card); margin-bottom: var(--gap); }
+.mission-head { margin-bottom: 18px; gap: 18px; }
+.mission-title { font-family: var(--font); font-weight: 650; font-size: var(--fs-4); letter-spacing: -0.015em; line-height: 26px; }
+.mission-sub { font-size: var(--fs-2); color: var(--ink-2); margin-top: 3px; }
+.mission-count b { font-family: var(--font); font-weight: 650; font-size: var(--fs-3); font-variant-numeric: tabular-nums; }
+.mission.is-cleared .mission-title { color: var(--ink); }
+.mission .mission-grid { gap: 0; grid-template-columns: minmax(0, 1fr); border-radius: var(--r-inner); overflow: hidden; background: rgba(8, 8, 14, 0.28); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); }
+.mission .quest { border: 0; border-radius: 0; background: transparent; min-height: 58px; padding: 10px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.mission .quest:last-child { border-bottom: 0; }
+.mission a.quest:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.06); }
+.mission .quest.is-done .quest-title { color: var(--ink-3); text-decoration: line-through; text-decoration-color: rgba(255, 255, 255, 0.2); }
+.mission .quest-title { font-size: var(--fs-3); font-weight: 500; }
+.mr-season { font-size: var(--fs-4); font-weight: 650; letter-spacing: -0.015em; }
+
+.pulse { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); margin-bottom: var(--gap); }
+@media (max-width: 560px) { .pulse { grid-template-columns: minmax(0, 1fr); } }
+.pulse-card { display: flex; align-items: center; gap: 16px; padding: 18px 20px; min-height: 108px; text-decoration: none; color: inherit; }
+.pulse-text { display: flex; flex-direction: column; min-width: 0; gap: 2px; }
+.pulse-label { font-size: var(--fs-1); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); font-weight: 600; }
+.pulse-value { font-size: var(--fs-5); font-weight: 650; letter-spacing: -0.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.pulse-of { font-size: var(--fs-2); font-weight: 500; color: var(--ink-3); letter-spacing: 0; }
+.pulse-note { font-size: var(--fs-2); color: var(--ink-2); }
+.pstrip { gap: 6px; }

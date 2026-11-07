@@ -18,6 +18,7 @@ import { HabitsTile, NextUp } from '../features/today/HabitsNext'
 import { FirstRunCard } from '../features/onboarding/FirstRunCard'
 import { InsightsCard } from '../features/insights/InsightsCard'
 import { MissionBoard } from '../features/game/ui/Mission'
+import { Pulse } from '../features/today/Pulse'
 import { FocusBar } from '../features/tasks/FocusBar'
 import { AgendaStrip } from '../features/today/AgendaStrip'
 import { DailyFind } from '../features/today/DailyFindLine'
@@ -102,8 +103,9 @@ export default function Today() {
 
       <FirstRunCard />
 
-      {/* Game layer: today's self-completing quests. Calm mode renders nothing here, leaving the classic Today below. */}
+      {/* Today's plan: items tick themselves off from real logs. */}
       <MissionBoard />
+      <Pulse />
 
       {loaded && (
         <div className="today-top">

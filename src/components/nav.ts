@@ -3,7 +3,7 @@
 import type { IconName } from './Icons'
 import type { SkillId } from '../features/game/types'
 
-export type HubId = 'today' | 'plan' | 'skills' | 'you'
+export type HubId = 'today' | 'plan' | 'money' | 'skills' | 'you'
 
 export interface NavItem {
   to: string
@@ -25,15 +25,15 @@ export const NAV: NavItem[] = [
   { to: '/planner', label: 'Planner', icon: 'calendar', group: 'Plan', hub: 'plan', aka: 'Calendar' },
   { to: '/goals', label: 'Goals', icon: 'goals', group: 'Plan', hub: 'plan', aka: 'Quest log' },
   { to: '/habits', label: 'Habits', icon: 'habits', group: 'Plan', hub: 'plan', aka: 'Routines' },
-  { to: '/skills', label: 'Skills', icon: 'star', group: 'Skills', hub: 'skills', aka: 'Constellation' },
-  { to: '/body', label: 'Body', icon: 'body', group: 'Skills', hub: 'skills', skill: 'body', aka: 'Weight' },
-  { to: '/food', label: 'Food', icon: 'food', group: 'Skills', hub: 'skills', skill: 'body', aka: 'Meals' },
-  { to: '/finance', label: 'Money', icon: 'finance', group: 'Skills', hub: 'skills', skill: 'money', aka: 'Finance' },
-  { to: '/mind', label: 'Mind', icon: 'mind', group: 'Skills', hub: 'skills', skill: 'mind' },
-  { to: '/journal', label: 'Journal', icon: 'journal', group: 'Skills', hub: 'skills', skill: 'mind' },
-  { to: '/learning', label: 'Learning', icon: 'learning', group: 'Skills', hub: 'skills', skill: 'mind' },
-  { to: '/career', label: 'Career', icon: 'career', group: 'Skills', hub: 'skills', skill: 'career', aka: 'Wins' },
-  { to: '/people', label: 'People', icon: 'people', group: 'Skills', hub: 'skills', skill: 'people' },
+  { to: '/skills', label: 'Areas', icon: 'star', group: 'Areas', hub: 'skills', aka: 'Skills Constellation' },
+  { to: '/body', label: 'Body', icon: 'body', group: 'Areas', hub: 'skills', skill: 'body', aka: 'Weight' },
+  { to: '/food', label: 'Food', icon: 'food', group: 'Areas', hub: 'skills', skill: 'body', aka: 'Meals' },
+  { to: '/finance', label: 'Money', icon: 'finance', group: 'Money', hub: 'money', skill: 'money', aka: 'Finance' },
+  { to: '/mind', label: 'Mind', icon: 'mind', group: 'Areas', hub: 'skills', skill: 'mind' },
+  { to: '/journal', label: 'Journal', icon: 'journal', group: 'Areas', hub: 'skills', skill: 'mind' },
+  { to: '/learning', label: 'Learning', icon: 'learning', group: 'Areas', hub: 'skills', skill: 'mind' },
+  { to: '/career', label: 'Career', icon: 'career', group: 'Areas', hub: 'skills', skill: 'career', aka: 'Wins' },
+  { to: '/people', label: 'People', icon: 'people', group: 'Areas', hub: 'skills', skill: 'people' },
   { to: '/you', label: 'You', icon: 'user', group: 'You', hub: 'you', aka: 'Overview' },
   { to: '/history', label: 'Trophies', icon: 'trophy', group: 'You', hub: 'you', aka: 'History' },
   { to: '/review', label: 'Season', icon: 'review', group: 'You', hub: 'you', aka: 'Weekly review' },
@@ -44,7 +44,7 @@ export const NAV: NavItem[] = [
 ]
 
 /** Kept for older imports: the rail/palette section order. */
-export const NAV_GROUPS = ['Today', 'Plan', 'Skills', 'You'] as const
+export const NAV_GROUPS = ['Today', 'Plan', 'Money', 'Areas', 'You'] as const
 
 export interface HubTab { to: string; label: string; /** Other paths that light this tab (sub-pages). */ also?: string[] }
 export interface HubDef { id: Exclude<HubId, 'today'>; label: string; to: string; icon: IconName; tabs: HubTab[] }
@@ -54,12 +54,12 @@ export const HUBS: Record<Exclude<HubId, 'today'>, HubDef> = {
     id: 'plan', label: 'Plan', to: '/plan', icon: 'planner',
     tabs: [{ to: '/plan', label: 'Overview' }, { to: '/tasks', label: 'Tasks' }, { to: '/planner', label: 'Planner' }, { to: '/goals', label: 'Goals' }, { to: '/habits', label: 'Habits' }],
   },
+  money: { id: 'money', label: 'Money', to: '/finance', icon: 'finance', tabs: [{ to: '/finance', label: 'Money' }] },
   skills: {
-    id: 'skills', label: 'Skills', to: '/skills', icon: 'star',
+    id: 'skills', label: 'Areas', to: '/skills', icon: 'star',
     tabs: [
-      { to: '/skills', label: 'Constellation' },
+      { to: '/skills', label: 'Overview' },
       { to: '/body', label: 'Body', also: ['/food'] },
-      { to: '/finance', label: 'Money' },
       { to: '/mind', label: 'Mind', also: ['/journal', '/learning'] },
       { to: '/career', label: 'Career' },
       { to: '/people', label: 'People' },

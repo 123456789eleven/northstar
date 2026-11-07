@@ -1,23 +1,18 @@
-// Mission surfaces built on usePlayer(): the Today board, the desktop mission rail and the phone player strip.
-// All three render nothing in Calm mode.
+// Plan surfaces built on usePlayer(): the Today plan board, the desktop rail and the phone plan pill.
 import { Link, useLocation } from 'react-router-dom'
-import { useNumberRoll } from '../../../components/motion'
-import { LevelBadge, Ring } from './Ring'
-import { WeekDots, XpBar } from './Meters'
+import { Ring } from './Ring'
+import { WeekDots } from './Meters'
+import { seasonOf } from '../../you/season'
+import { today } from '../../../lib/dates'
 import { QuestCard } from './QuestCard'
 import { usePlayerState } from './playerContext'
 import { useEngineOnMount } from './engineGate'
 import type { PlayerState } from '../types'
 
 const streakLine = (p: PlayerState) =>
-  `${p.streak.daysThisWeek} of ${p.streak.target} active days${p.streak.restTokens ? ` · ${p.streak.restTokens} rest ${p.streak.restTokens === 1 ? 'token' : 'tokens'}` : ''}${p.streak.weeksInRow > 0 ? ` · ${p.streak.weeksInRow} ${p.streak.weeksInRow === 1 ? 'week' : 'weeks'} in a row` : ''}`
+  `${p.streak.daysThisWeek} of ${p.streak.target} days this week${p.streak.restTokens ? ` · ${p.streak.restTokens} grace ${p.streak.restTokens === 1 ? 'day' : 'days'}` : ''}${p.streak.weeksInRow > 0 ? ` · ${p.streak.weeksInRow}-week run` : ''}`
 
-function TodayXp({ xp }: { xp: number }) {
-  const n = useNumberRoll(xp)
-  return <span className="xp-chip is-earned" aria-label={`${xp} XP earned today`}><span className="mono">+{n}</span> XP today</span>
-}
-
-/** Top of Today: progress ring for the day, quest cards, streak strip, Day cleared state. */
+/** Top of Today: the day's plan. Items tick themselves off from real logs; a coach line names the next one. */
 export function MissionBoard() {
   const p = usePlayerState()
   useEngineOnMount()
@@ -25,24 +20,24 @@ export function MissionBoard() {
   if (p.loading) return <div className="card mission mission-skel skel-pulse" aria-hidden />
   const total = p.quests.length
   const left = total - p.questsDone
+  const next = p.quests.find((q) => !q.done)
   return (
-    <section className={`card mission ${p.cleared ? 'is-cleared' : ''}`} aria-labelledby="mission-h">
+    <section className={`card mission ${p.cleared ? 'is-cleared' : ''}`} aria-labelledby="mission-h" data-spec>
       <header className="mission-head">
-        <Ring value={total ? p.questsDone / total : 0} size={56} stroke={4} tone={p.cleared ? 'reward' : undefined} label={`${p.questsDone} of ${total} quests done`} className="mission-ring">
+        <Ring value={total ? p.questsDone / total : 0} size={64} stroke={5} tone={p.cleared ? 'reward' : undefined} label={`${p.questsDone} of ${total} plan items done`} className="mission-ring">
           <span className="mission-count"><b className="mono">{p.questsDone}</b><span>/{total}</span></span>
         </Ring>
         <div className="mission-text">
-          <h2 className="mission-title" id="mission-h">{p.cleared ? 'Day cleared' : "Today's missions"}</h2>
+          <h2 className="mission-title" id="mission-h">{p.cleared ? 'Plan done' : "Today's plan"}</h2>
           <p className="mission-sub">
             {total === 0
-              ? 'Missions come from your goals and routines. Add a goal to get your first ones.'
+              ? 'The plan fills from your goals and routines. Add a goal to start.'
               : p.cleared
-                ? 'Every quest is done. Anything else today is a bonus.'
-                : `${left} to go. They complete themselves as you log.`}
+                ? 'Everything planned is done. Anything else today is extra.'
+                : `${left} left. Next: ${next?.title ?? 'nothing'}.`}
           </p>
         </div>
         <div className="mission-meta">
-          <TodayXp xp={p.todayXp} />
           <WeekDots streak={p.streak} />
         </div>
       </header>
@@ -57,66 +52,67 @@ export function MissionBoard() {
   )
 }
 
-/** Desktop right rail (>= 1280px): player level, today's quests (not on Today, where the board shows them), week, recent XP. */
+/** Desktop right rail (>= 1280px): the season, today's plan (not on Today, where the board shows it), the week, recent activity. */
 export function MissionRail() {
   const p = usePlayerState()
   const { pathname } = useLocation()
   if (p.calm) return null
   const onToday = pathname === '/'
+  const season = seasonOf(today())
   return (
-    <aside className="mission-rail" aria-label="Mission">
+    <aside className="mission-rail" aria-label="Plan and week">
       <div className="mr-inner">
-        <Link to="/skills" className="mr-player">
-          <LevelBadge level={p.level} progress={p.xpForNext ? p.xpIntoLevel / p.xpForNext : 0} size={48} tone="reward" label={`Level ${p.level}`} />
+        <Link to="/review" className="mr-player">
           <div className="mr-player-text">
-            <span className="mr-kicker">Northstar level</span>
-            <XpBar info={p} label={`Level ${p.level}`} />
+            <span className="mr-kicker">Season</span>
+            <span className="mr-season">{season.name}</span>
+            <span className="mr-note" style={{ margin: 0 }}>{season.daysLeft === 0 ? 'Last day' : `${season.daysLeft} days left`}</span>
           </div>
         </Link>
         {!onToday && (
           <section className="mr-sec" aria-labelledby="mr-q">
-            <h2 className="mr-head" id="mr-q"><span>Today's quests</span><span className="mono muted">{p.questsDone}/{p.quests.length}</span></h2>
+            <h2 className="mr-head" id="mr-q"><span>Today's plan</span><span className="mono muted">{p.questsDone}/{p.quests.length}</span></h2>
             {p.loading ? null : p.quests.length ? (
               <div className="mr-quests">{p.quests.map((q) => <QuestCard key={q.id} quest={q} compact />)}</div>
             ) : (
-              <p className="mr-empty">No quests yet. <Link to="/goals">Set a goal</Link> to get some.</p>
+              <p className="mr-empty">Nothing planned yet. <Link to="/goals">Set a goal</Link> to fill it.</p>
             )}
-            {p.cleared && <p className="mr-cleared">Day cleared</p>}
+            {p.cleared && <p className="mr-cleared">Plan done</p>}
           </section>
         )}
         <section className="mr-sec" aria-labelledby="mr-w">
-          <h2 className="mr-head" id="mr-w"><span>Weekly streak</span></h2>
+          <h2 className="mr-head" id="mr-w"><span>This week</span></h2>
           <WeekDots streak={p.streak} />
           <p className="mr-note">{streakLine(p)}</p>
         </section>
         <section className="mr-sec" aria-labelledby="mr-x">
-          <h2 className="mr-head" id="mr-x"><span>Recent XP</span><span className="mono muted">+{p.todayXp} today</span></h2>
+          <h2 className="mr-head" id="mr-x"><span>Recent</span></h2>
           {p.recent.length ? (
             <ul className="mr-recent">
               {p.recent.slice(0, 5).map((g) => (
-                <li key={g.id}><span className="mr-why">{g.reason.replace(/\s*\(\+\d+\)$/, '')}</span><span className="mr-xp mono">+{g.xp}</span></li>
+                <li key={g.id}><span className="mr-why">{g.reason.replace(/\s*\(\+\d+\)$/, '')}</span></li>
               ))}
             </ul>
           ) : (
-            <p className="mr-empty">Log a weigh-in, a win or a journal line to earn your first XP.</p>
+            <p className="mr-empty">Log a weigh-in, a win or a journal line and it shows here.</p>
           )}
-          <Link className="mr-link" to="/settings#game">Why do I earn XP?</Link>
+          <Link className="mr-link" to="/settings#game">How progress is counted</Link>
         </section>
       </div>
     </aside>
   )
 }
 
-/** Phone top bar: level ring + XP + this week's active days. Opens Skills. */
+/** Phone top bar: today's plan as a small ring and count. */
 export function PlayerStrip() {
   const p = usePlayerState()
   if (p.calm || p.loading) return null
+  const total = p.quests.length
   return (
-    <Link to="/skills" className="pstrip">
-      <LevelBadge level={p.level} progress={p.xpForNext ? p.xpIntoLevel / p.xpForNext : 0} size={28} tone="reward" />
-      <span className="pstrip-xp"><XpBar info={p} compact /></span>
-      <span className="pstrip-streak mono">{p.streak.daysThisWeek}/{p.streak.target}</span>
-      <span className="sr-only"> active days this week. Open Skills</span>
+    <Link to="/" className="pstrip">
+      <Ring value={total ? p.questsDone / total : 0} size={26} stroke={3} tone={p.cleared ? 'reward' : undefined} />
+      <span className="pstrip-streak mono">{p.questsDone}/{total}</span>
+      <span className="sr-only"> plan items done today</span>
     </Link>
   )
 }
