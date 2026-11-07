@@ -198,7 +198,7 @@ export default function Ops() {
               ) : (
                 <Empty title="Nothing to review" action={<button className="btn btn-sm" onClick={() => navigate('/tasks')}>Open Tasks</button>}>
                   Proposals are generated on this device from your data by fixed rules: an overdue task, a quarter goal with no progress in 14 days, a person past their contact cadence,
-                  uncategorized transactions that match a merchant rule, a budget on pace to go over, or a study streak about to lapse.
+                  uncategorized transactions that match a merchant rule, a budget on pace to go over, or a study habit with nothing logged today.
                 </Empty>
               )}
             </Card>

@@ -142,7 +142,7 @@ export default function People() {
                 {tracked.length === 0 && <div className="ppl-empty-hint small muted">Nothing scheduled. Everyone is in the list below.</div>}
                 {tracked.map(({ p, s }, idx) => (
                   <div key={p.id}>
-                    {idx === 0 && s.overdue && <div className="ppl-group"><span>Due now</span><span className="mono">{dueCount}</span></div>}
+                    {idx === 0 && s.overdue && <div className="ppl-group"><span>To contact</span><span className="mono">{dueCount}</span></div>}
                     {!s.overdue && (idx === 0 || tracked[idx - 1].s.overdue) && <div className="ppl-group"><span>{dueCount ? 'Up to date' : 'On rhythm'}</span><span className="mono">{tracked.length - dueCount}</span></div>}
                     {row(p)}
                   </div>

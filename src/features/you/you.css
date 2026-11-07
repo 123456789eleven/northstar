@@ -13,7 +13,7 @@
 .ms-date { font-size: var(--fs-2); color: var(--ink-2); font-variant-numeric: tabular-nums; min-width: 6.5em; text-align: right; }
 .ms-more { margin-top: var(--sp-2); }
 @media (max-width: 519px) { .ms-row { grid-template-columns: 10px minmax(0, 1fr) auto; } .ms-area { display: none; } }
-.tr-sub { font-family: var(--mono); font-size: var(--text-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); margin-bottom: var(--sp-2); }
+.tr-sub { font-family: var(--font); font-size: var(--fs-1); letter-spacing: 0.02em; text-transform: none; color: var(--ink-2); margin-bottom: var(--sp-2); }
 .tr-next-wrap { margin-top: var(--sp-4); padding-top: var(--sp-3); border-top: 1px solid var(--line-soft); }
 .tr-next { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--gap); }
 .tr-next-card { min-width: 0; }
@@ -48,24 +48,24 @@
 .ssn-days { font-size: var(--text-sm); color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .ssn-boss-title { font-weight: 600; font-size: var(--text-base); }
 .ssn-boss-meta { display: flex; justify-content: space-between; gap: var(--sp-3); font-size: var(--text-sm); color: var(--ink-2); flex-wrap: wrap; }
-.ssn-recap-h { margin: 0 0 var(--sp-2); font-family: var(--mono); font-size: var(--text-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); font-weight: 500; }
+.ssn-recap-h { margin: 0 0 var(--sp-2); font-family: var(--font); font-size: var(--fs-1); letter-spacing: 0.02em; text-transform: none; color: var(--ink-2); font-weight: 600; }
 
 .story { margin-bottom: var(--gap); min-width: 0; }
 .story-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: var(--sp-3); scrollbar-width: none; overscroll-behavior-x: contain; }
 .story-track::-webkit-scrollbar { display: none; }
 .story-card { flex: 0 0 min(88%, 420px); scroll-snap-align: center; min-height: 190px; display: flex; flex-direction: column; gap: var(--sp-2); }
-.story-card h3 { margin: 0; font-family: var(--mono); font-size: var(--text-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); font-weight: 500; }
+.story-card h3 { margin: 0; font-family: var(--font); font-size: var(--fs-1); letter-spacing: 0.02em; text-transform: none; color: var(--ink-2); font-weight: 600; }
 .story-big { font-family: var(--serif); font-size: var(--text-hero); line-height: 1.1; font-variant-numeric: tabular-nums; }
 .story-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: var(--text-base); }
 .story-mini { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
-.story-dots { display: flex; justify-content: center; gap: 8px; margin-top: var(--sp-3); }
-.story-dot { width: 8px; height: 8px; border-radius: 50%; border: 0; padding: 0; background: var(--surface-3); position: relative; }
-.story-dot::after { content: ''; position: absolute; inset: -18px -6px; }
-.story-dot[aria-current='true'] { background: var(--accent); }
+.story-dots { display: flex; justify-content: center; gap: 0; margin-top: var(--sp-2); }
+.story-dot { width: 32px; height: 32px; border: 0; padding: 0; background: transparent; position: relative; }
+.story-dot::before { content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--surface-3); }
+.story-dot[aria-current='true']::before { background: var(--accent); }
 
 /* ---- Intel briefing cards ---- */
 .brief-group { margin-bottom: var(--gap); }
-.brief-h { display: flex; align-items: center; justify-content: space-between; margin: 0 0 var(--sp-2); font-family: var(--mono); font-size: var(--text-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); font-weight: 500; }
+.brief-h { display: flex; align-items: center; justify-content: space-between; margin: 0 0 var(--sp-2); font-family: var(--font); font-size: var(--fs-1); letter-spacing: 0.02em; text-transform: none; color: var(--ink-2); font-weight: 600; }
 .brief-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
 .brief { display: flex; gap: var(--sp-3); align-items: flex-start; width: 100%; text-align: left; padding: var(--sp-3) var(--pad); border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); color: inherit; font: inherit; cursor: pointer; min-height: 44px; transition: border-color var(--dur-fast) var(--ease-out); }
 .brief:hover { border-color: var(--line-strong); }
@@ -74,10 +74,10 @@
 .brief-title { font-size: var(--text-base); font-weight: 600; overflow-wrap: anywhere; }
 .brief-why { font-size: var(--text-sm); color: var(--ink-2); overflow-wrap: anywhere; }
 .brief-find { font-size: var(--text-xs); color: var(--ink-2); }
-.brief-why-k { font-family: var(--mono); font-size: var(--text-label); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); margin-right: 8px; }
+.brief-why-k { font-family: var(--font); font-size: var(--fs-1); letter-spacing: 0.02em; text-transform: none; color: var(--ink-2); margin-right: 8px; }
 .tr-next-stack { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 819px) { .tr-next-stack { display: flex; } }
-.you-ok { color: var(--good); margin: 0; }
+.you-ok { color: var(--accent-text); margin: 0; }
 .you-profile { justify-content: center; }
 .you-mid { align-items: start; }
 .you-who { display: flex; flex-direction: column; gap: 2px; }
@@ -85,7 +85,13 @@
 .you-season { font-size: var(--fs-2); color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .you-life { margin: 0; }
 .ssn-coach { margin: 0; font-size: var(--fs-2); color: var(--ink-2); }
-.story-actions { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; margin-top: var(--sp-3); }
+.story-actions { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; margin: 0 0 var(--sp-3); }
 .story-share { margin-left: auto; }
 @media (max-width: 519px) { .story-share { margin-left: 0; } }
 @media print { .story-actions { display: none; } }
+/* Desktop: the cards lay out as a grid (nothing clipped); swiping and stepping are for narrow screens. */
+@media (min-width: 820px) {
+  .story-track { flex-wrap: wrap; overflow: visible; }
+  .story-card { flex: 1 1 220px; max-width: none; }
+  .story-dots, .story-step { display: none; }
+}

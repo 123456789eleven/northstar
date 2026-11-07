@@ -1,0 +1,2 @@
+/* Palette scope: status colour in these screens is powder for ok and poppy for problems, never green. */
+.pal-powder { --good: var(--accent-text); --good-soft: var(--accent-soft); --info: var(--accent-text); }

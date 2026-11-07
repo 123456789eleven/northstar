@@ -46,7 +46,7 @@ export default function SkillsHub() {
                 <thead><tr><th scope="col">Area</th><th scope="col" className="num">Days</th><th scope="col" className="num">Counted</th><th scope="col">What fed it</th></tr></thead>
                 <tbody>
                   {areas.map((a) => (
-                    <tr key={a.id}><th scope="row">{a.label}</th><td className="num mono">{a.days} of {target}</td><td className="num mono">{a.total}</td><td className="small muted">{inputLine(a, 6)}</td></tr>
+                    <tr key={a.id}><th scope="row">{a.label}</th><td className="num mono">{Math.min(a.days, target)} of {target}</td><td className="num mono">{a.total}</td><td className="small muted">{inputLine(a, 6)}</td></tr>
                   ))}
                 </tbody>
               </table>
@@ -58,16 +58,16 @@ export default function SkillsHub() {
               return (
                 <Link key={a.id} to={page.to} className="card card-interactive area-card" data-area={a.id}>
                   <span className="area-head">
-                    <Ring value={a.value} size={72} stroke={6} tone={a.id} label={`${a.label}: ${a.days} of ${target} days this week`}>
-                      <span className="area-days"><b className="mono">{a.days}</b><span>/{target}</span></span>
+                    <Ring value={a.value} size={72} stroke={6} label={`${a.label}: ${Math.min(a.days, target)} of ${target} days this week`}>
+                      <span className="area-days"><b className="mono">{Math.min(a.days, target)}</b><span>/{target}</span></span>
                     </Ring>
                     <span className="area-name">
-                      <span className="area-title"><ModuleTile icon={page.icon} size="sm" /> {a.label}</span>
+                      <span className="area-title"><ModuleTile icon={page.icon} size="sm" quiet /> {a.label}</span>
                       <span className="area-sub">{page.sub}</span>
                     </span>
                   </span>
                   <span className="area-fed">
-                    <span className="area-fed-h">Fed this week</span>
+                    <span className="area-fed-h">This week</span>
                     {a.inputs.length ? (
                       <ul className="area-inputs">
                         {a.inputs.slice(0, 4).map((i) => <li key={i.kind}><b className="mono">{i.count}</b> {i.label}</li>)}

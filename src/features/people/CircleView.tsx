@@ -36,7 +36,7 @@ export function CircleView({ people, onOpen, selectedId }: { people: Person[]; o
               <circle className="ppl-halo" r={L.dotR * 1.8} style={{ opacity: g.glow * 0.3 }} />
               <circle className="ppl-core" r={L.dotR} style={{ opacity: 0.4 + 0.6 * g.glow }} />
               {g.overdue && <circle className="ppl-due-ring" r={L.dotR + 2.5} />}
-              <circle className="ppl-hit" r={L.dotR + 4} />
+              <circle className="ppl-hit" r={Math.max(L.dotR + 4, R * 0.12)} />
             </g>
           )
         })}

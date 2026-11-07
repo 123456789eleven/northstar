@@ -14,3 +14,10 @@
 .area-note { margin: 0 0 var(--gap); }
 .area-table { margin-bottom: var(--gap); }
 .area-table .num { text-align: right; }
+
+/* Area rings stay in the powder family. */
+.area-card[data-area='body'] { --ring-c: var(--accent); }
+.area-card[data-area='money'] { --ring-c: var(--accent-text); }
+.area-card[data-area='mind'] { --ring-c: color-mix(in srgb, var(--accent) 70%, var(--ink-3)); }
+.area-card[data-area='career'] { --ring-c: color-mix(in srgb, var(--accent) 55%, var(--ink-3)); }
+.area-card[data-area='people'] { --ring-c: color-mix(in srgb, var(--accent) 85%, var(--ink)); }

@@ -1,12 +1,12 @@
 // The Interview page (/interview). First visit: a short guided flow, one section at a time in big type. After that (or with
 // ?full=1, which You links to) the full version: every section as a tab. Answers save as you leave each field; "Apply" writes the real records.
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { getSetting, setSetting } from '../../db'
 import { Card, Field, PageHeader, PageSkeleton, Progress, Tabs } from '../../components/ui'
 import { applyAnswers, hasAnything } from './apply'
-import { allQuestions, answersAsText, isAnswered, PROFILE_KEY, progress, SECTIONS, type Answers, type Question } from './questions'
+import { allQuestions, answersAsText, LEGACY_OPTIONS, isAnswered, PROFILE_KEY, progress, SECTIONS, type Answers, type Question } from './questions'
 import './interview.css'
 
 function QuestionField({ q, value, onChange }: { q: Question; value: Answers[string] | undefined; onChange: (v: Answers[string] | undefined) => void }) {
@@ -21,7 +21,7 @@ function QuestionField({ q, value, onChange }: { q: Question; value: Answers[str
     )
   }
   if (q.type === 'multi') {
-    const cur = Array.isArray(value) ? value : []
+    const cur = Array.isArray(value) ? value.map((x) => LEGACY_OPTIONS[x] ?? x) : []
     return (
       <Field label={q.label} hint={q.why}>
         <div className="iv-chips" role="group" aria-label={q.label}>
@@ -70,7 +70,7 @@ function Guided({ answers, set, onFull }: { answers: Answers; set: (id: string, 
   if (done) {
     return (
       <div className="stack iv-guided">
-        <PageHeader title="That is enough to start" sub="Your answers are saved on this device. Apply them now, or finish the rest any time from You." />
+        <PageHeader title="That is enough to start" icon="user" sub="Your answers are saved on this device. Apply them now, or finish the rest any time from You." />
         <ApplyCard answers={answers} />
         <div className="row iv-actions"><button className="btn" onClick={onFull}>Open the full interview</button></div>
       </div>
@@ -78,9 +78,9 @@ function Guided({ answers, set, onFull }: { answers: Answers; set: (id: string, 
   }
   return (
     <div className="stack iv-guided">
-      <p className="iv-step small muted" aria-live="polite">Section {i + 1} of {SECTIONS.length}</p>
+      <PageHeader title="Interview" icon="user" sub={`Section ${i + 1} of ${SECTIONS.length}. Skip anything.`} />
       <Progress value={((i + 1) / SECTIONS.length) * 100} label="Interview progress" />
-      <h1 className="iv-big">{section.title}</h1>
+      <h2 className="iv-big">{section.title}</h2>
       <p className="iv-lede">{section.blurb}</p>
       <div className="stack iv-form iv-form-big" key={section.id}>
         {section.questions.map((q) => <QuestionField key={q.id} q={q} value={answers[q.id]} onChange={(v) => set(q.id, v)} />)}
@@ -100,7 +100,7 @@ function Full({ answers, set }: { answers: Answers; set: (id: string, v: Answers
   const section = SECTIONS.find((s) => s.id === tab)!
   return (
     <div className="stack">
-      <PageHeader title="Interview" sub={`${p.done} of ${p.total} answered. Skip anything. Answers stay on this device.`} />
+      <PageHeader title="Interview" icon="user" sub={`${p.done} of ${p.total} answered. Skip anything. Answers stay on this device.`} />
       <Card>
         <Progress value={p.total ? (p.done / p.total) * 100 : 0} label="Interview progress" />
         <Tabs value={tab} onChange={setTab} options={SECTIONS.map((s) => ({ value: s.id, label: `${s.title} ${p.bySection[s.id].done}/${p.bySection[s.id].total}` }))} />
@@ -131,6 +131,7 @@ function Inner({ saved, startGuided }: { saved: Answers; startGuided: boolean })
 
 export default function Interview() {
   const saved = useLiveQuery(() => getSetting<Answers>(PROFILE_KEY, {}), [])
+  useEffect(() => { document.title = 'Interview | Northstar' }, [])
   const [params] = useSearchParams()
   if (!saved) return <PageSkeleton strip={false} rows={5} />
   // Decided once, when the answers first load: the first visit (nothing answered, no ?full=1) is the guided flow.
