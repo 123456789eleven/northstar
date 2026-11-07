@@ -75,7 +75,7 @@ export const RULE_META: Record<RuleId, RuleMeta> = {
   'person-overdue': { id: 'person-overdue', label: 'Person overdue', description: 'Contact 3+ days past cadence: add a check-in task.', type: 'Person', risk: 'low', autoEligible: true },
   'merchant-category': { id: 'merchant-category', label: 'Merchant category', description: 'Uncategorized transactions that match a merchant rule: apply the category.', type: 'Transaction', risk: 'low', autoEligible: true },
   'budget-over': { id: 'budget-over', label: 'Budget over', description: 'Category projected over its monthly limit: flag for review (no automatic action).', type: 'Budget', risk: 'medium', autoEligible: false },
-  'study-streak': { id: 'study-streak', label: 'Study streak', description: 'Study streak of 3+ days with nothing logged today: pin a study task.', type: 'LearningItem', risk: 'low', autoEligible: true },
+  'study-streak': { id: 'study-streak', label: 'Study reminder', description: 'You studied 3 or more days in a row and nothing is logged today: pin a study task.', type: 'LearningItem', risk: 'low', autoEligible: true },
 }
 export const RULE_IDS = Object.keys(RULE_META) as RuleId[]
 
@@ -275,9 +275,9 @@ const studyStreak: RuleFn = (s) => {
       rule: 'study-streak',
       objectRef: ref,
       title: `Pin "${task.title}" to today's focus`,
-      rationale: `Your ${n}-day study streak ends today unless you log a session. Pinning a study task puts it in your top 3.`,
+      rationale: `You studied ${n} days in a row. Nothing is logged yet today. Pinning a study task puts it in your top 3.`,
       evidence: [`study sessions on ${n} consecutive days, none today`, `task #${task.id} "${task.title}"${byGoal.length ? ' (linked to an active learning goal)' : ' (title looks like study work)'}`, `${pinnedToday} of ${MAX_FOCUS} focus slots used`],
-      logic: `study streak >= 3 days AND no session today (${s.today}) AND a free focus slot AND an open study task exists -> pin task for today`,
+      logic: `study on 3+ consecutive days AND no session today (${s.today}) AND a free focus slot AND an open study task exists -> pin task for today`,
       risk: 'low',
       action: { label: 'Pin task', kind: 'task.pin', params: { taskId: task.id } },
     },

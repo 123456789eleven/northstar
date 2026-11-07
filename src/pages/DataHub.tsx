@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
+import '../features/hubs/palette.css'
 import { Card, Empty, PageHeader, PageSkeleton } from '../components/ui'
 import DataTable from '../components/DataTable'
 import KpiStrip from '../components/KpiStrip'
@@ -84,7 +85,7 @@ export default function DataHub() {
   ].sort((a, b) => b.at.localeCompare(a.at))
 
   return (
-    <>
+    <div className="pal-powder">
       <PageHeader title="Data" sub="Every way data gets into Northstar, and where it goes." />
 
       <KpiStrip
@@ -165,6 +166,6 @@ export default function DataHub() {
           )}
         </Card>
       </div>
-    </>
+    </div>
   )
 }

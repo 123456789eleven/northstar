@@ -16,6 +16,9 @@ export interface Question {
 
 export interface Section { id: string; title: string; blurb: string; questions: Question[] }
 
+/** Answers saved before the wording changed still show as selected. */
+export const LEGACY_OPTIONS: Record<string, string> = { 'Levels and XP': 'Rings and goals', 'Boss goals': 'Personal bests' }
+
 export const PROFILE_KEY = 'profile.answers'
 export type Answers = Record<string, string | number | string[]>
 
@@ -26,7 +29,7 @@ export const SECTIONS: Section[] = [
       { id: 'name', type: 'text', label: 'What should Northstar call you?', why: 'Greetings and recaps use it.' },
       { id: 'goodYear', type: 'long', label: 'It is a year from now and it went well. What happened?', why: 'Your answer becomes the "why" behind your goals.' },
       { id: 'quit', type: 'multi', label: 'What makes you stop using an app?', why: 'Tells me which friction to remove first.', options: ['Too much typing', 'Feels like homework', 'Guilt when I miss days', 'Gets boring', 'Too cluttered', 'I forget it exists'] },
-      { id: 'pull', type: 'multi', label: 'What pulls you back to an app?', why: 'Decides which game features get the screen space.', options: ['Streaks', 'Progress bars', 'Levels and XP', 'Boss goals', 'Seeing numbers move', 'Weekly recaps', 'Quiet and simple'] },
+      { id: 'pull', type: 'multi', label: 'What pulls you back to an app?', why: 'Decides what Today shows first.', options: ['Streaks', 'Progress bars', 'Rings and goals', 'Personal bests', 'Seeing numbers move', 'Weekly recaps', 'Quiet and simple'] },
     ],
   },
   {

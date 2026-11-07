@@ -124,6 +124,12 @@ export function SeasonStories({ weekOf, snapshot, wins, focusNext, planned }: { 
 
   return (
     <section className="story" aria-label="Week story" data-testid="story-cards">
+      <div className="story-actions">
+        <button type="button" className="btn btn-sm story-step" aria-label="Previous card" disabled={idx <= 0} onClick={() => step(-1)}>Back</button>
+        <button type="button" className="btn btn-sm story-step" aria-label="Next card" disabled={idx >= order.length - 1} onClick={() => step(1)}>Next</button>
+        <button type="button" className="btn btn-primary btn-sm story-share" disabled={busy} onClick={() => void share()}>{busy ? 'Drawing...' : 'Share card'}</button>
+        <span className="small muted" role="status">{shareMsg}</span>
+      </div>
       <div className="story-track" ref={track} tabIndex={0} role="group" aria-label="Week story cards, scroll sideways">
         {order.map((id) => (
           <article key={id} className="card story-card" data-story={id} aria-label={TITLES[id]}>
@@ -134,12 +140,6 @@ export function SeasonStories({ weekOf, snapshot, wins, focusNext, planned }: { 
       </div>
       <div className="story-dots" role="group" aria-label="Story cards">
         {order.map((id, i) => <button key={id} type="button" className="story-dot" aria-label={`Show ${TITLES[id]}`} aria-current={idx === i ? 'true' : undefined} onClick={() => go(i)} />)}
-      </div>
-      <div className="story-actions">
-        <button type="button" className="btn btn-sm story-step" aria-label="Previous card" disabled={idx <= 0} onClick={() => step(-1)}>Back</button>
-        <button type="button" className="btn btn-sm story-step" aria-label="Next card" disabled={idx >= order.length - 1} onClick={() => step(1)}>Next</button>
-        <button type="button" className="btn btn-primary btn-sm story-share" disabled={busy} onClick={() => void share()}>{busy ? 'Drawing...' : 'Share card'}</button>
-        <span className="small muted" role="status">{shareMsg}</span>
       </div>
     </section>
   )

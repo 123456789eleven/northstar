@@ -1,5 +1,5 @@
 /* Command + Ontology pages. Dense, flat, 1px borders; powder blue is the only accent. */
-.ops-label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); }
+.ops-label { font-family: var(--font); font-size: var(--fs-1); text-transform: none; letter-spacing: 0.02em; color: var(--ink-3); }
 .ops-mono { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
 
 .ops-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); margin-bottom: 12px; }
@@ -21,7 +21,7 @@
 .ops-count { margin-left: auto; font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; color: var(--ink-2); }
 
 .ops-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.ops-table th { text-align: left; padding: 6px 12px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); }
+.ops-table th { text-align: left; padding: 6px 12px; border-bottom: 1px solid var(--line); font-family: var(--font); font-size: var(--fs-1); font-weight: 600; text-transform: none; letter-spacing: 0.02em; color: var(--ink-3); }
 .ops-table td { padding: 0 12px; height: 36px; border-bottom: 1px solid var(--line); vertical-align: middle; }
 .ops-table tbody tr { cursor: pointer; }
 .ops-table tbody tr:hover { background: var(--surface-2); }
@@ -130,7 +130,7 @@
 
 /* Phase 3: facet heading uses the label style; the key hint is a real button that opens the shortcuts overlay; the
    empty review column is a quiet placeholder instead of a tall box; Network view summary reads as a disclosure. */
-.cmd-sub { font-family: var(--mono); font-size: var(--text-label); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); padding: 0 8px; }
+.cmd-sub { font-family: var(--font); font-size: var(--fs-1); font-weight: 600; letter-spacing: 0.02em; text-transform: none; color: var(--ink-2); padding: 0 8px; }
 .cmd .cmd-empty-panel { min-height: 0; }
 .cmd-empty-panel .sheet-body { padding-bottom: 16px; }
 .cmd-network summary { list-style: none; font-weight: 600; }
@@ -146,3 +146,6 @@
 .cmd-facet-name { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
 .cmd-facet { min-height: 36px; }
 .cmd-facet[aria-pressed='false'] .tile { opacity: 0.45; }
+
+.cmd-toggle { min-height: 32px; }
+.cmd-toggle input[type='checkbox'] { width: 20px; height: 20px; flex: 0 0 auto; }

@@ -84,7 +84,7 @@ export default function YouHub() {
         <BackupStatus />
       </div>
       <div className="hub-grid">
-        <HubCard to="/history" icon="trophy" title="Milestones" sub="Your logbook of what you finished" stat={milestones} />
+        <HubCard to="/history" icon="history" title="Milestones" sub="Your logbook of what you finished" stat={milestones} />
         <HubCard to="/review" icon="review" title="Season" sub={`${season.name} · weekly recaps`} stat={reviews} />
         <HubCard to="/ops" icon="command" title="Intel" sub="Suggestions and briefings from your data" />
         <HubCard to="/interview?full=1" icon="user" title="Interview" sub="The full set of questions, any time" />

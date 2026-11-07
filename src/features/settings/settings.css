@@ -12,7 +12,7 @@
 .set-counts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px 16px; font-size: 13px; margin: 0 0 14px; }
 .set-counts div { display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding: 4px 0; }
 .set-error { color: var(--warn); font-size: 14px; margin: 8px 0 0; }
-.set-ok { color: var(--good); font-size: 14px; margin: 8px 0 0; }
+.set-ok { color: var(--accent-text); font-size: 14px; margin: 8px 0 0; }
 .set-danger { border-color: var(--poppy-line); }
 .set-danger .card-title { color: var(--warn); }
 .set-file { display: none; }
@@ -76,9 +76,9 @@
 .set-status dd.set-status-note { margin: 0; font-size: 12px; font-weight: 400; color: var(--ink-3); }
 
 /* Game section (Constellation G1): a switch is a 44x24 track; on = accent. */
-.switch { position: relative; flex: 0 0 auto; width: 44px; height: 24px; padding: 0; border-radius: var(--radius-pill); border: 1px solid var(--line-strong); background: var(--surface-2); cursor: pointer; transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
-.switch::after { content: ''; position: absolute; inset: -10px -2px; } /* 44px tall hit area */
-.switch-knob { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--ink-2); transition: transform var(--dur-base) var(--ease-spring), background-color var(--dur-fast) var(--ease-out); }
+.switch { position: relative; flex: 0 0 auto; width: 52px; height: 32px; padding: 0; border-radius: var(--radius-pill); border: 1px solid var(--line-strong); background: var(--surface-2); cursor: pointer; transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+.switch::after { content: ''; position: absolute; inset: -6px -2px; } /* 44px tall hit area */
+.switch-knob { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--ink-2); transition: transform var(--dur-base) var(--ease-spring), background-color var(--dur-fast) var(--ease-out); }
 .switch[aria-checked='true'] { background: var(--accent); border-color: var(--accent); }
 .switch[aria-checked='true'] .switch-knob { transform: translateX(20px); background: var(--accent-ink); }
 .switch:focus-visible { outline-offset: 3px; }
@@ -87,3 +87,7 @@
 .set-xp .num { text-align: right; }
 .set-xp .set-xp-n { color: var(--reward); font-weight: 600; }
 @media (forced-colors: active) { .switch { border: 1px solid ButtonText; } .switch[aria-checked='true'] { background: Highlight; } .switch-knob { background: ButtonText; } }
+
+/* 32px minimum tap targets for text links and small controls on this screen. */
+.set-page a, .set-page .btn-link, .set-page .card-link { display: inline-flex; align-items: center; min-height: 32px; }
+.set-page .btn-sm { min-height: 32px; }

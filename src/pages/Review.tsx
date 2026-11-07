@@ -11,6 +11,7 @@ import { InsightsWeek } from '../features/insights/InsightsCard'
 import { SeasonHeader, SeasonStories } from '../features/review/SeasonParts'
 import { useMedia, PHONE_QUERY } from '../components/useMedia'
 import '../features/review/review.css'
+import '../features/hubs/palette.css'
 
 function Chevron({ dir }: { dir: 'l' | 'r' }) {
   return (
@@ -48,7 +49,7 @@ export default function Review() {
     : streak > 0 ? `Weekly recap · ${streak}-week run · ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'} in total` : `Weekly recap · ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'}`
 
   return (
-    <>
+    <div className="pal-powder">
       <PageHeader title="Season" sub={sub} actions={<button className="btn btn-ghost no-print" onClick={() => window.print()}>Print</button>} />
 
       <SeasonHeader />
@@ -103,6 +104,6 @@ export default function Review() {
           </Card>
         </div>
       </div>
-    </>
+    </div>
   )
 }

@@ -1,4 +1,6 @@
 // /style: the design system on one page. Not in the nav; reached by URL. Static sample content only (no user data).
+import { useEffect } from 'react'
+import { Navigate } from 'react-router-dom'
 import { Card, Empty, PageHeader, Progress, Skeleton } from '../components/ui'
 import { GlassSurface } from '../components/glass'
 import { Icon } from '../components/Icons'
@@ -9,9 +11,12 @@ const TYPE = [['fs-6', 'Hero figure', '2,140'], ['fs-5', 'Page title', 'Money'],
 const SWATCH = ['--bg', '--surface-1', '--ink', '--ink-2', '--ink-3', '--accent', '--reward', '--good', '--warn']
 
 export default function StyleTile() {
+  useEffect(() => { document.title = 'Style | Northstar' }, [])
+  // Design reference: dev builds only.
+  if (!import.meta.env.DEV) return <Navigate to="/" replace />
   return (
     <div className="stack st">
-      <PageHeader title="Style tile" sub="Materials, type, motion and the primitives. Static samples only." />
+      <PageHeader title="Style tile" icon="star" sub="Materials, type, motion and the primitives. Static samples only." />
 
       <section className="st-grid" aria-label="Material tiers">
         <GlassSurface tier="thin" className="st-tier"><b>Thin</b><span className="small muted">Tab bar, toolbars. Most see-through, floats.</span></GlassSurface>

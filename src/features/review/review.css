@@ -6,7 +6,7 @@
 .rv-weeknav .btn svg { width: 14px; height: 14px; }
 .rv-week-label { font-weight: 500; min-width: 0; }
 .rv-week-state { font-size: 13px; color: var(--ink-3); }
-.rv-week-state.is-done { color: var(--good); }
+.rv-week-state.is-done { color: var(--accent-text); }
 
 .rv-suggest {
   border: 1px solid var(--line); border-left: 3px solid var(--accent); background: var(--surface);
@@ -63,7 +63,7 @@
 /* Phase 3: figures in the digest read as figures (Fraunces, tabular); a chosen rating is a soft accent, not six solid
    amber blocks; the selected past week is marked with weight and a bar, not amber text. */
 .rv-fact-value { font-family: var(--serif); font-size: var(--text-lg); line-height: 26px; letter-spacing: var(--track-display); }
-.rv-fact-label { font-family: var(--mono); font-size: var(--text-label); letter-spacing: var(--track-label); text-transform: uppercase; }
+.rv-fact-label { font-family: var(--font); font-size: var(--fs-1); letter-spacing: 0.02em; text-transform: none; }
 .rv-rate-btns .btn[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent-line); color: var(--ink); font-weight: 600; }
 .rv-rate-row { min-height: 36px; border-bottom: 1px solid var(--line-soft); }
 .rv-rate-row:last-child { border-bottom: 0; }
