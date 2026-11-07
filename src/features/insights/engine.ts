@@ -256,7 +256,7 @@ const studyAtRisk: Rule = (s) => {
     {
       id: 'study-streak',
       severity: 'nudge',
-      text: `Your ${n}-day study streak ends today unless you log a session. Even 10 minutes keeps it.`,
+      text: `You studied ${n} days running. No session logged yet today; 10 minutes adds a day.`,
       href: '/learning',
       score: 65,
     },

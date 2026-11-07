@@ -24,7 +24,7 @@
   --accent-soft: rgba(156, 200, 230, 0.14);
   --accent-text: #b4d9f1; /* accent-coloured TEXT on an --accent-soft tint (accent itself is 3.96:1 there) */
   /* status (always with a label or icon) */
-  --good: #6cc49a;
+  --good: #a9d6ee; /* powder: good states share the interactive colour; no green in this palette */
   --warn: #ff7d75; /* poppy, text-safe */
   --poppy: #e8453c; /* poppy red: tertiary. Fills, urgent states, over-budget. Text uses --warn. */
   --poppy-soft: rgba(232, 69, 60, 0.16);
@@ -73,7 +73,7 @@
   --accent-ring: 0 0 0 1px var(--accent);
   --ink-disabled: #6b6a7e;
   /* status soft backgrounds (with a label, never alone) */
-  --good-soft: rgba(108, 196, 154, 0.12);
+  --good-soft: rgba(156, 200, 230, 0.12);
   --warn-soft: rgba(224, 122, 95, 0.12);
   /* type scale (ratio ~1.2 from 14): 12 14 17 20 24 28, plus 11 label, 13 small, 36 hero */
   --text-label: 11px;
