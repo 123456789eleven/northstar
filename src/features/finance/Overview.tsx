@@ -1,188 +1,133 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Card, Empty, PageSkeleton } from '../../components/ui'
 import ChartFrame from '../../components/ChartFrame'
-import KpiStrip from '../../components/KpiStrip'
-import { percentChange, type Trend } from '../../components/trend'
 import { db } from '../../db'
-import { formatDate, money, today } from '../../lib/dates'
-import { useMemo } from 'react'
-import { budgetSpend, cadenceText } from './bills'
+import { money, today } from '../../lib/dates'
+import { budgetSpend } from './bills'
 import { useBills } from './billsData'
-import { detectRecurring, monthlyTotal } from './recurring'
 import { merchantLabel, UNCATEGORIZED } from './categories'
 import { CategoryBars, TrendChart } from './charts'
-import HealthBar from './HealthBar'
-import MoneyHero from './MoneyHero'
+import { BillsCard, BudgetsCard, CashFlowCard, GoalsCard, InvestmentsCard, NetWorthCard, RecapCard, SubscriptionsCard, type Go } from './OverviewCards'
+import SafeHero from './SafeHero'
+import { safeToSpend } from './safeToSpend'
 import { TREND_LEGEND } from './series'
-import { monthLabel, monthRange, moneyExact, pct, shiftMonth, summarize, topMerchants, useMonthTx } from './model'
+import { monthLabel, monthRange, moneyExact, shiftMonth, summarize, topMerchants, useMonthTx } from './model'
 
-export default function Overview({ month, goTo }: { month: string; goTo: (tab: 'transactions' | 'import' | 'budgets', category?: string) => void }) {
+export default function Overview({ month, goTo }: { month: string; goTo: Go }) {
   const txs = useMonthTx(month)
   const budgets = useLiveQuery(() => db.budgets.toArray(), [])
   const first = shiftMonth(month, -5)
   const trendTx = useLiveQuery(() => db.transactions.where('date').between(monthRange(first)[0], monthRange(month)[1], true, true).toArray(), [first, month])
   const bills = useBills()
-  const anyTx = useLiveQuery(() => db.transactions.count(), [])
-
   const allTx = useLiveQuery(() => db.transactions.toArray(), [])
-  const recurring = useMemo(() => (allTx ? detectRecurring(allTx, today()) : []), [allTx])
 
-  if (!txs || !budgets || !trendTx || anyTx === undefined || !bills) return <PageSkeleton rows={5} />
+  if (!txs || !budgets || !trendTx || !allTx || !bills) return <PageSkeleton rows={5} />
 
-  if (anyTx === 0) {
+  if (allTx.length === 0) {
     return (
-      <Card>
-        <Empty
-          title="No transactions yet"
-          action={<button className="btn btn-primary" onClick={() => goTo('import')}>Import a file</button>}
-        >
-          Download recent transactions from your bank's website (OFX/QFX preferred, CSV works too), then import the file here. Everything stays on this device.
-        </Empty>
-      </Card>
+      <div className="stack mn-page">
+        <SafeHero month={month} safe={null} onBudgets={() => goTo('budgets')} />
+        <Card>
+          <Empty
+            title="No transactions yet"
+            action={<button className="btn btn-primary" onClick={() => goTo('import')}>Import a file</button>}
+          >
+            Download recent transactions from your bank (OFX or QFX preferred, CSV works), then import the file here. It stays on this device.
+          </Empty>
+        </Card>
+        <NetWorthCard go={goTo} />
+        <InvestmentsCard go={goTo} />
+        <GoalsCard />
+      </div>
     )
   }
 
   const s = summarize(txs)
+  const t = today()
   const cats = [...s.byCategory.entries()].filter(([, v]) => v > 0.005).sort((a, b) => b[1] - a[1]).map(([category, amount]) => ({ category, amount }))
   const trend = Array.from({ length: 6 }, (_, i) => {
     const m = shiftMonth(first, i)
-    const sm = summarize(trendTx.filter((t) => t.date.startsWith(m)))
+    const sm = summarize(trendTx.filter((x) => x.date.startsWith(m)))
     return { label: monthLabel(m, true), income: Math.round(sm.income), spending: Math.round(Math.max(0, sm.spending)) }
   })
   const merchants = topMerchants(txs)
   const bs = budgetSpend(txs, bills)
-  const warnings = budgets
-    .map((b) => ({ ...b, spent: bs.spent.get(b.category) ?? 0, bill: bs.billInfo.get(b.category) }))
-    .filter((b) => b.monthlyLimit > 0 && b.spent / b.monthlyLimit > 0.9)
-    .sort((a, b) => b.spent / b.monthlyLimit - a.spent / a.monthlyLimit)
-  const budgeted = budgets.filter((b) => b.monthlyLimit > 0)
-  const budgetLeft = budgeted.reduce((sum, b) => sum + b.monthlyLimit - Math.max(0, bs.spent.get(b.category) ?? 0), 0)
-  const budgetNote = budgeted.length ? (budgetLeft >= 0 ? `${money(budgetLeft)} left in budgets` : `${money(-budgetLeft)} over budgets`) : undefined
-  const uncategorized = txs.filter((t) => t.category === UNCATEGORIZED).length
+  const uncategorized = txs.filter((x) => x.category === UNCATEGORIZED).length
 
-  const topMerchantsCard = (
-    <Card title="Top merchants">
-      {merchants.length ? (
-        <div className="list">
-          {merchants.map(([k, v]) => (
-            <div key={k} className="list-item small">
-              <span className="grow">{merchantLabel(k)}</span>
-              <span className="faint tiny">
-                {v.count} {v.count === 1 ? 'purchase' : 'purchases'}
-              </span>
-              <span className="mono" style={{ minWidth: 80, textAlign: 'right' }}>
-                {moneyExact(v.total)}
-              </span>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <Empty>No purchases this month.</Empty>
-      )}
-    </Card>
-  )
-
-  // Previous month, from the 6-month window already loaded. No transactions there = no comparison (no trend shown).
-  // The month in progress is compared with the same days of the previous month (to date), so day 1 of November is never
-  // judged against all of October ("spending -98%").
+  // The month in progress is compared with the same days of last month, so day 1 is never judged against all of last month.
   const prevMonth = shiftMonth(month, -1)
-  const inProgress = month === today().slice(0, 7)
-  const cutoffDay = Number(today().slice(8, 10))
-  const prevTx = trendTx.filter((t) => t.date.startsWith(prevMonth) && (!inProgress || Number(t.date.slice(8, 10)) <= cutoffDay))
+  const inProgress = month === t.slice(0, 7)
+  const cutoffDay = Number(t.slice(8, 10))
+  const prevTx = trendTx.filter((x) => x.date.startsWith(prevMonth) && (!inProgress || Number(x.date.slice(8, 10)) <= cutoffDay))
   const prev = prevTx.length ? summarize(prevTx) : null
-  const vs = inProgress ? `vs ${monthLabel(prevMonth, true)} to date` : `vs ${monthLabel(prevMonth, true)}`
-  const pctTrend = (cur: number, before: number | undefined, goodDirection: 'up' | 'down'): Trend | undefined => {
-    const d = prev && before !== undefined ? percentChange(cur, before) : null
-    return d === null ? undefined : { delta: d, unit: '%', goodDirection, label: vs }
-  }
-  const rateTrend: Trend | undefined =
-    prev && prev.savingsRate !== null && s.savingsRate !== null
-      ? { delta: (s.savingsRate - prev.savingsRate) * 100, unit: ' pts', goodDirection: 'up', label: vs }
-      : undefined
+
+  const safe = safeToSpend(budgets, txs, bills, month, t)
 
   return (
-    <div className="stack" style={{ gap: 16 }}>
-      <MoneyHero month={month} spent={bs.spent} totalSpent={s.spending} budgets={budgets} savingsRate={s.savingsRate} txs={txs} bills={bills} onBudgets={() => goTo('budgets')} />
-      <KpiStrip
-        items={[
-          { label: 'Income', value: money(s.income), trend: pctTrend(s.income, prev?.income, 'up') },
-          { label: 'Spending', value: money(s.spending), trend: pctTrend(s.spending, prev?.spending, 'down'), note: budgetNote },
-          { label: 'Net', hero: true, value: <span className={s.net >= 0 ? '' : 'warn'}>{money(s.net)}</span>, trend: pctTrend(s.net, prev?.net, 'up') },
-          { label: 'Savings rate', value: s.savingsRate === null ? '—' : pct(s.savingsRate), trend: rateTrend, note: s.savingsRate === null ? 'No income this month' : 'Net ÷ income' },
-        ]}
-      />
+    <div className="stack mn-page">
+      <SafeHero month={month} safe={safe} onBudgets={() => goTo('budgets')} />
 
       {uncategorized > 0 && (
         <div className="card row-between wrap">
           <span className="small">
-            <strong>{uncategorized}</strong> <span className="muted">transaction{uncategorized === 1 ? '' : 's'} this month need a category.</span>
+            <strong className="mn-num">{uncategorized}</strong> <span className="muted">{uncategorized === 1 ? 'transaction needs' : 'transactions need'} a category this month.</span>
           </span>
-          <button className="btn btn-sm" onClick={() => goTo('transactions', UNCATEGORIZED)}>
-            Categorize
-          </button>
+          <button className="btn btn-sm" onClick={() => goTo('transactions', UNCATEGORIZED)}>Categorize</button>
         </div>
       )}
 
-      {warnings.length > 0 && (
-        <Card title="Budgets near or over limit" action={<button className="btn btn-ghost btn-sm" onClick={() => goTo('budgets')}>All budgets</button>}>
-          <div className="list">
-            {warnings.map((w) => (
-              <div key={w.category} className="list-item small fin-warn-row">
-                <span className="grow">
-                  {w.category}
-                  {w.bill && <span className="tiny faint"> · Bill: {money(w.bill.monthly)}/mo set aside (paid {w.bill.bills.map((b) => cadenceText(b, money)).join(' + ')})</span>}
-                  <HealthBar spent={w.spent} limit={w.monthlyLimit} month={month} label={w.category} />
-                </span>
-                <span className="mono muted">
-                  {moneyExact(w.spent)} of {moneyExact(w.monthlyLimit)}
-                </span>
-                <span className={`mono ${w.spent > w.monthlyLimit ? 'warn' : ''}`} style={{ minWidth: 92, textAlign: 'right' }}>
-                  {w.spent > w.monthlyLimit ? `${moneyExact(w.spent - w.monthlyLimit)} over` : `${moneyExact(w.monthlyLimit - w.spent)} left`}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
+      <NetWorthCard go={goTo} />
+      <CashFlowCard month={month} s={s} prev={prev} />
+      <BudgetsCard month={month} budgets={budgets} spent={bs.spent} go={goTo} />
+      <BillsCard month={month} bills={bills} go={goTo} />
+      <SubscriptionsCard allTx={allTx} />
+      <InvestmentsCard go={goTo} />
+      <GoalsCard />
+      <RecapCard month={month} txs={txs} s={s} prev={prev} />
 
+      <h2 className="mn-section">Spending detail</h2>
       <div className="fin-ov-grid">
         <div className="fin-ov-col">
-        <ChartFrame
-          title={`Spending by category · ${monthLabel(month, true)}`}
-          empty="No spending this month yet."
-          hasData={cats.length > 0}
-          table={<MoneyTable head={['Category', 'Spent']} rows={cats.map((c) => [c.category, money(c.amount)])} />}
-        >
-          <CategoryBars rows={cats} onPick={(c) => goTo('transactions', c)} />
-        </ChartFrame>
-        {topMerchantsCard}
+          <ChartFrame
+            title={`Spending by category, ${monthLabel(month, true)}`}
+            empty="No spending this month yet."
+            hasData={cats.length > 0}
+            table={<MoneyTable head={['Category', 'Spent']} rows={cats.map((c) => [c.category, money(c.amount)])} />}
+          >
+            <CategoryBars rows={cats} onPick={(c) => goTo('transactions', c)} />
+          </ChartFrame>
+          <Card title="Top merchants">
+            {merchants.length ? (
+              <div className="list">
+                {merchants.map(([k, v]) => (
+                  <div key={k} className="list-item small">
+                    <span className="grow">{merchantLabel(k)}</span>
+                    <span className="faint tiny">{v.count} {v.count === 1 ? 'purchase' : 'purchases'}</span>
+                    <span className="mn-num" style={{ minWidth: 80, textAlign: 'right' }}>{moneyExact(v.total)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <Empty>No purchases this month.</Empty>
+            )}
+          </Card>
         </div>
         <ChartFrame
-          title="Income vs spending · 6 months"
+          title="Income and spending, 6 months"
           legend={TREND_LEGEND}
-          hasData={trend.some((t) => t.income > 0 || t.spending > 0)}
-          table={<MoneyTable head={['Month', 'Income', 'Spending']} rows={trend.map((t) => [t.label, money(t.income), money(t.spending)])} />}
+          hasData={trend.some((x) => x.income > 0 || x.spending > 0)}
+          table={<MoneyTable head={['Month', 'Income', 'Spending']} rows={trend.map((x) => [x.label, money(x.income), money(x.spending)])} />}
         >
           <TrendChart data={trend} />
         </ChartFrame>
       </div>
 
-      {recurring.length > 0 && (
-        <Card title="Recurring and subscriptions" action={<span className="mono small muted">{moneyExact(monthlyTotal(recurring))} / month</span>}>
-          <div className="list">
-            {recurring.map((r) => (
-              <div key={`${r.merchant}-${r.amount}`} className="list-item small fin-rec">
-                <span className="grow">
-                  {merchantLabel(r.merchant)}
-                  <span className="tiny faint"> · {r.cadence} · last {formatDate(r.last)} · next ~{formatDate(r.next)}</span>
-                </span>
-                <span className="mono" style={{ minWidth: 80, textAlign: 'right' }}>{moneyExact(r.amount)}</span>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-
+      <div className="mn-tools no-print">
+        <span className="mn-label">Tools</span>
+        <button className="btn btn-sm btn-ghost" onClick={() => goTo('import')}>Import a file</button>
+        <button className="btn btn-sm btn-ghost" onClick={() => goTo('transactions', UNCATEGORIZED)}>Categorize</button>
+        <button className="btn btn-sm btn-ghost" onClick={() => goTo('budgets')}>Budgets and bills</button>
+      </div>
     </div>
   )
 }

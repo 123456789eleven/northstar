@@ -57,8 +57,8 @@ test('Ctrl+K palette: search and navigate', async ({ page }) => {
   await page.keyboard.press('Control+k')
   const palette = page.getByRole('dialog', { name: 'Search and commands' })
   await expect(palette).toBeVisible()
-  await page.getByRole('combobox', { name: /Search tasks/ }).fill('Finance')
-  await palette.getByRole('option', { name: /Finance/ }).first().click()
+  await page.getByRole('combobox', { name: /Search tasks/ }).fill('Money')
+  await palette.getByRole('option', { name: /Money/ }).first().click()
   await expect(page).toHaveURL(/#\/finance/)
 })
 
