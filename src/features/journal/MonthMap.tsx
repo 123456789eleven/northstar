@@ -1,4 +1,4 @@
-// Mood constellation: one star per day of the month, sized by words written and tinted by mood (violet scale).
+// Month map: one star per day of the month, sized by words written and tinted by mood (powder blue).
 // Tap a day to open it. Table view via ChartFrame.
 import { useMemo, useState } from 'react'
 import type { JournalEntry } from '../../db'
@@ -21,7 +21,7 @@ export function MonthMap({ entries, goal, selected, onOpen, compact = false }: {
   const size = MAX_STAR * 2 + 2
   return (
     <ChartFrame
-      title="Mood constellation"
+      title="Month map"
       controls={
         <>
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => setMonth(shiftMonth(month, -1))} aria-label="Previous month">‹</button>

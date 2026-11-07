@@ -1,4 +1,4 @@
-// Hero: promotion case strength as an HP-style bar with five labelled segments, a "Next to strengthen" line with a
+// Hero: case strength as a five-part meter with five labelled segments, a "Next to strengthen" line with a
 // one-tap action, and a plain "How this is scored" disclosure. The score itself is pure (caseStrength.ts).
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
@@ -12,11 +12,11 @@ export function CaseMeter({ wins, projects, onAction }: { wins: Win[]; projects:
   const r = useCaseStrength(wins, projects)
   const shown = useNumberRoll(r.score)
   return (
-    <section className="card car-meter" aria-label="Promotion case strength" data-testid="case-meter">
+    <section className="card car-meter" aria-label="Case strength" data-testid="case-meter">
       <div className="car-meter-head">
         <div>
-          <h2 className="car-meter-title">Promotion case strength</h2>
-          <p className="small muted">Coverage of what a case needs, from your own records.</p>
+          <h2 className="car-meter-title">Case strength</h2>
+          <p className="small muted">How much of a promotion case your records cover. The inputs are below.</p>
         </div>
         <div className="car-meter-score" aria-label={`Score ${r.score} out of 100`}>
           <span className="car-meter-num mono" data-testid="case-score" data-score={r.score}>{shown}</span><span className="muted small"> / 100</span>
@@ -33,7 +33,7 @@ export function CaseMeter({ wins, projects, onAction }: { wins: Win[]; projects:
       </div>
       {r.next ? (
         <div className="car-next">
-          <p className="car-next-text"><span className="muted">Next to strengthen: </span><strong>{r.next.label}</strong> <span className="muted small">({r.next.detail})</span></p>
+          <p className="car-next-text"><span className="muted">Next: </span><strong>{r.next.label}</strong> <span className="muted small">({r.next.detail})</span></p>
           {r.next.action === 'goals'
             ? <Link className="btn btn-sm btn-primary" to="/goals">{r.next.actionLabel}</Link>
             : <button type="button" className="btn btn-sm btn-primary" onClick={() => onAction(r.next!.action as Exclude<NextAction, 'goals'>)}>{r.next.actionLabel}</button>}

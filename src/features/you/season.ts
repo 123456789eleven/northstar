@@ -30,3 +30,12 @@ export function storyOrder(has: { wins: boolean; slipped: boolean; numbers: bool
   const sorted = mid.map((id, i) => ({ id, i })).sort((a, b) => Number(!has[a.id]) - Number(!has[b.id]) || a.i - b.i).map((x) => x.id)
   return ['summary', ...sorted, 'next']
 }
+
+/** The coach note under a season goal, from real progress against the share of the season already gone. */
+export function paceNote(progress: number, elapsed: number, daysLeft: number): string {
+  const done = Math.round(progress * 100)
+  const gone = Math.round(elapsed * 100)
+  if (progress >= 1) return 'Season goal met.'
+  if (progress >= elapsed - 0.05) return `On pace: ${done}% done with ${gone}% of the season gone.`
+  return `Behind pace: ${done}% done with ${gone}% of the season gone. ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'} left.`
+}

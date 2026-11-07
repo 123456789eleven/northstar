@@ -1,4 +1,4 @@
-// The one XP table. Everything in the engine reads it; Settings shows it ("Why?" transparency).
+// The one XP table. Everything in the engine reads it; Settings shows it (transparency).
 // Each action maps to exactly one skill. Tune numbers here only.
 import type { SkillId } from '../types'
 
@@ -32,17 +32,17 @@ export const XP_TABLE: XpRule[] = [
   { kind: 'import', skill: 'money', xp: 15, cap: 15, label: 'Imported transactions', rule: 'One import a day' },
   { kind: 'net-worth', skill: 'money', xp: 10, cap: 10, label: 'Updated net worth', rule: 'Balances recorded for a day' },
   { kind: 'journal', skill: 'mind', xp: 20, cap: 30, label: 'Wrote a journal entry', rule: '+10 for 150 words or more' },
-  { kind: 'learning', skill: 'mind', xp: 1, cap: 60, label: 'Studied', rule: '1 XP per 3 minutes of study, up to 60 a day' },
+  { kind: 'learning', skill: 'mind', xp: 1, cap: 60, label: 'Studied', rule: '1 per 3 minutes of study, up to 60 a day' },
   { kind: 'focus', skill: 'mind', xp: 10, cap: 30, label: 'Finished a focus session', rule: 'Up to 3 a day' },
   { kind: 'win', skill: 'career', xp: 25, cap: 50, label: 'Logged a win', rule: 'Up to 2 a day' },
   { kind: 'review', skill: 'career', xp: 60, cap: 60, label: 'Locked a weekly review', rule: 'When the review is locked' },
-  { kind: 'milestone', skill: 'goal', fallback: 'career', xp: 50, cap: 100, label: 'Reached a goal milestone', rule: 'Skill follows the goal area' },
-  { kind: 'goal-done', skill: 'goal', fallback: 'career', xp: 150, cap: 300, label: 'Finished a goal', rule: 'Skill follows the goal area' },
+  { kind: 'milestone', skill: 'goal', fallback: 'career', xp: 50, cap: 100, label: 'Reached a goal milestone', rule: 'Area follows the goal' },
+  { kind: 'goal-done', skill: 'goal', fallback: 'career', xp: 150, cap: 300, label: 'Finished a goal', rule: 'Area follows the goal' },
   { kind: 'contact', skill: 'people', xp: 12, cap: 36, label: 'Contacted someone', rule: 'One per person per day, up to 3' },
-  { kind: 'task', skill: 'goal', fallback: 'mind', xp: 10, cap: 60, label: 'Finished a task', rule: '+5 high priority, +5 linked to a goal; skill follows the goal area, else Mind' },
-  { kind: 'habit', skill: 'goal', fallback: 'mind', xp: 8, cap: 40, label: 'Checked in a habit', rule: 'Skill follows the linked goal area, else Mind' },
-  { kind: 'day-clear', skill: 'top', xp: 30, cap: 30, label: 'Day cleared', rule: 'All of the day quests done; XP goes to the skill you earned most in' },
-  { kind: 'week-clear', skill: 'top', xp: 120, cap: 120, label: 'Week cleared', rule: 'Weekly active-day target met; XP goes to the skill you earned most in' },
+  { kind: 'task', skill: 'goal', fallback: 'mind', xp: 10, cap: 60, label: 'Finished a task', rule: '+5 high priority, +5 linked to a goal; area follows the goal, else Mind' },
+  { kind: 'habit', skill: 'goal', fallback: 'mind', xp: 8, cap: 40, label: 'Checked in a habit', rule: 'Area follows the linked goal, else Mind' },
+  { kind: 'day-clear', skill: 'top', xp: 30, cap: 30, label: 'Plan done', rule: 'Every plan item for the day done; counts toward the area you were busiest in' },
+  { kind: 'week-clear', skill: 'top', xp: 120, cap: 120, label: 'Week target met', rule: 'Weekly active-day target met; counts toward the area you were busiest in' },
 ]
 
 export const RULES = Object.fromEntries(XP_TABLE.map((r) => [r.kind, r])) as Record<XpKind, XpRule>

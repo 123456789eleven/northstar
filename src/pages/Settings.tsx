@@ -7,7 +7,7 @@ import { GameSection } from '../features/settings/GameSection'
 import '../features/settings/settings.css'
 
 const SECTIONS = [
-  { id: 'set-game', label: 'Game' },
+  { id: 'set-game', label: 'Progress' },
   { id: 'set-sync', label: 'Sync' },
   { id: 'set-backup', label: 'Backup & restore' },
   { id: 'set-data', label: 'Data on this device' },
@@ -46,13 +46,13 @@ function SectionIndex() {
 
 export default function Settings() {
   const { hash } = useLocation()
-  // "Why do I earn XP?" links to /settings#game.
+  // "How progress is counted" links to /settings#game.
   useEffect(() => {
     if (hash === '#game') requestAnimationFrame(() => document.getElementById('set-game')?.scrollIntoView({ block: 'start' }))
   }, [hash])
   return (
     <>
-      <PageHeader title="Settings" sub="Sync, backups, data on this device, the game layer and privacy." />
+      <PageHeader title="Settings" sub="Progress, sync, backups, data on this device and privacy." />
       <StatusStrip />
       <div className="set-layout">
         <SectionIndex />

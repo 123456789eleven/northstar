@@ -1,16 +1,18 @@
-// One-second moments: a level-up (overall or a skill) or "Day cleared". The small constellation brightens once, then
-// the card leaves. No confetti. Fires only on a real change after the first loaded state (never on page load, never
-// on day rollover resets), never in Calm mode. Tap, Esc or the Close button skips it. Reduced motion: shown still.
+// One small toast for a real win: a tick draws, the count rolls up, a glass ripple. It leaves by itself in about two
+// seconds. Fires only on a real change after the first loaded state. Reduced motion: shown still, no ripple, no roll.
 import { useEffect, useRef, useState } from 'react'
-import { prefersReducedMotion } from '../../../components/motion'
+import { prefersReducedMotion, useNumberRoll } from '../../../components/motion'
 import { momentFor, type Base, type Moment } from './moment'
-import { Constellation } from './Constellation'
 import { celebrate } from './feedback'
 import { usePlayerState } from './playerContext'
 
+const SHOW_MS = 2000
+const STILL_MS = 2600
 
-const SHOW_MS = 1000
-const STILL_MS = 2200
+function Count({ done, total }: { done: number; total: number }) {
+  const n = useNumberRoll(done, 500, Math.max(0, done - 1))
+  return <span className="moment-count mono">{n} of {total}</span>
+}
 
 export function MomentHost() {
   const p = usePlayerState()
@@ -21,11 +23,10 @@ export function MomentHost() {
 
   useEffect(() => {
     if (p.loading) return
-    const next: Base = { level: p.level, skills: Object.fromEntries(p.skills.map((s) => [s.id, s.level])), cleared: p.cleared }
     const found = momentFor(base.current, p)
-    base.current = next
+    base.current = { done: p.questsDone, total: p.quests.length }
     if (!found) return
-    celebrate('double')
+    celebrate('tick')
     setLeaving(false)
     setM({ id: ++seq.current, ...found })
   }, [p])
@@ -44,15 +45,14 @@ export function MomentHost() {
   return (
     <div className="moment-layer">
       <div key={m.id} className={`moment ${leaving ? 'is-leaving' : ''}`} role="status" aria-live="polite" onClick={() => setM(null)}>
-        <div className="moment-sky" aria-hidden><Constellation skills={p.skills} compact bright interactive={false} /></div>
-        <div className="moment-text">
-          <span className="moment-kicker">{m.kicker}</span>
-          <span className="moment-title">{m.title}</span>
+        <span className="moment-ripple" aria-hidden />
+        <svg className="moment-tick" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path pathLength="1" d="M4.5 10.5l3.5 3.5 7.5-8" />
+        </svg>
+        <span className="moment-text">
+          <span className="moment-title">{m.title} <Count done={m.done} total={m.total} /></span>
           <span className="moment-sub">{m.sub}</span>
-        </div>
-        <button type="button" className="icon-btn moment-skip" aria-label="Dismiss" onClick={(e) => { e.stopPropagation(); setM(null) }}>
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden><path d="M4 4l8 8M12 4l-8 8" /></svg>
-        </button>
+        </span>
       </div>
     </div>
   )

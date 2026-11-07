@@ -44,8 +44,8 @@ export default function Review() {
   const streak = reviews ? reviewStreak(reviews) : 0
 
   const sub = reviews === undefined ? '' : reviews.length === 0
-    ? 'Weekly recap: ten minutes each week on what went well, what didn’t, what’s next.'
-    : streak > 0 ? `Weekly recap · ${streak}-week streak · ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'} in total` : `Weekly recap · ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'} · no current streak`
+    ? 'Weekly recap: ten minutes a week on what went well, what did not, and what is next.'
+    : streak > 0 ? `Weekly recap · ${streak}-week run · ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'} in total` : `Weekly recap · ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'}`
 
   return (
     <>
@@ -72,7 +72,7 @@ export default function Review() {
 
       <div className="rv-layout">
         <div className="stack" style={{ gap: 16 }}>
-          {current !== undefined && phone && <SeasonStories weekOf={weekOf} snapshot={(current as LockableReview | null)?.numbers} wins={current?.wins} focusNext={current?.focusNext} planned={planned} />}
+          {current !== undefined && <SeasonStories weekOf={weekOf} snapshot={(current as LockableReview | null)?.numbers} wins={current?.wins} focusNext={current?.focusNext} planned={planned} />}
           {current !== undefined && <WeekInNumbers weekOf={weekOf} snapshot={(current as LockableReview | null)?.numbers} />}
           {!phone && <Digest weekOf={weekOf} />}
           {weekOf === thisWeek && <InsightsWeek />}
@@ -98,7 +98,7 @@ export default function Review() {
                 })}
               </div>
             ) : (
-              <Empty>Your first review will appear here. Fill in the form and save.</Empty>
+              <Empty>Your first recap shows here. Fill in the form and save.</Empty>
             )}
           </Card>
         </div>

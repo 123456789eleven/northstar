@@ -9,7 +9,7 @@ import { KINDS, logContact, nextBirthday, sortPeople, undoContact } from '../fea
 import { PersonDetail, PersonForm } from '../features/people/PersonModals'
 import { CircleView } from '../features/people/CircleView'
 import { PersonRow } from '../features/people/PersonRow'
-import { mostOverdue } from '../features/people/circle'
+import { mostOverdue, reminderLine } from '../features/people/circle'
 import '../features/people/people.css'
 import '../features/people/circle.css'
 
@@ -99,7 +99,7 @@ export default function People() {
       .sort((a, b) => a.inDays - b.inDays)
   }, [people, now])
 
-  const sub = people === undefined ? '' : people.length === 0 ? 'Keep in touch with the people who matter.' : dueCount ? `${dueCount} due for a check-in` : 'Everyone is up to date'
+  const sub = people === undefined ? '' : people.length === 0 ? 'Keep in touch with the people who matter.' : dueCount ? `${dueCount} to check in with` : 'Everyone is up to date'
 
   return (
     <>
@@ -126,7 +126,7 @@ export default function People() {
         )}
         <div className="ppl-toolbar">
           <Tabs<View> value={view} onChange={chooseView} options={[{ value: 'circle', label: 'Circle' }, { value: 'list', label: 'List' }]} />
-          {reach && <button type="button" className="ppl-reach" onClick={() => setOpenId(reach.id!)} data-testid="reach-out">Reach out to {reach.name}</button>}
+          {reach && <button type="button" className="ppl-reach" onClick={() => setOpenId(reach.id!)} data-testid="reach-out">{reminderLine(reach, now)}</button>}
         </div>
         <div className={`ppl-board ${view === 'list' ? 'is-list' : ''}`}>
           {view === 'circle' && (

@@ -19,7 +19,7 @@ function whenIdle(cb: () => void): () => void {
   return () => window.clearTimeout(t)
 }
 
-/** Renders the app at once; the engine chunk loads when idle (or when the Today board asks), never in Calm mode.
+/** Renders the app at once; the engine chunk loads when idle or when the Today board asks. The old Calm switch is gone: calm is the permanent default and `game.calm` is no longer read.
  *  Mirrors the device-local game settings into the feedback helpers and <html>. */
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const g = useGameSettings()
@@ -28,11 +28,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [live, setLive] = useState<PlayerState | null>(null)
   useEffect(() => whenIdle(() => setIdle(true)), [])
 
-  const run = !g.loading && !g.calm && (idle || asked)
+  const run = !g.loading && (idle || asked)
   const player = useMemo<PlayerState>(() => {
-    if (!g.loading && g.calm) return { ...EMPTY_PLAYER, loading: false, calm: true, streak: { ...EMPTY_PLAYER.streak, target: g.weekTarget } }
     return run && live ? live : EMPTY_PLAYER
-  }, [g.loading, g.calm, g.weekTarget, run, live])
+  }, [run, live])
 
   useEffect(() => { setHapticsEnabled(g.haptics) }, [g.haptics])
   useEffect(() => { setSoundEnabled(g.sound) }, [g.sound])
@@ -41,11 +40,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     if (g.motion === 'reduced') root.dataset.motion = 'reduced'
     else delete root.dataset.motion
   }, [g.motion])
-  useEffect(() => {
-    const root = document.documentElement
-    if (g.calm) root.dataset.calm = 'on'
-    else delete root.dataset.calm
-  }, [g.calm])
   return (
     <PlayerContext.Provider value={player}>
       {children}

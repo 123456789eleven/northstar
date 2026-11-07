@@ -43,6 +43,7 @@
 .ach-month-name { color: var(--ink-3); font-size: 13px; padding-top: 2px; }
 .ach-list { display: flex; flex-direction: column; gap: 10px; }
 .ach-entry { display: flex; gap: 12px; align-items: baseline; }
+.ach-entry .ach-mark { align-self: center; }
 .ach-entry-title { flex: 1; min-width: 0; font-size: 15px; overflow-wrap: anywhere; }
 .ach-entry-meta { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
 @media (max-width: 520px) {
