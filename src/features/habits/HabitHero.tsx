@@ -23,7 +23,7 @@ export function HabitHero({ habits, byHabit, today }: { habits: Habit[]; byHabit
         <div className="habit-hero-text">
           <strong>This week</strong>
           <span>{week.done} of {week.target} check-ins</span>
-          <span className="faint">{steady.on} of the last {steady.of} weeks on target, with {GRACE_DAYS} grace day each week.</span>
+          {steady.on > 0 ? <span className="faint">{steady.on} of the last {steady.of} weeks on target, with {GRACE_DAYS} grace day each week.</span> : <span className="faint">Each week allows {GRACE_DAYS} grace day.</span>}
         </div>
       </div>
       <div className="cgrid-wrap">
