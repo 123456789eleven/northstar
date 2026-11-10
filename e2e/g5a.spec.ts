@@ -37,6 +37,17 @@ for (const vp of [{ name: '390', size: { width: 390, height: 844 }, touch: true 
   test.describe(`G5a at ${vp.name}`, () => {
     test.use({ viewport: vp.size, hasTouch: vp.touch })
 
+    test('Milestones: badges tab shows badges and opens a sheet', async ({ page }) => {
+      await seed(page, { events: milestones })
+      await page.goto('/#/history')
+      await page.getByRole('tab', { name: 'Badges' }).click()
+      await expect(page.getByTestId('badge')).toHaveCount(25)
+      await page.getByTestId('badge').first().click()
+      await expect(page.getByRole('dialog')).toBeVisible()
+      await page.getByRole('button', { name: 'Close' }).click()
+      await noHScroll(page)
+    })
+
     test('Milestones: logbook renders seeded milestones with date and next milestones, no rarity or New tags', async ({ page }) => {
       await seed(page, { events: milestones })
       await page.goto('/#/history')

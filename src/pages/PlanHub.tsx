@@ -21,6 +21,7 @@ import '../features/goals/quest.css'
 import '../features/goals/season.css'
 import '../features/hubs/planhub.css'
 import '../features/hubs/planhub2.css'
+import '../features/space/space.css'
 
 export default function PlanHub() {
   const d = today()
@@ -78,8 +79,8 @@ export default function PlanHub() {
           <div className="card"><Skeleton lines={4} label="Loading plan" /></div>
         </div>
       ) : (
-        <div className="plan-over">
-          <section className="card plan-hero" aria-label="Plan overview">
+        <div className="plan-over sp-plan">
+          <section className="card plan-hero sp-hero" aria-label="Plan overview">
             <div className="plan-hero-main">
               <span className="stat-label">Open tasks</span>
               <div className="plan-hero-num" data-testid="plan-open">
@@ -125,7 +126,7 @@ export default function PlanHub() {
             </div>
           </section>
 
-          <section className="card plan-focus" aria-labelledby="pf-h">
+          <section className="card plan-focus sp-flat" aria-labelledby="pf-h">
             <div className="plan-head"><h2 id="pf-h" className="quest-h">Today&apos;s focus</h2><Link to="/tasks" className="plan-more">Tasks</Link></div>
             <ol className="plan-slots">
               {Array.from({ length: MAX_FOCUS }, (_, i) => {
@@ -139,7 +140,7 @@ export default function PlanHub() {
             </ol>
           </section>
 
-          <section className="card plan-habits" aria-labelledby="ph-h">
+          <section className="card plan-habits sp-flat" aria-labelledby="ph-h">
             <div className="plan-head"><h2 id="ph-h" className="quest-h">Habits this week</h2><Link to="/habits" className="plan-more">Habits</Link></div>
             {ring.target > 0 ? (
               <div className="plan-habits-body">
@@ -158,7 +159,7 @@ export default function PlanHub() {
 
           <nav className="plan-tools" aria-label="Plan tools">
             {tools.map((q) => (
-              <Link key={q.to} to={q.to} className="card card-interactive plan-tool">
+              <Link key={q.to} to={q.to} className="card card-interactive plan-tool sp-flat">
                 <span className="plan-tool-name">{q.label}</span>
                 <span className={`plan-tool-note ${q.warn ? 'is-warn' : ''}`}>{q.note}</span>
               </Link>

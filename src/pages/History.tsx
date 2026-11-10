@@ -8,6 +8,7 @@ import { MilestoneShelf } from '../features/history/MilestoneShelf'
 import { BadgesView } from '../features/badges/BadgesView'
 import { BadgeWatcher } from '../features/badges/BadgeWatcher'
 import '../features/history/history.css'
+import '../features/space/space.css'
 
 type Tab = 'timeline' | 'achievements' | 'badges'
 
