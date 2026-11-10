@@ -1,4 +1,4 @@
-// Constellation shell (phase G1): hub navigation on phone and desktop, the capture orb, the mission rail, Calm mode and a
+// Constellation shell (phase G1): hub navigation on phone and desktop, the capture orb, Home and Today, Calm mode and a
 // quest that completes itself from real data. Fictional data only.
 import { expect, test } from '@playwright/test'
 
@@ -24,8 +24,9 @@ test.describe('phone 390x844', () => {
     await expect(page).toHaveURL(/#\/you$/)
     await expect(page.getByRole('heading', { level: 1, name: 'You' })).toBeVisible()
 
-    await bar.getByRole('link', { name: 'Today' }).click()
+    await bar.getByRole('link', { name: 'Home' }).click()
     await expect(page).toHaveURL(/#\/$/)
+    await expect(page.getByTestId('lifemap')).toBeVisible()
 
     // Tap targets: every bottom-bar control is at least 44px tall.
     for (const el of await bar.locator('a, button').all()) {
@@ -46,7 +47,7 @@ test.describe('phone 390x844', () => {
     await expect(sheet).toBeHidden()
 
     // No horizontal scroll on the hubs at phone width.
-    for (const r of ['/', '/plan', '/skills', '/mind', '/you', '/food']) {
+    for (const r of ['/', '/today', '/plan', '/skills', '/mind', '/you', '/food']) {
       await page.goto('/#' + r)
       await expect(page.locator('.route-view')).toBeVisible()
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
@@ -54,32 +55,27 @@ test.describe('phone 390x844', () => {
   })
 })
 
-test('desktop 1440: rail with area groups and the plan rail are visible; old URLs sit inside their hub', async ({ page }) => {
+test('desktop 1440: rail with Home, Today and area groups; no right rail; old URLs sit inside their hub', async ({ page }) => {
   await page.goto('/')
   const rail = page.getByRole('navigation', { name: 'Main' })
   await expect(rail).toBeVisible()
-  for (const name of ['Today', 'Plan', 'Body', 'Money', 'Mind', 'Career', 'People', 'Milestones', 'Settings']) {
+  for (const name of ['Home', 'Today', 'Plan', 'Body', 'Money', 'Mind', 'Career', 'People', 'Milestones', 'Settings']) {
     await expect(rail.getByRole('link', { name, exact: false }).first()).toBeVisible()
   }
-  // The season and week rail belongs to Today; other pages keep the room.
-  const mission = page.getByRole('complementary', { name: 'Plan and week' })
-  await expect(mission).toBeVisible()
-  await expect(mission.getByText('Season', { exact: true })).toBeVisible()
-  await expect(mission.getByRole('heading', { name: 'This week' })).toBeVisible()
-  await page.goto('/#/body')
-  await expect(mission).toBeHidden()
+  // The old right rail is gone: its season and week lines live in Home's Today tab.
+  await expect(page.getByRole('complementary', { name: 'Plan and week' })).toHaveCount(0)
+  const panel = page.getByTestId('home-panel')
+  await expect(panel.getByRole('link', { name: /Q\d \d{4}/ })).toBeVisible()
+  await expect(panel.getByRole('list', { name: /This week/ })).toBeVisible()
+  await expect(page).toHaveTitle('Home | Northstar')
+  await page.goto('/#/today')
+  await expect(page).toHaveTitle('Today | Northstar')
 
   // /food keeps working and lights Body in the hub strip and Food in the sub-strip.
   await page.goto('/#/food')
   await expect(page.getByRole('navigation', { name: 'Areas sections' }).getByRole('link', { name: 'Body' })).toHaveAttribute('aria-current', 'true')
   await expect(page.getByRole('navigation', { name: 'Body pages' }).getByRole('link', { name: 'Food' })).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Food | Northstar')
-
-  // Below 1280px the Today rail collapses.
-  await page.goto('/#/')
-  await expect(mission).toBeVisible()
-  await page.setViewportSize({ width: 1180, height: 900 })
-  await expect(mission).toBeHidden()
 })
 
 test('Areas hub shows five rings with their inputs and a table view, no levels', async ({ page }) => {
@@ -98,7 +94,7 @@ test('a weigh-in quest completes itself when you log a weight', async ({ page })
   await capture.fill('w 140.0 yesterday')
   await capture.press('Enter')
   await expect(page.locator('.topbar .qc-saved')).toBeVisible()
-  await page.goto('/')
+  await page.goto('/#/today')
   const quest = page.locator('[data-quest="weigh-in"]')
   await expect(quest).toBeVisible()
   await expect(quest).not.toHaveClass(/is-done/)

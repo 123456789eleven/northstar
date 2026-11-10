@@ -84,7 +84,7 @@ test.describe('phone 390x844', () => {
 
   test('today: focus bar pins from the picker and the agenda strip scrolls inside the card', async ({ page }) => {
     await addTask(page, 'Fixture focus task')
-    await page.goto('/#/')
+    await page.goto('/#/today')
     const focus = page.getByRole('region', { name: 'Focus' })
     await focus.getByRole('button', { name: 'Pin a task' }).click()
     await focus.getByRole('button', { name: 'Fixture focus task' }).click()
@@ -135,7 +135,7 @@ test.describe('desktop 1440x900', () => {
   })
 
   test('today: daily find is hidden with no data; focus and agenda render; tasks focus bar is shared', async ({ page }) => {
-    await page.goto('/#/')
+    await page.goto('/#/today')
     await expect(page.getByRole('region', { name: 'Focus' })).toBeVisible()
     await expect(page.getByRole('region', { name: "Today's agenda" })).toBeVisible()
     await expect(page.getByTestId('daily-find')).toHaveCount(0)
@@ -143,7 +143,7 @@ test.describe('desktop 1440x900', () => {
     await addTask(page, 'Fixture shared pin')
     await page.getByRole('button', { name: "Pin to today's focus" }).first().click()
     await expect(page.getByRole('region', { name: 'Focus' }).getByRole('button', { name: 'Unpin Fixture shared pin from focus' })).toBeVisible()
-    await page.goto('/#/')
+    await page.goto('/#/today')
     await expect(page.getByRole('region', { name: 'Focus' }).getByText('Fixture shared pin')).toBeVisible()
   })
 })
