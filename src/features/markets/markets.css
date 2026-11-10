@@ -1,0 +1,4 @@
+.mkt-box { margin: 10px 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; color: var(--ink-2); }
+.mkt-box ul { margin: 6px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.mkt-note { color: var(--ink-2); font-size: 13px; margin: 8px 0; }
+.mkt-actions { gap: 8px; flex-wrap: wrap; margin-top: 10px; }

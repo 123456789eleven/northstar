@@ -26,6 +26,11 @@ async function seedEverything() {
   await db.weights.add({ date: '2026-03-01', weight: 135.4, note: 'morning' })
   await db.holdings.add({ account: 'Example Roth IRA (VTI)', ticker: 'VTI', shares: 100.5, price: 312.45, priceDate: '2026-03-01', costBasis: 28000, note: 'x' })
   await db.contributions.add({ date: '2026-03-01', amount: 500, account: 'Example Roth IRA (VTI)', kind: 'contribution' })
+  await db.watchlist.add({ symbol: 'VTI', addedAt: T, note: 'core', alertAbove: 350, alertBelow: 250 })
+  await db.paperTrades.add({ symbol: 'VTI', side: 'buy', qty: 2.5, price: 300.1, date: '2026-03-01', note: 'practice' })
+  await db.tradeJournal.add({ date: '2026-03-01', symbol: 'VTI', thesis: 'Example thesis', setup: 's', outcome: 'o', lesson: 'l', emotion: 'calm', tags: ['etf'] })
+  await db.priceHistory.add({ symbol: 'VTI', date: '2026-03-01', close: 312.45, open: 310, high: 313, low: 309.5, volume: 1000 })
+  await db.settings.put({ key: 'paper.startCash', value: 50000 })
   await db.settings.put({ key: 'food.targets', value: { protein: 120 } })
   await db.settings.put({ key: BACKUP_LAST_KEY, value: T })
   // v4 sync bookkeeping (device-local, no user content).
@@ -36,6 +41,37 @@ async function seedEverything() {
 const snapshot = async () => Object.fromEntries(await Promise.all(db.tables.map(async (t) => [t.name, await t.toArray()])))
 const file = (content: unknown, name = 'northstar-backup-2026-03-01.json', type = 'application/json') =>
   new File([typeof content === 'string' ? content : JSON.stringify(content)], name, { type })
+
+describe('device-local secrets', () => {
+  it('the Finnhub key and SimpleFIN URL never enter a backup and survive a restore', async () => {
+    await seedEverything()
+    await db.settings.bulkPut([
+      { key: 'market.finnhubKey', value: 'fake-key-abcd1234' },
+      { key: 'market.showMovers', value: true },
+      { key: 'simplefin.accessUrl', value: 'https://fake.invalid/x' },
+    ])
+    const backup = await buildBackup()
+    const keys = (backup.tables.settings as { key: string }[]).map((r) => r.key)
+    expect(keys).not.toContain('market.finnhubKey')
+    expect(keys).not.toContain('simplefin.accessUrl')
+    expect(keys).toContain('market.showMovers')
+    expect(JSON.stringify(backup)).not.toContain('fake-key-abcd1234')
+
+    // A restore replaces data but keeps this device's secrets, and ignores a key smuggled into a file.
+    ;(backup.tables.settings as unknown[]).push({ key: 'market.finnhubKey', value: 'file-key' })
+    await importBackup(backup)
+    expect((await db.settings.get('market.finnhubKey'))!.value).toBe('fake-key-abcd1234')
+    expect((await db.settings.get('simplefin.accessUrl'))!.value).toBe('https://fake.invalid/x')
+  })
+
+  it('a restore on a device with no key does not create one from the file', async () => {
+    await seedEverything()
+    const backup = await buildBackup()
+    ;(backup.tables.settings as unknown[]).push({ key: 'market.finnhubKey', value: 'file-key' })
+    await importBackup(backup)
+    expect(await db.settings.get('market.finnhubKey')).toBeUndefined()
+  })
+})
 
 describe('backup round trip', () => {
   it('seeds a row in every table (guard)', async () => {
