@@ -288,6 +288,12 @@ export interface TradeJournalEntry {
   lesson?: string
   emotion?: string
   tags?: string[]
+  /** Planned prices, set before the trade. */
+  plan?: { entry?: number; stop?: number; target?: number }
+  /** Paper trade this entry is about (standalone when missing). */
+  tradeId?: number
+  /** Whether the trade followed the plan, set when reviewing. */
+  followedPlan?: boolean
 }
 
 /** Markets: one daily close per symbol, recorded from quotes. Derived cache, device-local (never synced). */
