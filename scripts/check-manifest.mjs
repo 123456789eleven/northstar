@@ -3,7 +3,7 @@
 import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 const dist = 'dist'
-const BRAND = '#0b0b10'
+const BRAND = '#08090c'
 const fail = []
 const m = JSON.parse(readFileSync(join(dist, 'manifest.webmanifest'), 'utf8'))
 const html = readFileSync(join(dist, 'index.html'), 'utf8')
