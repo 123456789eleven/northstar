@@ -5,6 +5,7 @@ import { isPinned, togglePin } from './taskActions'
 import { useTaskToggle } from './useTaskToggle'
 import { useMedia, PHONE_QUERY } from '../../components/useMedia'
 import { haptic } from '../../lib/haptics'
+import './aura.css'
 import { idle, isSwiping, pull, swipeReduce, THRESHOLD, type SwipeEvent, type SwipeState } from './swipe'
 
 export function PinIcon() {

@@ -10,6 +10,8 @@ import { completeTask, reopenTask } from './taskActions'
 import { forgetCompletion, recordCompletion } from './combo'
 import { doneMessage } from './winCopy'
 
+const AURA_MS = 560
+
 export function useTaskToggle(task: Task) {
   const toast = useToast()
   const [completing, setCompleting] = useState(false)
@@ -24,7 +26,7 @@ export function useTaskToggle(task: Task) {
     if (completing) return
     setCompleting(true)
     if (!prefersReducedMotion()) {
-      await new Promise((r) => window.setTimeout(r, DUR.slow))
+      await new Promise((r) => window.setTimeout(r, AURA_MS)) // long enough for the aura ring to read before the row leaves
       setLeaving(true)
       await new Promise((r) => window.setTimeout(r, DUR.base))
     }
