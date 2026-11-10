@@ -37,8 +37,8 @@ export function MilestoneShelf() {
   const [shown, setShown] = useState(PAGE)
   if (!all) return <section className="card tr-shelf"><Skeleton rows={3} label="Loading milestones" /></section>
   return (
-    <section className="card tr-shelf" aria-labelledby="tr-shelf-h">
-      <div className="card-title"><h2 id="tr-shelf-h" className="tr-h">Latest milestones</h2><span className="small faint mono">{all.length} {all.length === 1 ? 'milestone' : 'milestones'}</span></div>
+    <section className="card tr-shelf sp-flat" aria-labelledby="tr-shelf-h">
+      <div className="card-title"><h2 id="tr-shelf-h" className="tr-h">Latest milestones</h2><span className="sp-figure"><b className="mono">{all.length}</b> {all.length === 1 ? 'milestone' : 'milestones'}</span></div>
       {all.length === 0 ? (
         <p className="small muted tr-empty">None yet. Finished goals, completed courses and anything you add with Milestone switched on are logged here, with the date.</p>
       ) : (

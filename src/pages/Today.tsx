@@ -25,6 +25,8 @@ import '../features/tasks/tasks.css'
 import '../features/tasks/g2a.css'
 import '../features/today/today.css'
 import '../features/today/g2a.css'
+import '../features/space/space.css'
+import { BadgeWatcher } from '../features/badges/BadgeWatcher'
 
 export default function Today() {
   const d = today()
@@ -100,13 +102,14 @@ export default function Today() {
       />
 
       <FirstRunCard />
+      <BadgeWatcher />
 
       {/* Today's plan: items tick themselves off from real logs. */}
       <MissionBoard />
       <Pulse />
 
       {loaded && (
-        <div className="today-top">
+        <div className="card today-top sp-duo">
           <FocusBar tasks={tasks} d={d} onEdit={setEditing} />
           <AgendaStrip />
         </div>
@@ -114,7 +117,7 @@ export default function Today() {
 
       {!loaded && <div className="skel skel-strip skel-pulse kpi-skel" aria-hidden />}
 
-      <div className="today-grid">
+      <div className="today-grid sp-today">
         <div className="today-col">
           <Card title="Your day" action={<Link className="card-link" to="/tasks">All tasks</Link>}>
             {dueList.length > 0 && (

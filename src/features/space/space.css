@@ -1,0 +1,64 @@
+/* Space pass: fewer boxes, more air. One hero block per page keeps its card; supporting blocks sit flat on the page,
+   separated by whitespace and a hairline. Loaded after liquid.css, so selectors carry an extra class to win. */
+
+/* A card that gives up its box. */
+.card.sp-flat { background: none; background-image: none; border: 0; box-shadow: none; padding: 0; -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: 0; }
+.card.sp-flat::before, .card.sp-flat::after { display: none; }
+.card.sp-flat.card-interactive:hover { background: none; transform: none; }
+.card.sp-flat.card-interactive:hover .area-title, .card.sp-flat.card-interactive:hover .plan-tool-name { color: var(--accent-text, var(--accent)); }
+.sp-figure { font-size: var(--fs-2); color: var(--ink-2); font-weight: 400; }
+.sp-figure b { font-size: 40px; line-height: 1; font-weight: 600; color: var(--ink); letter-spacing: -0.02em; margin-right: 6px; }
+
+/* Today */
+.sp-duo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; padding: 28px; margin-bottom: 24px; }
+.sp-duo > .card { background: none; background-image: none; border: 0; box-shadow: none; padding: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.sp-duo > .card::before, .sp-duo > .card::after { display: none; }
+.sp-duo > .card + .card { padding-left: 48px; border-left: 1px solid var(--line-soft); }
+.sp-duo .focus-slot.is-empty, .sp-duo .focus-slot { border-color: transparent; border-bottom: 1px solid var(--line-soft); border-radius: 0; background: none; }
+.sp-duo .focus-add, .sp-duo .focus-open { border-radius: 0; border: 0; border-bottom: 1px solid var(--line-soft); background: none; }
+@media (max-width: 819px) { .sp-duo { grid-template-columns: minmax(0, 1fr); gap: 32px; padding: 20px; } .sp-duo > .card + .card { padding-left: 0; border-left: 0; padding-top: 28px; border-top: 1px solid var(--line-soft); } }
+.mission { margin-bottom: 32px; }
+.mission .mission-grid > * { background: none; border-radius: 0; box-shadow: none; }
+.pulse { gap: 24px; margin-bottom: 32px; }
+.pulse .pulse-value { font-size: 44px; white-space: nowrap; line-height: 1; letter-spacing: -0.025em; }
+.pulse .pulse-of { font-size: var(--fs-3); }
+.sp-today { gap: 24px; }
+.sp-today .today-col { gap: 24px; }
+.today-more { margin-top: 32px; }
+
+/* Plan */
+.sp-plan { gap: 48px 56px; }
+.sp-plan > .plan-hero.sp-hero { padding: 32px; gap: 56px; }
+.sp-plan .plan-hero-big { font-size: 112px; }
+.sp-plan .plan-focus, .sp-plan .plan-habits { border-top: 1px solid var(--line-soft); padding-top: 28px; }
+.sp-plan .plan-slots { gap: 0; }
+.sp-plan .plan-slot { border: 0; border-bottom: 1px solid var(--line-soft); border-radius: 0; background: none; padding-left: 0; padding-right: 0; min-height: 52px; }
+.sp-plan .plan-tools { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px 40px; border-top: 1px solid var(--line-soft); padding-top: 28px; }
+.sp-plan .plan-tool { padding: 0; }
+@media (max-width: 819px) { .sp-plan { gap: 36px; } .sp-plan > .plan-hero.sp-hero { padding: 20px; gap: 32px; } .sp-plan .plan-hero-big { font-size: 80px; } }
+
+/* Areas */
+.sp-areas { gap: 56px 64px; margin-top: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+.sp-areas .area-card { border-top: 1px solid var(--line-soft); padding-top: 28px; gap: 24px; }
+.sp-areas .area-days b { font-size: 28px; }
+.sp-areas .area-card .ring, .sp-areas .area-head svg { max-width: 96px; }
+@media (max-width: 819px) { .sp-areas { gap: 36px; } }
+
+/* You */
+.sp-you { gap: 56px; margin-bottom: 48px; }
+.sp-you .you-profile.sp-hero { padding: 32px; }
+.sp-you .you-name { font-size: 44px; line-height: 1.05; letter-spacing: -0.025em; }
+.sp-you.you-top { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+.you-mid { gap: 56px; margin-bottom: 48px; }
+.you-mid .tr-next-link, .you-mid .tr-next-card { border: 0; border-bottom: 1px solid var(--line-soft); border-radius: 0; padding-left: 0; padding-right: 0; }
+.sp-links { gap: 0 48px; border-top: 1px solid var(--line-soft); padding-top: 8px; }
+.sp-links .hub-card.card { background: none; background-image: none; border: 0; border-bottom: 1px solid var(--line-soft); box-shadow: none; border-radius: 0; padding: 16px 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.sp-links .hub-card.card::before, .sp-links .hub-card.card::after { display: none; }
+@media (max-width: 819px) { .sp-you { gap: 40px; } .you-mid { gap: 40px; } .sp-you .you-name { font-size: 36px; } }
+
+/* Milestones */
+.tr-shelf.sp-flat { margin-bottom: 40px; }
+.tr-shelf.sp-flat .ms-row { padding: 14px 0; }
+.tr-shelf .tr-next-wrap { margin-top: 32px; padding-top: 24px; }
+.tr-shelf .tr-next { gap: 32px; }
+.tr-shelf .tr-next-link { border: 0; padding: 0; }
