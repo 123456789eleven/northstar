@@ -81,7 +81,7 @@ describe('navigate and fitView', () => {
     expect(navigate(l.nodes, 'b:family', 'left')).toBe('b:family')
   })
   it('fits small trees centred and clamps long ones', () => {
-    expect(fitView({ x: 0, y: 0, w: 400, h: 200 }, 800, 600).k).toBeCloseTo(1.1)
+    expect(fitView({ x: 0, y: 0, w: 400, h: 200 }, 800, 600).k).toBeCloseTo(1.35)
     expect(fitView({ x: 0, y: 0, w: 400, h: 4000 }, 390, 500).k).toBe(0.55)
   })
 })

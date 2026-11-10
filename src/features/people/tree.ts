@@ -136,7 +136,7 @@ export function navigate(nodes: Pick<TNode, 'key' | 'x' | 'y' | 'kind'>[], from:
 }
 
 /** Scale and offset to fit `bounds` in a viewport; scale is clamped so a long tree stays legible (then it aligns to the top-left and pans). */
-export function fitView(bounds: TreeLayout['bounds'], vw: number, vh: number, minScale = 0.55, maxScale = 1.1) {
+export function fitView(bounds: TreeLayout['bounds'], vw: number, vh: number, minScale = 0.55, maxScale = 1.35) {
   const raw = Math.min(vw / bounds.w, vh / bounds.h)
   const k = Math.min(maxScale, Math.max(minScale, raw))
   const fitsX = bounds.w * k <= vw, fitsY = bounds.h * k <= vh
