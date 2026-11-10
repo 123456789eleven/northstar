@@ -5,9 +5,11 @@ import { useFocusParam, useFocusTarget } from '../lib/useFocusParam'
 import { PageHeader, Tabs } from '../components/ui'
 import { Achievements, AddEntry, OnThisDay, Timeline } from '../features/history/history'
 import { MilestoneShelf } from '../features/history/MilestoneShelf'
+import { BadgesView } from '../features/badges/BadgesView'
+import { BadgeWatcher } from '../features/badges/BadgeWatcher'
 import '../features/history/history.css'
 
-type Tab = 'timeline' | 'achievements'
+type Tab = 'timeline' | 'achievements' | 'badges'
 
 export default function History() {
   const [tab, setTab] = useState<Tab>('timeline')
@@ -31,8 +33,9 @@ export default function History() {
 
       <MilestoneShelf />
 
-      <Tabs<Tab> value={tab} onChange={setTab} options={[{ value: 'timeline', label: 'Timeline' }, { value: 'achievements', label: 'Logbook' }]} />
-      {tab === 'timeline' ? <><OnThisDay /><Timeline onAdd={() => setAdding(true)} revealAt={revealAt} /></> : <Achievements onAdd={() => setAdding(true)} />}
+      <Tabs<Tab> value={tab} onChange={setTab} options={[{ value: 'timeline', label: 'Timeline' }, { value: 'achievements', label: 'Logbook' }, { value: 'badges', label: 'Badges' }]} />
+      {tab === 'timeline' ? <><OnThisDay /><Timeline onAdd={() => setAdding(true)} revealAt={revealAt} /></> : tab === 'badges' ? <BadgesView /> : <Achievements onAdd={() => setAdding(true)} />}
+      <BadgeWatcher />
       {adding && <AddEntry onClose={() => setAdding(false)} />}
     </>
   )
