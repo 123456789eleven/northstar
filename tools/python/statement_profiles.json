@@ -1,0 +1,22 @@
+{
+  "_comment": "Generic example profiles. Add your own bank layout here (see README). 'detect' is a regex tested against the PDF text; first match wins. Without a match the tool uses automatic layout detection.",
+  "profiles": [
+    {
+      "name": "example-amount-and-balance",
+      "detect": "EXAMPLE BANK CHECKING",
+      "row_regex": "^(?P<date>\\d{2}/\\d{2})\\s+(?P<desc>.+?)\\s+(?P<amount>-?[\\d,]+\\.\\d{2})\\s+(?P<balance>[\\d,]+\\.\\d{2})$",
+      "skip": [
+        "^Page \\d+",
+        "^Beginning balance",
+        "^Ending balance"
+      ]
+    },
+    {
+      "name": "example-card-purchases",
+      "detect": "EXAMPLE CARD SERVICES",
+      "row_regex": "^(?P<date>\\d{2}/\\d{2})\\s+(?P<posted>\\d{2}/\\d{2})\\s+(?P<desc>.+?)\\s+(?P<amount>-?\\$?[\\d,]+\\.\\d{2})$",
+      "unsigned": "expense",
+      "period_regex": "(?P<start>\\d{2}/\\d{2}/\\d{4})\\s*-\\s*(?P<end>\\d{2}/\\d{2}/\\d{4})"
+    }
+  ]
+}

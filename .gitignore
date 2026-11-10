@@ -37,3 +37,8 @@ pages-dist
 # Playwright
 test-results/
 playwright-report/
+
+# Python tools (private outputs and statements)
+tools/python/out/
+*.pdf
+__pycache__/
