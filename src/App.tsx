@@ -36,6 +36,7 @@ const Planner = lazy(() => import('./pages/Planner'))
 const DataHub = lazy(() => import('./pages/DataHub'))
 const Career = lazy(() => import('./pages/Career'))
 const PlanHub = lazy(() => import('./pages/PlanHub'))
+const LifeMap = lazy(() => import('./pages/LifeMap'))
 const SkillsHub = lazy(() => import('./pages/SkillsHub'))
 const MindHub = lazy(() => import('./pages/MindHub'))
 const YouHub = lazy(() => import('./pages/YouHub'))
@@ -98,6 +99,7 @@ function Shell() {
             </Route>
             <Route element={<HubLayout hub="skills" />}>
               <Route path="/skills" element={<SkillsHub />} />
+              <Route path="/map" element={<LifeMap />} />
               <Route path="/body" element={<Body />} />
               <Route path="/interview" element={<Interview />} />
               <Route path="/style" element={<StyleTile />} />
