@@ -12,7 +12,7 @@ def make_pdf(pages, path):
         objs.append(f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 700 800] /Contents {4 + 2 * i} 0 R /Resources << /Font << /F1 {font_id} 0 R >> >> >>".encode())
         parts = ["BT /F1 9 Tf 11 TL 20 780 Td"]
         for ln in lines:
-            esc = ln.replace("\\", "\\\\").replace("(", "\(").replace(")", "\)")
+            esc = ln.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
             parts.append(f"({esc}) Tj T*")
         parts.append("ET")
         stream = "\n".join(parts).encode("latin-1")
