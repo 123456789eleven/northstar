@@ -4,7 +4,7 @@ import { REGISTRY, resolveLinks, timelineFor, TYPE_LIST } from './registry'
 
 describe('ontology registry', () => {
   it('declares every type with a table that exists', () => {
-    expect(TYPE_LIST.length).toBe(14)
+    expect(TYPE_LIST.length).toBe(17)
     for (const t of TYPE_LIST) expect(db.tables.map((x) => x.name)).toContain(t.table)
   })
 
@@ -55,5 +55,13 @@ describe('ontology registry', () => {
     const id = (await db.goals.add({ title: 'G', area: 'career', horizon: 'quarter', status: 'active', milestones: [{ id: 'a', title: 'a', done: true }, { id: 'b', title: 'b', done: false }], createdAt: '2026-01-01T00:00:00.000Z' })) as number
     const g = (await db.goals.get(id))!
     expect(await REGISTRY.Goal.functions[0].run(g as never)).toContain('50%')
+  })
+})
+
+describe('markets types', () => {
+  it('trade journal titles never include thesis or lesson text', () => {
+    const e = { id: 1, date: '2026-03-01', symbol: 'VTI', thesis: 'very private thesis', lesson: 'very private lesson' }
+    const shown = REGISTRY.TradeJournalEntry.title(e as never) + REGISTRY.TradeJournalEntry.subtitle(e as never)
+    expect(shown).not.toContain('private')
   })
 })

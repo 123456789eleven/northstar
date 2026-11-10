@@ -10,8 +10,10 @@ export interface BackupFile {
   tables: Record<string, unknown[]>
 }
 
-/** Settings under this prefix hold secrets: excluded from backups and kept across a restore. */
-export const SECRET_PREFIX = 'simplefin.'
+/** Settings whose key starts with any of these hold secrets: excluded from backups and kept across a restore.
+ *  'market.finnhubKey' is the owner's own Finnhub API key (other market.* settings are plain preferences). */
+export const SECRET_PREFIXES = ['simplefin.', 'market.finnhubKey'] as const
+export const isSecretSetting = (key: unknown): boolean => typeof key === 'string' && SECRET_PREFIXES.some((p) => key.startsWith(p))
 export const BACKUP_LAST_KEY = 'backup.lastAt'
 export const BACKUP_LAST_ENCRYPTED_KEY = 'backup.lastEncrypted'
 export const BACKUP_REMIND_KEY = 'backup.reminderDays'
@@ -30,8 +32,8 @@ export async function buildBackup(): Promise<BackupFile> {
   await db.transaction('r', db.tables, async () => {
     for (const t of db.tables) tables[t.name] = await t.toArray()
   })
-  // Device-only secrets (the SimpleFIN access URL) never go into a backup file.
-  tables.settings = (tables.settings ?? []).filter((r) => !String((r as { key?: unknown }).key).startsWith(SECRET_PREFIX))
+  // Device-only secrets (the SimpleFIN access URL, the Finnhub key) never go into a backup file.
+  tables.settings = (tables.settings ?? []).filter((r) => !isSecretSetting((r as { key?: unknown }).key))
   return { app: 'northstar', version: db.verno, exportedAt: new Date().toISOString(), tables }
 }
 
@@ -107,11 +109,11 @@ export function parseBackupText(text: string): ParsedBackup {
 /** Replaces ALL local data with the backup's contents in one transaction. */
 export async function importBackup(data: BackupFile) {
   await db.transaction('rw', db.tables, async () => {
-    const secrets = await db.settings.filter((r) => r.key.startsWith(SECRET_PREFIX)).toArray()
+    const secrets = await db.settings.filter((r) => isSecretSetting(r.key)).toArray()
     for (const t of db.tables) {
       await t.clear()
       const rows = data.tables[t.name]
-      if (rows?.length) await t.bulkAdd((t.name === 'settings' ? rows.filter((r) => !String((r as { key?: unknown }).key).startsWith(SECRET_PREFIX)) : rows) as never[])
+      if (rows?.length) await t.bulkAdd((t.name === 'settings' ? rows.filter((r) => !isSecretSetting((r as { key?: unknown }).key)) : rows) as never[])
     }
     if (secrets.length) await db.settings.bulkPut(secrets)
   })

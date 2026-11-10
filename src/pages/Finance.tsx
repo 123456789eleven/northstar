@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PageHeader, Tabs } from '../components/ui'
 import { db } from '../db'
@@ -9,6 +9,9 @@ import Budgets from '../features/finance/Budgets'
 import Import from '../features/finance/Import'
 import NetWorth from '../features/finance/NetWorth'
 import Investments from '../features/investments/Investments'
+const MarketsTab = lazy(() => import('../features/markets/MarketsTab'))
+const PracticeTab = lazy(() => import('../features/practice/PracticeTab'))
+const LearnTab = lazy(() => import('../features/learn/LearnTab'))
 import Overview from '../features/finance/Overview'
 import Transactions from '../features/finance/Transactions'
 import { UNCATEGORIZED } from '../features/finance/categories'
@@ -16,14 +19,16 @@ import { monthLabel, shiftMonth } from '../features/finance/model'
 import '../features/finance/finance.css'
 import '../features/finance/money.css'
 
-type Tab = 'overview' | 'transactions' | 'budgets' | 'networth' | 'investments' | 'import'
+type Tab = 'overview' | 'markets' | 'practice' | 'learn' | 'transactions' | 'budgets' | 'networth' | 'investments' | 'import'
 
 export default function Finance() {
   // Search deep link: ?tab=transactions&focus=<txId>&month=YYYY-MM (read once here, and again by useFocusTarget for in-page jumps).
   const [params] = useSearchParams()
   const linkMonth = /^\d{4}-\d{2}$/.test(params.get('month') ?? '') ? params.get('month')! : null
   const linked = params.get('focus') != null && params.get('tab') === 'transactions'
-  const [tab, setTab] = useState<Tab>(linked ? 'transactions' : 'overview')
+  const asked = params.get('tab')
+  const deepTab: Tab | null = asked === 'markets' || asked === 'practice' || asked === 'learn' || asked === 'investments' || asked === 'networth' || asked === 'budgets' ? asked : null
+  const [tab, setTab] = useState<Tab>(linked ? 'transactions' : deepTab ?? 'overview')
   const [month, setMonth] = useState(linkMonth ?? monthKey())
   const [category, setCategory] = useState('')
   const [jumped, setJumped] = useState(linkMonth != null)
@@ -82,6 +87,9 @@ export default function Finance() {
         onChange={setTab}
         options={[
           { value: 'overview', label: 'Overview' },
+          { value: 'markets', label: 'Markets' },
+          { value: 'practice', label: 'Practice' },
+          { value: 'learn', label: 'Learn' },
           { value: 'transactions', label: uncategorized > 0 ? `Transactions · ${uncategorized}` : 'Transactions' },
           { value: 'budgets', label: 'Budgets' },
           { value: 'networth', label: 'Net worth' },
@@ -90,6 +98,11 @@ export default function Finance() {
         ]}
       />
       {tab === 'overview' && <Overview month={month} goTo={go} />}
+      <Suspense fallback={null}>
+        {tab === 'markets' && <MarketsTab />}
+        {tab === 'practice' && <PracticeTab />}
+        {tab === 'learn' && <LearnTab />}
+      </Suspense>
       {tab === 'transactions' && <Transactions month={month} category={category} setCategory={setCategory} onImport={() => setTab('import')} />}
       {tab === 'budgets' && <Budgets month={month} />}
       {tab === 'networth' && <NetWorth />}
