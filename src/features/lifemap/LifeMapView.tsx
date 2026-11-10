@@ -161,7 +161,7 @@ export default function LifeMapView({ map, focus, onFocus, inset, phone }: Props
           const tl = worldToScreen(project(d.origin.x, d.origin.y + d.size), cam, view)
           const br = worldToScreen(project(d.origin.x + d.size, d.origin.y), cam, view)
           const bot = worldToScreen(project(d.origin.x + d.size, d.origin.y + d.size), cam, view)
-          const top = worldToScreen({ x: d.centre.x, y: d.top.y - (d.beacon || d.gold ? 40 : 14) }, cam, view)
+          const top = worldToScreen({ x: d.centre.x, y: d.top.y - (d.beacon || d.gold ? 50 : 14) }, cam, view)
           const on = focus === d.id || hover === d.id
           return (
             <button

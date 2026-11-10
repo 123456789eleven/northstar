@@ -38,6 +38,8 @@
 .lm-road.is-main { stroke-opacity: 0.2; }
 .lm-lane { fill: none; stroke: var(--accent); stroke-opacity: 0.32; stroke-width: 1; stroke-dasharray: 5 9; vector-effect: non-scaling-stroke; }
 .lm-lane.is-minor { stroke-opacity: 0.12; }
+.lm-survey { fill: none; stroke: var(--accent); stroke-opacity: 0.14; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.lm-survey.is-outer { stroke-opacity: 0.07; }
 
 /* plinths */
 .lm-pool { opacity: calc(0.3 + var(--g, 0) * 0.7); }

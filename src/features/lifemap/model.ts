@@ -307,7 +307,7 @@ export function buildLifeMap(inp: LifeInput): LifeMap {
     else if (a.id === 'mind') buildings = mindBuildings(a)
     else if (a.id === 'career') buildings = careerBuildings(a, inp.projects ?? 0)
     else trees = parkTrees(inp.people)
-    const tallest = Math.max(trees.length ? 46 : 0, ...buildings.map((x) => x.h + (x.roof === 'spire' ? 26 : x.roof === 'pyramid' ? 14 : 0)))
+    const tallest = Math.max(trees.length ? 64 : 0, ...buildings.map((x) => x.h + (x.roof === 'spire' ? 26 : x.roof === 'pyramid' ? 14 : 0)))
     let beacon: string | null = null
     const facts: Fact[] = [{ label: 'Active days', value: `${days} of ${inp.target}` }]
     if (a.id === 'money') {

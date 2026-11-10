@@ -158,6 +158,9 @@ export const CityScene = memo(function CityScene({ map, selected }: { map: LifeM
       <path d={grid.minor} className="lm-grid" />
       <path d={grid.major} className="lm-grid is-major" />
       <Roads roads={map.roads} />
+      {/* survey rings on the ground around the centre: a quiet sense of scale */}
+      <ellipse cx={0} cy={0} rx={8.6 * 45.25} ry={8.6 * 22.63} className="lm-survey" />
+      <ellipse cx={0} cy={0} rx={13.4 * 45.25} ry={13.4 * 22.63} className="lm-survey is-outer" />
       <g className="lm-outskirts">{outskirts.map((b, i) => <BuildingShape key={i} b={b} />)}</g>
       {map.cars.map((c, i) => (
         <g key={i} className="lm-car" style={{ '--ax': `${r1(c.a.x)}px`, '--ay': `${r1(c.a.y)}px`, '--bx': `${r1(c.b.x)}px`, '--by': `${r1(c.b.y)}px`, animationDuration: `${c.dur}s`, animationDelay: `${c.delay}s` } as CSSProperties}>

@@ -5,10 +5,10 @@ import { Ring } from '../game/ui/Ring'
 import { WeekDots } from '../game/ui/Meters'
 import type { PlayerState, SkillId } from '../game/types'
 import { seasonOf } from '../you/season'
-import { formatDate, money as fmtMoney, today } from '../../lib/dates'
+import { formatDate, today } from '../../lib/dates'
 import { loadDemoWithConfirm } from '../onboarding/demoActions'
 import { openSetup } from '../onboarding/setupLogic'
-import { clamp01, weightProgress, type District, type LifeMap } from './model'
+import { clamp01, money as whole, weightProgress, type District, type LifeMap } from './model'
 import type { HomeHud } from './useHomeHud'
 
 export type HomeTab = 'today' | SkillId
@@ -173,8 +173,8 @@ function TodayTab({ p, hud, map }: { p: PlayerState; hud?: HomeHud; map: LifeMap
       </section>
       <div className="hm-nums">
         <Num label="Calories" value={hud ? num(hud.cal) : '0'} of={hud ? `of ${num(hud.calTarget)}` : undefined} />
-        {safe ? <Num label="Safe to spend" value={fmtMoney(Math.max(0, safe.left))} warn={safe.left < 0} of={safe.left < 0 ? `${fmtMoney(-safe.left)} over` : 'this month'} />
-          : <Num label="Spent" value={fmtMoney(hud?.spentMonth ?? 0)} of="this month" />}
+        {safe ? <Num label="Safe to spend" value={whole(Math.max(0, safe.left))} warn={safe.left < 0} of={safe.left < 0 ? `${whole(-safe.left)} over` : 'this month'} />
+          : <Num label="Spent" value={whole(hud?.spentMonth ?? 0)} of="this month" />}
         <Num label="Active days" value={`${p.streak.daysThisWeek} of ${p.streak.target}`} of="this week" />
       </div>
       <p className="hm-next">
@@ -206,12 +206,12 @@ function MoneyTab({ hud, map }: { hud?: HomeHud; map: LifeMap }) {
       <Flags d={d} />
       <div className="hm-hero">
         <span className="hm-num-label">{safe ? 'Safe to spend this month' : 'Spent this month'}</span>
-        <span className={`hm-hero-value mono${safe && safe.left < 0 ? ' is-warn' : ''}`}>{safe ? fmtMoney(safe.left) : fmtMoney(hud?.spentMonth ?? 0)}</span>
-        <span className="hm-muted">{safe ? `${fmtMoney(safe.spent)} spent of ${fmtMoney(safe.budget)}${safe.billsDue ? `, ${fmtMoney(safe.billsDue)} in bills due` : ''}` : 'Set budgets on Money to see what is safe to spend.'}</span>
+        <span className={`hm-hero-value mono${safe && safe.left < 0 ? ' is-warn' : ''}`}>{whole(safe ? safe.left : (hud?.spentMonth ?? 0))}</span>
+        <span className="hm-muted">{safe ? `${whole(safe.spent)} spent of ${whole(safe.budget)}${safe.billsDue ? `, ${whole(safe.billsDue)} in bills due` : ''}` : 'Set budgets on Money to see what is safe to spend.'}</span>
       </div>
       <div className="hm-nums is-two">
         <Num label="Net worth" value={map.overview.netWorth} />
-        <Num label="Portfolio" value={hud?.portfolio != null ? fmtMoney(hud.portfolio) : 'None yet'} of={hud?.portfolio != null ? 'at last price' : 'Add holdings on Money'} />
+        <Num label="Portfolio" value={hud?.portfolio != null ? whole(hud.portfolio) : 'None yet'} of={hud?.portfolio != null ? 'at last price' : 'Add holdings on Money'} />
       </div>
     </>
   )
