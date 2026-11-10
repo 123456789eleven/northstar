@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <title>Security: how encrypted sync keeps the server unable to read you | Northstar</title>
 <meta name="description" content="How Northstar's optional end-to-end encrypted sync works: PBKDF2 with 600,000 rounds, a wrapped master key, AES-256-GCM per record, and exactly what the server can and cannot see.">
-<meta name="theme-color" content="#0b0b10">
+<meta name="theme-color" content="#08090c">
 <meta name="color-scheme" content="dark">
 <link rel="canonical" href="%BASE%security.html">
 <meta property="og:type" content="website">
@@ -17,7 +17,7 @@
 <meta property="og:image" content="%BASE%img/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Northstar. Write one line; Northstar files it. A private, local-first life operations app.">
+<meta property="og:image:alt" content="Northstar. Write one line; Northstar files it. A calm, private, local-first life dashboard.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Security: how encrypted sync keeps the server unable to read you | Northstar">
 <meta name="twitter:description" content="How Northstar's optional end-to-end encrypted sync works: PBKDF2 with 600,000 rounds, a wrapped master key, AES-256-GCM per record, and exactly what the server can and cannot see.">
@@ -26,7 +26,6 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="site.webmanifest">
-<link rel="preload" href="fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <script src="site.js" defer></script>
@@ -34,7 +33,7 @@
 <body class="pg-security">
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-head"><div class="wrap head-in">
-<a class="brand" href="index.html" aria-label="Northstar home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#8b7cf0"/><path d="M8 32h48" stroke="#8b7cf0" stroke-width="2.5"/></svg><span>Northstar</span></a>
+<a class="brand" href="index.html" aria-label="Northstar home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#9cc8e6"/><path d="M8 32h48" stroke="#9cc8e6" stroke-width="2.5"/></svg><span>Northstar</span></a>
 <nav class="nav-d" aria-label="Main"><ul><li><a href="features.html">Features</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="security.html" aria-current="page">Security</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
 <button type="button" class="pal-btn js-only" data-pal aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><span class="pal-l">Search</span><kbd class="pal-k" aria-hidden="true">Ctrl K</kbd></button>
 <a class="btn sm head-cta" href="app/">Open the app</a>
@@ -98,7 +97,7 @@
 <text class="lab s3" x="300" y="426">fresh 96-bit nonce each time</text>
 </svg>
 </div>
-<figcaption class="ann">Fig. 1&ensp;Key hierarchy of the optional sync, from <code>src/sync/crypto.ts</code>. Violet marks the selected step.</figcaption>
+<figcaption class="ann">Fig. 1&ensp;Key hierarchy of the optional sync, from <code>src/sync/crypto.ts</code>. The accent marks the selected step.</figcaption>
 </figure>
 </div>
 </div></section>
@@ -144,13 +143,13 @@
 </main>
 <footer class="site-foot"><div class="wrap ruled">
 <div class="foot-top">
-<div class="foot-id"><a class="brand" href="index.html" aria-label="Northstar home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#8b7cf0"/><path d="M8 32h48" stroke="#8b7cf0" stroke-width="2.5"/></svg><span>Northstar</span></a><p>A private, local-first life operations app. Free to use. Your records stay on your device.</p></div>
+<div class="foot-id"><a class="brand" href="index.html" aria-label="Northstar home"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4l5.5 28L32 60l-5.5-28z" fill="#9cc8e6"/><path d="M8 32h48" stroke="#9cc8e6" stroke-width="2.5"/></svg><span>Northstar</span></a><p>A calm, private, local-first life dashboard. Free to use. Your records stay on your device.</p></div>
 <nav aria-labelledby="f-p"><h2 id="f-p">Product</h2><ul><li><a href="features.html">Features</a></li><li><a href="install.html">Install</a></li><li><a href="roadmap.html">Roadmap</a></li><li><a href="app/">Open the app</a></li></ul></nav>
 <nav aria-labelledby="f-t"><h2 id="f-t">Trust</h2><ul><li><a href="privacy.html">Privacy</a></li><li><a href="security.html">Security</a></li><li><a href="faq.html">FAQ</a></li></ul></nav>
 <nav aria-labelledby="f-s"><h2 id="f-s">Source</h2><ul><li><a href="https://github.com/123456789eleven/northstar" rel="noopener">Repository</a></li><li><a href="faq.html#open-source">License status</a></li></ul></nav>
 </div>
 <svg class="foot-word" viewBox="0 0 1000 215" aria-hidden="true" focusable="false"><text x="0" y="178" textLength="1000" lengthAdjust="spacingAndGlyphs">Northstar</text></svg>
-<div class="foot-base"><span>Source is viewable; license not yet chosen.</span><span>Set in Fraunces and Inter, served from this site. No cookies, no storage, no third-party requests.</span></div>
+<div class="foot-base"><span>Source is viewable; license not yet chosen.</span><span>Set in Inter, served from this site. No cookies, no storage, no third-party requests.</span></div>
 </div></footer>
 <div id="live" class="sr-only" aria-live="polite"></div>
 </body>
