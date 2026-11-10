@@ -87,7 +87,7 @@ export default function Finance() {
           { value: 'overview', label: 'Overview' },
           { value: 'markets', label: 'Markets' },
           { value: 'practice', label: 'Practice' },
-          { value: 'learn', label: 'Learn' },
+          // Learn tab arrives with its content (feat/learn); hidden until then so there is no empty placeholder.
           { value: 'transactions', label: uncategorized > 0 ? `Transactions · ${uncategorized}` : 'Transactions' },
           { value: 'budgets', label: 'Budgets' },
           { value: 'networth', label: 'Net worth' },
