@@ -1,6 +1,6 @@
 import type { Lesson } from './types'
 
-const MARKETS = { label: 'Open Markets', to: '/finance' }
+const MARKETS = { label: 'Open Markets', to: '/finance?tab=markets' }
 
 export const foundations: Lesson[] = [
   {
@@ -55,7 +55,7 @@ export const foundations: Lesson[] = [
     summary: 'Owning a whole market in one purchase, and how funds differ from single stocks.',
     minutes: 4,
     terms: ['index', 'index-fund', 'etf', 'expense-ratio', 'mutual-fund'],
-    tool: { label: 'Open Investments', to: '/finance' },
+    tool: { label: 'Open Investments', to: '/finance?tab=investments' },
     body: [
       { p: ['A fund pools many investors\' money to buy a basket of securities. An index fund is a fund that simply copies a published list, called an index. A broad US stock index holds hundreds or thousands of companies, weighted by size. Because it follows a list instead of paying analysts to pick, it is cheap to run.'] },
       { h: 'ETF versus mutual fund', p: ['An exchange-traded fund (ETF) trades on an exchange all day like a stock, at a live price. A traditional mutual fund is bought and sold once a day at the closing value, directly from the fund company. Both can track an index. For long-term holding the practical differences are minimum purchases, how your broker handles fractions, and tax details that depend on the specific fund.'] },
@@ -77,7 +77,7 @@ export const foundations: Lesson[] = [
     summary: 'A bond is a loan. How coupon, price and yield relate.',
     minutes: 5,
     terms: ['bond', 'coupon', 'face-value', 'maturity', 'yield', 'duration'],
-    tool: { label: 'Open Practice', to: '/finance' },
+    tool: { label: 'Open Practice', to: '/finance?tab=practice' },
     body: [
       { p: ['A bond is a loan you make to a government or company. In return the borrower pays interest, called the coupon, and returns the face value (also called par, usually 1,000) on the maturity date. Unlike a stock, the payments are set in advance, which is why bonds are called fixed income.'] },
       { h: 'Coupon is not yield', p: ['The coupon is fixed by the bond\'s terms: a 4% coupon on 1,000 face value pays 40 a year. But bonds trade, and their price moves. Yield is the return you earn given the price you pay. If you pay less than face value, your yield is above the coupon; if you pay more, it is below.'] },
@@ -121,7 +121,7 @@ export const foundations: Lesson[] = [
     summary: 'Why money loses value standing still, and how growth builds on itself.',
     minutes: 4,
     terms: ['inflation', 'compounding', 'real-return', 'rule-of-72'],
-    tool: { label: 'Open Practice', to: '/finance' },
+    tool: { label: 'Open Practice', to: '/finance?tab=practice' },
     body: [
       { p: ['Inflation is the general rise in prices over time. If it runs at 3% a year, something that costs 100 today costs about 103 next year and about 134 in ten years. Money kept at 0% buys less every year. This is the main reason that long-term savings are invested rather than left idle.'] },
       { h: 'Nominal versus real', p: ['A nominal return is the headline number. A real return subtracts inflation. A 7% nominal return with 3% inflation is a real return of about 4%. Always compare after inflation when looking at decades.'] },
@@ -144,7 +144,7 @@ export const foundations: Lesson[] = [
     summary: 'Why higher potential returns come with bigger swings, and what risk really means.',
     minutes: 4,
     terms: ['volatility', 'drawdown'],
-    tool: { label: 'Open Markets', to: '/finance' },
+    tool: { label: 'Open Markets', to: '/finance?tab=markets' },
     body: [
       { p: ['Investing risk is the chance that what you get differs from what you expected, including the chance of loss. In general, assets that have offered higher long-run returns have had larger and more frequent drops. If an investment promised high returns with no risk, treat that as a warning, not a bargain.'] },
       { h: 'Ways to measure it', list: ['Volatility: how much the price bounces around, often measured as standard deviation.', 'Drawdown: the fall from a peak to a low. A 50% drawdown needs a 100% gain to recover.', 'Permanent loss: a company that fails or a borrower that defaults. This is different from a temporary dip.'] },
@@ -166,7 +166,7 @@ export const foundations: Lesson[] = [
     summary: 'Spreading holdings so one failure does not decide the outcome.',
     minutes: 4,
     terms: ['diversification', 'correlation', 'concentration'],
-    tool: { label: 'Open Investments', to: '/finance' },
+    tool: { label: 'Open Investments', to: '/finance?tab=investments' },
     body: [
       { p: ['Diversification means holding many different things so no single one can sink you. It is often summarized as not putting all your eggs in one basket. The aim is not to maximize return but to reduce the chance of a large, avoidable loss.'] },
       { h: 'How it works', p: ['Different holdings do not all move together. When some fall, others may hold steady or rise. The degree to which two assets move together is called correlation. Assets that rarely fall at the same time smooth the overall ride.'] },

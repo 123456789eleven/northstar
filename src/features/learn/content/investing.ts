@@ -8,7 +8,7 @@ export const investing: Lesson[] = [
     summary: 'The one part of investing you control completely.',
     minutes: 4,
     terms: ['expense-ratio', 'commission', 'spread'],
-    tool: { label: 'Open Practice', to: '/finance' },
+    tool: { label: 'Open Practice', to: '/finance?tab=practice' },
     body: [
       { p: ['You cannot control what markets do. You can control what you pay. Costs are subtracted every year whether the market is up or down, and they compound against you just as returns compound for you.'] },
       { h: 'Where costs hide', list: ['Expense ratio: the yearly fee a fund takes, shown as a percentage of assets. It is taken inside the fund price, so you never see a bill.', 'Commissions: a fee per trade. Many US brokers now charge nothing to trade stocks and ETFs, but check yours.', 'Spread: the gap between bid and ask, paid on each round trip.', 'Sales loads: a percentage charged when you buy or sell some mutual funds.', 'Advisory fees: often around 1% of assets a year when someone manages the account. Ask what you get for it.', 'Taxes from frequent trading, covered later.'] },
@@ -30,7 +30,7 @@ export const investing: Lesson[] = [
     summary: 'The split between stocks, bonds and cash matters more than any single pick.',
     minutes: 5,
     terms: ['asset-allocation', 'rebalancing', 'asset-class'],
-    tool: { label: 'Open Investments', to: '/finance' },
+    tool: { label: 'Open Investments', to: '/finance?tab=investments' },
     body: [
       { p: ['Asset allocation is how your money is divided among asset classes: mainly stocks, bonds and cash. It largely determines how bumpy your ride is. A portfolio of 90% stocks will fall much further in a bad year than one of 40% stocks.'] },
       { h: 'How people choose', p: ['Common inputs are the time until you need the money, how much loss you can handle without selling, and how stable your income is. A longer horizon usually supports more stocks because there is time to recover. There is no universally right split, and nobody can know the best one in advance. This lesson is education, not a recommended mix.'] },
@@ -54,7 +54,7 @@ export const investing: Lesson[] = [
     summary: 'Investing a fixed amount on a schedule, and what it does and does not do.',
     minutes: 3,
     terms: ['dca'],
-    tool: { label: 'Open Practice', to: '/finance' },
+    tool: { label: 'Open Practice', to: '/finance?tab=practice' },
     body: [
       { p: ['Dollar-cost averaging (DCA) means investing the same amount of money at regular intervals, regardless of price. A paycheck contribution to a retirement account is DCA without any decision.'] },
       { h: 'The arithmetic', p: ['A fixed dollar amount buys more shares when the price is low and fewer when it is high. Your average cost per share ends up below the simple average of the prices paid, because you bought more at the low prices.'] },
@@ -99,7 +99,7 @@ export const investing: Lesson[] = [
     summary: 'US taxable accounts, in general terms: when you owe, and what is rewarded.',
     minutes: 4,
     terms: ['capital-gain', 'cost-basis', 'wash-sale'],
-    tool: { label: 'Open Investments', to: '/finance' },
+    tool: { label: 'Open Investments', to: '/finance?tab=investments' },
     body: [
       { p: ['This is a general US overview, not tax advice, and the rules and rates change. In a regular taxable account, taxes arise from selling at a gain and from income such as dividends and interest.'] },
       { h: 'Capital gains', p: ['A gain is realized only when you sell. It equals what you receive minus your cost basis, which is what you paid. If you held the asset more than one year, the gain is long-term and generally taxed at lower rates than ordinary income. If you held it a year or less, the gain is short-term and taxed like ordinary income. Losses can offset gains, and a limited amount of excess loss can offset ordinary income each year.'] },
@@ -122,7 +122,7 @@ export const investing: Lesson[] = [
     summary: 'Decide the rules while calm, so you do not improvise during a drop.',
     minutes: 4,
     terms: ['time-horizon'],
-    tool: { label: 'Open Practice', to: '/finance' },
+    tool: { label: 'Open Practice', to: '/finance?tab=practice' },
     body: [
       { p: ['A written plan, sometimes called an investment policy statement, is a short document you write in a calm moment and follow in a stressful one. Its value is not cleverness. It is that it exists before the panic.'] },
       { h: 'What goes in it', list: ['Goal and date: what the money is for and when you need it.', 'Emergency cash: how many months of expenses sit outside investments first.', 'Allocation: target split and the range you will tolerate.', 'Contribution: how much, how often, which account.', 'What you will buy: the kinds of holdings, and what you will not buy.', 'Rebalancing rule: when and how.', 'Sell rule: the reasons you may sell (need the money, rebalance, the holding no longer fits), and the reasons you may not (a headline, a drop of 15%).', 'Review schedule: yearly, plus after big life changes.'] },
@@ -144,7 +144,7 @@ export const investing: Lesson[] = [
     summary: 'Overtrading, loss aversion and chasing: the mistakes that cost more than fees.',
     minutes: 5,
     terms: ['loss-aversion', 'overtrading'],
-    tool: { label: 'Open Practice', to: '/finance' },
+    tool: { label: 'Open Practice', to: '/finance?tab=practice' },
     body: [
       { p: ['Most investor damage comes from behaviour rather than from choosing the wrong fund. Knowing the traps does not make you immune, but it lets you build rules that catch you.'] },
       { h: 'Overtrading', p: ['Trading often feels productive. But each trade has a spread, possibly a tax bill, and a chance you are wrong. Research on individual investors has widely found that those who trade more tend to earn less after costs. The fix is a rule: for example, no trades on a day you check the news.'] },

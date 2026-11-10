@@ -26,7 +26,9 @@ export default function Finance() {
   const [params] = useSearchParams()
   const linkMonth = /^\d{4}-\d{2}$/.test(params.get('month') ?? '') ? params.get('month')! : null
   const linked = params.get('focus') != null && params.get('tab') === 'transactions'
-  const [tab, setTab] = useState<Tab>(linked ? 'transactions' : 'overview')
+  const asked = params.get('tab')
+  const deepTab: Tab | null = asked === 'markets' || asked === 'practice' || asked === 'learn' || asked === 'investments' || asked === 'networth' || asked === 'budgets' ? asked : null
+  const [tab, setTab] = useState<Tab>(linked ? 'transactions' : deepTab ?? 'overview')
   const [month, setMonth] = useState(linkMonth ?? monthKey())
   const [category, setCategory] = useState('')
   const [jumped, setJumped] = useState(linkMonth != null)
@@ -87,7 +89,7 @@ export default function Finance() {
           { value: 'overview', label: 'Overview' },
           { value: 'markets', label: 'Markets' },
           { value: 'practice', label: 'Practice' },
-          // Learn tab arrives with its content (feat/learn); hidden until then so there is no empty placeholder.
+          { value: 'learn', label: 'Learn' },
           { value: 'transactions', label: uncategorized > 0 ? `Transactions · ${uncategorized}` : 'Transactions' },
           { value: 'budgets', label: 'Budgets' },
           { value: 'networth', label: 'Net worth' },

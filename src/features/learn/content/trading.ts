@@ -1,6 +1,6 @@
 import type { Lesson } from './types'
 
-const PRACTICE = { label: 'Open Practice', to: '/finance' }
+const PRACTICE = { label: 'Open Practice', to: '/finance?tab=practice' }
 
 export const trading: Lesson[] = [
   {
@@ -149,7 +149,7 @@ export const trading: Lesson[] = [
     summary: 'Practice with simulated money: what it teaches, and what it cannot.',
     minutes: 3,
     terms: ['paper-trading', 'slippage'],
-    tool: { label: 'Open Practice', to: '/finance' },
+    tool: { label: 'Open Practice', to: '/finance?tab=practice' },
     body: [
       { p: ['Paper trading is trading with simulated money at real prices. Nothing is bought, so nothing can be lost. It is the right place to learn the mechanics and test a method before risking a dollar.'] },
       { h: 'What it is good for', list: ['Learning order types and how the quote screen behaves.', 'Practising your position sizing and stop rules until they are habit.', 'Testing whether your method has a positive expectancy over dozens of trades.', 'Building a journal and a review routine.'] },
