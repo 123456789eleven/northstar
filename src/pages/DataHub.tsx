@@ -75,7 +75,7 @@ export default function DataHub() {
     { name: 'Built-in food reference', brings: '~150 staple foods, approximate values, works offline', feeds: [['Meal', 'Meal']], status: 'Always on', tone: 'good', action: { label: 'Open Food', to: '/food' } },
     { name: 'Backup file', brings: 'A full JSON export you restore yourself', feeds: [['Everything']], status: 'Manual', tone: 'faint', action: { label: 'Open Settings', to: '/settings' } },
     { name: 'Cloud sync', brings: 'Your data mirrored to your own cloud store (optional)', feeds: [['Everything']], status: syncOn ? (STATE[sync!.state!] ?? sync!.state!) : 'Off', tone: syncOn ? (sync?.state === 'error' ? 'warn' : 'good') : 'faint', last: when(sync?.lastSyncedAt), rows: sync?.pending ? `${sync.pending} pending` : undefined, action: { label: 'Open Settings', to: '/settings' } },
-    { name: 'Manual & quick capture', brings: 'Things you type: tasks, meals, notes', feeds: [['Task', 'Task'], ['Meal', 'Meal'], ['Life event', 'LifeEvent']], status: 'Always on', tone: 'good', rows: `${data.tasks} tasks · ${data.meals} meals · ${data.events} events`, action: { label: 'Open Today', to: '/' } },
+    { name: 'Manual & quick capture', brings: 'Things you type: tasks, meals, notes', feeds: [['Task', 'Task'], ['Meal', 'Meal'], ['Life event', 'LifeEvent']], status: 'Always on', tone: 'good', rows: `${data.tasks} tasks · ${data.meals} meals · ${data.events} events`, action: { label: 'Open Today', to: '/today' } },
   ]
 
   // Per-batch history. Finance batches use the finance undo, others the data undo.

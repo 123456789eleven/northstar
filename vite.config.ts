@@ -41,7 +41,7 @@ export default defineConfig({
         ],
         shortcuts: [
           { name: 'Quick capture', short_name: 'Capture', url: './#/?capture=1', icons: [{ src: 'icon-192.png', sizes: '192x192', type: 'image/png' }] },
-          { name: 'Today', url: './#/', icons: [{ src: 'icon-192.png', sizes: '192x192', type: 'image/png' }] },
+          { name: 'Today', url: './#/today', icons: [{ src: 'icon-192.png', sizes: '192x192', type: 'image/png' }] },
         ],
       },
     }),

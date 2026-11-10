@@ -1,9 +1,8 @@
-/* Shell v3 "Constellation": three-zone cockpit on desktop (rail | canvas | mission rail >= 1280px), thumb bar on phone.
+/* Shell v3 "Constellation": two-zone cockpit on desktop (rail | canvas), thumb bar on phone.
    Tokens only. Loaded after index.css, so these rules refine the v2 shell rules there. */
 
 /* ---- desktop rail ---- */
 @media (min-width: 1024px) { .shell { grid-template-columns: 216px minmax(0, 1fr); } }
-@media (min-width: 1280px) { .shell.has-mission { grid-template-columns: 216px minmax(0, 1fr) 288px; } }
 .sidebar { gap: 1px; padding: 14px 10px; scrollbar-width: thin; }
 .nav-link { min-height: 34px; }
 .nav-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -15,7 +14,6 @@
 .sidebar { view-transition-name: ns-rail; }
 .topbar { view-transition-name: ns-topbar; }
 .tabbar { view-transition-name: ns-tabbar; }
-.mission-rail { view-transition-name: ns-mission; }
 
 /* ---- hub tab strip ---- */
 .hub-strip { margin: 0 0 var(--sp-5); }
