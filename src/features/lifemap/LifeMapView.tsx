@@ -111,7 +111,7 @@ export default function LifeMapView({ map }: { map: LifeMap }) {
   const limit = useMemo(() => padBounds(map.bounds, 120), [map.bounds])
 
   const inset = useCallback((open: boolean): Inset => (phone ? { t: 84, b: open ? 330 : 64 } : { l: open ? 0 : 250, r: open ? 380 : 0, b: 70, t: 20 }), [phone])
-  const fitCam = useMemo(() => (view.w ? fitCamera(map.bounds, view, phone ? 1.12 : 0.96, inset(false)) : null), [map.bounds, view, inset])
+  const fitCam = useMemo(() => (view.w ? fitCamera(map.bounds, view, phone ? 1.12 : 0.96, inset(false)) : null), [map.bounds, view, inset, phone])
   const target = useMemo<Camera | null>(() => {
     if (!fitCam) return null
     if (!selected) return fitCam
