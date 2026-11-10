@@ -9,10 +9,11 @@ import type { DBCore, DBCoreMutateRequest, DBCoreMutateResponse, DBCoreTable, DB
 
 export const OUTBOX = 'outbox'
 export const SYNC_META = 'syncMeta'
-export const INTERNAL_TABLES = new Set([OUTBOX, SYNC_META])
+/** Bookkeeping plus device-local derived caches (priceHistory): never queued, never synced. Still backed up and erased. */
+export const INTERNAL_TABLES = new Set([OUTBOX, SYNC_META, 'priceHistory'])
 
 /** Settings that describe this device, not the person: never synced. */
-const LOCAL_SETTING_PREFIXES = ['sync.', 'game.', 'gcal.', 'demo.', 'packs.', 'finance.map.', 'simplefin.', 'backup.']
+const LOCAL_SETTING_PREFIXES = ['sync.', 'game.', 'gcal.', 'demo.', 'packs.', 'finance.map.', 'simplefin.', 'market.', 'backup.']
 const LOCAL_SETTING_KEYS = new Set(['backup.lastAt', 'ops.autolog', 'food.lookup.optin', 'ui.setup.done', 'ui.density'])
 export function isLocalOnlySetting(key: unknown): boolean {
   return typeof key !== 'string' || LOCAL_SETTING_KEYS.has(key) || LOCAL_SETTING_PREFIXES.some((p) => key.startsWith(p))

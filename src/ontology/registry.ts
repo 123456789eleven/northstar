@@ -1,6 +1,6 @@
 // Ontology: a typed registry of the things Northstar knows about, how they link, and what you can do with them.
 // Actions call the existing feature functions (never duplicate logic). Everything is on-device.
-import { db, type Budget, type CalendarEvent, type Goal, type Habit, type HabitLog, type Interaction, type JournalEntry, type LearningItem, type LifeEvent, type Meal, type Person, type Review, type Task, type Transaction } from '../db'
+import { db, type Budget, type CalendarEvent, type Goal, type Habit, type HabitLog, type Interaction, type JournalEntry, type LearningItem, type LifeEvent, type Meal, type Person, type Review, type Task, type Transaction, type WatchlistItem, type PaperTrade, type TradeJournalEntry } from '../db'
 import { archiveHabit, toggleCheckIn } from '../features/habits/habitData'
 import { perWeekLabel, streak } from '../features/habits/stats'
 import { wordCount } from '../features/journal/stats'
@@ -14,7 +14,7 @@ import { merchantKey, merchantLabel } from '../features/finance/categories'
 import { completeTask, reopenTask, togglePin } from '../features/tasks/taskActions'
 import { RULE_META, type RuleId } from '../features/ops/proposals'
 
-export type TypeKey = 'Task' | 'Goal' | 'Person' | 'Transaction' | 'Meal' | 'LearningItem' | 'Interaction' | 'LifeEvent' | 'Review' | 'Budget' | 'Habit' | 'HabitLog' | 'JournalEntry' | 'CalendarEvent'
+export type TypeKey = 'Task' | 'Goal' | 'Person' | 'Transaction' | 'Meal' | 'LearningItem' | 'Interaction' | 'LifeEvent' | 'Review' | 'Budget' | 'Habit' | 'HabitLog' | 'JournalEntry' | 'CalendarEvent' | 'WatchlistItem' | 'PaperTrade' | 'TradeJournalEntry'
 export type Row = { id?: number } & Record<string, unknown>
 
 export interface PropDef { name: string; type: string }
@@ -219,6 +219,40 @@ const journalEntry = erase<JournalEntry>({
   automations: [],
 })
 
+const watchlistItem = erase<WatchlistItem>({
+  key: 'WatchlistItem', label: 'Watchlist symbol', table: 'watchlist',
+  title: (o) => o.symbol,
+  subtitle: (o) => `added ${o.addedAt.slice(0, 10)}`,
+  properties: [{ name: 'symbol', type: 'string (unique)' }, { name: 'addedAt', type: 'timestamp' }, { name: 'note', type: 'string?' }, { name: 'alertAbove', type: 'number?' }, { name: 'alertBelow', type: 'number?' }],
+  links: [],
+  actions: [],
+  functions: [],
+  automations: [],
+})
+
+const paperTrade = erase<PaperTrade>({
+  key: 'PaperTrade', label: 'Paper trade', table: 'paperTrades',
+  title: (o) => `${o.side} ${o.symbol}`,
+  subtitle: (o) => `${o.date} · simulated`,
+  properties: [{ name: 'symbol', type: 'string' }, { name: 'side', type: "'buy'|'sell'" }, { name: 'qty', type: 'number' }, { name: 'price', type: 'number' }, { name: 'date', type: 'date' }, { name: 'note', type: 'string?' }],
+  links: [],
+  actions: [],
+  functions: [],
+  automations: [],
+})
+
+const tradeJournalEntry = erase<TradeJournalEntry>({
+  key: 'TradeJournalEntry', label: 'Trade journal entry', table: 'tradeJournal',
+  // Titles never include the thesis or lesson text.
+  title: (o) => `Trade note ${o.symbol}`,
+  subtitle: (o) => o.date,
+  properties: [{ name: 'date', type: 'date' }, { name: 'symbol', type: 'string' }, { name: 'thesis', type: 'string (private)' }, { name: 'setup', type: 'string? (private)' }, { name: 'outcome', type: 'string? (private)' }, { name: 'lesson', type: 'string? (private)' }, { name: 'emotion', type: 'string?' }, { name: 'tags', type: 'string[]?' }],
+  links: [],
+  actions: [],
+  functions: [],
+  automations: [],
+})
+
 const calendarEvent = erase<CalendarEvent>({
   key: 'CalendarEvent', label: 'Calendar event', table: 'calendar',
   title: (o) => o.title,
@@ -230,7 +264,7 @@ const calendarEvent = erase<CalendarEvent>({
   automations: [],
 })
 
-export const TYPE_LIST: TypeDef[] = [goal, task, learning, budget, transaction, person, interaction, meal, review, lifeEvent, habit, habitLog, journalEntry, calendarEvent]
+export const TYPE_LIST: TypeDef[] = [goal, task, learning, budget, transaction, person, interaction, meal, review, lifeEvent, habit, habitLog, journalEntry, calendarEvent, watchlistItem, paperTrade, tradeJournalEntry]
 export const REGISTRY = Object.fromEntries(TYPE_LIST.map((t) => [t.key, t])) as Record<TypeKey, TypeDef>
 
 export const typeForTable = (table: string): TypeDef | undefined => TYPE_LIST.find((t) => t.table === table)

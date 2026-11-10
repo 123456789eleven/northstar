@@ -256,6 +256,52 @@ export interface Contribution {
   kind: 'contribution' | 'withdrawal'
 }
 
+/** Markets: symbols the owner follows. Natural key: symbol (upper case). */
+export interface WatchlistItem {
+  id?: number
+  symbol: string
+  addedAt: ISOTime
+  note?: string
+  alertAbove?: number
+  alertBelow?: number
+}
+
+/** Markets: a simulated trade. Paper trading only; nothing here ever reaches a broker. */
+export interface PaperTrade {
+  id?: number
+  symbol: string
+  side: 'buy' | 'sell'
+  qty: number
+  price: number
+  date: ISODate
+  note?: string
+}
+
+/** Markets: a private note about a trade idea. Never shown in titles or shared views. */
+export interface TradeJournalEntry {
+  id?: number
+  date: ISODate
+  symbol: string
+  thesis: string
+  setup?: string
+  outcome?: string
+  lesson?: string
+  emotion?: string
+  tags?: string[]
+}
+
+/** Markets: one daily close per symbol, recorded from quotes. Derived cache, device-local (never synced). */
+export interface PriceBar {
+  id?: number
+  symbol: string
+  date: ISODate
+  close: number
+  open?: number
+  high?: number
+  low?: number
+  volume?: number
+}
+
 export interface Setting {
   key: string
   value: unknown
@@ -283,6 +329,10 @@ export const db = new Dexie('northstar') as Dexie & {
   weights: EntityTable<WeightEntry, 'id'>
   holdings: EntityTable<Holding, 'id'>
   contributions: EntityTable<Contribution, 'id'>
+  watchlist: EntityTable<WatchlistItem, 'id'>
+  paperTrades: EntityTable<PaperTrade, 'id'>
+  tradeJournal: EntityTable<TradeJournalEntry, 'id'>
+  priceHistory: EntityTable<PriceBar, 'id'>
 }
 
 db.version(1).stores({
@@ -343,5 +393,13 @@ db.version(5).stores({
 db.version(6).stores({
   holdings: '++id, account, ticker',
   contributions: '++id, date, account',
+})
+// v7: Markets. watchlist (unique symbol), paper trades, trade journal, and a per-day price cache. priceHistory is a
+// derived, device-local cache (see LOCAL_TABLES in sync/outbox.ts): it never syncs but is backed up and erased with the rest.
+db.version(7).stores({
+  watchlist: '++id, &symbol',
+  paperTrades: '++id, symbol, date',
+  tradeJournal: '++id, date, symbol',
+  priceHistory: '++id, &[symbol+date]',
 })
 installOutbox(db, { autoStart: true })

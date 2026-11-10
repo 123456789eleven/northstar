@@ -152,3 +152,33 @@ describe('v5 -> v6 (holdings, contributions)', () => {
     expect(await db.contributions.where('date').equals('2026-03-02').count()).toBe(1)
   })
 })
+
+// The schema exactly as shipped in v6 (v5 + holdings, contributions). Frozen: never edit.
+const V6_STORES = { ...V5_STORES, holdings: '++id, account, ticker', contributions: '++id, date, account' }
+
+describe('v6 -> v7 (markets)', () => {
+  it('v6 data survives and the markets tables work', async () => {
+    await db.delete()
+    const old = new Dexie('northstar')
+    old.version(6).stores(V6_STORES)
+    await old.open()
+    await old.table('holdings').add({ account: 'Example Roth IRA (VTI)', ticker: 'VTI', shares: 10 })
+    await old.table('settings').put({ key: 'food.targets', value: { calories: 2400 } })
+    old.close()
+
+    await db.open()
+    expect(db.verno).toBeGreaterThanOrEqual(7)
+    expect((await db.holdings.toArray())[0].ticker).toBe('VTI')
+    expect((await db.settings.get('food.targets'))!.value).toEqual({ calories: 2400 })
+
+    await db.watchlist.add({ symbol: 'VTI', addedAt: '2026-03-01T00:00:00Z' })
+    await expect(db.watchlist.add({ symbol: 'VTI', addedAt: '2026-03-02T00:00:00Z' })).rejects.toBeTruthy()
+    await db.paperTrades.add({ symbol: 'VTI', side: 'buy', qty: 1, price: 100, date: '2026-03-01' })
+    await db.tradeJournal.add({ date: '2026-03-01', symbol: 'VTI', thesis: 'x' })
+    await db.priceHistory.add({ symbol: 'VTI', date: '2026-03-01', close: 100 })
+    await expect(db.priceHistory.add({ symbol: 'VTI', date: '2026-03-01', close: 101 })).rejects.toBeTruthy()
+    expect(await db.paperTrades.where('symbol').equals('VTI').count()).toBe(1)
+    expect(await db.tradeJournal.where('date').equals('2026-03-01').count()).toBe(1)
+    expect(await db.priceHistory.where('[symbol+date]').equals(['VTI', '2026-03-01']).count()).toBe(1)
+  })
+})
