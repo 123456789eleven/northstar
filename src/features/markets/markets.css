@@ -52,8 +52,9 @@
 .mkt-table .r { text-align: right; }
 .mkt-th { background: none; border: 0; color: inherit; font: inherit; text-transform: inherit; letter-spacing: inherit; cursor: pointer; min-height: 32px; padding: 0; }
 .mkt-th:hover { color: var(--ink); }
-.mkt-sym { display: flex; flex-direction: column; justify-content: center; min-width: 0; height: 44px; }
-.mkt-sym b { font-weight: 600; }
+.mkt-sym { min-width: 0; }
+.mkt-sym b { font-weight: 600; display: block; }
+.mkt-sym .mkt-name { display: block; }
 .mkt-name { font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 22ch; }
 .mkt-num { white-space: nowrap; }
 .mkt-tag { margin-left: 6px; font-size: 11px; color: var(--ink-3); }
