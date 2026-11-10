@@ -1,76 +1,44 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db, type Interaction, type Person } from '../db'
+import { db, type Person } from '../db'
 import { Card, Empty, PageHeader, PageSkeleton, Tabs } from '../components/ui'
-import { useToast } from '../components/toastContext'
 import { useFocusTarget } from '../lib/useFocusParam'
 import { daysBetween, formatDate, today } from '../lib/dates'
-import { KINDS, logContact, nextBirthday, sortPeople, undoContact } from '../features/people/people'
+import { nextBirthday, sortPeople } from '../features/people/people'
 import { PersonDetail, PersonForm } from '../features/people/PersonModals'
-import { CircleView } from '../features/people/CircleView'
+import { LogPanel, useQuickLog } from '../features/people/LogPanel'
+import { TreeView } from '../features/people/TreeView'
 import { PersonRow } from '../features/people/PersonRow'
-import { mostOverdue, reminderLine } from '../features/people/circle'
+import { reminderLine } from '../features/people/circle'
+import { groupByRelation, reachSoon } from '../features/people/tree'
 import '../features/people/people.css'
-import '../features/people/circle.css'
+import '../features/people/tree.css'
 
-const KIND_KEY = 'northstar.people.lastKind'
-const lastKind = (): Interaction['kind'] => {
-  try {
-    const v = localStorage.getItem(KIND_KEY)
-    return KINDS.some((k) => k.value === v) ? (v as Interaction['kind']) : 'text'
-  } catch {
-    return 'text'
-  }
-}
-const rememberKind = (k: Interaction['kind']) => {
-  try { localStorage.setItem(KIND_KEY, k) } catch { /* ignore */ }
-}
-
-function LogPanel({ person, onDone }: { person: Person; onDone: () => void }) {
-  const [note, setNote] = useState('')
-  const [date, setDate] = useState(today())
-  const log = async (kind: Interaction['kind']) => {
-    rememberKind(kind)
-    await logContact(person, kind, note, date)
-    onDone()
-  }
-  return (
-    <div className="ppl-log">
-      <div className="ppl-log-extra">
-        <input className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note (optional)" aria-label="Note" />
-        <input className="input ppl-date" type="date" value={date} max={today()} onChange={(e) => setDate(e.target.value || today())} aria-label="Date of contact" />
-      </div>
-      <div className="ppl-log-kinds">
-        {KINDS.map((k) => <button key={k.value} className="btn" onClick={() => log(k.value)}>{k.label}</button>)}
-        <button className="btn btn-ghost" onClick={onDone}>Cancel</button>
-      </div>
-    </div>
-  )
-}
-
-type View = 'circle' | 'list'
+type View = 'tree' | 'list'
 const VIEW_KEY = 'northstar.people.view'
+const OPEN_KEY = 'northstar.people.tree.open'
 const MAX_OTHERS = 60
+const BIG_BRANCH = 12
+
+const readOverrides = (): Record<string, boolean> => { try { return JSON.parse(localStorage.getItem(OPEN_KEY) || '{}') } catch { return {} } }
 
 export default function People() {
-  const [view, setView] = useState<View>(() => { try { return localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'circle' } catch { return 'circle' } })
+  const [view, setView] = useState<View>(() => { try { return localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'tree' } catch { return 'tree' } })
   const chooseView = (v: View) => { setView(v); try { localStorage.setItem(VIEW_KEY, v) } catch { /* ignore */ } }
   const [q, setQ] = useState('')
-  const people = useLiveQuery(() => db.people.toArray(), [])
-  const [adding, setAdding] = useState(false)
+  const [reload, setReload] = useState(0)
+  const data = useLiveQuery(async () => { try { return { people: await db.people.toArray() } } catch { return { error: true as const } } }, [reload])
+  const people = data && 'people' in data ? data.people : undefined
+  const failed = !!data && 'error' in data
+  const [adding, setAdding] = useState<{ relation: string } | null>(null)
   const [openId, setOpenId] = useState<number | null>(null)
   const [loggingId, setLoggingId] = useState<number | null>(null)
+  const [overrides, setOverrides] = useState(readOverrides)
   const now = today()
-  const toast = useToast()
-  const quickLog = async (p: Person) => {
-    const kind = lastKind()
-    const label = KINDS.find((k) => k.value === kind)?.label.toLowerCase() ?? kind
-    await logContact(p, kind)
-    toast({ message: `Logged ${label} with ${p.name}`, undo: () => undoContact(p.id!, kind, today()) })
-  }
+  const quickLog = useQuickLog()
 
   useFocusTarget({
-    ready: people !== undefined,
+    ready: people !== undefined || failed,
     exists: (id) => (people ?? []).some((p) => String(p.id) === id),
     reveal: (id) => setOpenId(Number(id)),
   })
@@ -79,7 +47,17 @@ export default function People() {
   const tracked = sorted.filter((x) => x.p.cadenceDays > 0)
   const others = sorted.filter((x) => !(x.p.cadenceDays > 0))
   const dueCount = tracked.filter((x) => x.s.overdue).length
-  const reach = mostOverdue(tracked.map((x) => x.p), now)
+  const soon = useMemo(() => reachSoon(people ?? [], now, 5), [people, now])
+  const branches = useMemo(() => groupByRelation(people ?? []), [people])
+  const collapsed = useMemo(() => {
+    const big = (people?.length ?? 0) > 40
+    return new Set(branches.filter((b) => (b.key in overrides ? !overrides[b.key] : big && b.people.length > BIG_BRANCH)).map((b) => b.key))
+  }, [branches, overrides, people])
+  const toggleBranch = (key: string) => {
+    const next = { ...overrides, [key]: collapsed.has(key) }
+    setOverrides(next)
+    try { localStorage.setItem(OPEN_KEY, JSON.stringify(next)) } catch { /* ignore */ }
+  }
   const matchedOthers = others.filter((x) => x.p.name.toLowerCase().includes(q.trim().toLowerCase()))
   const shownOthers = matchedOthers.slice(0, MAX_OTHERS)
   const row = (p: Person) => (
@@ -103,39 +81,58 @@ export default function People() {
 
   return (
     <>
-      <PageHeader title="People" sub={sub} actions={<button className="btn btn-primary" onClick={() => setAdding(true)}>Add person</button>} />
-      {people === undefined ? (
+      <PageHeader title="People" sub={sub} actions={<button className="btn btn-primary" onClick={() => setAdding({ relation: '' })}>Add person</button>} />
+      {failed ? (
+        <Card>
+          <Empty title="People could not load" action={<button className="btn" onClick={() => setReload((n) => n + 1)}>Try again</button>}>
+            Your data is still on this device. Try again, and if it keeps happening export a backup from Settings.
+          </Empty>
+        </Card>
+      ) : people === undefined ? (
         <PageSkeleton strip={false} rows={7} />
       ) : people.length === 0 ? (
         <Card>
-          <Empty title="No one here yet" action={<button className="btn btn-primary" onClick={() => setAdding(true)}>Add your first person</button>}>
-            Add someone you want to stay close to and choose how often to check in. When you talk, tap “Contacted” and Northstar will tell you who is due next.
+          <Empty title="No one here yet" action={<button className="btn btn-primary" onClick={() => setAdding({ relation: '' })}>Add your first person</button>}>
+            Start with one person you want to stay close to and choose how often to check in. They become the first leaf on your tree, and Northstar tells you who is due next.
           </Empty>
         </Card>
       ) : (
         <>
-        {birthdays.length > 0 && (
-          <ul className="ppl-strip" aria-label="Birthdays in the next 30 days">
-            {birthdays.map(({ p, next, inDays }) => (
-              <li key={p.id} className="ppl-strip-item">
-                <span>{p.name}</span>
-                <span className={inDays <= 3 ? 'ppl-status is-due' : 'ppl-status'}>{inDays === 0 ? 'Today' : inDays === 1 ? 'Tomorrow' : `${formatDate(next)} · ${inDays} days`}</span>
-              </li>
-            ))}
-          </ul>
-        )}
         <div className="ppl-toolbar">
-          <Tabs<View> value={view} onChange={chooseView} options={[{ value: 'circle', label: 'Circle' }, { value: 'list', label: 'List' }]} />
-          {reach && <button type="button" className="ppl-reach" onClick={() => setOpenId(reach.id!)} data-testid="reach-out">{reminderLine(reach, now)}</button>}
-        </div>
-        <div className={`ppl-board ${view === 'list' ? 'is-list' : ''}`}>
-          {view === 'circle' && (
-            <Card title="Your circle" className="ppl-circle-card">
-              {tracked.length === 0 ? (
-                <div className="ppl-empty-hint small muted">Nobody has a check-in rhythm yet. Open a person and choose weekly, monthly or quarterly to place them on the circle.</div>
-              ) : <CircleView people={tracked.map((x) => x.p)} onOpen={setOpenId} selectedId={openId} />}
-            </Card>
+          <Tabs<View> value={view} onChange={chooseView} options={[{ value: 'tree', label: 'Tree' }, { value: 'list', label: 'List' }]} />
+          {birthdays.length > 0 && (
+            <details className="ppl-menu">
+              <summary>Birthdays <span className="mono">{birthdays.length}</span></summary>
+              <ul className="ppl-menu-pop" aria-label="Birthdays in the next 30 days">
+                {birthdays.map(({ p, next, inDays }) => (
+                  <li key={p.id} className="ppl-strip-item">
+                    <button type="button" className="ppl-link" onClick={() => setOpenId(p.id!)}>{p.name}</button>
+                    <span className={inDays <= 3 ? 'ppl-status is-due' : 'ppl-status'}>{inDays === 0 ? 'Today' : inDays === 1 ? 'Tomorrow' : `${formatDate(next)} · ${inDays} days`}</span>
+                  </li>
+                ))}
+              </ul>
+            </details>
           )}
+        </div>
+        {view === 'tree' ? (
+          <>
+            <TreeView branches={branches} collapsed={collapsed} now={now} selectedId={openId} onToggle={toggleBranch} onOpen={setOpenId} onAdd={(relation) => setAdding({ relation })} />
+            {tracked.length === 0 && <p className="ppl-empty-hint small muted">Nobody has a check-in rhythm yet. Open a person and choose weekly, monthly or quarterly so their ring can show how recently you spoke.</p>}
+            {soon.length > 0 && (
+              <section className="ppl-soon" aria-label="Reach out soon">
+                <h2 className="ppl-soon-h">Reach out soon</h2>
+                <ul>
+                  {soon.map(({ p }, i) => (
+                    <li key={p.id}>
+                      <button type="button" className="ppl-reach" onClick={() => setOpenId(p.id!)} data-testid={i === 0 ? 'reach-out' : undefined}>{reminderLine(p, now)}</button>
+                      <button type="button" className="btn btn-sm" onClick={() => quickLog(p)} aria-label={`Contacted ${p.name} today`}>Contacted</button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </>
+        ) : (
           <div className="ppl-col">
             <Card title="Check-ins" flush>
               <div>
@@ -161,10 +158,10 @@ export default function People() {
               </Card>
             )}
           </div>
-        </div>
+        )}
         </>
       )}
-      {adding && <PersonForm onClose={() => setAdding(false)} />}
+      {adding && <PersonForm defaultRelation={adding.relation} onClose={() => setAdding(null)} />}
       {openId != null && <PersonDetail personId={openId} onClose={() => setOpenId(null)} />}
     </>
   )

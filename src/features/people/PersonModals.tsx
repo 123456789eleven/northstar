@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Interaction, type Person } from '../../db'
 import { Field, Modal } from '../../components/ui'
 import { formatDate } from '../../lib/dates'
+import { LogPanel, useQuickLog } from './LogPanel'
 import { CADENCES, KINDS, cadenceLabel, deleteInteraction, deletePerson, personStatus } from './people'
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleDateString(undefined, { month: 'short' }))
@@ -16,9 +17,9 @@ export function XIcon() {
   )
 }
 
-export function PersonForm({ person, onClose, onSaved }: { person?: Person; onClose: () => void; onSaved?: (id: number) => void }) {
+export function PersonForm({ person, onClose, onSaved, defaultRelation }: { person?: Person; onClose: () => void; onSaved?: (id: number) => void; defaultRelation?: string }) {
   const [name, setName] = useState(person?.name ?? '')
-  const [relation, setRelation] = useState(person?.relation ?? '')
+  const [relation, setRelation] = useState(person?.relation ?? defaultRelation ?? '')
   const [cadence, setCadence] = useState(person?.cadenceDays ?? 30)
   const [bm, setBm] = useState(person?.birthday?.slice(0, 2) ?? '')
   const [bd, setBd] = useState(person?.birthday?.slice(3, 5) ?? '')
@@ -90,6 +91,8 @@ export function PersonDetail({ personId, onClose }: { personId: number; onClose:
   const person = useLiveQuery(() => db.people.get(personId), [personId])
   const history = useLiveQuery(() => db.interactions.where('personId').equals(personId).reverse().sortBy('date'), [personId])
   const [editing, setEditing] = useState(false)
+  const [logging, setLogging] = useState(false)
+  const quickLog = useQuickLog()
 
   if (person === undefined) return null
   if (editing) return <PersonForm person={person} onClose={() => setEditing(false)} />
@@ -112,6 +115,14 @@ export function PersonDetail({ personId, onClose }: { personId: number; onClose:
       </div>
       {person.notes ? <p className="ppl-notes">{person.notes}</p> : <p className="ppl-notes faint">No notes yet.</p>}
 
+      <div className="ppl-section">Log a contact</div>
+      {logging ? <LogPanel person={person} onDone={() => setLogging(false)} /> : (
+        <div className="row">
+          <button className="btn" onClick={() => quickLog(person)}>Contacted today</button>
+          <button className="btn btn-ghost" onClick={() => setLogging(true)}>Add details</button>
+        </div>
+      )}
+
       <div className="ppl-section">History</div>
       {history && history.length > 0 ? (
         <div>
@@ -125,7 +136,7 @@ export function PersonDetail({ personId, onClose }: { personId: number; onClose:
           ))}
         </div>
       ) : (
-        <p className="small faint">No contacts logged yet. Use “Logged contact” on the list.</p>
+        <p className="small faint">No contacts logged yet. Use “Contacted today” above.</p>
       )}
 
       <div className="row-between" style={{ marginTop: 18 }}>
