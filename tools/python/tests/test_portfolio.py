@@ -49,7 +49,7 @@ class T(unittest.TestCase):
             self.assertIn("AAA", h)
             sav = (out / "savings_rate_by_month.csv").read_text().splitlines()
             self.assertIn("2025-01,3000.0,150.0,2850.0,95.0", sav[1])  # transfer excluded
-            self.assertEqual((out / "top_merchants.csv").read_text().splitlines()[1].split(",")[0], "GROCERY MART")
+            self.assertEqual((out / "top_merchants.csv").read_text().splitlines()[2], "GROCERY MART,150.0,2")
             self.assertNotIn("123456789012", (out / "summary.txt").read_text() + buf.getvalue())
 
     def test_unrealised(self):
