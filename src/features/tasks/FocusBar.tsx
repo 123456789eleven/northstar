@@ -1,4 +1,5 @@
 // Three focus slots shared by Today and Tasks. Same data as the pin button on every task row (task.focusDate === today).
+import './aura.css'
 import { useState } from 'react'
 import type { Task } from '../../db'
 import { MAX_FOCUS, byUrgency, togglePin } from './taskActions'

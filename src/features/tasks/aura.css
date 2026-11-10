@@ -1,0 +1,13 @@
+/* Completion aura: one soft ring leaves the checkbox and fades, the row catches a brief powder wash. Paint-only (box-shadow, background),
+   under 600 ms, one ring (no confetti, no coins). Reduced motion: no ring, the check just fills. */
+.task-row.completing .check, .focus-slot.completing .check { animation: aura-ring 560ms var(--spring-gentle) both; }
+.task-row.completing { animation: aura-wash 560ms var(--spring-gentle) both; }
+@keyframes aura-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 85%, transparent), 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent); transform: scale(0.88); }
+  40% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 55%, transparent), 0 0 20px 5px color-mix(in srgb, var(--accent) 38%, transparent); transform: scale(1.12); }
+  100% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--accent) 0%, transparent), 0 0 30px 12px color-mix(in srgb, var(--accent) 0%, transparent); transform: scale(1); }
+}
+@keyframes aura-wash { 0% { background-color: color-mix(in srgb, var(--accent) 14%, var(--surface)); } 100% { background-color: var(--surface); } }
+@media (prefers-reduced-motion: reduce) { .task-row.completing .check, .focus-slot.completing .check, .task-row.completing { animation: none; } }
+/* the ring must not be clipped by the swipe wrapper while it plays */
+.task-swipe:has(.completing) { overflow: visible; }
