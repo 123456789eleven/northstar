@@ -5,6 +5,7 @@ import { PageHeader, Skeleton } from '../components/ui'
 import type { IconName } from '../components/Icons'
 import ModuleTile from '../components/ModuleTile'
 import { Ring } from '../features/game/ui/Ring'
+import '../features/space/space.css'
 import { usePlayerState } from '../features/game/ui/playerContext'
 import { useAreaWeek } from '../features/game/useAreaWeek'
 import { inputLine } from '../features/game/areas'
@@ -52,11 +53,11 @@ export default function SkillsHub() {
               </table>
             </div>
           )}
-          <div className="area-grid">
+          <div className="area-grid sp-areas">
             {areas.map((a) => {
               const page = PAGES[a.id]
               return (
-                <Link key={a.id} to={page.to} className="card card-interactive area-card" data-area={a.id}>
+                <Link key={a.id} to={page.to} className="card card-interactive area-card sp-flat" data-area={a.id}>
                   <span className="area-head">
                     <Ring value={a.value} size={72} stroke={6} label={`${a.label}: ${Math.min(a.days, target)} of ${target} days this week`}>
                       <span className="area-days"><b className="mono">{Math.min(a.days, target)}</b><span>/{target}</span></span>

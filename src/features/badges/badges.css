@@ -1,0 +1,24 @@
+.bdg-view { display: flex; flex-direction: column; gap: 40px; padding-top: 24px; }
+.bdg-count { margin: 0; color: var(--ink-2); font-size: var(--fs-3); }
+.bdg-count-n { color: var(--ink); font-size: 40px; font-weight: 600; font-variant-numeric: tabular-nums; margin-right: 6px; letter-spacing: -0.02em; }
+.bdg-group { display: flex; flex-direction: column; gap: 16px; }
+.bdg-group-h { margin: 0; font-size: var(--fs-1); font-weight: 500; letter-spacing: 0.02em; color: var(--ink-3); padding-bottom: 8px; border-bottom: 1px solid var(--line-soft); }
+.bdg-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 32px 24px; }
+.bdg { all: unset; box-sizing: border-box; width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 8px 0; min-height: 44px; cursor: pointer; color: var(--ink-3); border-radius: var(--radius-sm); }
+.bdg:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.bdg.is-earned { color: var(--ink); }
+.bdg-mark { position: relative; display: inline-flex; margin-bottom: 4px; color: inherit; }
+.bdg:not(.is-earned) .bdg-mark { opacity: 0.55; }
+.bdg:hover .bdg-mark { color: var(--accent-text, var(--accent)); }
+.bdg-gold { position: absolute; right: -2px; top: -2px; width: 8px; height: 8px; border-radius: 50%; background: var(--reward); }
+.bdg-title { font-size: var(--fs-3); font-weight: 500; color: var(--ink); }
+.bdg:not(.is-earned) .bdg-title { color: var(--ink-2); }
+.bdg-sub { font-size: var(--fs-1); color: var(--ink-2); line-height: 1.4; }
+.bdg-prog { font-size: var(--fs-1); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.bdg-sheet { display: flex; flex-direction: column; gap: 12px; color: var(--ink-2); }
+.bdg-sheet.is-earned .bdg-mark { color: var(--ink); }
+.bdg-mark-lg { color: var(--ink-3); margin: 8px 0; }
+.bdg-meaning { margin: 0; color: var(--ink); font-size: var(--fs-3); }
+.bdg-how { margin: 0; font-size: var(--fs-2); }
+.bdg-actions { justify-content: flex-end; }
+@media (max-width: 519px) { .bdg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; } }

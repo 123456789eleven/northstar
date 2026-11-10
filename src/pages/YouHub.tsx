@@ -1,4 +1,5 @@
 // You hub (/you): profile summary, season line, consistency, backup status and links to Milestones, Season, Intel, Settings, Data and Ontology.
+import '../features/space/space.css'
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, getSetting } from '../db'
@@ -26,11 +27,11 @@ function BackupStatus() {
   const now = useNow()
   const [open, setOpen] = useState(false)
   const [done, setDone] = useState('')
-  if (!info) return <section className="card you-backup"><Skeleton lines={2} label="Loading backup status" /></section>
+  if (!info) return <section className="card you-backup sp-flat"><Skeleton lines={2} label="Loading backup status" /></section>
   const age = info.at ? Math.floor((now.getTime() - new Date(info.at).getTime()) / 86_400_000) : null
   const overdue = (info.remind || 0) > 0 && (age === null || age > (info.remind || BACKUP_REMIND_DAYS))
   return (
-    <section className="card you-backup" aria-labelledby="you-backup-h" data-testid="backup-status">
+    <section className="card you-backup sp-flat" aria-labelledby="you-backup-h" data-testid="backup-status">
       <h2 id="you-backup-h" className="you-section-h">Backup status</h2>
       <div className="you-backup-row">
         <div>
@@ -57,15 +58,15 @@ export default function YouHub() {
   return (
     <>
       <PageHeader title="You" sub="Your season, your consistency, and how Northstar runs on this device." />
-      <div className="you-top">
-        <section className="card you-profile" aria-label="Profile summary" data-spec>
+      <div className="you-top sp-you">
+        <section className="card you-profile sp-hero" aria-label="Profile summary" data-spec>
           <div className="you-who">
             <span className="you-name">{name === undefined ? '' : name || 'You'}</span>
             <span className="you-season">{season.name} · {season.daysLeft === 0 ? 'last day' : `${season.daysLeft} ${season.daysLeft === 1 ? 'day' : 'days'} left`}</span>
           </div>
           <Progress value={season.elapsed * 100} label={`${season.name}: ${Math.round(season.elapsed * 100)}% elapsed`} />
         </section>
-        <section className="card you-star" aria-labelledby="you-cons-h">
+        <section className="card you-star sp-flat" aria-labelledby="you-cons-h">
           <h2 id="you-cons-h" className="you-section-h">Consistency</h2>
           {p.loading ? <Skeleton lines={2} label="Loading consistency" /> : (
             <>
@@ -77,13 +78,13 @@ export default function YouHub() {
         </section>
       </div>
       <div className="you-mid">
-        <section className="card" aria-labelledby="you-next-h">
+        <section className="card sp-flat" aria-labelledby="you-next-h">
           <h2 id="you-next-h" className="you-section-h">Next milestones</h2>
           <NextTrophyRow max={3} className="tr-next-stack" />
         </section>
         <BackupStatus />
       </div>
-      <div className="hub-grid">
+      <div className="hub-grid sp-links">
         <HubCard to="/history" icon="history" title="Milestones" sub="Your logbook of what you finished" stat={milestones} />
         <HubCard to="/review" icon="review" title="Season" sub={`${season.name} · weekly recaps`} stat={reviews} />
         <HubCard to="/ops" icon="command" title="Intel" sub="Suggestions and briefings from your data" />
