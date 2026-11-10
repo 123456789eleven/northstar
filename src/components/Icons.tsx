@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 
 const P = {
   command: <><rect x="2" y="2" width="5" height="5" /><rect x="9" y="2" width="5" height="5" /><rect x="2" y="9" width="5" height="5" /><rect x="9" y="9" width="5" height="5" /></>,
+  home: <><path d="M2 11.5L8 14.5l6-3M2 11.5V6l3-1.5L8 6v8.5M8 6l3-4 3 2v7.5" /></>,
   today: <><circle cx="8" cy="8" r="5.5" /><path d="M8 4.5V8l2.5 1.5" /></>,
   planner: <><rect x="2" y="3" width="12" height="11" rx="1.5" /><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" /></>,
   tasks: <><rect x="2.5" y="2.5" width="11" height="11" rx="2" /><path d="M5.5 8.2l1.8 1.8 3.2-3.5" /></>,

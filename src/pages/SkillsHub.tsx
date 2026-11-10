@@ -33,7 +33,7 @@ export default function SkillsHub() {
       <PageHeader
         title="Areas"
         sub="Body, money, mind, career and people. Each ring fills with the days you did something there this week."
-        actions={<><Link to="/map" className="btn btn-ghost">Life map</Link>{areas ? <button type="button" className="btn btn-ghost" aria-expanded={table} aria-controls={`${uid}-t`} onClick={() => setTable((v) => !v)}>{table ? 'Hide table' : 'Table view'}</button> : null}</>}
+        actions={<><Link to="/" className="btn btn-ghost">Life map</Link>{areas ? <button type="button" className="btn btn-ghost" aria-expanded={table} aria-controls={`${uid}-t`} onClick={() => setTable((v) => !v)}>{table ? 'Hide table' : 'Table view'}</button> : null}</>}
       />
       {!areas ? (
         <div className="area-grid" aria-busy="true">{Object.keys(PAGES).map((k) => <div key={k} className="card"><Skeleton lines={3} label="Loading areas" /></div>)}</div>

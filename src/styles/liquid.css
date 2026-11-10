@@ -184,7 +184,6 @@ h1, .page-title { letter-spacing: -0.02em; font-weight: 650; }
 .mission a.quest:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.06); }
 .mission .quest.is-done .quest-title { color: var(--ink-3); text-decoration: line-through; text-decoration-color: rgba(255, 255, 255, 0.2); }
 .mission .quest-title { font-size: var(--fs-3); font-weight: 500; }
-.mr-season { font-size: var(--fs-4); font-weight: 650; letter-spacing: -0.015em; }
 
 .pulse { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); margin-bottom: var(--gap); }
 @media (max-width: 560px) { .pulse { grid-template-columns: minmax(0, 1fr); } }

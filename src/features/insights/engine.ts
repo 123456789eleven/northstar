@@ -365,6 +365,6 @@ export function nextBestAction(s: Snapshot): NextAction | null {
   if (s.tasks.length === 0) return { text: 'Insights appear once you have a little data. Start by adding a task.', href: '/tasks', cta: 'Add a task' }
   if (s.goals.length === 0) return { text: 'Set one goal for this quarter and link a task to it. Insights will track whether it is moving.', href: '/goals', cta: 'Set a goal' }
   if (s.tasks.length + s.meals.length + s.transactions.length + s.studySessions.length + s.people.length < 5)
-    return { text: 'A few more days of logging and this page will start noticing patterns.', href: '/', cta: 'Open Today' }
+    return { text: 'A few more days of logging and this page will start noticing patterns.', href: '/today', cta: 'Open Today' }
   return null
 }

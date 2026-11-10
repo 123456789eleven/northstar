@@ -81,31 +81,6 @@ a.quest.is-compact:hover { background: var(--glass-bg-hover); border-color: tran
 @keyframes moment-ripple { 0% { opacity: 0.9; transform: scale(0.2); } 100% { opacity: 0; transform: scale(1.4); } }
 @media (max-width: 819px) { .moment-layer { top: calc(52px + env(safe-area-inset-top)); } }
 
-/* Desktop mission rail (>= 1280px; hidden in Calm mode by not rendering) */
-.mission-rail { display: none; }
-@media (min-width: 1280px) {
-  .mission-rail { display: block; position: sticky; top: 0; height: 100vh; overflow-y: auto; border-left: 1px solid var(--glass-border); background: var(--glass-bg); scrollbar-width: thin; }
-}
-.mr-inner { display: flex; flex-direction: column; gap: var(--sp-5); padding: var(--sp-4) var(--sp-4) var(--sp-6); }
-.mr-player { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3); margin: calc(var(--sp-1) * -1) calc(var(--sp-2) * -1) 0; border-radius: var(--radius); color: inherit; text-decoration: none; transition: background-color var(--dur-fast) var(--ease-out); }
-.mr-player:hover { background: var(--glass-bg-hover); }
-.mr-player-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.mr-kicker, .mr-head { font-family: var(--mono); font-size: var(--text-label); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-2); }
-.mr-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--sp-2); }
-.mr-head .muted { text-transform: none; letter-spacing: 0; }
-.mr-sec { display: flex; flex-direction: column; }
-.mr-quests { display: flex; flex-direction: column; margin: 0 calc(var(--sp-2) * -1); }
-.mr-note { margin: var(--sp-2) 0 0; font-size: var(--text-xs); color: var(--ink-2); }
-.mr-empty { margin: 0; font-size: var(--text-sm); color: var(--ink-2); }
-.mr-cleared { margin: var(--sp-2) 0 0; font-size: var(--text-sm); font-weight: 600; color: var(--reward); }
-.mr-recent { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.mr-recent li { display: flex; justify-content: space-between; gap: var(--sp-2); padding: 6px 0; border-bottom: 1px solid var(--line-soft); font-size: var(--text-sm); }
-.mr-recent li:last-child { border-bottom: 0; }
-.mr-why { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); }
-.mr-xp { color: var(--reward); font-weight: 600; }
-.mr-link { margin-top: var(--sp-2); font-size: var(--text-xs); color: var(--ink-2); align-self: flex-start; min-height: 32px; display: inline-flex; align-items: center; }
-.mr-link:hover { color: var(--ink); }
-
 /* Phone player strip (top bar) */
 .pstrip { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 6px; border-radius: var(--radius-sm); color: var(--ink); text-decoration: none; }
 .pstrip:active { background: var(--glass-bg-hover); }
@@ -121,11 +96,11 @@ a.quest.is-compact:hover { background: var(--glass-bg-hover); border-color: tran
 :root[data-motion='reduced'] .ring-fill { transition: none; }
 :root[data-motion='reduced'] :is(.quest-ring.is-pulsing, .quest-check.is-drawing path, .moment, .moment-ripple, .moment-tick path) { animation: none; }
 :root[data-motion='reduced'] .moment-ripple { display: none; }
-@media (prefers-reduced-transparency: reduce) { .moment { background: var(--surface-3); } .moment::before { content: none; } .mission-rail { background: var(--surface-1); } }
+@media (prefers-reduced-transparency: reduce) { .moment { background: var(--surface-3); } .moment::before { content: none; } }
 @media (forced-colors: active) {
   .ring-fill { stroke: Highlight; } .ring-track { stroke: GrayText; }
     .wd.on .wd-dot { background: Highlight; border-color: Highlight; }
   .moment { border: 1px solid CanvasText; } .moment::before { content: none; }
   .quest { border: 1px solid CanvasText; }
 }
-@media print { .mission-rail, .moment-layer, .mission { display: none !important; } }
+@media print { .moment-layer, .mission { display: none !important; } }

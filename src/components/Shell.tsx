@@ -1,5 +1,5 @@
-// App shell: desktop rail (Today, Plan, Money, Areas, You), top bar (context, capture, search, sync, date; phone: plan pill and You),
-// and the phone bottom bar (Today | Plan | capture orb | Money | Areas) with the capture sheet.
+// App shell: desktop rail (Home, Today, Plan, Money, Areas, You), top bar (context, capture, search, sync, date; phone: plan pill and You),
+// and the phone bottom bar (Home | Plan | capture orb | Money | Areas) with the capture sheet.
 import { lazy, Suspense, useEffect, useState, type CSSProperties } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -90,7 +90,8 @@ function RailLink({ e, pathname }: { e: RailEntry; pathname: string }) {
 }
 
 const RAIL_TOP: RailEntry[] = [
-  { to: '/', label: 'Today', icon: 'today' },
+  { to: '/', label: 'Home', icon: 'home', also: ['/map'] },
+  { to: '/today', label: 'Today', icon: 'today' },
   { to: '/plan', label: 'Plan', icon: 'planner', also: HUBS.plan.tabs.map((t) => t.to) },
   { to: '/finance', label: 'Money', icon: 'finance', skill: 'money' },
 ]
@@ -244,7 +245,7 @@ export function CaptureHost() {
 }
 
 const BAR: Array<{ hub: HubId; to: string; label: string; icon: IconName }> = [
-  { hub: 'today', to: '/', label: 'Today', icon: 'today' },
+  { hub: 'today', to: '/', label: 'Home', icon: 'home' },
   { hub: 'plan', to: '/plan', label: 'Plan', icon: 'planner' },
   { hub: 'money', to: '/finance', label: 'Money', icon: 'finance' },
   { hub: 'skills', to: '/skills', label: 'Areas', icon: 'star' },

@@ -1,3 +1,4 @@
+// Home (/) is the Life map; Today (/today) is the day's plan. /map stays as an alias of Home.
 // Information architecture v3 ("Constellation", docs/design/game-direction.md): 18 pages grouped into 4 hubs + Today.
 // Every old URL stays a real route; hubs add landing pages (/plan, /skills, /mind, /you) and a tab strip across their pages.
 import type { IconName } from './Icons'
@@ -19,7 +20,8 @@ export interface NavItem {
 }
 
 export const NAV: NavItem[] = [
-  { to: '/', label: 'Today', icon: 'today', group: 'Today', hub: 'today' },
+  { to: '/', label: 'Home', icon: 'home', group: 'Home', hub: 'today', aka: 'Life map City Overview' },
+  { to: '/today', label: 'Today', icon: 'today', group: 'Today', hub: 'today', aka: "Today's plan Agenda Focus" },
   { to: '/plan', label: 'Plan', icon: 'planner', group: 'Plan', hub: 'plan', aka: 'Overview' },
   { to: '/tasks', label: 'Tasks', icon: 'tasks', group: 'Plan', hub: 'plan' },
   { to: '/planner', label: 'Planner', icon: 'calendar', group: 'Plan', hub: 'plan', aka: 'Calendar' },
@@ -84,7 +86,8 @@ const matches = (to: string, pathname: string) => (to === '/' ? pathname === '/'
 
 /** The nav item that owns a router pathname. */
 export function navItemFor(pathname: string): NavItem | undefined {
-  return NAV.find((n) => matches(n.to, pathname))
+  const p = pathname === '/map' ? '/' : pathname
+  return NAV.find((n) => matches(n.to, p))
 }
 
 /** Which hub a pathname belongs to (unknown paths count as Today). */

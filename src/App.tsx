@@ -7,7 +7,6 @@ import { CaptureHost, Rail, TabBar, TopBar } from './components/Shell'
 import HubLayout, { RouteFade } from './components/HubLayout'
 import { GlassDefs } from './components/GlassDefs'
 import { PlayerProvider } from './features/game/ui/PlayerProvider'
-import { MissionRail } from './features/game/ui/Mission'
 import './features/game/ui/game.css'
 import ToastProvider from './components/Toast'
 import UpdatePrompt from './components/UpdatePrompt'
@@ -36,7 +35,7 @@ const Planner = lazy(() => import('./pages/Planner'))
 const DataHub = lazy(() => import('./pages/DataHub'))
 const Career = lazy(() => import('./pages/Career'))
 const PlanHub = lazy(() => import('./pages/PlanHub'))
-const LifeMap = lazy(() => import('./pages/LifeMap'))
+const Home = lazy(() => import('./pages/Home'))
 const SkillsHub = lazy(() => import('./pages/SkillsHub'))
 const MindHub = lazy(() => import('./pages/MindHub'))
 const YouHub = lazy(() => import('./pages/YouHub'))
@@ -76,7 +75,7 @@ function Shell() {
   useNavTransitions()
   useDensity()
   return (
-      <div className={`shell ${pathname === '/' ? 'has-mission' : ''}`}>
+      <div className={`shell${pathname === '/' || pathname === '/map' ? ' is-home' : ''}`}>
         <a className="skip-link" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus() }}>Skip to content</a>
         <GlassDefs />
         <Rail />
@@ -85,7 +84,9 @@ function Shell() {
         <main className="main" id="main" tabIndex={-1}>
           <Routes>
             <Route element={<RouteFade />}>
-              <Route path="/" element={<Today />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/map" element={<Home />} />
+              <Route path="/today" element={<Today />} />
             </Route>
             <Route element={<HubLayout hub="plan" />}>
               <Route path="/plan" element={<PlanHub />} />
@@ -99,7 +100,6 @@ function Shell() {
             </Route>
             <Route element={<HubLayout hub="skills" />}>
               <Route path="/skills" element={<SkillsHub />} />
-              <Route path="/map" element={<LifeMap />} />
               <Route path="/body" element={<Body />} />
               <Route path="/interview" element={<Interview />} />
               <Route path="/style" element={<StyleTile />} />
@@ -122,7 +122,6 @@ function Shell() {
           </Routes>
         </main>
         </div>
-        <MissionRail />
         <TabBar />
         <CaptureHost />
         <Suspense fallback={null}><MomentHost /></Suspense>
