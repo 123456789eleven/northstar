@@ -203,3 +203,11 @@ html[data-lens] .toast { -webkit-backdrop-filter: url(#ns-lens) blur(14px) satur
 /* Hero cards keep real glass over the backdrop; plain content cards stay near-solid (see --mat-regular-bg). */
 .card[data-spec], .pulse-card { background-color: rgba(18, 23, 33, 0.58); }
 .card[data-spec]::before, .pulse-card::before { -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); }
+
+/* ---------- breathing room (owner: fewer cards, more space) ---------- */
+:root:not([data-density='compact']) { --pad: 22px; --gap: 20px; --row: 42px; --main-pt: 32px; --head-gap: 28px; --title-gap: 14px; }
+.main { row-gap: var(--gap); }
+.card { padding: var(--pad); }
+.card-title { margin-bottom: 14px; }
+.page-head, .page-header { margin-bottom: var(--head-gap, 28px); }
+@media (max-width: 819px) { :root:not([data-density='compact']) { --pad: 18px; --gap: 16px; --main-pt: 20px; --head-gap: 20px; } }
