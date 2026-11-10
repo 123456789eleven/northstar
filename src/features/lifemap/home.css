@@ -157,3 +157,9 @@
 @media (prefers-reduced-motion: reduce) { .hm-body, .hm-panel { animation: none; transition: none; } }
 @media (prefers-reduced-transparency: reduce) { .hm-glass, .hm-title { background: var(--surface-2); -webkit-backdrop-filter: none; backdrop-filter: none; } .hm-strip-shape { fill: var(--surface-2); } }
 @media (forced-colors: active) { .hm-glass, .hm-title { border: 1px solid CanvasText; } .hm-strip-tab[aria-selected='true'], .hm-tab[aria-selected='true'] { outline: 1px solid Highlight; } }
+
+.hm-day { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.hm-day-value { font-size: var(--fs-3); font-weight: 600; }
+.hm-day-value.is-up, .hm-stat-note.is-up { color: var(--accent-text); }
+.hm-day-value.is-down, .hm-stat-note.is-down { color: var(--warn); }
+.hm-day .hm-open { margin-left: auto; }

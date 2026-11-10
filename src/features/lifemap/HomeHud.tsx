@@ -8,6 +8,7 @@ import { seasonOf } from '../you/season'
 import { formatDate, today } from '../../lib/dates'
 import { loadDemoWithConfirm } from '../onboarding/demoActions'
 import { openSetup } from '../onboarding/setupLogic'
+import { freshness, type DayChange } from './useDayChange'
 import { clamp01, money as whole, weightProgress, type District, type LifeMap } from './model'
 import type { HomeHud } from './useHomeHud'
 
@@ -37,19 +38,19 @@ export function TitleBar() {
   )
 }
 
-function StatRow({ to, label, value, ring, warn, note }: { to: string; label: string; value: string; ring: number; warn?: boolean; note?: string }) {
+function StatRow({ to, label, value, ring, warn, note, noteTone }: { to: string; label: string; value: string; ring: number; warn?: boolean; note?: string; noteTone?: 'up' | 'down' }) {
   return (
     <Link to={to} className="hm-stat">
       <Ring value={ring} size={34} stroke={3} />
       <span className="hm-stat-text">
         <span className="hm-stat-label">{label}</span>
-        <span className={`hm-stat-value mono${warn ? ' is-warn' : ''}`}>{value}{note && <span className="hm-stat-note"> {note}</span>}</span>
+        <span className={`hm-stat-value mono${warn ? ' is-warn' : ''}`}>{value}{note && <span className={`hm-stat-note${noteTone ? ` is-${noteTone}` : ''}`}> {note}</span>}</span>
       </span>
     </Link>
   )
 }
 
-export function Overview({ map, hud, p }: { map: LifeMap; hud: HomeHud | undefined; p: PlayerState }) {
+export function Overview({ map, hud, p, day }: { map: LifeMap; hud: HomeHud | undefined; p: PlayerState; day?: DayChange | null }) {
   const money = map.districts.find((d) => d.id === 'money')
   const people = map.districts.find((d) => d.id === 'people')
   const total = p.quests.length
@@ -58,7 +59,7 @@ export function Overview({ map, hud, p }: { map: LifeMap; hud: HomeHud | undefin
   const [busy, setBusy] = useState(false)
   return (
     <section className="hm-overview hm-glass" aria-label="Overview">
-      <StatRow to="/finance" label="Net worth" value={map.overview.netWorth} ring={money?.glow ?? 0} />
+      <StatRow to="/finance" label="Net worth" value={map.overview.netWorth} ring={money?.glow ?? 0} note={day ? `${dayText(day)} today` : undefined} noteTone={day ? (day.amount < 0 ? 'down' : 'up') : undefined} />
       <StatRow to="/today" label="Today's plan" value={total ? `${p.questsDone} of ${total}` : 'None yet'} ring={total ? p.questsDone / total : 0} />
       <StatRow to="/food" label="Calories" value={hud ? num(hud.cal) : '0'} note={hud ? `of ${num(hud.calTarget)}` : undefined} ring={hud ? clamp01(hud.cal / hud.calTarget) : 0} />
       <StatRow to="/people" label="To contact" value={String(overdue)} warn={overdue > 0} ring={tracked ? 1 - overdue / tracked : 0} />
@@ -198,7 +199,12 @@ function TodayTab({ p, hud, map }: { p: PlayerState; hud?: HomeHud; map: LifeMap
   )
 }
 
-function MoneyTab({ hud, map }: { hud?: HomeHud; map: LifeMap }) {
+export function dayText(d: DayChange) {
+  const sign = d.amount < 0 ? '-' : '+'
+  return `${sign}$${Math.abs(d.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${sign}${Math.abs(d.pct * 100).toFixed(2)}%)`
+}
+
+function MoneyTab({ hud, map, day }: { hud?: HomeHud; map: LifeMap; day?: DayChange | null }) {
   const d = map.districts.find((x) => x.id === 'money')
   const safe = hud?.safe
   return (
@@ -211,8 +217,15 @@ function MoneyTab({ hud, map }: { hud?: HomeHud; map: LifeMap }) {
       </div>
       <div className="hm-nums is-two">
         <Num label="Net worth" value={map.overview.netWorth} />
-        <Num label="Portfolio" value={hud?.portfolio != null ? whole(hud.portfolio) : 'None yet'} of={hud?.portfolio != null ? 'at last price' : 'Add holdings on Money'} />
+        <Num label="Portfolio" value={hud?.portfolio != null ? whole(hud.portfolio) : 'None yet'} of={hud?.portfolio != null ? (day ? 'live quotes' : 'at last price') : 'Add holdings on Money'} />
       </div>
+      {day && (
+        <div className="hm-day" data-testid="day-change">
+          <span className={`mono hm-day-value is-${day.amount < 0 ? 'down' : 'up'}`}>{dayText(day)} today</span>
+          <span className="hm-muted">{freshness(day.asOf)}</span>
+          <Link className="hm-open" to="/finance?tab=markets">Markets<span aria-hidden="true">&nbsp;&rarr;</span></Link>
+        </div>
+      )}
     </>
   )
 }
@@ -314,15 +327,15 @@ function PeopleTab({ hud, map }: { hud?: HomeHud; map: LifeMap }) {
 }
 
 /** Right panel (desktop) or bottom sheet (phone): one breakout tab at a time, an Open link, collapsible. */
-export function BreakoutPanel({ tab, onTab, open, onOpen, map, hud, p, phone }: {
+export function BreakoutPanel({ tab, onTab, open, onOpen, map, hud, p, phone, day }: {
   tab: HomeTab; onTab: (t: HomeTab) => void; open: boolean; onOpen: (o: boolean) => void
-  map: LifeMap; hud?: HomeHud; p: PlayerState; phone: boolean
+  map: LifeMap; hud?: HomeHud; p: PlayerState; phone: boolean; day?: DayChange | null
 }) {
   const idx = TABS.findIndex((t) => t.id === tab)
   const { refs, onKey } = useRoving(TABS.length, idx, (i) => onTab(TABS[i].id))
   const current = TABS[idx]
   const body = tab === 'today' ? <TodayTab p={p} hud={hud} map={map} />
-    : tab === 'money' ? <MoneyTab hud={hud} map={map} />
+    : tab === 'money' ? <MoneyTab hud={hud} map={map} day={day} />
     : tab === 'body' ? <BodyTab hud={hud} map={map} />
     : tab === 'mind' ? <MindTab hud={hud} map={map} />
     : tab === 'career' ? <CareerTab hud={hud} map={map} />
