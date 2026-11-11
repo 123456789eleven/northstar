@@ -17,7 +17,8 @@
     linear-gradient(to bottom, var(--page) 0%, transparent 26%, transparent 62%, var(--page) 100%),
     radial-gradient(90% 80% at 50% 40%, transparent 40%, color-mix(in srgb, var(--page) 85%, transparent) 100%);
 }
-.stage { position: relative; z-index: 1; }
+/* no z-index on .stage: it would trap modals and sheets under the strip */
+.stage { position: relative; }
 :root[data-motion='reduced'] .cb-cam, :root[data-motion='reduced'] .cb { transition: none; }
 @media (prefers-reduced-motion: reduce) { .cb-cam, .cb { transition: none; } }
 @media (prefers-reduced-transparency: reduce) { .cb-cam, .cb-fog { display: none; } .cb { background: var(--page); } }

@@ -85,9 +85,28 @@ test('desktop 1440: district strip is the primary nav; no right rail; old URLs s
   // /food keeps working and lights Body in the hub strip and Food in the sub-strip.
   await page.goto('/#/food')
   await expect(strip.getByRole('link', { name: 'Body' })).toHaveAttribute('aria-current', 'true')
-  await expect(page.getByRole('navigation', { name: 'Areas sections' }).getByRole('link', { name: 'Body' })).toHaveAttribute('aria-current', 'true')
-  await expect(page.getByRole('navigation', { name: 'Body pages' }).getByRole('link', { name: 'Food' })).toHaveAttribute('aria-current', 'page')
+  await expect(page.getByRole('navigation', { name: 'Body sections' }).getByRole('link', { name: 'Food' })).toHaveAttribute('aria-current', 'page')
+  const crumb = page.getByRole('navigation', { name: 'Breadcrumb' })
+  await expect(crumb.getByRole('link', { name: 'Body' })).toHaveAttribute('href', /#\/body$/)
+  await expect(crumb.locator('[aria-current="page"]')).toHaveText('Food')
   await expect(page).toHaveTitle('Food | Northstar')
+  // Money tabs live in the URL, so the head reads Money / Markets and the strip returns there.
+  await page.goto('/#/finance')
+  await page.getByRole('tab', { name: 'Markets' }).click()
+  await expect(page).toHaveURL(/#\/finance\?tab=markets$/)
+  await expect(crumb.locator('[aria-current="page"]')).toHaveText('Markets')
+  await strip.getByRole('link', { name: 'People' }).click()
+  await expect(page.locator('.city-head')).toHaveAttribute('data-district', 'people')
+  await expect(crumb).toHaveCount(0)
+  await strip.getByRole('link', { name: 'Money' }).click()
+  await expect(page).toHaveURL(/#\/finance\?tab=markets$/)
+  // The mini-map lights the active district and goes where you tap.
+  const mini = page.getByRole('group', { name: /City map, you are in Money/ })
+  await expect(mini.getByRole('link', { name: 'Money' })).toHaveAttribute('aria-current', 'true')
+  await mini.getByRole('link', { name: 'Career' }).click()
+  await expect(page).toHaveURL(/#\/career$/)
+  await expect(page.getByRole('group', { name: /you are in Career/ })).toBeVisible()
+  await expect(page).toHaveTitle('Career | Northstar')
 })
 
 test('Areas hub shows five rings with their inputs and a table view, no levels', async ({ page }) => {

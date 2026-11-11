@@ -10,8 +10,8 @@ import { useMedia, PHONE_QUERY } from './components/useMedia'
 import { LifeMapProvider } from './features/lifemap/useLifeMap'
 import { CityDefs } from './features/lifemap/CityScene'
 import CityBackdrop from './features/lifemap/CityBackdrop'
-import { CityHead } from './components/DistrictFrame'
-import HubLayout, { RouteFade } from './components/HubLayout'
+import { RouteFade } from './components/HubLayout'
+import DistrictFrame from './components/DistrictFrame'
 import { GlassDefs } from './components/GlassDefs'
 import { PlayerProvider } from './features/game/ui/PlayerProvider'
 import './features/game/ui/game.css'
@@ -91,43 +91,36 @@ function Shell() {
         <div className="stage">
         <TopBar />
         <main className="main" id="main" tabIndex={-1}>
-          <CityHead />
           <Routes>
             <Route element={<RouteFade />}>
               <Route path="/" element={<Home />} />
               <Route path="/map" element={<Home />} />
             </Route>
-            <Route element={<HubLayout hub="plan" />}>
+            <Route element={<DistrictFrame />}>
               <Route path="/today" element={<Today />} />
               <Route path="/plan" element={<PlanHub />} />
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/planner" element={<Planner />} />
               <Route path="/goals" element={<Goals />} />
               <Route path="/habits" element={<Habits />} />
-            </Route>
-            <Route element={<RouteFade />}>
               <Route path="/finance" element={<Finance />} />
-            </Route>
-            <Route element={<HubLayout hub="skills" />}>
-              <Route path="/skills" element={<SkillsHub />} />
               <Route path="/body" element={<Body />} />
-              <Route path="/interview" element={<Interview />} />
-              <Route path="/style" element={<StyleTile />} />
               <Route path="/food" element={<Food />} />
               <Route path="/mind" element={<MindHub />} />
               <Route path="/journal" element={<Journal />} />
               <Route path="/learning" element={<Learning />} />
               <Route path="/career" element={<Career />} />
               <Route path="/people" element={<People />} />
-            </Route>
-            <Route element={<HubLayout hub="you" />}>
               <Route path="/you" element={<YouHub />} />
+              <Route path="/skills" element={<SkillsHub />} />
               <Route path="/history" element={<History />} />
               <Route path="/review" element={<Review />} />
               <Route path="/ops" element={<Ops />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/data" element={<DataHub />} />
               <Route path="/ontology" element={<Ontology />} />
+              <Route path="/interview" element={<Interview />} />
+              <Route path="/style" element={<StyleTile />} />
             </Route>
           </Routes>
         </main>

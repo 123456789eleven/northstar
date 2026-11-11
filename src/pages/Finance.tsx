@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useState, lazy, Suspense } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PageHeader, Tabs } from '../components/ui'
 import { db } from '../db'
@@ -23,17 +23,24 @@ type Tab = 'overview' | 'markets' | 'practice' | 'learn' | 'transactions' | 'bud
 
 export default function Finance() {
   // Search deep link: ?tab=transactions&focus=<txId>&month=YYYY-MM (read once here, and again by useFocusTarget for in-page jumps).
-  const [params] = useSearchParams()
+  const [params, setParams] = useSearchParams()
   const linkMonth = /^\d{4}-\d{2}$/.test(params.get('month') ?? '') ? params.get('month')! : null
   const linked = params.get('focus') != null && params.get('tab') === 'transactions'
   const asked = params.get('tab')
-  const deepTab: Tab | null = asked === 'markets' || asked === 'practice' || asked === 'learn' || asked === 'investments' || asked === 'networth' || asked === 'budgets' ? asked : null
+  const deepTab: Tab | null = asked === 'markets' || asked === 'practice' || asked === 'learn' || asked === 'investments' || asked === 'networth' || asked === 'budgets' || asked === 'transactions' || asked === 'import' ? asked : null
   const [tab, setTab] = useState<Tab>(linked ? 'transactions' : deepTab ?? 'overview')
   const [month, setMonth] = useState(linkMonth ?? monthKey())
   const [category, setCategory] = useState('')
   const [jumped, setJumped] = useState(linkMonth != null)
   const latest = useLiveQuery(() => db.transactions.orderBy('date').last(), [])
   const uncategorized = useLiveQuery(() => db.transactions.where('category').equals(UNCATEGORIZED).count(), []) ?? 0
+
+  // The open tab lives in the URL (?tab=), so the district head reads "Money / Markets" and the strip returns here.
+  // Left alone while a ?focus= deep link is being resolved (useFocusTarget clears it).
+  useEffect(() => {
+    if (params.get('focus') != null || (params.get('tab') ?? 'overview') === tab) return
+    setParams((p) => { const n = new URLSearchParams(p); if (tab === 'overview') n.delete('tab'); else n.set('tab', tab); return n }, { replace: true })
+  }, [tab, params, setParams])
 
   const focusId = useFocusParam().focus
   const focusTx = useLiveQuery(async () => (focusId ? ((await db.transactions.get(Number(focusId))) ?? null) : undefined), [focusId])

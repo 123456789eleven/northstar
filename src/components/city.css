@@ -62,9 +62,27 @@
 @media (forced-colors: active) { .dstrip-shape { stroke: CanvasText; } .dstrip-tab.is-active { outline: 1px solid Highlight; } .capture-orb { border: 1px solid CanvasText; } }
 @media print { .dstrip, .capture-orb { display: none !important; } }
 
-/* ---- district frame head: mini-map, district name ---- */
-.city-head { display: flex; align-items: center; gap: 14px; margin: 0 0 var(--sp-4); min-width: 0; }
-.city-head-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.city-head-name { font-size: var(--fs-1); font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-text); }
-@media (max-width: 819px) { .city-head { gap: 10px; margin-bottom: var(--sp-3); } }
+/* ---- district frame: head (mini-map, name in the district hue, breadcrumb), sub-tabs, page ---- */
+.city-head { display: flex; align-items: center; gap: 16px; margin: 0 0 var(--sp-4); min-width: 0; }
+.city-head-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.city-head-name { display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-1); font-weight: 650; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+.city-head-mark { width: 8px; height: 8px; border-radius: 2px; transform: rotate(45deg); background: var(--d-hue, var(--accent)); box-shadow: 0 0 10px -1px var(--d-hue, var(--accent)); }
+.city-crumb ol { display: flex; align-items: center; gap: 0; margin: 0; padding: 0; list-style: none; font-size: var(--fs-2); color: var(--ink-2); min-width: 0; }
+.city-crumb li { display: inline-flex; align-items: center; min-width: 0; white-space: nowrap; }
+.city-crumb li + li::before { content: '/'; margin: 0 8px; color: var(--ink-3); }
+.city-crumb a { color: var(--ink-2); text-decoration: none; display: inline-flex; align-items: center; min-height: 32px; }
+.city-crumb a:hover { color: var(--ink); }
+.city-crumb [aria-current='page'] { color: var(--accent-text); font-weight: 550; overflow: hidden; text-overflow: ellipsis; }
+.df > .hub-strip { margin-top: 0; }
+/* the page slides in a little on a route change (head and tabs hold still) */
+.df > .route-view { animation: df-in 260ms var(--spring-gentle); } /* no fill: a held transform would trap modals in a stacking context */
+@keyframes df-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+:root.vt-running .df > .route-view { animation: none; }
+:root[data-motion='reduced'] .df > .route-view { animation: none; }
+@media (prefers-reduced-motion: reduce) { .df > .route-view { animation: none; } }
+@media (max-width: 819px) {
+  .city-head { gap: 10px; margin-bottom: var(--sp-3); }
+  .city-head-text { flex-direction: row; align-items: center; gap: 10px; }
+  .city-head:has(.city-crumb) .city-head-name { display: none; }
+}
 @media print { .city-head { display: none !important; } }

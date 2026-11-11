@@ -1,6 +1,6 @@
 // Global primary navigation: the curved glass district strip along the bottom (same band as the Life map's), on phone and
 // desktop. The active district is lit; a poppy dot means something there is behind or overdue. You sits in the top bar.
-import { useEffect, useRef, type KeyboardEvent } from 'react'
+import { useRef, type KeyboardEvent } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
@@ -28,7 +28,8 @@ export default function DistrictStrip({ phone }: { phone: boolean }) {
   const current = districtForPath(pathname)
   const behind = useBehind()
   const refs = useRef<(HTMLAnchorElement | null)[]>([])
-  useEffect(() => { rememberPath(pathname, search) }, [pathname, search])
+  // Recorded during render (idempotent module write) so the next page's strip already knows it, however fast the tap.
+  rememberPath(pathname, search)
   const onKey = (e: KeyboardEvent) => {
     const i = refs.current.findIndex((el) => el === document.activeElement)
     if (i < 0) return
@@ -40,7 +41,7 @@ export default function DistrictStrip({ phone }: { phone: boolean }) {
   }
   const depth = phone ? 10 : 18
   return (
-    <nav className={`dstrip${phone ? ' is-phone' : ''}`} aria-label="Districts" data-spec>
+    <nav className={`dstrip${phone ? ' is-phone' : ''}`} aria-label="Districts">
       <svg className="dstrip-bg" viewBox="0 0 700 80" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <linearGradient id="dstrip-rim" x1="0" y1="0" x2="1" y2="0">

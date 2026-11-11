@@ -1,6 +1,5 @@
 // Home (/) is the Life map; Today (/today) is the day's plan. /map stays as an alias of Home.
-// Information architecture v3 ("Constellation", docs/design/game-direction.md): 18 pages grouped into 4 hubs + Today.
-// Every old URL stays a real route; hubs add landing pages (/plan, /skills, /mind, /you) and a tab strip across their pages.
+// Page list for titles and the Ctrl+K palette. Which district and tab a route sits in: districts.ts (the city shell).
 import type { IconName } from './Icons'
 import type { SkillId } from '../features/game/types'
 
@@ -48,56 +47,12 @@ export const NAV: NavItem[] = [
 /** Kept for older imports: the rail/palette section order. */
 export const NAV_GROUPS = ['Today', 'Plan', 'Money', 'Areas', 'You'] as const
 
-export interface HubTab { to: string; label: string; /** Other paths that light this tab (sub-pages). */ also?: string[] }
-export interface HubDef { id: Exclude<HubId, 'today'>; label: string; to: string; icon: IconName; tabs: HubTab[] }
-
-export const HUBS: Record<Exclude<HubId, 'today'>, HubDef> = {
-  plan: {
-    id: 'plan', label: 'Plan', to: '/plan', icon: 'planner',
-    tabs: [{ to: '/today', label: 'Today' }, { to: '/plan', label: 'Overview' }, { to: '/tasks', label: 'Tasks' }, { to: '/planner', label: 'Planner' }, { to: '/goals', label: 'Goals' }, { to: '/habits', label: 'Habits' }],
-  },
-  money: { id: 'money', label: 'Money', to: '/finance', icon: 'finance', tabs: [{ to: '/finance', label: 'Money' }] },
-  skills: {
-    id: 'skills', label: 'Areas', to: '/skills', icon: 'star',
-    tabs: [
-      { to: '/skills', label: 'Overview' },
-      { to: '/body', label: 'Body', also: ['/food'] },
-      { to: '/mind', label: 'Mind', also: ['/journal', '/learning'] },
-      { to: '/career', label: 'Career' },
-      { to: '/people', label: 'People' },
-    ],
-  },
-  you: {
-    id: 'you', label: 'You', to: '/you', icon: 'user',
-    tabs: [
-      { to: '/you', label: 'Overview' }, { to: '/history', label: 'Milestones' }, { to: '/review', label: 'Season' }, { to: '/ops', label: 'Intel' },
-      { to: '/settings', label: 'Settings' }, { to: '/data', label: 'Data' }, { to: '/ontology', label: 'Ontology' },
-    ],
-  },
-}
-
-/** Second-level tabs inside a skill (Body: Weight | Food; Mind: Overview | Journal | Learning). */
-export const SUBTABS: Array<{ label: string; tabs: HubTab[] }> = [
-  { label: 'Body', tabs: [{ to: '/body', label: 'Weight' }, { to: '/food', label: 'Food' }] },
-  { label: 'Mind', tabs: [{ to: '/mind', label: 'Overview' }, { to: '/journal', label: 'Journal' }, { to: '/learning', label: 'Learning' }] },
-]
-
 const matches = (to: string, pathname: string) => (to === '/' ? pathname === '/' : pathname === to || pathname.startsWith(to + '/'))
 
 /** The nav item that owns a router pathname. */
 export function navItemFor(pathname: string): NavItem | undefined {
   const p = pathname === '/map' ? '/' : pathname
   return NAV.find((n) => matches(n.to, p))
-}
-
-/** Which hub a pathname belongs to (unknown paths count as Today). */
-export function hubForPath(pathname: string): HubId {
-  return navItemFor(pathname)?.hub ?? 'today'
-}
-
-/** True when a hub tab is the current page or one of its sub-pages. */
-export function tabActive(tab: HubTab, pathname: string): boolean {
-  return matches(tab.to, pathname) || !!tab.also?.some((p) => matches(p, pathname))
 }
 
 /** Browser tab title for a router pathname: "Tasks | Northstar", bare "Northstar" when unknown. */
