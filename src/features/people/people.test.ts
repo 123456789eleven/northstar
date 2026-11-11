@@ -142,4 +142,18 @@ describe('contact logging (db)', () => {
     expect(await db.interactions.count()).toBe(1)
     expect(await db.events.filter((e) => e.kind === 'person.contact').count()).toBe(1)
   })
+
+  it('reconnecting after 60+ days records one highlight, milestone only from 180', async () => {
+    const id = (await db.people.add({ name: 'R', relation: '', cadenceDays: 30, lastContact: '2026-04-20' })) as number
+    expect(await logContact((await db.people.get(id))!, 'text', undefined, '2026-06-10')).toBeNull()
+    expect(await logContact((await db.people.get(id))!, 'text', undefined, '2026-08-20')).toBe(71)
+    const first = await db.events.filter((e) => e.kind === 'people.reconnect').toArray()
+    expect(first).toHaveLength(1)
+    expect(first[0]).toMatchObject({ area: 'relationships', milestone: false, refId: id })
+    expect(await logContact((await db.people.get(id))!, 'call', undefined, '2027-03-01')).toBe(193)
+    const all = await db.events.filter((e) => e.kind === 'people.reconnect').toArray()
+    expect(all.map((e) => e.milestone)).toEqual([false, true])
+    await undoContact(id, 'call', '2027-03-01')
+    expect(await db.events.filter((e) => e.kind === 'people.reconnect').count()).toBe(1)
+  })
 })
