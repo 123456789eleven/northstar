@@ -101,7 +101,7 @@ async function searchFor(page: import('@playwright/test').Page, text: string, op
 
 test('Search deep link: a person opens with their details', async ({ page }) => {
   await page.goto('/#/people')
-  await page.getByRole('button', { name: 'Add your first person' }).click()
+  await page.getByRole('button', { name: 'Add the first name' }).click()
   const form = page.getByRole('dialog', { name: 'Add a person' })
   await form.getByLabel('Name').fill('Fixture Wendell Marsh')
   await form.getByRole('button', { name: 'Add person' }).click()

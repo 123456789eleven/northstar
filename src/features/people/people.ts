@@ -1,5 +1,6 @@
 import { db, logEvent, type Interaction, type ISODate, type Person } from '../../db'
 import { addDays, daysBetween, parseISODate, toISODate, today } from '../../lib/dates'
+import { MILESTONE_DAYS, RECONNECT_DAYS } from './warmth'
 
 export const CADENCES: { days: number; label: string }[] = [
   { days: 7, label: 'Weekly' },
@@ -76,20 +77,36 @@ const EVENT_VERB: Record<Interaction['kind'], string> = {
   other: 'Caught up with',
 }
 
-export async function logContact(p: Person, kind: Interaction['kind'], note?: string, date: ISODate = today()) {
-  if (p.id == null) return
+/** Logs a contact. Returns the number of days apart when this reconnects you after RECONNECT_DAYS or more, else null. */
+export async function logContact(p: Person, kind: Interaction['kind'], note?: string, date: ISODate = today()): Promise<number | null> {
+  if (p.id == null) return null
   const clean = note?.trim() || undefined
-  await db.transaction('rw', db.interactions, db.people, db.events, async () => {
+  return db.transaction('rw', db.interactions, db.people, db.events, async () => {
+    const before = (await db.people.get(p.id!))?.lastContact ?? p.lastContact
+    const at = date === today() ? {} : { at: new Date(parseISODate(date).setHours(12)).toISOString() }
     await db.interactions.add({ personId: p.id!, date, kind, note: clean })
-    if (!p.lastContact || date > p.lastContact) await db.people.update(p.id!, { lastContact: date })
+    if (!before || date > before) await db.people.update(p.id!, { lastContact: date })
     await logEvent({
       area: 'relationships',
       kind: 'person.contact',
       title: `${EVENT_VERB[kind]} ${p.name}${clean ? ` — ${clean}` : ''}`,
       refTable: 'people',
       refId: p.id,
-      ...(date === today() ? {} : { at: new Date(parseISODate(date).setHours(12)).toISOString() }),
+      ...at,
     })
+    const gap = before && date > before ? daysBetween(before, date) : 0
+    if (gap < RECONNECT_DAYS) return null
+    await logEvent({
+      area: 'relationships',
+      kind: 'people.reconnect',
+      title: `Back in touch with ${p.name} after ${gap} days`,
+      refTable: 'people',
+      refId: p.id,
+      milestone: gap >= MILESTONE_DAYS,
+      meta: JSON.stringify({ days: gap, date }),
+      ...at,
+    })
+    return gap
   })
 }
 
@@ -122,5 +139,7 @@ export async function undoContact(personId: number, kind: Interaction['kind'], d
     await db.people.update(personId, { lastContact: rest.reduce<string | undefined>((m, r) => (!m || r.date > m ? r.date : m), undefined) })
     const ev = (await db.events.where('area').equals('relationships').filter((e) => e.kind === 'person.contact' && e.refId === personId).toArray()).sort((a, b) => (b.id ?? 0) - (a.id ?? 0))[0]
     if (ev?.id != null) await db.events.delete(ev.id)
+    const re = (await db.events.where('area').equals('relationships').filter((e) => e.kind === 'people.reconnect' && e.refId === personId && (e.meta ?? '').includes(`"date":"${date}"`)).toArray()).sort((a, b) => (b.id ?? 0) - (a.id ?? 0))[0]
+    if (re?.id != null) await db.events.delete(re.id)
   })
 }
