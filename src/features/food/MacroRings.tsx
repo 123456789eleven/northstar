@@ -10,6 +10,13 @@ function MacroRing({ label, unit, value, target, ready, size, stroke, hero }: { 
   const shown = useNumberRoll(Math.round(value))
   const prev = useRef<number | null>(null)
   const [pulse, setPulse] = useState(false)
+  // A small pop on the number each time it grows (a logged meal), derived while rendering.
+  const [seen, setSeen] = useState(value)
+  const [pop, setPop] = useState(0)
+  if (seen !== value) {
+    if (ready && value > seen) setPop(pop + 1)
+    setSeen(value)
+  }
   useEffect(() => {
     if (!ready) return
     const fire = justReached(prev.current, value, target)
@@ -23,7 +30,7 @@ function MacroRing({ label, unit, value, target, ready, size, stroke, hero }: { 
     <div className={`mring ${hero ? 'is-hero' : 'is-side'} ${pulse ? 'is-pulse' : ''} ${r.reached ? 'is-met' : ''}`} data-testid={`ring-${label.toLowerCase()}`}>
       <Ring value={r.fill} size={size} stroke={stroke} tone={r.reached ? 'reward' : undefined} label={`${label}: ${Math.round(value).toLocaleString()} of ${target.toLocaleString()} ${unit}`}>
         <span className="mring-center">
-          <span className="mring-big mono" data-testid={`ring-${label.toLowerCase()}-value`}>{shown.toLocaleString()}</span>
+          <span key={pop} className={`mring-big mono${pop ? ' tick-pop' : ''}`} data-testid={`ring-${label.toLowerCase()}-value`}>{shown.toLocaleString()}</span>
           <span className="mring-of">of {target.toLocaleString()} {unit}</span>
         </span>
       </Ring>
@@ -35,11 +42,12 @@ function MacroRing({ label, unit, value, target, ready, size, stroke, hero }: { 
   )
 }
 
-export default function MacroRings({ targets, totals, ready }: { targets: { calories?: number; protein?: number }; totals: { calories: number; protein: number }; ready: boolean }) {
+export default function MacroRings({ targets, totals, ready, size = 128 }: { targets: { calories?: number; protein?: number }; totals: { calories: number; protein: number }; ready: boolean; size?: number }) {
+  const stroke = Math.round(size / 11.6)
   return (
     <div className="mrings">
-      {targets.calories ? <MacroRing label="Calories" unit="kcal" value={totals.calories} target={targets.calories} ready={ready} size={128} stroke={11} hero /> : null}
-      {targets.protein ? <MacroRing label="Protein" unit="g" value={totals.protein} target={targets.protein} ready={ready} size={128} stroke={11} /> : null}
+      {targets.calories ? <MacroRing label="Calories" unit="kcal" value={totals.calories} target={targets.calories} ready={ready} size={size} stroke={stroke} hero /> : null}
+      {targets.protein ? <MacroRing label="Protein" unit="g" value={totals.protein} target={targets.protein} ready={ready} size={size} stroke={stroke} /> : null}
     </div>
   )
 }

@@ -14,7 +14,7 @@ export default function DayStrip({ date, targets, onPick }: { date: ISODate; tar
   const meals = useLiveQuery(() => db.meals.where('date').between(start, end, true, true).toArray(), [start, end])
   const days = Array.from({ length: 7 }, (_, i) => addDays(start, i))
   return (
-    <ol className="dstrip" aria-label="Last 7 days">
+    <ol className="fday" aria-label="Last 7 days">
       {days.map((d) => {
         const ms = (meals ?? []).filter((m) => m.date === d)
         const sum = sumMeals(ms)
@@ -23,10 +23,10 @@ export default function DayStrip({ date, targets, onPick }: { date: ISODate; tar
         const name = formatDate(d, { weekday: 'long', month: 'short', day: 'numeric' })
         return (
           <li key={d}>
-            <button className={`dstrip-day ${d === date ? 'is-sel' : ''}`} aria-current={d === date ? 'date' : undefined} aria-label={`${name}${WORD[st] ? `, ${WORD[st]}` : ''}`} onClick={() => onPick(d)}>
-              <span className="dstrip-wd" aria-hidden>{formatDate(d, { weekday: 'narrow' })}</span>
-              <span className="dstrip-n" aria-hidden>{formatDate(d, { day: 'numeric' })}</span>
-              <span className={`dstrip-dot dot-${st}`} aria-hidden />
+            <button className={`fday-day ${d === date ? 'is-sel' : ''}`} aria-current={d === date ? 'date' : undefined} aria-label={`${name}${WORD[st] ? `, ${WORD[st]}` : ''}`} onClick={() => onPick(d)}>
+              <span className="fday-wd" aria-hidden>{formatDate(d, { weekday: 'narrow' })}</span>
+              <span className="fday-n" aria-hidden>{formatDate(d, { day: 'numeric' })}</span>
+              <span className={`fday-dot dot-${st}`} aria-hidden />
             </button>
           </li>
         )

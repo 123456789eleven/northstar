@@ -125,16 +125,16 @@
 .mring.is-pulse .ring { animation: mring-pulse 700ms var(--ease-spring-soft) both; }
 @keyframes mring-pulse { 0% { transform: scale(1); } 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
 
-.dstrip { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
-.dstrip-day { width: 100%; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: var(--surface-1); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); color: var(--ink); cursor: pointer; }
-.dstrip-day:hover { border-color: var(--line-strong); }
-.dstrip-day.is-sel { border-color: var(--accent-line); background: var(--accent-soft); }
-.dstrip-wd { font-size: 10px; color: var(--ink-2); line-height: 1; }
-.dstrip-n { font-size: var(--text-sm); line-height: 1; font-variant-numeric: tabular-nums; }
-.dstrip-dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--line-strong); }
-.dstrip-dot.dot-met { background: var(--good); border-color: var(--good); }
-.dstrip-dot.dot-close { background: var(--accent); border-color: var(--accent); }
-.dstrip-dot.dot-missed { background: var(--warn); border-color: var(--warn); }
+.fday { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.fday-day { width: 100%; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: var(--surface-1); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); color: var(--ink); cursor: pointer; }
+.fday-day:hover { border-color: var(--line-strong); }
+.fday-day.is-sel { border-color: var(--accent-line); background: var(--accent-soft); }
+.fday-wd { font-size: 10px; color: var(--ink-2); line-height: 1; }
+.fday-n { font-size: var(--text-sm); line-height: 1; font-variant-numeric: tabular-nums; }
+.fday-dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--line-strong); }
+.fday-dot.dot-met { background: var(--accent); border-color: var(--accent); }
+.fday-dot.dot-close { background: transparent; border-color: var(--accent); }
+.fday-dot.dot-missed { background: var(--surface-3); border-color: var(--line-strong); }
 .dstrip-dot.dot-none, .dstrip-dot.dot-empty { background: transparent; }
 
 .food-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); align-items: start; }

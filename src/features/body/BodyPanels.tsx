@@ -1,11 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { Card, Field } from '../../components/ui'
 import { useToast } from '../../components/toastContext'
-import type { Habit, HabitLog, ISODate } from '../../db'
 import { daysBetween, formatDate, today } from '../../lib/dates'
-import { useHabitCheckIn } from '../habits/useHabitCheckIn'
-import { weekCount } from '../habits/stats'
-import { applyFoodTargets, createLiftHabit, findLiftHabit, saveBodySetting, type BodySettings } from './bodyData'
+import { applyFoodTargets, saveBodySetting, type BodySettings } from './bodyData'
 import { adaptiveMaintenance, adviceFor, dailyTargets, FAST_RATE, isFlat, weeksToGo, type WeightPoint } from './model'
 
 const numOrUndef = (s: string) => {
@@ -94,33 +91,6 @@ export function GuidanceCard({ s, weights, rate, weight, intake, remaining, goal
             <button className="btn btn-sm" onClick={async () => { await saveBodySetting('maintenance', adaptive); setMaint(String(adaptive)); toast({ message: 'Maintenance set from your data' }) }}>Adopt</button>
           </div>
         )}
-      </div>
-    </Card>
-  )
-}
-
-export function TrainingCard({ habits, logs, target }: { habits: Habit[]; logs: HabitLog[]; target: number }) {
-  const toast = useToast()
-  const tick = useHabitCheckIn()
-  const habit = findLiftHabit(habits)
-  if (!habit) {
-    return (
-      <Card title="Training">
-        <div className="row wrap" style={{ justifyContent: 'space-between', gap: 8 }}>
-          <span className="muted small">Muscle gain needs consistent lifting. Track sessions as a habit.</span>
-          <button className="btn btn-sm" onClick={async () => { await createLiftHabit(target); toast({ message: `Lift habit created (${target}x/week)` }) }}>Create a Lift habit ({target}x/week)</button>
-        </div>
-      </Card>
-    )
-  }
-  const dates = new Set<ISODate>(logs.filter((l) => l.habitId === habit.id).map((l) => l.date))
-  const done = weekCount(dates, today())
-  const checked = dates.has(today())
-  return (
-    <Card title="Training">
-      <div className="row wrap" style={{ justifyContent: 'space-between', gap: 8 }}>
-        <span className="small">{habit.name}: <strong className="mono">{done > target ? `${done}` : `${done} of ${target}`}</strong> sessions this week{done > target ? ` (target ${target})` : ''}{done >= target ? ' - target met' : ''}</span>
-        <button className="btn btn-sm" aria-pressed={checked} onClick={() => void tick(habit, today())}>{checked ? 'Today done (undo)' : 'Log today’s session'}</button>
       </div>
     </Card>
   )

@@ -9,9 +9,9 @@ export default function Suggestions({ remaining, own, date, slot }: { remaining:
   const ranked = useMemo(() => rankSuggestions(remaining, [...own, ...bulkStaples()], 7), [remaining, own])
   if (!ranked.length) return null
   return (
-    <section className="card food-suggest">
-      <div className="card-title">
-        <span>Hit your numbers</span>
+    <section className="card floor-card food-suggest kit-suggest" aria-label="What fits">
+      <div className="floor-card-head">
+        <h2>What fits</h2>
         <span className="tiny faint">adds to {slot}</span>
       </div>
       <div className="food-favs">

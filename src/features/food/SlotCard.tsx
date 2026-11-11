@@ -96,23 +96,6 @@ export default function SlotCard({
           <button type="button" className="btn btn-sm food-add-btn" aria-expanded={open} onClick={() => setOpen((v) => !v)} aria-label={`Add to ${label.toLowerCase()}`}>
             {open ? 'Close' : '+ Add'}
           </button>
-          {meals.length > 0 && tplName == null && (
-            <button className="btn btn-ghost btn-sm" onClick={() => setTplName(label === 'Snack' ? 'Usual snack' : `Usual ${label.toLowerCase()}`)}>
-              Save as template
-            </button>
-          )}
-          {hasYesterday && (
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={async () => {
-                const ids = await copyYesterdayIds(date, slot)
-                toast({ message: `Copied ${ids.length} from yesterday's ${label.toLowerCase()}`, undo: () => removeMeals(ids) })
-              }}
-              title={`Copy yesterday's ${label.toLowerCase()}`}
-            >
-              Copy yesterday
-            </button>
-          )}
         </span>
       </div>
 
@@ -134,6 +117,28 @@ export default function SlotCard({
             Cancel
           </button>
         </form>
+      )}
+
+      {open && (meals.length > 0 || hasYesterday) && (
+        <div className="row food-slot-tools">
+            {meals.length > 0 && tplName == null && (
+              <button className="btn btn-ghost btn-sm" onClick={() => setTplName(label === 'Snack' ? 'Usual snack' : `Usual ${label.toLowerCase()}`)}>
+                Save as template
+              </button>
+            )}
+            {hasYesterday && (
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={async () => {
+                  const ids = await copyYesterdayIds(date, slot)
+                  toast({ message: `Copied ${ids.length} from yesterday's ${label.toLowerCase()}`, undo: () => removeMeals(ids) })
+                }}
+                title={`Copy yesterday's ${label.toLowerCase()}`}
+              >
+                Copy yesterday
+              </button>
+            )}
+        </div>
       )}
 
       {open && templates.length > 0 && (

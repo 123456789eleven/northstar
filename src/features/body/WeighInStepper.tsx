@@ -4,7 +4,7 @@ import { useToast } from '../../components/toastContext'
 import { formatDate, today } from '../../lib/dates'
 import { logWeight } from './bodyData'
 
-export default function WeighInStepper({ loggedToday, last, first = false }: { loggedToday?: number; last?: number; first?: boolean }) {
+export default function WeighInStepper({ loggedToday, last, first = false, bare = false }: { loggedToday?: number; last?: number; first?: boolean; /** Inside a hero: no card of its own, no capture hint. */ bare?: boolean }) {
   const toast = useToast()
   const [text, setText] = useState('')
   const [date, setDate] = useState('')
@@ -29,7 +29,7 @@ export default function WeighInStepper({ loggedToday, last, first = false }: { l
   }
 
   return (
-    <form className={`card wstep ${first ? 'is-first' : ''}`} onSubmit={submit}>
+    <form className={`${bare ? '' : 'card '}wstep ${first ? 'is-first' : ''}${bare ? ' is-bare' : ''}`} onSubmit={submit}>
       <div className="wstep-row">
         <button type="button" className="btn wstep-btn" onClick={() => nudge(-0.1)} aria-label="Lower by 0.1 pound">-0.1</button>
         <div className="wstep-field">
@@ -53,7 +53,7 @@ export default function WeighInStepper({ loggedToday, last, first = false }: { l
         ) : (
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowDate(true)}>Change date</button>
         )}
-        <span className="faint">Or in the capture bar: <span className="mono">w 136.4</span></span>
+        {!bare && <span className="faint">Or in the capture bar: <span className="mono">w 136.4</span></span>}
       </div>
     </form>
   )

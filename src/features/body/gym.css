@@ -1,0 +1,119 @@
+/* Gym floors (Weigh-in, Kitchen, Training). Tokens only. Loaded after body.css, body2.css, food.css. */
+
+/* ---- Weigh-in hero ---- */
+.wi-hero { display: flex; flex-direction: column; gap: 18px; }
+.wi-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: var(--sp-5); align-items: center; }
+.wi-now { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.wi-num { display: flex; align-items: baseline; gap: 8px; }
+.wi-big { display: inline-block; font-size: 64px; line-height: 1; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); transform-origin: left bottom; }
+.wi-unit { font-size: var(--fs-4); color: var(--ink-2); }
+.wi-sub { margin: 2px 0 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--fs-2); color: var(--ink-2); }
+.wi-first { margin: 6px 0 0; font-size: var(--fs-4); color: var(--ink); }
+.wi-act { min-width: 0; }
+.wstep.is-bare { padding: 0; }
+.wstep.is-bare .wstep-input { font-family: var(--font); font-weight: 600; }
+.wstep.is-bare .wstep-more { justify-content: flex-end; }
+.wi-path { display: flex; flex-direction: column; gap: 4px; }
+.wi-ends { display: flex; justify-content: space-between; font-size: var(--fs-1); color: var(--ink-2); }
+.wi-path .bossbar-fill { transition: transform 900ms var(--spring-smooth); }
+.wi-pace { margin: 6px 0 0; font-size: var(--fs-2); color: var(--ink-2); }
+.wi-pace.tone-slow, .wi-pace.tone-flat { color: var(--warn); }
+
+.gym-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; margin: 0; }
+.gym-stats > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gym-stats dt { font-size: var(--fs-1); color: var(--ink-3); letter-spacing: 0.02em; }
+.gym-stats dd { margin: 0; font-size: var(--fs-4); color: var(--ink); white-space: nowrap; }
+
+.gym-flags { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.gym-flag { display: flex; justify-content: space-between; gap: 8px; min-height: 32px; align-items: center; padding: 0 10px; border-radius: 8px; color: var(--ink-3); font-size: var(--fs-2); }
+.gym-flag.is-reached { color: var(--reward); background: var(--reward-soft); }
+.gym-flag.is-next { color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent-line); }
+
+/* ---- Kitchen ---- */
+.kit-hero { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px var(--sp-6); align-items: center; }
+.kit-hero > .kit-day { grid-column: 1 / -1; margin: -6px 0 0 -8px; }
+.kit-rings { display: flex; gap: 18px; align-items: center; }
+.kit-rings .mrings { display: flex; gap: 18px; margin: 0; }
+.kit-main { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.kit-total { margin: 0; font-size: var(--fs-4); color: var(--ink); }
+.kit-total .faint { font-size: var(--fs-3); }
+.kit-coach { margin: 0; font-size: var(--fs-2); color: var(--ink-2); display: flex; align-items: center; gap: 8px; }
+.kit-coach.is-behind { color: var(--warn); }
+.kit-coach.is-behind::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--poppy); flex: 0 0 auto; }
+.kit-favs { display: flex; flex-wrap: wrap; gap: 6px; }
+.kit-fav {
+  display: inline-flex; align-items: baseline; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: var(--radius-pill);
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); font: inherit; font-size: var(--fs-2); cursor: pointer;
+  transition: border-color var(--t-snappy) var(--spring-gentle), transform var(--t-snappy) var(--spring-snappy);
+}
+.kit-fav:hover { border-color: var(--accent-line); }
+.kit-fav:active { transform: scale(0.95); }
+.kit-fav:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.kit-fav .mono { color: var(--ink-3); font-size: var(--fs-1); }
+.kit-hero .food-quick { margin: 0; }
+.kit-hero .food-default { margin: 0; }
+.kit-day { display: flex; align-items: center; gap: 4px; }
+.kit-day strong { font-size: var(--fs-3); min-width: 64px; text-align: center; }
+.kit-day .btn { min-width: 36px; }
+.kit-meals { display: grid; gap: 0; }
+.kit-meals .food-slot { background: none; border: 0; box-shadow: none; padding: 10px 0; border-top: 1px solid var(--line-soft); border-radius: 0; }
+.kit-meals .food-slot:first-child { border-top: 0; padding-top: 0; }
+.kit-meals .card-title { margin-bottom: 4px; }
+.kit-suggest .food-favs { margin: 0; display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
+.kit-suggest .food-fav { display: flex; justify-content: space-between; gap: 10px; width: 100%; white-space: nowrap; }
+.kit-suggest .food-fav > span:first-child { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.kit-suggest .food-fav > span:last-child { flex: 0 0 auto; }
+.kit-hero .mring.is-pulse .mring-big, .kit-hero .mring-big.tick-pop { color: var(--accent-text); }
+
+/* ---- Training ---- */
+.tr-hero { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--sp-5); align-items: center; }
+.tr-hero .ring { grid-row: span 1; }
+.tr-side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.tr-line { margin: 0; font-size: var(--fs-4); color: var(--ink); }
+.tr-week { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; max-width: 420px; }
+.tr-day {
+  width: 100%; aspect-ratio: 1; min-height: 40px; max-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink-2); font: inherit; font-size: var(--fs-1); cursor: pointer;
+  transition: background-color var(--t-snappy) var(--spring-gentle), border-color var(--t-snappy) var(--spring-gentle), transform var(--t-snappy) var(--spring-snappy);
+}
+.tr-day .mono { font-size: var(--fs-2); color: var(--ink); }
+.tr-day:hover:not(:disabled) { border-color: var(--accent-line); }
+.tr-day:active:not(:disabled) { transform: scale(0.92); }
+.tr-day:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tr-day.is-on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.tr-day.is-on .mono { color: var(--accent-ink); }
+.tr-day.is-today:not(.is-on) { border-color: var(--accent-line); color: var(--ink); }
+.tr-day:disabled { opacity: 0.4; cursor: default; }
+.tr-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tr-target { display: flex; align-items: center; gap: 10px; }
+.tr-target .btn { width: 36px; padding: 0; }
+.tr-target .mono { font-size: var(--fs-5); min-width: 1.4em; text-align: center; }
+.tr-weeks { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; align-items: flex-end; height: 56px; }
+.tr-weeks li { flex: 1 1 0; max-width: 28px; border-radius: 4px; background: var(--surface-3); min-height: 4px; transition: height var(--t-smooth) var(--spring-smooth); }
+.tr-weeks li.is-hit { background: var(--accent); }
+.tr-big { font-size: var(--fs-5); color: var(--ink); line-height: 1; }
+
+@media (max-width: 1100px) { .kit-hero { grid-template-columns: minmax(0, 1fr); } .kit-rings { justify-content: center; } }
+@media (max-width: 819px) {
+  .wi-top { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .wi-big { font-size: 52px; }
+  .wstep.is-bare .wstep-more { justify-content: flex-start; }
+  .kit-hero { gap: 14px; }
+  .kit-rings .mrings { gap: 10px; }
+  .tr-hero { gap: 14px 18px; }
+  .tr-side { display: contents; }
+  .tr-line { grid-column: 2; grid-row: 1; font-size: var(--fs-3); }
+  .tr-week { grid-column: 1 / -1; max-width: none; }
+  .tr-actions { grid-column: 1 / -1; }
+  .tr-actions .btn { flex: 1 1 auto; }
+  .kit-hero { grid-template-columns: minmax(0, 1fr); }
+  .kit-hero > .kit-day { justify-content: center; margin: -4px 0 0; }
+  .kit-favs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+  .kit-favs::-webkit-scrollbar { display: none; }
+  .kit-fav { flex: 0 0 auto; white-space: nowrap; }
+}
+@media (prefers-reduced-motion: reduce) { .wi-path .bossbar-fill, .tr-day, .kit-fav { transition: none; } }
+:root[data-motion='reduced'] .wi-path .bossbar-fill { transition: none; }
+@media (forced-colors: active) { .tr-day.is-on { background: Highlight; } }
+.kit-hero .mring-big { display: inline-block; font-family: var(--font); font-weight: 600; letter-spacing: -0.01em; }
+.train-big { font-family: var(--font); font-weight: 600; }

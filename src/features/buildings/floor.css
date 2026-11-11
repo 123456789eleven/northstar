@@ -1,0 +1,49 @@
+/* Floor layout: hero, up to three supporting cards, one More row. Tokens only. */
+.floor { display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
+.floor-hero { position: relative; padding: 20px 22px; }
+.floor-support { display: grid; gap: var(--sp-4); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); align-items: start; }
+.floor-support.n-3 { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); }
+.floor-support.n-2 { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+.floor-card { padding: 16px 18px; min-width: 0; }
+.floor-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 32px; margin-bottom: 10px; }
+.floor-card-head h2 { margin: 0; font-size: var(--fs-2); font-weight: 600; letter-spacing: 0.02em; color: var(--ink-2); }
+
+.floor-more {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 18px; border-radius: var(--radius-tile);
+  border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 70%, transparent); color: var(--ink); cursor: pointer; text-align: left;
+  font: inherit; font-size: var(--fs-3); font-weight: 550;
+  transition: border-color var(--t-snappy) var(--spring-gentle), transform var(--t-snappy) var(--spring-snappy);
+}
+.floor-more:hover { border-color: var(--accent-line); }
+.floor-more:active { transform: scale(0.99); }
+.floor-more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.floor-more-list { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-3); font-size: var(--fs-2); font-weight: 450; }
+.floor-more-chev { color: var(--ink-3); font-size: 20px; line-height: 1; }
+.floor-more-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.floor-more-item {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 12px; border: 0; border-radius: 8px; background: none;
+  color: var(--ink); font: inherit; font-size: var(--fs-3); text-align: left; text-decoration: none; cursor: pointer;
+}
+.floor-more-item > span:first-child { flex: 1 1 auto; }
+.floor-more-item:hover { background: var(--surface-3); }
+.floor-more-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.floor-more-item > span:last-child { color: var(--ink-3); }
+.floor-more-val { color: var(--ink-2); font-size: var(--fs-2); font-variant-numeric: tabular-nums; }
+.floor-back { align-self: flex-start; }
+.floor-panel .card { background: none; border: 0; box-shadow: none; padding: 0; }
+
+/* a figure that counts up and a gentle tick when it lands */
+.tick-pop { animation: tick-pop 420ms var(--spring-snappy); }
+@keyframes tick-pop { 0% { transform: scale(1); } 35% { transform: scale(1.06); } 100% { transform: scale(1); } }
+
+@media (max-width: 1100px) { .floor-support.n-3 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .floor-support.n-3 > :first-child { grid-column: 1 / -1; } }
+@media (max-width: 819px) {
+  .floor { gap: var(--sp-3); }
+  .floor-hero { padding: 16px; }
+  .floor-support, .floor-support.n-2, .floor-support.n-3 { grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }
+  .floor-card { padding: 14px 16px; }
+}
+:root[data-motion='reduced'] .tick-pop { animation: none; }
+@media (prefers-reduced-motion: reduce) { .tick-pop, .floor-more { animation: none; transition: none; } }
+@media (prefers-reduced-transparency: reduce) { .floor-more { background: var(--surface-1); } }
+@media (forced-colors: active) { .floor-more { border: 1px solid CanvasText; } }

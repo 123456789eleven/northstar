@@ -3,6 +3,7 @@ import { useToast } from '../../components/toastContext'
 import type { ISODate, MealSlot } from '../../db'
 import { addMeal, removeMeals, SLOTS } from './foodData'
 import { parseQuickEntry } from './foodLogic'
+import { celebrate } from '../game/ui/feedback'
 
 /** One-line add above the slots: "3 eggs 210", "shake 600cal 40p". */
 export default function QuickAdd({ date, slot, setSlot }: { date: ISODate; slot: MealSlot; setSlot: (s: MealSlot) => void }) {
@@ -13,6 +14,7 @@ export default function QuickAdd({ date, slot, setSlot }: { date: ISODate; slot:
     if (!text.trim()) return
     const id = await addMeal({ date, slot, ...parsed })
     setText('')
+    celebrate('tick')
     toast({ message: `Added ${parsed.name}`, undo: () => removeMeals(id != null ? [id] : []) })
   }
   return (
@@ -23,7 +25,7 @@ export default function QuickAdd({ date, slot, setSlot }: { date: ISODate; slot:
         void submit()
       }}
     >
-      <input className="input food-quick-text" placeholder="Quick add: 3 eggs 210, or shake 600cal 40p" value={text} onChange={(e) => setText(e.target.value)} aria-label="Quick add a meal" />
+      <input className="input food-quick-text" placeholder="Add a meal: shake 600cal 40p" value={text} onChange={(e) => setText(e.target.value)} aria-label="Quick add a meal" />
       <select className="select food-quick-slot" value={slot} onChange={(e) => setSlot(e.target.value as MealSlot)} aria-label="Meal slot">
         {SLOTS.map((s) => (
           <option key={s.value} value={s.value}>

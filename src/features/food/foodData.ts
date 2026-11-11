@@ -25,6 +25,12 @@ export function effectiveCalorieTarget(targets?: FoodTargets | null): number {
   const c = targets?.calories
   return typeof c === 'number' && Number.isFinite(c) && c > 0 ? c : DEFAULT_CALORIE_TARGET
 }
+/** Protein target to use: the stored one, else 0.8 g per lb of the body goal weight (the Body guidance rule). */
+export function effectiveProteinTarget(targets: FoodTargets | null | undefined, goalWeightLb: number): number {
+  const p = targets?.protein
+  if (typeof p === 'number' && Number.isFinite(p) && p > 0) return p
+  return Math.round((Number.isFinite(goalWeightLb) && goalWeightLb > 0 ? goalWeightLb : 165) * 0.8)
+}
 export { TEMPLATES_KEY }
 
 /** Parse an optional positive number from a text field; blank/invalid → undefined. */
