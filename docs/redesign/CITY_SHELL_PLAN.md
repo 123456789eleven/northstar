@@ -29,7 +29,7 @@ Pure function `districtForPath(pathname)` plus `subtabForPath` (tested) is the s
 ## Phases (commit after each; update the checklist below)
 - [x] P1 `districtForPath` + tests; DistrictStrip replaces TabBar and Rail; top-bar You control; palette and titles unchanged. Done: `src/components/districts.ts` (+ tests), `DistrictStrip.tsx` + `city.css` on every width, You control in the top bar, phone capture orb bottom right (lifted over pinned add lines), Today joins the Plan strip, one shared `LifeMapProvider`; e2e 77/77.
 - [x] P2 Mini-map component driven by the same scene model as the Life map (shared, not copied). Done: `CityScene` gained `lite` and civic places (town hall = Plan, home base = You) in `model.ts`; `MiniMap.tsx` (desktop 176x100 chip with 40x32 place hits, phone 64x38 chip to Home) in the page head; placement math in `place.ts` (tested); scene gradients mounted once (`CityDefs`).
-- [ ] P3 Backdrop city layer with camera following the route
+- [x] P3 Backdrop city layer with camera following the route. Done: `CityBackdrop.tsx` + `backdrop.css`: lite scene rendered once per model (about 300 SVG elements, no cars), camera is one CSS transform driven by `--px/--py` with `--spring-smooth`; hidden on Home; reduced motion = instant, reduced transparency = solid ground, forced colours/print = off; no poppy in the backdrop.
 - [ ] P4 District frame (header + breadcrumb) applied to every page; Today, Plan hub, Areas hub, You hub reviewed for density
 - [ ] P5 e2e/unit updates, a11y (landmarks, focus, labels), reduced motion/transparency fallbacks, performance (cap SVG elements, no redraw on route change)
 - [ ] P6 Visual pass at 1440 and 390 on every district; fix inconsistencies

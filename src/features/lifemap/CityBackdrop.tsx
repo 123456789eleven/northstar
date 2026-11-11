@@ -1,0 +1,40 @@
+// Backdrop city: the same scene, faint and static, behind every non-home page. The SVG renders once per model change; a route
+// change only moves a CSS custom property, and the layer glides there with a CSS spring (no per-frame JS, no scene re-render).
+import { memo, useMemo, type CSSProperties } from 'react'
+import { useLocation } from 'react-router-dom'
+import { districtForPath } from '../../components/districts'
+import { padBounds, type Bounds } from './iso'
+import { BACKDROP_K, backdropFocus, backdropOffset } from './place'
+import { CityScene } from './CityScene'
+import { useLifeMap } from './useLifeMap'
+import type { LifeMap } from './model'
+import './lifemap.css'
+import './backdrop.css'
+
+const PAD = 260
+
+const Scene = memo(function Scene({ map, b }: { map: LifeMap; b: Bounds }) {
+  const w = Math.round((b.maxX - b.minX) * BACKDROP_K), h = Math.round((b.maxY - b.minY) * BACKDROP_K)
+  return (
+    <svg className="cb-svg" width={w} height={h} viewBox={`${b.minX} ${b.minY} ${b.maxX - b.minX} ${b.maxY - b.minY}`} aria-hidden="true" focusable="false">
+      <CityScene map={map} selected={null} lite />
+    </svg>
+  )
+})
+
+export default function CityBackdrop() {
+  const map = useLifeMap()
+  const { pathname } = useLocation()
+  const id = districtForPath(pathname)
+  const b = useMemo(() => (map ? padBounds(map.cityBounds, PAD) : null), [map])
+  if (!map || !b) return <div className="cb is-home" aria-hidden="true" />
+  const at = backdropOffset(backdropFocus(map, id), b)
+  return (
+    <div className={`cb${id === 'home' ? ' is-home' : ''}`} aria-hidden="true" data-district={id}>
+      <div className="cb-cam" style={{ '--px': `${at.x}px`, '--py': `${at.y}px` } as CSSProperties}>
+        <Scene map={map} b={b} />
+      </div>
+      <div className="cb-fog" />
+    </div>
+  )
+}

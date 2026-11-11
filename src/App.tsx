@@ -9,6 +9,7 @@ import { districtForPath } from './components/districts'
 import { useMedia, PHONE_QUERY } from './components/useMedia'
 import { LifeMapProvider } from './features/lifemap/useLifeMap'
 import { CityDefs } from './features/lifemap/CityScene'
+import CityBackdrop from './features/lifemap/CityBackdrop'
 import { CityHead } from './components/DistrictFrame'
 import HubLayout, { RouteFade } from './components/HubLayout'
 import { GlassDefs } from './components/GlassDefs'
@@ -86,6 +87,7 @@ function Shell() {
         <a className="skip-link" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus() }}>Skip to content</a>
         <GlassDefs />
         <CityDefs />
+        <CityBackdrop />
         <div className="stage">
         <TopBar />
         <main className="main" id="main" tabIndex={-1}>

@@ -1,0 +1,25 @@
+/* Backdrop city behind non-home pages: faint, static, low contrast. The camera is one CSS transform with a spring.
+   Reduced motion: no glide. Reduced transparency: solid ground, no city. Hidden on Home (the Life map is the page there). */
+.cb { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; opacity: 1; transition: opacity var(--t-smooth) var(--spring-gentle); }
+.cb.is-home { opacity: 0; }
+.cb-cam {
+  position: absolute; left: 0; top: 0; will-change: transform;
+  transform: translate3d(calc(50vw - var(--px, 0px)), calc(40vh - var(--py, 0px)), 0);
+  transition: transform 900ms var(--spring-smooth);
+}
+.cb-svg { display: block; opacity: 0.18; }
+/* the backdrop is place, not signal: no poppy or gold in it (the strip and the page carry those) */
+.cb .lm-leafring.is-overdue { stroke: var(--accent); stroke-opacity: 0.5; }
+.cb .lm-district .lm-plinth { stroke-opacity: 0.25; }
+.cb-fog {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to bottom, var(--page) 0%, transparent 26%, transparent 62%, var(--page) 100%),
+    radial-gradient(90% 80% at 50% 40%, transparent 40%, color-mix(in srgb, var(--page) 85%, transparent) 100%);
+}
+.stage { position: relative; z-index: 1; }
+:root[data-motion='reduced'] .cb-cam, :root[data-motion='reduced'] .cb { transition: none; }
+@media (prefers-reduced-motion: reduce) { .cb-cam, .cb { transition: none; } }
+@media (prefers-reduced-transparency: reduce) { .cb-cam, .cb-fog { display: none; } .cb { background: var(--page); } }
+@media (forced-colors: active) { .cb { display: none; } }
+@media print { .cb { display: none !important; } }

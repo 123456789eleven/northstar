@@ -16,7 +16,7 @@ export function placeAnchors(map: LifeMap, view: Size) {
 }
 
 /** World px to backdrop px. */
-export const BACKDROP_K = 1.15
+export const BACKDROP_K = 0.9
 
 /** Where the backdrop camera looks for a district: its centre (civic ones too); Home looks at the middle of the city. */
 export function backdropFocus(map: LifeMap, id: DistrictId): Pt {
