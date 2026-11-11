@@ -1,26 +1,29 @@
-/* Backdrop city behind non-home pages: faint, static, low contrast. The camera is one CSS transform with a spring.
+/* Backdrop city behind non-home pages: faint, low contrast, on a plane tilted away from the viewer so the far side recedes
+   into fog (one static 3D layer). The camera is one CSS transform with a spring.
    Reduced motion: no glide. Reduced transparency: solid ground, no city. Hidden on Home (the Life map is the page there). */
 .cb { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; opacity: 1; transition: opacity var(--t-smooth) var(--spring-gentle); }
 .cb.is-home { opacity: 0; }
+.cb-plane { position: absolute; inset: -12% -18% 0; transform: perspective(1100px) rotateX(26deg); transform-origin: 50% 40%; }
 .cb-cam {
   position: absolute; left: 0; top: 0; will-change: transform;
-  transform: translate3d(calc(50vw - var(--px, 0px)), calc(40vh - var(--py, 0px)), 0);
+  transform: translate3d(calc(68vw - var(--px, 0px)), calc(52vh - var(--py, 0px)), 0);
   transition: transform 900ms var(--spring-smooth);
 }
-.cb-svg { display: block; opacity: 0.18; }
+.cb-svg { display: block; opacity: 0.24; }
 /* the backdrop is place, not signal: no poppy or gold in it (the strip and the page carry those) */
 .cb .lm-leafring.is-overdue { stroke: var(--accent); stroke-opacity: 0.5; }
 .cb .lm-district .lm-plinth { stroke-opacity: 0.25; }
+.cb .lm-lights { opacity: calc(0.3 + var(--night, 0.7) * 0.5); }
 .cb-fog {
   position: absolute; inset: 0;
   background:
-    linear-gradient(to bottom, var(--page) 0%, transparent 26%, transparent 62%, var(--page) 100%),
+    linear-gradient(to bottom, var(--page) 0%, color-mix(in srgb, var(--page) 70%, transparent) 14%, transparent 38%, transparent 60%, var(--page) 100%),
     radial-gradient(90% 80% at 50% 40%, transparent 40%, color-mix(in srgb, var(--page) 85%, transparent) 100%);
 }
 /* no z-index on .stage: it would trap modals and sheets under the strip */
 .stage { position: relative; }
 :root[data-motion='reduced'] .cb-cam, :root[data-motion='reduced'] .cb { transition: none; }
 @media (prefers-reduced-motion: reduce) { .cb-cam, .cb { transition: none; } }
-@media (prefers-reduced-transparency: reduce) { .cb-cam, .cb-fog { display: none; } .cb { background: var(--page); } }
+@media (prefers-reduced-transparency: reduce) { .cb-plane, .cb-fog { display: none; } .cb { background: var(--page); } }
 @media (forced-colors: active) { .cb { display: none; } }
 @media print { .cb { display: none !important; } }

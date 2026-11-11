@@ -28,6 +28,14 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
     ],
   },
   {
+    name: 'Home map',
+    items: [
+      { keys: [['Q'], ['E']], label: 'Turn the city left or right' },
+      { keys: [['+'], ['-']], label: 'Zoom in or out (map focused)' },
+      { keys: [['0']], label: 'Fit the whole city (map focused)' },
+    ],
+  },
+  {
     name: 'Capture bar',
     items: [
       { keys: [['Enter']], label: 'Add what you typed' },

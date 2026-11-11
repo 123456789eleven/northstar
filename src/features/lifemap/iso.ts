@@ -114,3 +114,66 @@ export function springStep(s: Spring, target: number, dt: number, stiffness = 17
 }
 
 export const springSettled = (s: Spring, target: number, eps = 0.0005) => Math.abs(s.v - target) < eps && Math.abs(s.vel) < eps
+
+// ---- Rotation (90 degree steps), the rotation swing, and the perspective tilt ----
+
+/** Quarter turns, always 0..3. */
+export const quarter = (r: number) => ((Math.round(r) % 4) + 4) % 4
+
+/** Rotate a world tile point about the city centre by `r` quarter turns. */
+export function rotateTile(x: number, y: number, r: number): Pt {
+  switch (quarter(r)) {
+    case 1: return { x: -y, y: x }
+    case 2: return { x: -x, y: -y }
+    case 3: return { x: y, y: -x }
+    default: return { x, y }
+  }
+}
+
+/** Rotate an axis-aligned footprint (back corner x, y; w by d tiles); returns the new back corner and footprint. */
+export function rotateRect(x: number, y: number, w: number, d: number, r: number): { x: number; y: number; w: number; d: number } {
+  switch (quarter(r)) {
+    case 1: return { x: -y - d, y: x, w: d, d: w }
+    case 2: return { x: -x - w, y: -y - d, w, d }
+    case 3: return { x: y, y: -x - w, w: d, d: w }
+    default: return { x, y, w, d }
+  }
+}
+
+/** Ground-plane rotation by `theta` radians, as a screen-space linear map [a, b, c, d] (x' = a x + c y, y' = b x + d y).
+ *  It is P R P^-1 for the 2:1 projection, so at a quarter turn it lands exactly on the rotated scene. */
+export function swingMatrix(theta: number): [number, number, number, number] {
+  const cs = Math.cos(theta), sn = Math.sin(theta)
+  const hw = TILE_W / 2, hh = TILE_H / 2
+  // P = [[hw, -hw], [hh, hh]], P^-1 = 1 / (2 hw hh) [[hh, hw], [-hh, hw]], R = [[cs, -sn], [sn, cs]]
+  const det = 2 * hw * hh
+  const pr = [[hw * cs - hw * sn, -hw * sn - hw * cs], [hh * cs + hh * sn, -hh * sn + hh * cs]]
+  const m00 = (pr[0][0] * hh + pr[0][1] * -hh) / det, m01 = (pr[0][0] * hw + pr[0][1] * hw) / det
+  const m10 = (pr[1][0] * hh + pr[1][1] * -hh) / det, m11 = (pr[1][0] * hw + pr[1][1] * hw) / det
+  return [m00, m10, m01, m11]
+}
+
+/** SVG transform for a swing of `theta` about world point `c`. */
+export function swingTransform(theta: number, c: Pt): string {
+  if (Math.abs(theta) < 1e-4) return ''
+  const [a, b, cc, d] = swingMatrix(theta)
+  const e = c.x - (a * c.x + cc * c.y), f = c.y - (b * c.x + d * c.y)
+  return `matrix(${round4(a)} ${round4(b)} ${round4(cc)} ${round4(d)} ${round(e)} ${round(f)})`
+}
+
+export interface Tilt { rx: number; ry: number }
+/** Perspective distance (px) of the tilted stage. */
+export const PERSPECTIVE = 1500
+
+/** Where a point drawn on the stage lands after the stage's CSS `perspective(P) rotateX(rx) rotateY(ry)` about its centre. */
+export function tiltPoint(p: Pt, view: Size, t: Tilt, persp = PERSPECTIVE): Pt {
+  const ax = (t.rx * Math.PI) / 180, ay = (t.ry * Math.PI) / 180
+  const x0 = p.x - view.w / 2, y0 = p.y - view.h / 2
+  // rotateY first, then rotateX (CSS applies the list right to left to the point)
+  const x1 = x0 * Math.cos(ay), z1 = -x0 * Math.sin(ay)
+  const y2 = y0 * Math.cos(ax) - z1 * Math.sin(ax), z2 = y0 * Math.sin(ax) + z1 * Math.cos(ax)
+  const w = 1 - z2 / persp
+  return { x: view.w / 2 + x1 / w, y: view.h / 2 + y2 / w }
+}
+
+export const tiltCss = (t: Tilt, persp = PERSPECTIVE) => `perspective(${persp}px) rotateX(${t.rx.toFixed(3)}deg) rotateY(${t.ry.toFixed(3)}deg)`

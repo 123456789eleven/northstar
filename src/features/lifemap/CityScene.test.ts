@@ -25,6 +25,15 @@ describe('CityScene element budget', () => {
     expect(lite).toBeLessThan(count(false))
     expect(renderToStaticMarkup(createElement('svg', null, createElement(CityScene, { map: full, selected: null, lite: true })))).not.toContain('lm-car')
   })
+  it('full Home scene (lights, shadows, fog veils, traffic) stays under 700 SVG elements', () => {
+    expect(count(false)).toBeLessThan(700)
+  })
+  it('lights more windows when the share is higher, and marks rising buildings', () => {
+    const lights = (w: number) => (renderToStaticMarkup(createElement('svg', null, createElement(CityScene, { map: full, selected: null, windows: w }))).match(/lm-lights/g) ?? []).length
+    expect(lights(0.7)).toBeGreaterThan(lights(0.1))
+    const html = renderToStaticMarkup(createElement('svg', null, createElement(CityScene, { map: full, selected: null, rising: new Set(['money:0']) })))
+    expect(html.match(/lm-b[^"]*is-rising/g)).toHaveLength(1)
+  })
   it('draws both civic places and marks the selected one', () => {
     const html = renderToStaticMarkup(createElement('svg', null, createElement(CityScene, { map: full, selected: 'plan', lite: true })))
     expect(html).toContain('data-d="plan"')

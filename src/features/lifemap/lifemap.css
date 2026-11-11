@@ -16,20 +16,34 @@
 .lm-viewport { position: absolute; inset: 0; outline: none; }
 .lm-viewport:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
 
-/* gradient stops (set in CSS so tokens resolve) */
-.lm-s-fl0 { stop-color: color-mix(in srgb, var(--accent) 46%, var(--surface-2)); }
-.lm-s-fl1 { stop-color: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+/* gradient stops (set in CSS so tokens resolve). Light comes from the back left, camera-relative: left faces catch it, right
+   faces sit in shade, both darken toward the ground; roofs carry a glass sheen from the back corner. */
+.lm-s-fl0 { stop-color: color-mix(in srgb, var(--accent) 52%, var(--surface-2)); }
+.lm-s-fl1 { stop-color: color-mix(in srgb, var(--accent) 24%, var(--surface)); }
+.lm-s-fl2 { stop-color: color-mix(in srgb, var(--accent) 7%, var(--page)); }
 .lm-s-fr0 { stop-color: color-mix(in srgb, var(--accent) 26%, var(--surface)); }
-.lm-s-fr1 { stop-color: color-mix(in srgb, var(--accent) 3%, var(--page)); }
-.lm-s-dl0 { stop-color: var(--surface-3); }
-.lm-s-dl1 { stop-color: var(--surface); }
+.lm-s-fr1 { stop-color: color-mix(in srgb, var(--accent) 9%, var(--surface)); }
+.lm-s-fr2 { stop-color: var(--page); }
+.lm-s-dl0 { stop-color: color-mix(in srgb, var(--accent) 12%, var(--surface-3)); }
+.lm-s-dl1 { stop-color: var(--surface-2); }
+.lm-s-dl2 { stop-color: var(--surface); }
 .lm-s-dr0 { stop-color: var(--surface-2); }
-.lm-s-dr1 { stop-color: var(--page); }
+.lm-s-dr1 { stop-color: var(--surface); }
+.lm-s-dr2 { stop-color: var(--page); }
+.lm-s-tl0 { stop-color: color-mix(in srgb, var(--accent) 86%, white); }
+.lm-s-tl1 { stop-color: color-mix(in srgb, var(--accent) 58%, var(--surface-3)); }
+.lm-s-tl2 { stop-color: color-mix(in srgb, var(--accent) 34%, var(--surface-2)); }
+.lm-s-td0 { stop-color: color-mix(in srgb, var(--accent) 26%, var(--surface-3)); }
+.lm-s-td1 { stop-color: var(--surface-3); }
+.lm-s-td2 { stop-color: var(--surface-2); }
 .lm-s-g0 { stop-color: color-mix(in srgb, var(--accent) 7%, var(--surface)); }
 .lm-s-g1 { stop-color: var(--surface); stop-opacity: 0.6; }
 .lm-s-g2 { stop-color: var(--page); stop-opacity: 0; }
 .lm-s-p0 { stop-color: var(--accent); stop-opacity: 0.4; }
 .lm-s-p1 { stop-color: var(--accent); stop-opacity: 0; }
+.lm-s-sh0 { stop-color: #000; stop-opacity: 0.62; }
+.lm-s-sh1 { stop-color: #000; stop-opacity: 0.3; }
+.lm-s-sh2 { stop-color: #000; stop-opacity: 0; }
 
 /* ground */
 .lm-grid { fill: none; stroke: var(--accent); stroke-opacity: 0.05; stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -42,36 +56,67 @@
 .lm-survey.is-outer { stroke-opacity: 0.07; }
 
 /* plinths */
-.lm-pool { opacity: calc(0.3 + var(--g, 0) * 0.7); }
+.lm-pool { opacity: calc(0.3 + var(--g, 0) * 0.7); transition: opacity var(--t-smooth) var(--spring-gentle); }
 .lm-plinth { fill: var(--surface-2); stroke: var(--accent); stroke-opacity: calc(0.2 + var(--g, 0) * 0.45); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
 .lm-plinth-side { fill: var(--surface-3); }
 .lm-plinth-side.is-r { fill: var(--surface); }
 .lm-district { transition: opacity var(--t-smooth) var(--spring-gentle); }
+.lm-lift { transition: transform var(--t-smooth) var(--spring-smooth); }
+.lm-veil { transition: opacity var(--t-smooth) var(--spring-gentle); }
 .lm.has-focus .lm-district:not(.is-selected) { opacity: 0.5; }
 .lm-district.is-selected .lm-plinth { stroke-opacity: 0.95; stroke-width: 1.8; }
 .lm-district.is-selected .lm-pool { opacity: 1; }
+.lm-district.is-selected > .lm-lift { transform: translateY(-4px); }
+/* hover or keyboard focus on a district: it lifts off its pool, which brightens, and steps out of the fog */
+.lm-svg[data-hover='money'] [data-d='money'] > .lm-lift,
+.lm-svg[data-hover='body'] [data-d='body'] > .lm-lift,
+.lm-svg[data-hover='mind'] [data-d='mind'] > .lm-lift,
+.lm-svg[data-hover='career'] [data-d='career'] > .lm-lift,
+.lm-svg[data-hover='people'] [data-d='people'] > .lm-lift { transform: translateY(-8px); }
+.lm-svg[data-hover='money'] [data-d='money'] > .lm-pool,
+.lm-svg[data-hover='body'] [data-d='body'] > .lm-pool,
+.lm-svg[data-hover='mind'] [data-d='mind'] > .lm-pool,
+.lm-svg[data-hover='career'] [data-d='career'] > .lm-pool,
+.lm-svg[data-hover='people'] [data-d='people'] > .lm-pool { opacity: 1; }
+.lm-district.is-selected .lm-veil,
+.lm-svg[data-hover='money'] [data-d='money'] .lm-veil,
+.lm-svg[data-hover='body'] [data-d='body'] .lm-veil,
+.lm-svg[data-hover='mind'] [data-d='mind'] .lm-veil,
+.lm-svg[data-hover='career'] [data-d='career'] .lm-veil,
+.lm-svg[data-hover='people'] [data-d='people'] .lm-veil { opacity: 0; }
 
-/* buildings: glass faces, glowing edges, window bands */
+/* buildings: volumetric faces, glass roofs, contact shadows, glowing edges, window lights by time of day */
+.lm-shadow { fill: url(#lm-shadow); }
 .lm-face-l { fill: url(#lm-dl); }
 .lm-face-r { fill: url(#lm-dr); }
-.lm-face-t, .lm-roof-l, .lm-roof-r { fill: var(--surface-3); }
+.lm-face-t { fill: url(#lm-td); }
+.lm-roof-l { fill: var(--surface-3); }
+.lm-roof-r { fill: var(--surface); }
 .lm-b.is-lit .lm-face-l { fill: url(#lm-fl); }
 .lm-b.is-lit .lm-face-r { fill: url(#lm-fr); }
-.lm-b.is-lit .lm-face-t { fill: color-mix(in srgb, var(--accent) 58%, var(--surface-3)); }
-.lm-b.is-lit .lm-roof-l { fill: color-mix(in srgb, var(--accent) 30%, var(--surface-2)); }
+.lm-b.is-lit .lm-face-t { fill: url(#lm-tl); }
+.lm-b.is-lit .lm-roof-l { fill: color-mix(in srgb, var(--accent) 44%, var(--surface-2)); }
 .lm-b.is-lit .lm-roof-r { fill: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
 .lm-edge { fill: none; stroke: var(--accent); stroke-opacity: var(--e); stroke-width: 1; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .lm-edge-glow { fill: none; stroke: var(--accent); stroke-opacity: calc(var(--e) * 0.2); stroke-width: 8; stroke-linejoin: round; stroke-linecap: round; }
-.lm-win { fill: none; stroke: var(--accent-text); stroke-opacity: calc(var(--e) * 0.5); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.lm-b:not(.is-lit) .lm-win { stroke-opacity: 0.07; }
+.lm-spec { fill: none; stroke: #fff; stroke-opacity: calc(var(--e) * 0.22); stroke-width: 1.2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.lm-b.is-lit .lm-spec { stroke-opacity: calc(var(--e) * 0.7); }
+.lm-win { fill: none; stroke: var(--accent-text); stroke-opacity: calc(var(--e) * 0.32); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.lm-b:not(.is-lit) .lm-win { stroke-opacity: 0.06; }
+.lm-lights { fill: var(--accent-text); opacity: calc(0.16 + var(--night, 0.7) * 0.3); }
+.lm-b.is-lit .lm-lights { fill: var(--accent-text); opacity: calc(0.3 + var(--night, 0.7) * 0.36); }
+.lm-outskirts .lm-lights { opacity: calc(0.12 + var(--night, 0.7) * 0.3); }
 .lm-b.is-lit .lm-edge { stroke: var(--accent-text); }
+.lm-veil { fill: var(--page); opacity: var(--fog, 0); pointer-events: none; }
 .lm-spire { stroke: var(--accent); stroke-opacity: var(--e); stroke-width: 1.4; }
 .lm-tip { fill: var(--accent-text); opacity: var(--e); }
 .lm-outskirts .lm-edge { stroke-opacity: 0.12; }
+/* a building that just grew rises from its base and settles */
+.lm-b.is-rising, .lm-tree.is-rising { transform-box: fill-box; transform-origin: 50% 100%; }
 
 /* park */
 .lm-park-path { fill: none; stroke: var(--accent); stroke-opacity: 0.16; stroke-width: 6; }
-.lm-tree-shadow { fill: var(--page); opacity: 0.6; }
+.lm-tree-shadow { fill: url(#lm-shadow); }
 .lm-trunk { stroke: var(--line-strong); stroke-width: 2.4; stroke-linecap: round; }
 .lm-crown { fill: color-mix(in srgb, var(--accent) 30%, var(--surface-2)); stroke: var(--accent); stroke-opacity: 0.55; stroke-width: 1; }
 .lm-leafring { fill: none; stroke: var(--accent); stroke-opacity: 0.85; stroke-width: 2; stroke-linecap: round; }
@@ -93,13 +138,36 @@
 .lm-gold polygon { fill: var(--reward); }
 .lm-gold line { stroke: var(--reward); stroke-opacity: 0.6; stroke-width: 1.2; }
 
-/* traffic: a few slow lights on the avenues */
+/* traffic: a few slow lights with short trails on the avenues */
 .lm-car { opacity: 0; }
-.lm-car-glow { fill: var(--accent); opacity: 0.22; }
-.lm-car-dot { fill: var(--accent-text); }
+.lm-car-glow { fill: var(--accent); opacity: 0.24; }
+.lm-car-dot { fill: color-mix(in srgb, var(--accent-text) 70%, white); }
+.lm-car-trail { stroke: var(--accent); stroke-opacity: 0.32; stroke-width: 2; stroke-linecap: round; fill: none; }
+.lm-gold { transform-box: fill-box; transform-origin: 50% 100%; }
+
+/* sky: the night tint over the ground (dusk and night are the default; day only lifts the haze a little) */
+.lm-sky {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 70% at 50% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%);
+  opacity: calc(0.9 - var(--night, 0.7) * 0.55); transition: opacity 30s linear;
+}
+.lm-stage { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
+
+/* drifting light motes, slow and sparse */
+.lm-motes { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.lm-motes i {
+  position: absolute; width: 3px; height: 3px; border-radius: 50%; opacity: 0;
+  background: var(--accent-text); box-shadow: 0 0 6px 1px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
 @media (prefers-reduced-motion: no-preference) {
   :root:not([data-motion='reduced']) .lm-car { animation: lm-car linear infinite; }
   :root:not([data-motion='reduced']) .lm-beacon-ring { animation: lm-ring 3.2s ease-out infinite; }
+  :root:not([data-motion='reduced']) .lm-beacon-dot { animation: lm-beat 3.2s ease-in-out infinite; }
+  :root:not([data-motion='reduced']) .lm-gold { animation: lm-float 6s ease-in-out infinite; }
+  :root:not([data-motion='reduced']) .lm-motes i { animation: lm-mote linear infinite; }
+  :root:not([data-motion='reduced']) .lm-b.is-rising { animation: lm-rise 1200ms cubic-bezier(0.25, 1.25, 0.45, 1) both; }
+  :root:not([data-motion='reduced']) .lm-tree.is-rising { animation: lm-grow 900ms cubic-bezier(0.25, 1.35, 0.45, 1) both; }
 }
 @keyframes lm-car {
   0% { transform: translate(var(--ax), var(--ay)); opacity: 0; }
@@ -108,6 +176,19 @@
   100% { transform: translate(var(--bx), var(--by)); opacity: 0; }
 }
 @keyframes lm-ring { from { transform: scale(0.7); opacity: 0.7; } to { transform: scale(1.6); opacity: 0; } }
+@keyframes lm-beat { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+@keyframes lm-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes lm-rise { from { transform: scaleY(var(--from, 0.2)); } }
+@keyframes lm-grow { from { transform: scale(0.1); opacity: 0; } }
+@keyframes lm-mote {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  15% { opacity: 0.55; }
+  70% { opacity: 0.35; }
+  100% { transform: translate3d(14px, -180px, 0); opacity: 0; }
+}
+:root[data-motion='reduced'] .lm-motes { display: none; }
+:root[data-motion='reduced'] .lm-lift, :root[data-motion='reduced'] .lm-sky, :root[data-motion='reduced'] .lm-veil { transition: none; }
+@media (prefers-reduced-motion: reduce) { .lm-motes { display: none; } .lm-lift, .lm-sky, .lm-veil { transition: none; } }
 
 /* district hit areas and labels (HTML so text stays crisp and focusable); one small label per district */
 .lm-hit { position: absolute; display: flex; justify-content: center; align-items: flex-start; padding: 0; margin: 0; border: 0; background: transparent; color: inherit; cursor: pointer; border-radius: var(--r-inner); -webkit-tap-highlight-color: transparent; }
@@ -132,8 +213,11 @@
 .lm-zbtn.is-text { font-size: var(--fs-1); font-weight: 600; }
 .lm-zbtn:hover { border-color: var(--accent-line); }
 .lm-zbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lm-zbtn svg { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.lm-zbtn.is-rot + .lm-zbtn:not(.is-rot) { margin-top: 6px; }
 .lm.is-phone .lm-zoom { left: auto; right: 10px; bottom: auto; top: 80px; }
-.lm.is-phone .lm-zbtn:not(.is-text) { display: none; }
+.lm.is-phone .lm-zbtn:not(.is-text):not(.is-rot) { display: none; }
+.lm.is-phone .lm-zbtn.is-rot + .lm-zbtn:not(.is-rot) { margin-top: 0; }
 
 @media (prefers-reduced-transparency: reduce) { .lm-label, .lm-zbtn { background: var(--surface-2); } }
 @media (forced-colors: active) { .lm-label, .lm-zbtn { border: 1px solid CanvasText; } }

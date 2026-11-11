@@ -338,6 +338,18 @@ export function buildCivic(planDone: number): Civic[] {
 /** Outskirt blocks that would sit on a civic plot are left out. */
 const offCivic = (q: Building) => Object.values(CIVIC_PLOTS).every(({ o, s }) => q.x + q.w < o.x - 0.3 || q.x > o.x + s + 0.3 || q.y + q.d < o.y - 0.3 || q.y > o.y + s + 0.3)
 
+type Place = Pick<District, 'origin' | 'size' | 'centre' | 'top'>
+const corners = (d: Place, lift: number) => [
+  project(d.origin.x, d.origin.y), project(d.origin.x + d.size, d.origin.y), project(d.origin.x, d.origin.y + d.size),
+  project(d.origin.x + d.size, d.origin.y + d.size), { x: d.centre.x, y: d.top.y - lift },
+]
+
+/** Fit bounds of the five districts, and of every place (civic ones too). Shared by the model and its rotations. */
+export function placeBounds(districts: Place[], civic: Place[]): { bounds: Bounds; cityBounds: Bounds } {
+  const ds = districts.flatMap((d) => corners(d, 30))
+  return { bounds: boundsOf(ds), cityBounds: boundsOf([...ds, ...civic.flatMap((c) => corners(c, 20))]) }
+}
+
 export function buildLifeMap(inp: LifeInput): LifeMap {
   const total = inp.areas.reduce((a, x) => a + x.total, 0)
   const empty = total === 0 && inp.netWorth === null && inp.peopleTotal === 0
@@ -375,15 +387,10 @@ export function buildLifeMap(inp: LifeInput): LifeMap {
       top: project(o.x + s / 2, o.y + s / 2, tallest),
     }
   })
-  const corners = districts.flatMap((d) => [
-    project(d.origin.x, d.origin.y), project(d.origin.x + d.size, d.origin.y), project(d.origin.x, d.origin.y + d.size),
-    project(d.origin.x + d.size, d.origin.y + d.size), { x: d.centre.x, y: d.top.y - 30 },
-  ])
   const active = inp.areas.reduce((a, x) => a + Math.min(x.days, inp.target), 0)
   const roads = buildRoads()
   const activity = inp.areas.length ? inp.areas.reduce((a, x) => a + x.value, 0) / inp.areas.length : 0
   const civic = buildCivic(inp.planTotal ? (inp.planTotal - inp.planLeft) / inp.planTotal : 0)
-  const civicCorners = civic.flatMap((c) => [project(c.origin.x, c.origin.y), project(c.origin.x + c.size, c.origin.y + c.size), project(c.origin.x + c.size, c.origin.y), project(c.origin.x, c.origin.y + c.size), { x: c.centre.x, y: c.top.y - 20 }])
   return {
     districts,
     civic,
@@ -391,8 +398,7 @@ export function buildLifeMap(inp: LifeInput): LifeMap {
     cars: buildCars(roads, activity),
     outskirts: buildOutskirts().filter(offCivic),
     empty,
-    bounds: boundsOf(corners),
-    cityBounds: boundsOf([...corners, ...civicCorners]),
+    ...placeBounds(districts, civic),
     overview: {
       netWorth: inp.netWorth === null ? 'None yet' : money(inp.netWorth),
       activeDays: `${active} of ${inp.target * inp.areas.length}`,
