@@ -8,6 +8,8 @@ import DistrictStrip from './components/DistrictStrip'
 import { districtForPath } from './components/districts'
 import { useMedia, PHONE_QUERY } from './components/useMedia'
 import { LifeMapProvider } from './features/lifemap/useLifeMap'
+import { CityDefs } from './features/lifemap/CityScene'
+import { CityHead } from './components/DistrictFrame'
 import HubLayout, { RouteFade } from './components/HubLayout'
 import { GlassDefs } from './components/GlassDefs'
 import { PlayerProvider } from './features/game/ui/PlayerProvider'
@@ -83,9 +85,11 @@ function Shell() {
       <div className={`shell${pathname === '/' || pathname === '/map' ? ' is-home' : ''}`} data-district={districtForPath(pathname)}>
         <a className="skip-link" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus() }}>Skip to content</a>
         <GlassDefs />
+        <CityDefs />
         <div className="stage">
         <TopBar />
         <main className="main" id="main" tabIndex={-1}>
+          <CityHead />
           <Routes>
             <Route element={<RouteFade />}>
               <Route path="/" element={<Home />} />

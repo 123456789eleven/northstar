@@ -8,7 +8,7 @@ import {
   cameraTransform, centreOn, clamp, fitCamera, padBounds, panBy, project, springSettled, springStep, worldToScreen, zoomAt,
   MAX_K, MIN_K, type Camera, type Inset, type Pt, type Size, type Spring,
 } from './iso'
-import { CityScene, SceneDefs } from './CityScene'
+import { CityScene } from './CityScene'
 import type { LifeMap } from './model'
 import './lifemap.css'
 
@@ -149,7 +149,6 @@ export default function LifeMapView({ map, focus, onFocus, inset, phone }: Props
   return (
     <div className={`lm${phone ? ' is-phone' : ''}${focus ? ' has-focus' : ''}`} ref={root} data-testid="lifemap" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onKeyDown={key}>
       <svg className="lm-svg" width={view.w} height={view.h} aria-hidden="true" focusable="false">
-        <SceneDefs />
         <g transform={cameraTransform(cam, view)}>
           <CityScene map={map} selected={focus} />
         </g>

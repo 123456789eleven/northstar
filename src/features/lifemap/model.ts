@@ -76,8 +76,12 @@ export interface District {
 export interface Road { x1: number; y1: number; x2: number; y2: number; w: number; main: boolean }
 export interface Car { a: Pt; b: Pt; dur: number; delay: number }
 export interface Overview { netWorth: string; activeDays: string; toContact: string; planLeft: string }
+/** Civic places with no area ring: the town hall (Plan) and home base (You). Quiet, drawn like districts. */
+export type CivicId = 'plan' | 'you'
+export interface Civic { id: CivicId; label: string; to: string; origin: Pt; size: number; buildings: Building[]; centre: Pt; top: Pt }
 export interface LifeMap {
   districts: District[]
+  civic: Civic[]
   roads: Road[]
   cars: Car[]
   /** Dim ambient blocks in the outskirts (no data meaning). */
@@ -86,6 +90,8 @@ export interface LifeMap {
   empty: boolean
   /** Bounds of the five districts (fit target). */
   bounds: Bounds
+  /** Bounds of every place, civic ones included (mini-map and backdrop). */
+  cityBounds: Bounds
 }
 
 export const PAGES: Record<SkillId, string> = { body: '/body', money: '/finance', mind: '/mind', career: '/career', people: '/people' }
@@ -105,6 +111,12 @@ export const PLOTS: Record<SkillId, { o: Pt; s: number }> = {
   career: { o: { x: -2.5, y: -11.5 }, s: 5 },
   mind: { o: { x: 6.5, y: -2.5 }, s: 5 },
   people: { o: { x: -2.5, y: 6.5 }, s: 5 },
+}
+
+/** Civic plots on the quiet diagonals: the town hall at the back, home base at the front. */
+export const CIVIC_PLOTS: Record<CivicId, { o: Pt; s: number }> = {
+  plan: { o: { x: -9.5, y: -9.5 }, s: 4 },
+  you: { o: { x: 5.5, y: 5.5 }, s: 4 },
 }
 
 export const clamp01 = (n: number) => Math.min(1, Math.max(0, Number.isFinite(n) ? n : 0))
@@ -295,6 +307,37 @@ export function buildOutskirts(): Building[] {
   return out
 }
 
+/** Town hall (lit by today's plan done share) and home base (a low house, always softly lit). */
+export function buildCivic(planDone: number): Civic[] {
+  const g = clamp01(planDone)
+  const hall = CIVIC_PLOTS.plan, home = CIVIC_PLOTS.you
+  const sites: { id: CivicId; label: string; to: string; plot: { o: Pt; s: number }; buildings: Building[] }[] = [
+    {
+      id: 'plan', label: 'Plan', to: '/today', plot: hall,
+      buildings: [
+        b(hall.o.x + 0.5, hall.o.y + 0.5, 3, 1.6, 26, g > 0, g, 'flat', 9, 0, 26),
+        b(hall.o.x + 1.4, hall.o.y + 1.4, 1.2, 1.2, 58, g > 0, g, 'spire', 12, 0, 58),
+        b(hall.o.x + 0.5, hall.o.y + 2.5, 1.4, 1, 18, g >= 1, g, 'pyramid', 0, 0, 18),
+      ],
+    },
+    {
+      id: 'you', label: 'You', to: '/you', plot: home,
+      buildings: [
+        b(home.o.x + 0.8, home.o.y + 0.8, 1.6, 1.4, 22, true, 0.35, 'pyramid', 0, 0, 22),
+        b(home.o.x + 2.6, home.o.y + 1.0, 0.9, 1.1, 14, false, 0, 'pyramid', 0, 0, 14),
+      ],
+    },
+  ]
+  return sites.map(({ id, label, to, plot, buildings }) => {
+    const tallest = Math.max(...buildings.map((x) => x.h + (x.roof === 'spire' ? 26 : x.roof === 'pyramid' ? 14 : 0)))
+    const c = { x: plot.o.x + plot.s / 2, y: plot.o.y + plot.s / 2 }
+    return { id, label, to, origin: plot.o, size: plot.s, buildings, centre: project(c.x, c.y, 0), top: project(c.x, c.y, tallest) }
+  })
+}
+
+/** Outskirt blocks that would sit on a civic plot are left out. */
+const offCivic = (q: Building) => Object.values(CIVIC_PLOTS).every(({ o, s }) => q.x + q.w < o.x - 0.3 || q.x > o.x + s + 0.3 || q.y + q.d < o.y - 0.3 || q.y > o.y + s + 0.3)
+
 export function buildLifeMap(inp: LifeInput): LifeMap {
   const total = inp.areas.reduce((a, x) => a + x.total, 0)
   const empty = total === 0 && inp.netWorth === null && inp.peopleTotal === 0
@@ -339,13 +382,17 @@ export function buildLifeMap(inp: LifeInput): LifeMap {
   const active = inp.areas.reduce((a, x) => a + Math.min(x.days, inp.target), 0)
   const roads = buildRoads()
   const activity = inp.areas.length ? inp.areas.reduce((a, x) => a + x.value, 0) / inp.areas.length : 0
+  const civic = buildCivic(inp.planTotal ? (inp.planTotal - inp.planLeft) / inp.planTotal : 0)
+  const civicCorners = civic.flatMap((c) => [project(c.origin.x, c.origin.y), project(c.origin.x + c.size, c.origin.y + c.size), project(c.origin.x + c.size, c.origin.y), project(c.origin.x, c.origin.y + c.size), { x: c.centre.x, y: c.top.y - 20 }])
   return {
     districts,
+    civic,
     roads,
     cars: buildCars(roads, activity),
-    outskirts: buildOutskirts(),
+    outskirts: buildOutskirts().filter(offCivic),
     empty,
     bounds: boundsOf(corners),
+    cityBounds: boundsOf([...corners, ...civicCorners]),
     overview: {
       netWorth: inp.netWorth === null ? 'None yet' : money(inp.netWorth),
       activeDays: `${active} of ${inp.target * inp.areas.length}`,

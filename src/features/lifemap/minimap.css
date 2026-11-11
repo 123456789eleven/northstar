@@ -1,0 +1,31 @@
+/* Mini-map chip: the city scene in small, thin glass, the active district lit and the rest dimmed. Tokens only. */
+.lm-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.mm {
+  position: relative; flex: 0 0 auto; width: 176px; height: 100px; border-radius: var(--r-inner); overflow: hidden; isolation: isolate;
+  background: radial-gradient(70% 70% at 50% 50%, color-mix(in srgb, var(--accent) 9%, var(--page)), var(--page));
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent); box-shadow: var(--inner-light), var(--elev-1);
+}
+.mm.is-phone { display: block; width: 64px; height: 38px; border-radius: 10px; }
+.mm-svg { position: absolute; inset: 0; display: block; pointer-events: none; }
+.mm-empty { position: absolute; inset: 0; }
+.mm-ground { position: absolute; inset: 0; border: 0; padding: 0; background: transparent; cursor: pointer; border-radius: inherit; }
+.mm-ground:focus-visible, .mm.is-phone:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mm .lm-district { transition: opacity var(--t-smooth) var(--spring-gentle); }
+.mm .lm-district:not(.is-selected) { opacity: 0.42; }
+.mm .lm-outskirts { display: none; }
+.mm .lm-district.is-selected .lm-plinth { fill: color-mix(in srgb, var(--accent) 34%, var(--surface-2)); stroke-opacity: 1; }
+.mm .lm-district.is-selected .lm-edge { stroke: var(--accent-text); stroke-opacity: 1; }
+.mm-hit {
+  position: absolute; width: 40px; height: 32px; transform: translate(-50%, -62%); border-radius: 10px; z-index: 1;
+  display: grid; place-items: center; text-decoration: none;
+}
+.mm-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.mm-tip {
+  padding: 1px 6px; border-radius: 999px; font-size: 10px; font-weight: 600; line-height: 14px; white-space: nowrap; color: var(--ink);
+  background: var(--mat-thick-bg); box-shadow: inset 0 0 0 1px var(--accent-line); opacity: 0; transform: translateY(2px);
+  transition: opacity var(--t-snappy) var(--spring-gentle), transform var(--t-snappy) var(--spring-gentle); pointer-events: none;
+}
+.mm-hit:hover .mm-tip, .mm-hit:focus-visible .mm-tip { opacity: 1; transform: none; }
+:root[data-motion='reduced'] .mm .lm-district, :root[data-motion='reduced'] .mm-tip { transition: none; }
+@media (prefers-reduced-motion: reduce) { .mm .lm-district, .mm-tip { transition: none; } }
+@media (forced-colors: active) { .mm { border-color: CanvasText; } }

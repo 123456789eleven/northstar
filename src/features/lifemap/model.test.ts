@@ -112,3 +112,33 @@ describe('city helpers', () => {
   })
   it('formats money', () => { expect(money(-1234.4)).toBe('-$1,234') })
 })
+
+describe('civic places', () => {
+  it('builds the town hall and home base off the outskirts, inside the city bounds', async () => {
+    const { buildCivic, CIVIC_PLOTS } = await import('./model')
+    const civic = buildCivic(0.5)
+    expect(civic.map((c) => c.id)).toEqual(['plan', 'you'])
+    expect(civic[0].buildings.some((x) => x.lit)).toBe(true)
+    expect(buildCivic(0)[0].buildings.every((x) => !x.lit)).toBe(true)
+    for (const [id, { o, s }] of Object.entries(CIVIC_PLOTS)) {
+      const c = civic.find((x) => x.id === id)!
+      for (const q of c.buildings) expect(q.x >= o.x && q.x + q.w <= o.x + s && q.y >= o.y && q.y + q.d <= o.y + s).toBe(true)
+    }
+  })
+})
+
+describe('city bounds', () => {
+  it('cover the five districts and both civic places; outskirts stay off civic plots', () => {
+    const m = buildLifeMap(base({ planTotal: 4, planLeft: 1 }))
+    expect(m.civic).toHaveLength(2)
+    expect(m.cityBounds.minY).toBeLessThan(m.bounds.minY)
+    expect(m.cityBounds.maxY).toBeGreaterThan(m.bounds.maxY)
+    expect(m.outskirts.length).toBeLessThanOrEqual(MAX_OUTSKIRTS)
+    for (const c of m.civic) {
+      for (const q of m.outskirts) {
+        const apart = q.x + q.w < c.origin.x || q.x > c.origin.x + c.size || q.y + q.d < c.origin.y || q.y > c.origin.y + c.size
+        expect(apart).toBe(true)
+      }
+    }
+  })
+})
