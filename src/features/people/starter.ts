@@ -1,7 +1,7 @@
 // Conversation starters and plain-words contact lines, built only from what the app already knows about a person.
 // Pure and deterministic: the phrasing varies by person and last contact, never by chance or the network.
 import type { ISODate, Person } from '../../db'
-import { daysBetween } from '../../lib/dates'
+import { addDays, daysBetween, parseISODate } from '../../lib/dates'
 import { firstName } from './tree'
 import { nextBirthday } from './people'
 
@@ -66,4 +66,18 @@ export function starterFor(p: Person, now: ISODate, others: Person[] = []): stri
   if (days <= 3) return pick([`You just spoke. A quick follow-up on whatever came up keeps ${f} close.`, `Fresh chat with ${f}. Send one line about something that made you think of them.`], seed)
   const rel = p.relation.trim().toLowerCase()
   return pick([`Ask ${f} what is new this week.`, `Share something small with ${f}: a song, a photo, a link.`, rel ? `Check in on your ${rel}, ${f}: how is life really going?` : `Check in with ${f}: how is life really going?`], seed)
+}
+
+/** The one subtle moment after a 60+ day gap (used as the toast message). */
+export function reconnectLine(p: Pick<Person, 'name'>, days: number): string {
+  const f = firstName(p.name)
+  return days >= 180
+    ? `${days} days apart and you picked it back up with ${f}. That is a record-worthy comeback.`
+    : `${f} is back in the game after ${days} days. Logged.`
+}
+
+/** Next Saturday strictly after today. */
+export function defaultHangoutDate(now: ISODate): ISODate {
+  const dow = parseISODate(now).getDay()
+  return addDays(now, ((6 - dow + 7) % 7) || 7)
 }

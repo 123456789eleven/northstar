@@ -9,16 +9,22 @@ import { PersonDetail, PersonForm } from '../features/people/PersonModals'
 import { LogPanel, useQuickLog } from '../features/people/LogPanel'
 import { TreeView } from '../features/people/TreeView'
 import { PersonRow } from '../features/people/PersonRow'
-import { reminderLine } from '../features/people/circle'
+import { FriendCard } from '../features/people/FriendBits'
+import { FormGuide, RecordsStrip, WarmthMeter } from '../features/people/CircleStats'
+import { reachLine } from '../features/people/starter'
+import { circleWarmth, formGuide, personWarmth, records } from '../features/people/warmth'
 import { groupByRelation, reachSoon } from '../features/people/tree'
 import '../features/people/people.css'
 import '../features/people/tree.css'
+import '../features/people/friends.css'
 
 type View = 'tree' | 'list'
 const VIEW_KEY = 'northstar.people.view'
 const OPEN_KEY = 'northstar.people.tree.open'
 const MAX_OTHERS = 60
 const BIG_BRANCH = 12
+const FEED_FIRST = 4
+const FEED_MAX = 30
 
 const readOverrides = (): Record<string, boolean> => { try { return JSON.parse(localStorage.getItem(OPEN_KEY) || '{}') } catch { return {} } }
 
@@ -27,12 +33,14 @@ export default function People() {
   const chooseView = (v: View) => { setView(v); try { localStorage.setItem(VIEW_KEY, v) } catch { /* ignore */ } }
   const [q, setQ] = useState('')
   const [reload, setReload] = useState(0)
-  const data = useLiveQuery(async () => { try { return { people: await db.people.toArray() } } catch { return { error: true as const } } }, [reload])
+  const data = useLiveQuery(async () => { try { return { people: await db.people.toArray(), interactions: await db.interactions.toArray() } } catch { return { error: true as const } } }, [reload])
   const people = data && 'people' in data ? data.people : undefined
+  const interactions = data && 'interactions' in data ? data.interactions : undefined
   const failed = !!data && 'error' in data
   const [adding, setAdding] = useState<{ relation: string } | null>(null)
   const [openId, setOpenId] = useState<number | null>(null)
   const [loggingId, setLoggingId] = useState<number | null>(null)
+  const [feedAll, setFeedAll] = useState(false)
   const [overrides, setOverrides] = useState(readOverrides)
   const now = today()
   const quickLog = useQuickLog()
@@ -47,6 +55,10 @@ export default function People() {
   const tracked = sorted.filter((x) => x.p.cadenceDays > 0)
   const others = sorted.filter((x) => !(x.p.cadenceDays > 0))
   const dueCount = tracked.filter((x) => x.s.overdue).length
+  const warmth = useMemo(() => circleWarmth(people ?? [], now), [people, now])
+  const form = useMemo(() => formGuide(people ?? [], interactions ?? [], now), [people, interactions, now])
+  const rec = useMemo(() => records(people ?? [], interactions ?? [], now), [people, interactions, now])
+  const feed = useMemo(() => (people ?? []).filter((p) => p.cadenceDays > 0).sort((a, b) => (personWarmth(a, now) ?? 1) - (personWarmth(b, now) ?? 1) || a.name.localeCompare(b.name)), [people, now])
   const soon = useMemo(() => reachSoon(people ?? [], now, 5), [people, now])
   const branches = useMemo(() => groupByRelation(people ?? []), [people])
   const collapsed = useMemo(() => {
@@ -77,7 +89,7 @@ export default function People() {
       .sort((a, b) => a.inDays - b.inDays)
   }, [people, now])
 
-  const sub = people === undefined ? '' : people.length === 0 ? 'Keep in touch with the people who matter.' : dueCount ? `${dueCount} to check in with` : 'Everyone is up to date'
+  const sub = people === undefined ? '' : people.length === 0 ? 'The people you keep close are half of how things go well.' : dueCount ? `${dueCount} ${dueCount === 1 ? 'person is' : 'people are'} ready to hear from you` : 'Everyone is inside their rhythm. Nicely held.'
 
   return (
     <>
@@ -92,12 +104,14 @@ export default function People() {
         <PageSkeleton strip={false} rows={7} />
       ) : people.length === 0 ? (
         <Card>
-          <Empty title="No one here yet" action={<button className="btn btn-primary" onClick={() => setAdding({ relation: '' })}>Add your first person</button>}>
-            Start with one person you want to stay close to and choose how often to check in. They become the first leaf on your tree, and Northstar tells you who is due next.
+          <Empty title="Your circle starts with one name" action={<button className="btn btn-primary" onClick={() => setAdding({ relation: '' })}>Add the first name</button>}>
+            Add one person you want to stay close to and pick how often you will check in. They become the first leaf on your tree, and your circle starts warming up.
           </Empty>
         </Card>
       ) : (
-        <>
+        <div className="ppl-flow">
+        <WarmthMeter warmth={warmth} />
+        <FormGuide form={form} />
         <div className="ppl-toolbar">
           <Tabs<View> value={view} onChange={chooseView} options={[{ value: 'tree', label: 'Tree' }, { value: 'list', label: 'List' }]} />
           {birthdays.length > 0 && (
@@ -116,19 +130,31 @@ export default function People() {
         </div>
         {view === 'tree' ? (
           <>
-            <TreeView branches={branches} collapsed={collapsed} now={now} selectedId={openId} onToggle={toggleBranch} onOpen={setOpenId} onAdd={(relation) => setAdding({ relation })} />
-            {tracked.length === 0 && <p className="ppl-empty-hint small muted">Nobody has a check-in rhythm yet. Open a person and choose weekly, monthly or quarterly so their ring can show how recently you spoke.</p>}
+            <TreeView branches={branches} collapsed={collapsed} now={now} selectedId={openId} onToggle={toggleBranch} onOpen={setOpenId} onAdd={(relation) => setAdding({ relation })} warmthPct={warmth.pct} />
+            {tracked.length === 0 && <p className="ppl-empty-hint small muted">Nobody has a rhythm yet. Open a person and pick weekly, monthly or quarterly, and their ring will start showing how warm things are.</p>}
             {soon.length > 0 && (
               <section className="ppl-soon" aria-label="Reach out soon">
                 <h2 className="ppl-soon-h">Reach out soon</h2>
                 <ul>
                   {soon.map(({ p }, i) => (
                     <li key={p.id}>
-                      <button type="button" className="ppl-reach" onClick={() => setOpenId(p.id!)} data-testid={i === 0 ? 'reach-out' : undefined}>{reminderLine(p, now)}</button>
+                      <button type="button" className="ppl-reach" onClick={() => setOpenId(p.id!)} data-testid={i === 0 ? 'reach-out' : undefined}>{reachLine(p, now)}</button>
                       <button type="button" className="btn btn-sm" onClick={() => quickLog(p)} aria-label={`Contacted ${p.name} today`}>Contacted</button>
                     </li>
                   ))}
                 </ul>
+              </section>
+            )}
+            {feed.length > 0 && (
+              <section className="ppl-feed" aria-label="Friend feed">
+                <h2 className="ppl-soon-h">Friend feed</h2>
+                <p className="small muted ppl-feed-sub">Coolest first, each with something to say.</p>
+                <div className="ppl-feed-list">
+                  {feed.slice(0, feedAll ? FEED_MAX : FEED_FIRST).map((p) => <FriendCard key={p.id} p={p} now={now} others={people ?? []} onOpen={() => setOpenId(p.id!)} />)}
+                </div>
+                {feed.length > FEED_FIRST && (
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => setFeedAll(!feedAll)}>{feedAll ? 'Show fewer' : `Show all ${Math.min(feed.length, FEED_MAX)}`}</button>
+                )}
               </section>
             )}
           </>
@@ -136,11 +162,11 @@ export default function People() {
           <div className="ppl-col">
             <Card title="Check-ins" flush>
               <div>
-                {tracked.length === 0 && <div className="ppl-empty-hint small muted">Nothing scheduled. Everyone is in the list below.</div>}
+                {tracked.length === 0 && <div className="ppl-empty-hint small muted">No rhythms set yet. Everyone is in the list below.</div>}
                 {tracked.map(({ p, s }, idx) => (
                   <div key={p.id}>
-                    {idx === 0 && s.overdue && <div className="ppl-group"><span>To contact</span><span className="mono">{dueCount}</span></div>}
-                    {!s.overdue && (idx === 0 || tracked[idx - 1].s.overdue) && <div className="ppl-group"><span>{dueCount ? 'Up to date' : 'On rhythm'}</span><span className="mono">{tracked.length - dueCount}</span></div>}
+                    {idx === 0 && s.overdue && <div className="ppl-group"><span>Ready to hear from you</span><span className="mono">{dueCount}</span></div>}
+                    {!s.overdue && (idx === 0 || tracked[idx - 1].s.overdue) && <div className="ppl-group"><span>{dueCount ? 'Warm' : 'On rhythm'}</span><span className="mono">{tracked.length - dueCount}</span></div>}
                     {row(p)}
                   </div>
                 ))}
@@ -159,7 +185,8 @@ export default function People() {
             )}
           </div>
         )}
-        </>
+        <RecordsStrip rec={rec} />
+        </div>
       )}
       {adding && <PersonForm defaultRelation={adding.relation} onClose={() => setAdding(null)} />}
       {openId != null && <PersonDetail personId={openId} onClose={() => setOpenId(null)} />}

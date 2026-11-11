@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { ISODate, Person } from '../../db'
 import { personStatus } from './people'
+import { circleWarmth } from './warmth'
 import { type Branch, type Dir, type TNode, firstName, fitView, layoutTree, navigate, ringFraction } from './tree'
 
 interface Props {
@@ -13,6 +14,8 @@ interface Props {
   onToggle: (branchKey: string) => void
   onOpen: (personId: number) => void
   onAdd: (relation: string) => void
+  /** Whole-circle warmth, shown on the root. */
+  warmthPct?: number | null
 }
 
 const R = 20
@@ -20,7 +23,7 @@ const ARROWS: Record<string, Dir> = { ArrowLeft: 'left', ArrowRight: 'right', Ar
 const clampK = (k: number) => Math.min(2.2, Math.max(0.3, k))
 const trunc = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s)
 
-export function TreeView({ branches, collapsed, now, selectedId, onToggle, onOpen, onAdd }: Props) {
+export function TreeView({ branches, collapsed, now, selectedId, onToggle, onOpen, onAdd, warmthPct }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
   const [view, setView] = useState({ k: 1, x: 0, y: 0 })
@@ -28,6 +31,10 @@ export function TreeView({ branches, collapsed, now, selectedId, onToggle, onOpe
   const pointers = useRef(new Map<number, { x: number; y: number }>())
   const gesture = useRef<{ moved: boolean; dist: number } | null>(null)
   const justDragged = useRef(false)
+  // Keys already on screen: anything that appears after the first paint grows in with a short spring.
+  const known = useRef<Set<string> | null>(null)
+  const grown = useRef(new Set<string>())
+  const branchWarmth = useMemo(() => new Map(branches.map((b) => [b.key, circleWarmth(b.people, now).pct])), [branches, now])
 
   const perRow = size.w >= 1000 ? 8 : size.w >= 640 ? 6 : 3
   const layout = useMemo(() => layoutTree(branches, collapsed, { perRow }), [branches, collapsed, perRow])
@@ -137,6 +144,11 @@ export function TreeView({ branches, collapsed, now, selectedId, onToggle, onOpe
     },
   })
 
+  const isFresh = (key: string) => {
+    if (known.current !== null && !known.current.has(key)) grown.current.add(key)
+    return grown.current.has(key)
+  }
+  useEffect(() => { known.current = new Set(layout.nodes.map((n) => n.key)) }, [layout])
   let leafIndex = 0
   return (
     <div className="ppl-tree" data-testid="people-tree">
@@ -149,9 +161,10 @@ export function TreeView({ branches, collapsed, now, selectedId, onToggle, onOpe
             {layout.nodes.map((n) => {
               if (n.kind === 'root') {
                 return (
-                  <g key="root" transform={`translate(${n.x} ${n.y})`} className="ppl-root" aria-hidden>
-                    <circle r={26} />
-                    <text y={4} textAnchor="middle">You</text>
+                  <g key="root" transform={`translate(${n.x} ${n.y})`} className="ppl-root" role="img" aria-label={warmthPct != null ? `You, circle ${warmthPct}% warm` : 'You'}>
+                    <circle r={30} />
+                    <text y={warmthPct != null ? -2 : 4} textAnchor="middle">You</text>
+                    {warmthPct != null && <text className="ppl-root-pct" y={13} textAnchor="middle">{warmthPct}%</text>}
                   </g>
                 )
               }
@@ -160,12 +173,14 @@ export function TreeView({ branches, collapsed, now, selectedId, onToggle, onOpe
                 const shut = collapsed.has(b.key)
                 const label = `${b.label} ${b.people.length}`
                 const w = Math.max(84, label.length * 7.4 + 38)
+                const bw = branchWarmth.get(b.key)
                 return (
                   <g key={n.key} transform={`translate(${n.x} ${n.y})`} className="ppl-node ppl-branch" role="button" aria-expanded={!shut}
-                    aria-label={`${b.label}, ${b.people.length} ${b.people.length === 1 ? 'person' : 'people'}, ${shut ? 'collapsed' : 'expanded'}`} {...handle(n)}>
+                    aria-label={`${b.label}, ${b.people.length} ${b.people.length === 1 ? 'person' : 'people'}, ${shut ? 'collapsed' : 'expanded'}${bw != null ? `, ${bw}% warm` : ''}`} {...handle(n)}>
                     <rect className="ppl-branch-pill" x={-w / 2} y={-17} width={w} height={34} rx={17} />
                     <text className="ppl-branch-label" x={-w / 2 + 14} y={4}>{b.label}</text>
                     <text className="ppl-branch-count" x={w / 2 - 12} y={4} textAnchor="end">{b.people.length}</text>
+                    {bw != null && <text className="ppl-branch-warm" y={34} textAnchor="middle" aria-hidden>{bw}% warm</text>}
                   </g>
                 )
               }
@@ -175,7 +190,7 @@ export function TreeView({ branches, collapsed, now, selectedId, onToggle, onOpe
                 const b = branchOf.get(n.branch!)!
                 return (
                   <g key={n.key} transform={`translate(${n.x} ${n.y})`} className="ppl-node ppl-add-node" role="button" aria-label={`Add a person to ${b.label}`} {...handle(n)}>
-                    <g className="ppl-pop" style={style}>
+                    <g className={isFresh(n.key) ? 'ppl-grow' : 'ppl-pop'} style={style}>
                       <circle className="ppl-hit" r={R} />
                       <circle className="ppl-add-circle" r={13} />
                       <path className="ppl-add-plus" d="M-5 0h10M0 -5v10" />
@@ -189,7 +204,7 @@ export function TreeView({ branches, collapsed, now, selectedId, onToggle, onOpe
               return (
                 <g key={n.key} transform={`translate(${n.x} ${n.y})`} className={`ppl-node ppl-person ${selectedId === p.id ? 'is-selected' : ''}`} role="button"
                   aria-label={`${p.name}, ${st.text.replace(' · never logged', '')}`} data-person={p.id} {...handle(n)}>
-                  <g className="ppl-pop" style={style}>
+                  <g className={isFresh(n.key) ? 'ppl-grow' : 'ppl-pop'} style={style}>
                     <title>{`${p.name}, ${st.text.replace(' · never logged', '')}`}</title>
                     <circle className="ppl-glow" r={R + 6} />
                     <circle className="ppl-disc" r={R} />

@@ -2,7 +2,9 @@ import { useState, type FormEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Interaction, type Person } from '../../db'
 import { Field, Modal } from '../../components/ui'
-import { formatDate } from '../../lib/dates'
+import { formatDate, today } from '../../lib/dates'
+import { FriendActions, WarmthRing } from './FriendBits'
+import { contactWords, starterFor } from './starter'
 import { LogPanel, useQuickLog } from './LogPanel'
 import { CADENCES, KINDS, cadenceLabel, deleteInteraction, deletePerson, personStatus } from './people'
 
@@ -93,6 +95,7 @@ export function PersonDetail({ personId, onClose }: { personId: number; onClose:
   const [editing, setEditing] = useState(false)
   const [logging, setLogging] = useState(false)
   const quickLog = useQuickLog()
+  const everyone = useLiveQuery(() => db.people.toArray(), [])
 
   if (person === undefined) return null
   if (editing) return <PersonForm person={person} onClose={() => setEditing(false)} />
@@ -109,13 +112,19 @@ export function PersonDetail({ personId, onClose }: { personId: number; onClose:
 
   return (
     <Modal title={person.name} onClose={onClose}>
-      <div className="small muted" style={{ marginTop: -10, marginBottom: 14 }}>
-        {[person.relation, cadenceLabel(person.cadenceDays), bday && `Birthday ${bday}`].filter(Boolean).join(' · ')}
-        <div className={status.overdue ? 'ppl-status is-due' : 'ppl-status'}>{status.text}</div>
+      <div className="fr-detail-head">
+        <WarmthRing p={person} now={today()} size={56} />
+        <div className="small muted">
+          {[person.relation, cadenceLabel(person.cadenceDays), bday && `Birthday ${bday}`].filter(Boolean).join(' · ')}
+          <div className="fr-when">{contactWords(person, today())}</div>
+          <div className={status.overdue ? 'ppl-status is-due' : 'ppl-status'}>{status.text}</div>
+        </div>
       </div>
-      {person.notes ? <p className="ppl-notes">{person.notes}</p> : <p className="ppl-notes faint">No notes yet.</p>}
+      <p className="fr-starter" data-testid="starter">{starterFor(person, today(), everyone ?? [])}</p>
+      <FriendActions p={person} now={today()} />
+      {person.notes ? <p className="ppl-notes">{person.notes}</p> : <p className="ppl-notes faint">No notes yet. Add what they are into and the conversation starters get sharper.</p>}
 
-      <div className="ppl-section">Log a contact</div>
+      <div className="ppl-section">Quick log</div>
       {logging ? <LogPanel person={person} onDone={() => setLogging(false)} /> : (
         <div className="row">
           <button className="btn" onClick={() => quickLog(person)}>Contacted today</button>
@@ -136,7 +145,7 @@ export function PersonDetail({ personId, onClose }: { personId: number; onClose:
           ))}
         </div>
       ) : (
-        <p className="small faint">No contacts logged yet. Use “Contacted today” above.</p>
+        <p className="small faint">Nothing logged yet. Use “Contacted today” and this is where your story together starts.</p>
       )}
 
       <div className="row-between" style={{ marginTop: 18 }}>

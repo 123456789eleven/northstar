@@ -84,3 +84,13 @@ describe('starters', () => {
     expect(reachLine({ name: 'Ben R', cadenceDays: 14, lastContact: '2026-06-10' }, NOW)).toBe('Ben is up in 9 days. Get ahead of it.')
   })
 })
+
+import { defaultHangoutDate, reconnectLine } from './starter'
+describe('hangout and reconnect copy', () => {
+  it('suggests the next Saturday and a calm comeback line', () => {
+    expect(defaultHangoutDate('2026-06-15')).toBe('2026-06-20')
+    expect(defaultHangoutDate('2026-06-20')).toBe('2026-06-27')
+    expect(reconnectLine({ name: 'Aisha K' }, 74)).toBe('Aisha is back in the game after 74 days. Logged.')
+    expect(reconnectLine({ name: 'Aisha K' }, 200)).toMatch(/200 days/)
+  })
+})
