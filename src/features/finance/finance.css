@@ -113,3 +113,10 @@
 .fin-trow-meta { color: var(--ink-2); }
 .fin-trow-un { color: var(--accent-text); }
 
+
+/* Wealth scoreboard */
+.nhero-high { color: var(--reward); font-weight: 650; letter-spacing: 0.02em; margin-left: 6px; }
+.nhero-changes { display: flex; gap: var(--sp-5); margin: 6px 0 0; flex-wrap: wrap; }
+.nhero-changes dt { font-size: var(--fs-1); color: var(--ink-3); }
+.nhero-changes dd { margin: 0; font-size: var(--fs-3); font-weight: 600; }
+.nhero-side { max-width: 38ch; }

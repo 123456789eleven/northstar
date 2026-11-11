@@ -66,7 +66,7 @@ export default function Budgets({ month }: { month: string }) {
       ) : (
         <Card>
           <Empty>
-            <p style={{ margin: '0 0 12px' }}>No budgets yet. Type a monthly limit next to any category below{copyable.length > 0 ? `, or start from what you actually spent in ${monthLabel(prev)}` : ''}.</p>
+            <p style={{ margin: '0 0 12px' }}>No budgets yet, so no form guide either. Type a monthly limit next to any category below{copyable.length > 0 ? `, or start from what you actually spent in ${monthLabel(prev)}` : ''}.</p>
             {copyable.length > 0 && (
               <button className="btn btn-primary" onClick={copyLastMonth}>
                 Use {monthLabel(prev, true)} spending as budgets

@@ -8,6 +8,7 @@ import { db, logEvent, type BalanceSnapshot } from '../../db'
 import { formatDate, money, today } from '../../lib/dates'
 import { NetWorthHero, NetWorthPath } from './NetWorthHero'
 import { netWorthSeries } from './model'
+import { RecordsStrip } from './WealthPanels'
 
 export default function NetWorth() {
   const snaps = useLiveQuery(() => db.balances.toArray(), [])
@@ -36,7 +37,7 @@ export default function NetWorth() {
     const now = after.at(-1)?.net ?? 0
     if (prevHigh !== null && now > prevHigh) {
       await logEvent({ area: 'finance', kind: 'finance.networth-high', title: `New net worth high: ${money(now)}`, refTable: 'balances', refId: id, milestone: true })
-      setFlash(`New all-time high: ${money(now)}`)
+      setFlash(`New all-time high: ${money(now)}. That is your best net worth yet.`)
       setTimeout(() => setFlash(''), 5000)
     }
   }
@@ -73,6 +74,7 @@ export default function NetWorth() {
           ]}
         />
       )}
+      {current && <RecordsStrip />}
       {flash && <div className="small good">{flash}</div>}
 
       <form className="card fin-add" onSubmit={submit}>
@@ -99,12 +101,12 @@ export default function NetWorth() {
 
       {accounts.length === 0 ? (
         <Card>
-          <Empty>Add each account's current balance above: checking, savings, retirement, and what you owe, like a card or car loan. Update monthly and the path draws itself.</Empty>
+          <Empty>Add each account's balance above: checking, savings, retirement, plus what you owe, like a card or car loan. Update it every so often and the growth path draws itself.</Empty>
         </Card>
       ) : (
         <>
           <ChartFrame
-            title="Net worth path"
+            title="Growth path"
             hasData={series.length >= 2}
             table={
               <table className="table">

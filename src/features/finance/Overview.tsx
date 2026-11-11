@@ -8,7 +8,9 @@ import { useBills } from './billsData'
 import { merchantLabel, UNCATEGORIZED } from './categories'
 import { CategoryBars, TrendChart } from './charts'
 import { BillsCard, BudgetsCard, MonthStrip, CashFlowCard, GoalsCard, InvestmentsCard, NetWorthCard, RecapCard, SubscriptionsCard, type Go } from './OverviewCards'
+import FormGuide from './FormGuide'
 import SafeHero from './SafeHero'
+import { WinsFeed } from './WealthPanels'
 import { safeToSpend } from './safeToSpend'
 import { TREND_LEGEND } from './series'
 import { monthLabel, monthRange, moneyExact, shiftMonth, summarize, topMerchants, useMonthTx } from './model'
@@ -29,10 +31,10 @@ export default function Overview({ month, goTo }: { month: string; goTo: Go }) {
         <SafeHero month={month} safe={null} onBudgets={() => goTo('budgets')} />
         <Card>
           <Empty
-            title="No transactions yet"
+            title="The scoreboard is empty"
             action={<button className="btn btn-primary" onClick={() => goTo('import')}>Import a file</button>}
           >
-            Download recent transactions from your bank (OFX or QFX preferred, CSV works), then import the file here. It stays on this device.
+            Grab recent transactions from your bank (OFX or QFX is best, CSV works too) and drop the file in. It never leaves this device. Your first week of form shows up right after.
           </Empty>
         </Card>
         <NetWorthCard go={goTo} />
@@ -65,7 +67,9 @@ export default function Overview({ month, goTo }: { month: string; goTo: Go }) {
 
   return (
     <div className="stack mn-page">
+      <FormGuide txs={allTx} budgets={budgets} bills={bills} onBudgets={() => goTo('budgets')} />
       <SafeHero month={month} safe={safe} onBudgets={() => goTo('budgets')} />
+      <WinsFeed />
       <MonthStrip month={month} txs={txs} bills={bills} />
 
       {uncategorized > 0 && (
@@ -86,12 +90,12 @@ export default function Overview({ month, goTo }: { month: string; goTo: Go }) {
       <GoalsCard />
       <RecapCard month={month} txs={txs} s={s} prev={prev} />
 
-      <h2 className="mn-section">Spending detail</h2>
+      <h2 className="mn-section">Where it went</h2>
       <div className="fin-ov-grid">
         <div className="fin-ov-col">
           <ChartFrame
             title={`Spending by category, ${monthLabel(month, true)}`}
-            empty="No spending this month yet."
+            empty="Nothing spent yet this month."
             hasData={cats.length > 0}
             table={<MoneyTable head={['Category', 'Spent']} rows={cats.map((c) => [c.category, money(c.amount)])} />}
           >
@@ -109,7 +113,7 @@ export default function Overview({ month, goTo }: { month: string; goTo: Go }) {
                 ))}
               </div>
             ) : (
-              <Empty>No purchases this month.</Empty>
+              <Empty>No purchases yet this month. Quiet is fine.</Empty>
             )}
           </Card>
         </div>

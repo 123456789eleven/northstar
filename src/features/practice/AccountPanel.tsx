@@ -85,8 +85,8 @@ export default function AccountPanel({ onJournal }: { onJournal: (tradeId: numbe
       </Card>
 
       {empty && (
-        <Empty title="Place your first paper trade">
-          You start with {money(startCash)} of simulated cash. Pick a symbol on the ticket, buy a small amount and write down why in the journal. Nothing here touches real money.
+        <Empty title="Take your first practice trade">
+          You start with {money(startCash)} of simulated cash. Pick a symbol on the ticket, buy a small amount and jot down why in the journal. It is all simulated, so nothing touches real money.
         </Empty>
       )}
 
@@ -128,7 +128,7 @@ export default function AccountPanel({ onJournal }: { onJournal: (tradeId: numbe
           {symbols.map((s) => <option key={s}>{s}</option>)}
         </select>
       ) : undefined}>
-        {history.length === 0 ? <p className="muted">No trades yet.</p> : (
+        {history.length === 0 ? <p className="muted">No trades yet. Your first one lands here.</p> : (
           <ul className="pr-list">
             {history.slice(0, shown).map((t) => {
               const id = t.id as number

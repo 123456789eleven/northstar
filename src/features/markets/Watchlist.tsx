@@ -106,7 +106,7 @@ export default function Watchlist({ d, selected, onSelect }: { d: MarketsData; s
       {triggered > 0 && <p className="mkt-alertline" role="status">{triggered} {triggered === 1 ? 'alert level' : 'alert levels'} crossed. Marked in the list.</p>}
       {d.rows.length === 0 ? (
         <div className="mkt-empty">
-          <p><b>Nothing on the watchlist yet.</b> Type a symbol above to follow it.</p>
+          <p><b>Your watchlist is empty.</b> Type a symbol above to start following one.</p>
           <div className="row mkt-common">
             <span className="muted">Common symbols</span>
             {COMMON_SYMBOLS.map((s) => <button key={s} className="btn btn-sm" onClick={() => void addSymbol(s, 0)}>Add {s}</button>)}

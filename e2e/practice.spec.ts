@@ -5,7 +5,7 @@ test('Practice: paper trade end to end and a journal entry', async ({ page }) =>
   await page.goto('/#/finance')
   await page.getByRole('tab', { name: 'Academy' }).click()
   await expect(page.getByText(/Paper account: simulated money/).first()).toBeVisible()
-  await expect(page.getByText('Place your first paper trade')).toBeVisible()
+  await expect(page.getByText('Take your first practice trade')).toBeVisible()
 
   const ticket = page.locator('form.pr-form')
   await ticket.getByLabel('Symbol').fill('vti')

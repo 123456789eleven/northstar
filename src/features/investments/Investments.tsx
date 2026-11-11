@@ -5,6 +5,7 @@ import ChartFrame from '../../components/ChartFrame'
 import { ACTIVE_DOT, CHART, GRID_PROPS, MARGIN, X_AXIS, Y_AXIS, tooltipProps } from '../../components/chartTheme'
 import { ChartTip } from '../../components/ChartTip'
 import { NetWorthHero, NetWorthPath } from '../finance/NetWorthHero'
+import { SavingsEngine } from '../finance/WealthPanels'
 import StatusChip from '../../components/StatusChip'
 import { Card, Empty, PageSkeleton, Progress } from '../../components/ui'
 import { db, setSetting, type BalanceSnapshot, type Contribution, type Holding } from '../../db'
@@ -58,9 +59,10 @@ export default function Investments() {
           <NetWorthPath data={path} name="Invested" />
         </ChartFrame>
       )}
+      <SavingsEngine />
       {holdings.length === 0 && (
         <Card title="Add your first holding">
-          <Empty>Add your VTI holding: type your balance and today's price. Prices are typed by hand; nothing is looked up online.</Empty>
+          <Empty>Start with VTI: type your balance and today's price. Prices are typed by hand here, nothing is looked up online.</Empty>
         </Card>
       )}
       <HoldingSetup assetNames={assetNames} latest={latest} />
@@ -213,7 +215,7 @@ function AccountCard({ account, holdings, latest, snaps, contribs, limit }: { ac
   const total = holdings.reduce((s, h) => s + (holdingValue(h) ?? 0), 0)
   return (
     <Card title={account} action={<span className="mono">{money(holdings.length ? total : latest?.balance ?? 0)}</span>}>
-      {holdings.length === 0 && <Empty>No holding yet. Use "Add a holding" above and pick this account.</Empty>}
+      {holdings.length === 0 && <Empty>No holding in this account yet. Use "Add a holding" above and pick it.</Empty>}
       {holdings.map((h) => <HoldingRow key={h.id} h={h} latestBal={latest} account={account} />)}
       <Tracker account={account} contribs={contribs} limit={limit} />
       <Growth account={account} snaps={snaps} contribs={contribs} />
@@ -247,7 +249,7 @@ function Tracker({ account, contribs, limit }: { account: string; contribs: Cont
       </div>
       <Progress value={limit > 0 ? Math.min(100, (ytd / limit) * 100) : 0} label={`${year} contributions toward limit`} />
       <div className="small muted">
-        {room === 0 ? 'Limit reached for this year.' : `${money(room)} room left. To max by Dec 31: ${money(perMonth)} per month.`}
+        {room === 0 ? 'You have maxed it out for this year.' : `${money(room)} room left. To max by Dec 31: ${money(perMonth)} per month.`}
       </div>
       <form className="inv-form" onSubmit={add}>
         <input className="input" type="date" value={date} onChange={(e) => setDate(e.target.value)} aria-label="Date" />
@@ -258,7 +260,7 @@ function Tracker({ account, contribs, limit }: { account: string; contribs: Cont
         </select>
         <button className="btn btn-primary" disabled={!okNum(amt)}>Add</button>
       </form>
-      {rows.length === 0 && <div className="inv-note">No contributions logged yet. Add this year's deposits, or import them from transactions below.</div>}
+      {rows.length === 0 && <div className="inv-note">No contributions logged yet. Add this year's deposits, or pull them in from your transactions below.</div>}
       {rows.slice(0, 8).map((c) => (
         <div key={c.id} className="inv-row">
           <span className="small">{formatDate(c.date, { month: 'short', day: 'numeric', year: 'numeric' })} · {c.kind === 'withdrawal' ? 'Withdrawal' : 'Contribution'}</span>

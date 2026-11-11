@@ -32,7 +32,7 @@ export function NetWorthCard({ go }: { go: Go }) {
   return (
     <Card title="Net worth" action={<button className="btn btn-ghost btn-sm" onClick={() => go('networth')}>{now ? 'Update balances' : 'Add balances'}</button>}>
       {!now ? (
-        <Empty>Add what you own and owe, one balance per account. Update once a month and the path draws itself.</Empty>
+        <Empty>Add what you own and what you owe, one balance per account. Update it now and then and your growth path draws itself.</Empty>
       ) : (
         <>
           <div className="mn-row">
@@ -86,7 +86,7 @@ export function BudgetsCard({ month, budgets, spent, go }: { month: string; budg
   return (
     <Card title="Budgets" action={<button className="btn btn-ghost btn-sm" onClick={() => go('budgets')}>{rows.length ? 'All budgets' : 'Set budgets'}</button>}>
       {rows.length === 0 ? (
-        <Empty>Give a few categories a monthly limit. Each gets a ring that fills as you spend.</Empty>
+        <Empty>Pick a few categories and give each a monthly limit. Each one gets a ring that fills as you spend.</Empty>
       ) : (
         <ul className="mn-rings">
           {rows.map((r) => (
@@ -121,7 +121,7 @@ export function BillsCard({ month, bills, go }: { month: string; bills: Bill[]; 
   return (
     <Card title="Bills coming up" action={<button className="btn btn-ghost btn-sm" onClick={() => go('budgets')}>{bills.length ? 'Manage bills' : 'Add a bill'}</button>}>
       {bills.length === 0 ? (
-        <Empty>Add insurance, tuition or any bill that is not monthly. Northstar spreads it across the months and shows when it lands.</Empty>
+        <Empty>Add insurance, tuition or any bill that is not monthly. It gets spread across the months so nothing lands as a surprise.</Empty>
       ) : (
         <div className="mn-bills">
           <div>
@@ -189,7 +189,7 @@ export function SubscriptionsCard({ allTx }: { allTx: Transaction[] }) {
   return (
     <Card title="Subscriptions" action={subscriptions.length > 0 ? <span className="mn-sub mn-num">{moneyExact(monthlyTotal(subscriptions))} a month</span> : undefined}>
       {subscriptions.length === 0 ? (
-        <Empty>No repeating discretionary charges found. A merchant shows up once it has billed you at a steady interval.</Empty>
+        <Empty>No repeating charges spotted yet. A merchant lands here once it has billed you on a steady schedule.</Empty>
       ) : (
         <>
           <RecRows rows={shown} />
@@ -249,7 +249,7 @@ export function InvestmentsCard({ go }: { go: Go }) {
   return (
     <Card title="Investments" action={<button className="btn btn-ghost btn-sm" onClick={() => go('investments')}>{empty ? 'Set up' : 'Open'}</button>}>
       {empty ? (
-        <Empty>Add a holding such as VTI with its shares and price, and log Roth contributions to track the yearly limit.</Empty>
+        <Empty>Add a holding such as VTI with its shares and price, then log Roth contributions to see how close you are to the yearly limit.</Empty>
       ) : (
         <div className="mn-stack">
           {d.holdings.length > 0 && (
@@ -306,7 +306,7 @@ export function GoalsCard() {
   return (
     <Card title="Money goals" action={<Link className="btn btn-ghost btn-sm" to="/goals">Goals</Link>}>
       {goals.length === 0 ? (
-        <Empty>No money goals yet. An emergency fund or a net worth target works well; link it to your balances in Goals.</Empty>
+        <Empty>No money goals yet. An emergency fund or a net worth target makes a good first one; link it to your balances in Goals.</Empty>
       ) : (
         <ul className="mn-list">
           {goals.slice(0, 5).map((g) => {

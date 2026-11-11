@@ -88,7 +88,7 @@ function Hero({ d, now }: { d: MarketsData; now: number }) {
           </div>
         </div>
       ) : (
-        <p className="muted mkt-hero-empty">No holdings yet. Add shares under Investments and the value and day change show here.</p>
+        <p className="muted mkt-hero-empty">No holdings on the board yet. Add shares under Wealth, then Investments, and your value and day change show up here.</p>
       )}
     </section>
   )

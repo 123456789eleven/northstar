@@ -117,7 +117,7 @@ export default function JournalPanel({ seed, clearSeed }: { seed: DraftSeed; cle
     <div className="pr-stack">
       <Card title="Review" sub="From your paper trades that closed with a sale, and your journal.">
         {stats.count === 0 && streak.reviewedDays === 0 ? (
-          <p className="muted">Nothing to review yet. Review appears after you sell a paper position and mark entries as followed or not.</p>
+          <p className="muted">Nothing to review yet. Once you close a paper position and mark entries as followed or not, your review builds here.</p>
         ) : (
           <dl className="pr-review">
             <div><dt>Win rate</dt><dd>{stats.winRate === null ? 'None yet' : `${Math.round(stats.winRate * 100)}%`}<small>{stats.wins} won, {stats.losses} lost</small></dd></div>
@@ -132,7 +132,7 @@ export default function JournalPanel({ seed, clearSeed }: { seed: DraftSeed; cle
 
       <Card title="Entries" sub={`${entries.length} saved. Private to this device.`} action={<button className="btn btn-primary btn-sm" onClick={() => setEdit({ draft: blankDraft(today()) })}>New entry</button>}>
         {entries.length === 0 ? (
-          <Empty title="Write the first entry">Record the thesis before you trade: why, the entry, the stop, the target. Add the outcome and lesson afterwards. You can also start from a trade in the Account tab.</Empty>
+          <Empty title="Start your journal">Record the thesis before you trade: why, the entry, the stop, the target. Add the outcome and lesson afterwards. You can also start from a trade in the Account tab.</Empty>
         ) : (
           <>
             <div className="pr-filters">

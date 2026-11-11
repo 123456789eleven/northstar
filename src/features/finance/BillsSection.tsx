@@ -33,13 +33,13 @@ export default function BillsSection({ bills }: { bills: Bill[] }) {
     const before = await readBills()
     await saveBills(before.filter((x) => x.id !== b.id))
     setEditing(null)
-    toast({ message: `Deleted bill "${b.name}"`, undo: () => saveBills(before) })
+    toast({ message: `Removed the ${b.name} bill`, undo: () => saveBills(before) })
   }
   const fromSuggestion = (s: BillSuggestion): Bill => ({ id: crypto.randomUUID(), name: s.name, amount: s.amount, everyMonths: s.everyMonths, lastPaid: s.lastPaid, category: s.category, matchText: s.matchText })
   async function addReminder(b: Bill) {
     const due = addDays(nextDue(b), -7)
     const id = await db.tasks.add({ title: `Pay ${b.name}`, notes: `${moneyExact(b.amount)} due ${formatDate(nextDue(b))}`, due, priority: 2, status: 'open', recurrence: 'none', createdAt: nowISO() })
-    toast({ message: `Reminder added for ${formatDate(due)}`, undo: async () => { await db.tasks.delete(id) } })
+    toast({ message: `Reminder set for ${formatDate(due)}`, undo: async () => { await db.tasks.delete(id) } })
   }
 
   return (
@@ -52,7 +52,7 @@ export default function BillsSection({ bills }: { bills: Bill[] }) {
       }
     >
       {bills.length === 0 ? (
-        <Empty>A bill is a payment that is not monthly, like car insurance every 6 months or an annual subscription; its monthly share is set aside in your budget instead of landing as one big overspend.</Empty>
+        <Empty>A bill here is a payment that is not monthly, like car insurance every 6 months or a yearly subscription. Its monthly share is set aside, so it never shows up as one big overspend.</Empty>
       ) : (
         <>
           <div className="list">

@@ -108,7 +108,7 @@ export default function Finance() {
     <div className="mn-scope">
       <PageHeader
         title="Money"
-        sub="What is safe to spend, what is coming, and whether net worth is growing. Data stays on this device."
+        sub="Your form this week, what is safe to spend, and how fast net worth is growing. Everything stays on this device."
         actions={
           showMonth && (
             <div className="row fin-month" role="group" aria-label="Month">

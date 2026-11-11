@@ -31,7 +31,7 @@ export default function PortfolioView({ d, onSelect }: { d: MarketsData; onSelec
   const [newT, setNewT] = useState('')
   if (d.loading) return <Skeleton />
   if (!p.positions.length) {
-    return <div className="mkt-empty"><p><b>No holdings yet.</b> Add shares under Investments. Value, day P/L and weights appear here, using live prices when a key is saved.</p></div>
+    return <div className="mkt-empty"><p><b>No holdings yet.</b> Add shares under Investments and your value, day gain or loss and weights show up here, with live prices once a key is saved.</p></div>
   }
   const alloc = allocation(p.positions)
   const drift = weightDrift(p.positions, d.targets)
