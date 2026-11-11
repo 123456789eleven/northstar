@@ -10,7 +10,7 @@ import BulkHost from '../features/bulk/BulkHost'
 import { SetupHost } from '../features/onboarding/SetupWizard'
 import BottomSheet from './BottomSheet'
 import { Icon, type IconName } from './Icons'
-import { breadcrumb, districtForPath } from './districts'
+import { districtForPath } from './districts'
 import { useMedia, PHONE_QUERY } from './useMedia'
 import { PlayerStrip } from '../features/game/ui/Mission'
 import './shell.css'
@@ -99,19 +99,10 @@ export function SyncChip({ dotOnly = false }: { dotOnly?: boolean }) {
   )
 }
 
-/** Top-bar context: district, then the tab inside it ("Money" / "Markets"). Home reads "Northstar". */
-function useRouteContext() {
-  const { pathname, search } = useLocation()
-  if (districtForPath(pathname) === 'home') return { label: 'Northstar', group: '' }
-  const [d, ...rest] = breadcrumb(pathname, search)
-  return rest.length ? { group: d, label: rest[rest.length - 1] } : { group: '', label: d }
-}
-
 const dateLabel = () => parseISODate(today()).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
 
 export function TopBar() {
   const phone = useMedia(PHONE_QUERY)
-  const ctx = useRouteContext()
   const { search, pathname } = useLocation()
   const you = districtForPath(pathname) === 'you'
   const navigate = useNavigate()
@@ -131,11 +122,8 @@ export function TopBar() {
   }, [phone])
   return (
     <header className="topbar">
-      <div className="topbar-ctx">
-        {!phone && <Mark />}
-        {ctx.group && <span className="topbar-group">{ctx.group}</span>}
-        <span className="topbar-title">{ctx.label}</span>
-      </div>
+      {/* Where you are lives in the district frame and the strip; the bar is the brand and the tools. */}
+      <Link to="/" className="topbar-ctx topbar-brand" aria-label="Northstar, open Home"><Mark /><span className="topbar-title">Northstar</span></Link>
       {!phone && <div className="topbar-capture"><QuickCapture /></div>}
       <div className="topbar-right">
         {phone && <PlayerStrip />}
@@ -143,6 +131,7 @@ export function TopBar() {
         <SyncChip dotOnly={phone} />
         {!phone && <span className="topbar-date mono">{dateLabel()}</span>}
         <Link to="/you" className={`icon-btn topbar-you${you ? ' is-active' : ''}`} aria-label="You" aria-current={you ? 'true' : undefined}><Icon name="user" size={18} /></Link>
+        {phone && <CaptureOrb />}
       </div>
       <PaletteHost />
       <BulkHost />
@@ -188,7 +177,7 @@ export function CaptureHost() {
   return open ? <CaptureSheet onClose={() => setOpen(false)} /> : null
 }
 
-/** Phone capture orb: floats bottom-right above the district strip (lifted above pages that pin an add line). */
+/** Phone capture orb: in the top bar's thumb-free corner, so it never sits over list content or the pinned add lines. */
 export function CaptureOrb() {
   return (
     <button type="button" className="capture-orb" aria-label="Capture" aria-haspopup="dialog" onClick={() => window.dispatchEvent(new Event(OPEN_CAPTURE_SHEET))}>

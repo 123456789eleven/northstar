@@ -41,18 +41,22 @@
 .topbar-you.is-active { color: var(--accent-text); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent-line); }
 .topbar-ctx .brand-tile { align-self: center; margin-right: 2px; }
 
-/* ---- phone capture orb: bottom right, above the strip; lifted above pages that pin an add line ---- */
+/* ---- top bar: brand link; phone capture orb (in the bar, so it never covers list content or pinned add lines) ---- */
+.topbar-brand { display: inline-flex; align-items: center; gap: 10px; min-height: 40px; text-decoration: none; color: var(--ink); border-radius: var(--radius-sm); }
+.topbar-brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .capture-orb {
-  position: fixed; right: 14px; bottom: calc(80px + env(safe-area-inset-bottom)); z-index: 21; width: 52px; height: 52px; border-radius: 50%; border: 0;
-  display: grid; place-items: center; cursor: pointer; background: var(--grad-violet); color: var(--accent-ink);
-  box-shadow: var(--inner-light), var(--elev-2); transition: transform var(--t-snappy) var(--spring-snappy);
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer;
+  background: var(--grad-violet); color: var(--accent-ink); box-shadow: var(--inner-light), var(--elev-1);
+  transition: transform var(--t-snappy) var(--spring-snappy);
 }
 .capture-orb:active { transform: scale(0.92); }
 .capture-orb:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.shell:has(.quick-add-sticky, .food-quickdock, .wstep-dock) .capture-orb { bottom: calc(146px + env(safe-area-inset-bottom)); }
-.shell.is-home .capture-orb { bottom: calc(300px + env(safe-area-inset-bottom)); }
+
+/* toasts sit above the strip, never under or on it */
+.toast-host:not(.update-host) { bottom: calc(100px + env(safe-area-inset-bottom)); }
 
 @media (max-width: 819px) {
+  .toast-host:not(.update-host) { bottom: calc(80px + env(safe-area-inset-bottom)); }
   .main { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
 }
 
@@ -65,11 +69,14 @@
 /* ---- district frame: head (mini-map, name in the district hue, breadcrumb), sub-tabs, page ---- */
 .city-head { display: flex; align-items: center; gap: 16px; margin: 0 0 var(--sp-4); min-width: 0; }
 .city-head-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.city-head-name { display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-1); font-weight: 650; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
 .city-head-mark { width: 8px; height: 8px; border-radius: 2px; transform: rotate(45deg); background: var(--d-hue, var(--accent)); box-shadow: 0 0 10px -1px var(--d-hue, var(--accent)); }
 .city-crumb ol { display: flex; align-items: center; gap: 0; margin: 0; padding: 0; list-style: none; font-size: var(--fs-2); color: var(--ink-2); min-width: 0; }
 .city-crumb li { display: inline-flex; align-items: center; min-width: 0; white-space: nowrap; }
 .city-crumb li + li::before { content: '/'; margin: 0 8px; color: var(--ink-3); }
+.city-crumb-home { gap: 8px; }
+.city-crumb-home a { font-size: var(--fs-1); font-weight: 650; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+.city-head-line { margin: 0; font-size: var(--fs-2); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.city-head-line.is-warn { color: var(--warn); }
 .city-crumb a { color: var(--ink-2); text-decoration: none; display: inline-flex; align-items: center; min-height: 32px; }
 .city-crumb a:hover { color: var(--ink); }
 .city-crumb [aria-current='page'] { color: var(--accent-text); font-weight: 550; overflow: hidden; text-overflow: ellipsis; }
@@ -82,7 +89,7 @@
 @media (prefers-reduced-motion: reduce) { .df > .route-view { animation: none; } }
 @media (max-width: 819px) {
   .city-head { gap: 10px; margin-bottom: var(--sp-3); }
-  .city-head-text { flex-direction: row; align-items: center; gap: 10px; }
-  .city-head:has(.city-crumb) .city-head-name { display: none; }
+  .city-head-text { gap: 0; }
+  .city-head-line { font-size: var(--fs-1); }
 }
 @media print { .city-head { display: none !important; } }

@@ -3,7 +3,7 @@ import { flushSync } from 'react-dom'
 import { HashRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { prefersReducedMotion } from './components/motion'
 import { routeTitle } from './components/nav'
-import { CaptureHost, CaptureOrb, TopBar } from './components/Shell'
+import { CaptureHost, TopBar } from './components/Shell'
 import DistrictStrip from './components/DistrictStrip'
 import { districtForPath } from './components/districts'
 import { useMedia, PHONE_QUERY } from './components/useMedia'
@@ -126,7 +126,6 @@ function Shell() {
         </main>
         </div>
         <DistrictStrip phone={phone} />
-        {phone && <CaptureOrb />}
         <CaptureHost />
         <Suspense fallback={null}><MomentHost /></Suspense>
         <UpdatePrompt />
