@@ -51,7 +51,7 @@ export default function Habits() {
     <>
       <PageHeader
         title="Habits"
-        sub={habits === undefined ? ' ' : active.length ? `${doneToday} of ${active.length} done today` : 'No habits yet'}
+        sub={habits === undefined ? ' ' : active.length ? `${doneToday} of ${active.length} checked in today` : 'Start with one'}
         actions={<button className="btn btn-primary" onClick={() => setEditing('new')}>New habit</button>}
       />
       {habits !== undefined && logs !== undefined && active.length > 0 && <HabitHero habits={active} byHabit={byHabit} today={d} />}
@@ -68,7 +68,7 @@ export default function Habits() {
             title="No habits yet"
             action={<button className="btn btn-primary" onClick={() => setEditing('new')}>New habit</button>}
           >
-            Pick one you can finish in two minutes, like a 10-minute walk. Check it off here or on Today.
+            Pick one small enough to do on your worst day, like a 10-minute walk. Check it off here or on Today and the form guide starts filling in.
           </Empty>
         </Card>
       )}

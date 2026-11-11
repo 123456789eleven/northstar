@@ -16,7 +16,7 @@ export function nextStepAfterGoal(goal: Goal, all: Goal[]): NextStep {
   const siblings = open.filter((g) => (parent ? g.parentId === parent.id : g.parentId == null && g.horizon === goal.horizon)).sort(byTarget)
   if (siblings.length) return { kind: 'sibling', text: `Next: ${siblings[0].title}` }
   if (parent) return { kind: 'add-child', text: `Nothing else open under ${parent.title}.`, parent }
-  return { kind: 'none', text: goal.horizon === 'life' ? 'Set the next direction when you are ready.' : 'Logged under Milestones.' }
+  return { kind: 'none', text: goal.horizon === 'life' ? 'Set the next direction when you are ready.' : 'Logged under Milestones, with today’s date.' }
 }
 
 /** After a milestone is checked: progress so far and the next open milestone, or the cue to finish the goal. */
@@ -24,8 +24,8 @@ export function nextStepAfterMilestone(goal: Goal, msId: string): { text: string
   const ms = goal.milestones.map((m) => (m.id === msId ? { ...m, done: true } : m))
   const done = ms.filter((m) => m.done).length
   const next = ms.find((m) => !m.done)
-  if (!next) return { text: `All ${ms.length} milestones done for ${goal.title}.`, allDone: true }
-  return { text: `${done} of ${ms.length} milestones. Next: ${next.title}`, allDone: false }
+  if (!next) return { text: `All ${ms.length} milestones done for ${goal.title}. Ready to call it?`, allDone: true }
+  return { text: `${done} of ${ms.length} milestones, ${ms.length - done} to go. Next: ${next.title}`, allDone: false }
 }
 
 export const childLabel = (parent: Goal) => {

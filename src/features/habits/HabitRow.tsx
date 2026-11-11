@@ -12,6 +12,7 @@ import { HeatStrip } from './HabitParts'
 import { perWeekLabel, weekCountText } from './stats'
 import { useHabitCheckIn } from './useHabitCheckIn'
 import { monthGrid, weekRing, type WeekRing } from './week'
+import { formGuide, formSummary } from './formGuide'
 
 const DOW = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
@@ -76,7 +77,19 @@ export function HabitCard({ habit, dates, today, goalTitle, onOpen }: { habit: H
           <span>{wt.caption}</span>
         </div>
       </div>
+      <FormGuide dates={dates} today={today} perWeek={habit.perWeek} />
     </section>
+  )
+}
+
+/** Last 8 weeks as small marks: filled = hit the weekly target, half = some days, hollow = none. */
+function FormGuide({ dates, today, perWeek }: { dates: Set<ISODate>; today: ISODate; perWeek: number }) {
+  const g = formGuide(dates, today, perWeek)
+  return (
+    <div className="form-guide" data-testid="form-guide" role="img" aria-label={`Form guide, last 8 weeks: ${formSummary(g)}`}>
+      <span className="form-guide-label" aria-hidden>Form</span>
+      {g.map((w) => <span key={w.start} className={`form-mark is-${w.mark} ${w.current ? 'is-current' : ''}`} title={`Week of ${formatDate(w.start, { month: 'short', day: 'numeric' })}: ${w.done} of ${w.target}`} />)}
+    </div>
   )
 }
 

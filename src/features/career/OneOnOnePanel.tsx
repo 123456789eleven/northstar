@@ -21,7 +21,7 @@ export function OneOnOnePanel() {
     const undo = await saveOneOnOne(date, d)
     if (!undo) return
     setD(BLANK)
-    toast({ message: '1:1 saved to your journal', undo })
+    toast({ message: '1:1 saved to your journal.', undo })
   }
   const makeTask = async (key: string, text: string) => {
     const undo = await makeTaskFromCommitment(key, text)
@@ -52,7 +52,7 @@ export function OneOnOnePanel() {
 
       <Card title="Past 1:1s">
         {!notes?.length ? (
-          <Empty title="No 1:1 notes yet">Write down what you each committed to after your next 1:1.</Empty>
+          <Empty title="No 1:1 notes yet">Write down what you each committed to after your next 1:1. It takes two minutes and settles every later argument.</Empty>
         ) : (
           <ul className="car-list">
             {notes.map((n, i) => {

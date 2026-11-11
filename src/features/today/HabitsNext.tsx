@@ -58,7 +58,7 @@ export function NextUp() {
   return (
     <Card title="Next up" action={<Link className="card-link" to="/planner">Planner</Link>}>
       {next.length === 0 ? (
-        <div className="tile-empty">Nothing on the calendar today or tomorrow.</div>
+        <div className="tile-empty">Nothing on the calendar today or tomorrow. Room to breathe.</div>
       ) : (
         next.map((e) => (
           <Link key={e.id} to="/planner" className="qgoal">

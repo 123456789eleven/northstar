@@ -13,7 +13,7 @@ export function useHabitCheckIn() {
     if (m) {
       const unit = (n: number) => `${n} ${m.unit}${n === 1 ? '' : 's'}`
       toast({
-        message: `Milestone: ${unit(m.count)} of ${habit.name}. Logged under Milestones.${m.next ? ` Next at ${unit(m.next)}.` : ''}`,
+        message: `Milestone: ${unit(m.count)} of ${habit.name}. That one is on your Milestones.${m.next ? ` Next stop: ${unit(m.next)}.` : ''}`,
         undo: () => undoCheckIn(habit, date, m),
       })
     }

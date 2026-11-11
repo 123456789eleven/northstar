@@ -17,7 +17,7 @@ export function QuickWin() {
     if (!r) return
     setText('')
     setTags([])
-    toast({ message: 'Win logged', undo: r.undo })
+    toast({ message: 'Win logged. It will be there at review time.', undo: r.undo })
   }
   const flip = (t: WinTag) => setTags((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t]))
 
@@ -48,7 +48,7 @@ export function QuickWin() {
 
 export function WinsList({ wins }: { wins: Win[] }) {
   const toast = useToast()
-  if (!wins.length) return <Empty title="No wins yet">Log your first win in one line. Small ones count.</Empty>
+  if (!wins.length) return <Empty title="No wins yet">Log your first win in one line. Small ones count, and they are the raw material for your next review.</Empty>
   const remove = async (w: Win) => {
     const undo = await removeWin(w.id)
     if (undo) toast({ message: 'Win removed', undo })

@@ -85,10 +85,10 @@ export default function YouHub() {
         <BackupStatus />
       </div>
       <div className="hub-grid sp-links">
-        <HubCard to="/history" icon="history" title="Milestones" sub="Your logbook of what you finished" stat={milestones} />
+        <HubCard to="/history" icon="history" title="Milestones" sub="The logbook of everything you finished" stat={milestones} />
         <HubCard to="/review" icon="review" title="Season" sub={`${season.name} · weekly recaps`} stat={reviews} />
-        <HubCard to="/ops" icon="command" title="Intel" sub="Suggestions and briefings from your data" />
-        <HubCard to="/interview?full=1" icon="user" title="Interview" sub="The full set of questions, any time" />
+        <HubCard to="/ops" icon="command" title="Intel" sub="What your own data suggests next" />
+        <HubCard to="/interview?full=1" icon="user" title="Interview" sub="The long list of questions, whenever you feel like it" />
         <HubCard to="/settings" icon="settings" title="Settings" sub="Progress, sync, backup and preferences" />
         <HubCard to="/data" icon="data" title="Data" sub="Import, export and what is stored here" />
         <HubCard to="/ontology" icon="ontology" title="Ontology" sub="Every object type and how they link" />

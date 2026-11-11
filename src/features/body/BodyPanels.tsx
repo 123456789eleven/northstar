@@ -28,7 +28,7 @@ export function GoalPanel({ s, firstWeight }: { s: BodySettings; firstWeight?: n
     await saveBodySetting('height', numOrUndef(height))
     const d = numOrUndef(days)
     await saveBodySetting('trainDays', d ? Math.min(7, Math.round(d)) : undefined)
-    toast({ message: 'Goal saved' })
+    toast({ message: 'Body goal saved. The pace line now has something to aim at.' })
   }
   return (
     <Card title="Set goal">

@@ -59,7 +59,7 @@ export default function DataHub() {
     const [tx, cal, ppl, tasks, meals, events] = await Promise.all([db.transactions.count(), db.calendar.count(), db.people.count(), db.tasks.count(), db.meals.count(), db.events.count()])
     return { fin: fin ?? [], dat: dat ?? [], optin: optin === true, sync, gcal, tx, cal, ppl, tasks, meals, events }
   }, [])
-  if (!data) return <><PageHeader title="Data" sub="Every way data gets into Northstar, and where it goes." /><PageSkeleton rows={8} /></>
+  if (!data) return <><PageHeader title="Data" sub="Every way data gets in, and where it goes. Nothing leaves unless you send it." /><PageSkeleton rows={8} /></>
   const { fin, dat, optin, sync, gcal } = data
   const lastOf = (kind: DataImportRecord['kind']) => dat.find((r) => r.kind === kind)
   const sumOf = (kind: DataImportRecord['kind']) => dat.filter((r) => r.kind === kind).reduce((n, r) => n + r.added, 0)

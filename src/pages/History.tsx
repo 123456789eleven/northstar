@@ -28,7 +28,7 @@ export default function History() {
       <PageHeader
         title="Milestones"
         icon="history"
-        sub="What you finished, dated, and everything else you did."
+        sub="What you finished, dated, plus everything else you got up to."
         actions={<button className="btn btn-primary" onClick={() => setAdding(true)}>Add entry</button>}
       />
 

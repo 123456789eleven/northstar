@@ -59,7 +59,7 @@ export default function Today() {
       goalTitle={t.goalId != null ? goalTitle.get(t.goalId) : undefined}
       onEdit={setEditing}
       onPinFull={() => {
-        setNote(`Focus holds ${MAX_FOCUS}. Unpin one first.`)
+        setNote(`Focus holds ${MAX_FOCUS}, and that's the point. Unpin one to make room.`)
         window.setTimeout(() => setNote(''), 3500)
       }}
     />
@@ -85,7 +85,7 @@ export default function Today() {
     ) : (
       goals !== undefined && (
         <div className="tile-empty">
-          No quarter goals yet. <Link to="/goals">Set one on Goals</Link>: what would make this quarter a win?
+          No quarter goal yet. <Link to="/goals">Set one on Goals</Link>: what would make this quarter worth it?
         </div>
       )
     )}
@@ -98,7 +98,7 @@ export default function Today() {
     <>
       <PageHeader
         title={formatDate(d, { weekday: 'long', month: 'long', day: 'numeric' })}
-        sub={loaded ? `${v.openCount} open${v.overdueCount ? ` · ${v.overdueCount} overdue` : ' · none overdue'}${nextEv ? ` · Next: ${nextEv}` : ''}` : ' '}
+        sub={loaded ? `${v.openCount} open${v.overdueCount ? ` · ${v.overdueCount} overdue` : ' · nothing late'}${nextEv ? ` · Next: ${nextEv}` : ''}` : ' '}
       />
 
       <FirstRunCard />
@@ -138,7 +138,7 @@ export default function Today() {
                 title="Nothing due today"
                 action={<button className="btn btn-sm" onClick={() => window.dispatchEvent(new Event('ns:capture'))}>Add a task</button>}
               >
-                Type one into the capture line, e.g. "call dentist tmr !1". Press / to jump there.
+                The day is yours. Type one into the capture line, like "call dentist tmr !1", or press / to jump there.
               </Empty>
             )}
             {note && <div className="focus-note">{note}</div>}

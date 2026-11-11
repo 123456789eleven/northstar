@@ -39,7 +39,7 @@ export default function TemplatesModal({ onClose }: { onClose: () => void }) {
   return (
     <Modal title="Meal templates" onClose={onClose}>
       {all.length === 0 ? (
-        <Empty>No templates yet. Use “Save as template” on a meal slot that has several items.</Empty>
+        <Empty>No templates yet. Use “Save as template” on a slot with several items and the usual breakfast becomes one tap.</Empty>
       ) : (
         <div className="stack">
           {all.map((t) => (

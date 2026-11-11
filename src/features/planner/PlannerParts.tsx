@@ -88,7 +88,7 @@ export function PlanPanel({ tasks, date, label }: { tasks: Task[]; date: ISODate
   return (
     <Card title="Plan my day">
       {list.length === 0 ? (
-        <Empty>Nothing to place. High-priority tasks without a due date show up here, ready to drop into {label}.</Empty>
+        <Empty>Nothing waiting for a slot. High-priority tasks without a due date appear here, ready to drop into {label}.</Empty>
       ) : (
         <>
           <div className="pl-note" style={{ marginBottom: 6 }}>Tap to schedule for {label}.</div>

@@ -30,7 +30,7 @@ export default function TrainingPanel({ habits, target }: { habits: Habit[]; tar
     const r = await checkIn(h, today())
     if (!r.checked) { toast({ message: 'Workout removed for today' }); return }
     const hh = h
-    toast({ message: 'Workout logged', undo: () => undoCheckIn(hh, today(), r.milestone) })
+    toast({ message: 'Workout logged. That counts toward this week.', undo: () => undoCheckIn(hh, today(), r.milestone) })
   }
 
   return (

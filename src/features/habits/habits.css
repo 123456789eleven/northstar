@@ -49,3 +49,11 @@
 .habit-tile-row .hb-check + .name { cursor: default; }
 .habit-foot { margin-top: -4px; }
 .habit-streak strong.is-met { color: var(--accent-text); }
+
+/* Form guide: 8 weekly marks. Filled powder blue = target met, half = some days, outline = none. */
+.form-guide { display: flex; align-items: center; gap: 6px; margin-top: var(--sp-3); }
+.form-guide-label { font-size: 12px; color: var(--ink-3); margin-right: 4px; }
+.form-mark { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--ink-3); box-sizing: border-box; background: transparent; }
+.form-mark.is-met { background: var(--accent); border-color: var(--accent); }
+.form-mark.is-part { background: linear-gradient(90deg, var(--accent) 50%, transparent 50%); border-color: var(--accent); }
+.form-mark.is-current { outline: 1px solid var(--ink-3); outline-offset: 2px; }

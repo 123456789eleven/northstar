@@ -52,7 +52,7 @@ export default function Settings() {
   }, [hash])
   return (
     <>
-      <PageHeader title="Settings" sub="Progress, sync, backups, data on this device and privacy." />
+      <PageHeader title="Settings" sub="Sync, backups, data on this device and privacy. The boring bits, handled." />
       <StatusStrip />
       <div className="set-layout">
         <SectionIndex />

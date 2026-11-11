@@ -34,7 +34,7 @@ export default function MindHub() {
   const target = Number(studyTarget) > 0 ? Number(studyTarget) : 120
   return (
     <>
-      <PageHeader title="Mind" sub="Writing and learning, with this week's rings." />
+      <PageHeader title="Mind" sub="Writing and learning, and how this week is going." />
       <section className="card hub-section mind-overview" aria-label="Mind this week" data-testid="mind-overview">
         <div className="mind-ov-item">
           <Ring value={fraction(days, weekTarget)} size={64} stroke={5} tone="mind" label={`${days} of ${weekTarget} writing days this week`}><span className="mind-ov-num">{days}</span></Ring>
@@ -52,7 +52,7 @@ export default function MindHub() {
       <div className="hub-grid">
         <HubCard
           to="/journal" icon="journal" title="Journal"
-          sub={wroteToday ? 'Written today' : last ? `Last entry ${formatDate(last.date, { month: 'short', day: 'numeric' })}` : 'No entries yet'}
+          sub={wroteToday ? 'Written today' : last ? `Last entry ${formatDate(last.date, { month: 'short', day: 'numeric' })}` : 'Page one is blank'}
           stat={entries ? <><span className="mono">{entries.length}</span><span className="hub-card-sub"> this week</span></> : undefined}
         >
           <span className="hub-empty">{wroteToday ? 'Add a thought any time: type journal: and a line in capture.' : 'Write a line for today. One sentence counts.'}</span>
@@ -67,7 +67,7 @@ export default function MindHub() {
                 </span>
               ))}
             </span>
-          ) : <span className="hub-empty">Nothing in progress. Add a course or a book on Learning.</span>}
+          ) : <span className="hub-empty">Nothing on the go. Pick a course or a book on Learning.</span>}
         </HubCard>
       </div>
     </>

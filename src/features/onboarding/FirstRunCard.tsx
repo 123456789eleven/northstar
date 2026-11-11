@@ -40,7 +40,7 @@ export function FirstRunCard() {
 
   return (
     <Card title="Getting started" action={<span className="faint small">{finished} of {steps.length}</span>} className="first-run">
-      <p className="muted small" style={{ margin: 0 }}>Everything stays on this device. Do these in any order, or look around with sample data first.</p>
+      <p className="muted small" style={{ margin: 0 }}>Everything stays on this device. Take these in any order, or poke around with sample data first. Each tick makes the rest of the app smarter.</p>
       <ol className="first-run-steps">
         {steps.map((x) => (
           <li key={x.label} className={x.done ? 'is-done' : ''}>

@@ -23,7 +23,7 @@ describe('nextStepAfterGoal', () => {
 describe('nextStepAfterMilestone', () => {
   const goal = g(1, { milestones: [{ id: 'a', title: 'A', done: true }, { id: 'b', title: 'B', done: false }, { id: 'c', title: 'C', done: false }] })
   it('reports progress and the next open milestone', () => {
-    expect(nextStepAfterMilestone(goal, 'b')).toEqual({ text: '2 of 3 milestones. Next: C', allDone: false })
+    expect(nextStepAfterMilestone(goal, 'b')).toEqual({ text: '2 of 3 milestones, 1 to go. Next: C', allDone: false })
   })
   it('flags the last one', () => {
     const almost = { ...goal, milestones: goal.milestones.map((m) => ({ ...m, done: m.id !== 'c' })) }
