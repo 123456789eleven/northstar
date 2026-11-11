@@ -3,7 +3,11 @@ import { flushSync } from 'react-dom'
 import { HashRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { prefersReducedMotion } from './components/motion'
 import { routeTitle } from './components/nav'
-import { CaptureHost, Rail, TabBar, TopBar } from './components/Shell'
+import { CaptureHost, CaptureOrb, TopBar } from './components/Shell'
+import DistrictStrip from './components/DistrictStrip'
+import { districtForPath } from './components/districts'
+import { useMedia, PHONE_QUERY } from './components/useMedia'
+import { LifeMapProvider } from './features/lifemap/useLifeMap'
 import HubLayout, { RouteFade } from './components/HubLayout'
 import { GlassDefs } from './components/GlassDefs'
 import { PlayerProvider } from './features/game/ui/PlayerProvider'
@@ -43,7 +47,7 @@ const YouHub = lazy(() => import('./pages/YouHub'))
 type VTDoc = Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } }
 
 /**
- * Route change: nav-level links (rail, phone tab bar, hub tab strip) cross-fade with the View Transitions API where supported.
+ * Route change: nav-level links (district strip, hub tab strip) cross-fade with the View Transitions API where supported.
  * Everywhere else, and in browsers without it, `.route-view` (keyed by path) plays a short CSS fade. Reduced motion: neither.
  */
 function useNavTransitions() {
@@ -53,7 +57,7 @@ function useNavTransitions() {
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
       if (!doc.startViewTransition || prefersReducedMotion()) return
-      const a = (e.target as Element | null)?.closest?.('a.nav-link, a.tab-item, a.hub-tab') as HTMLAnchorElement | null
+      const a = (e.target as Element | null)?.closest?.('a.dstrip-tab, a.hub-tab') as HTMLAnchorElement | null
       const href = a?.getAttribute('href')
       if (!href?.startsWith('#/')) return
       const to = href.slice(1)
@@ -74,11 +78,11 @@ function Shell() {
   useEffect(() => { document.title = routeTitle(pathname) }, [pathname])
   useNavTransitions()
   useDensity()
+  const phone = useMedia(PHONE_QUERY)
   return (
-      <div className={`shell${pathname === '/' || pathname === '/map' ? ' is-home' : ''}`}>
+      <div className={`shell${pathname === '/' || pathname === '/map' ? ' is-home' : ''}`} data-district={districtForPath(pathname)}>
         <a className="skip-link" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus() }}>Skip to content</a>
         <GlassDefs />
-        <Rail />
         <div className="stage">
         <TopBar />
         <main className="main" id="main" tabIndex={-1}>
@@ -86,9 +90,9 @@ function Shell() {
             <Route element={<RouteFade />}>
               <Route path="/" element={<Home />} />
               <Route path="/map" element={<Home />} />
-              <Route path="/today" element={<Today />} />
             </Route>
             <Route element={<HubLayout hub="plan" />}>
+              <Route path="/today" element={<Today />} />
               <Route path="/plan" element={<PlanHub />} />
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/planner" element={<Planner />} />
@@ -122,7 +126,8 @@ function Shell() {
           </Routes>
         </main>
         </div>
-        <TabBar />
+        <DistrictStrip phone={phone} />
+        {phone && <CaptureOrb />}
         <CaptureHost />
         <Suspense fallback={null}><MomentHost /></Suspense>
         <UpdatePrompt />
@@ -136,7 +141,9 @@ export default function App() {
     <HashRouter>
       <ToastProvider>
         <PlayerProvider>
-          <Shell />
+          <LifeMapProvider>
+            <Shell />
+          </LifeMapProvider>
         </PlayerProvider>
       </ToastProvider>
     </HashRouter>

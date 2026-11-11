@@ -5,36 +5,41 @@ import { expect, test } from '@playwright/test'
 test.describe('phone 390x844', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true })
 
-  test('bottom bar reaches its four tabs, You from the top bar, and the capture orb opens the sheet', async ({ page }) => {
+  test('district strip reaches every district, You from the top bar, and the capture orb opens the sheet', async ({ page }) => {
     await page.goto('/')
-    const bar = page.getByRole('navigation', { name: 'Main mobile' })
+    const bar = page.getByRole('navigation', { name: 'Districts' })
     await expect(bar).toBeVisible()
+    await expect(bar.getByRole('link')).toHaveText(['Home', 'Plan', 'Money', 'Body', 'Mind', 'Career', 'People'])
 
     await bar.getByRole('link', { name: 'Plan' }).click()
-    await expect(page).toHaveURL(/#\/plan$/)
-    await expect(page.getByRole('heading', { level: 1, name: 'Plan' })).toBeVisible()
+    await expect(page).toHaveURL(/#\/today$/)
+    await expect(bar.getByRole('link', { name: 'Plan' })).toHaveAttribute('aria-current', 'page')
     await page.getByRole('navigation', { name: 'Plan sections' }).getByRole('link', { name: 'Tasks' }).click()
     await expect(page).toHaveURL(/#\/tasks$/)
+    await expect(bar.getByRole('link', { name: 'Plan' })).toHaveAttribute('aria-current', 'true')
 
-    await bar.getByRole('link', { name: 'Areas' }).click()
-    await expect(page).toHaveURL(/#\/skills$/)
-    await expect(page.getByRole('heading', { level: 1, name: 'Areas' })).toBeVisible()
+    await bar.getByRole('link', { name: 'Body' }).click()
+    await expect(page).toHaveURL(/#\/body$/)
+    // Coming back to Plan returns to the last page there.
+    await bar.getByRole('link', { name: 'Plan' }).click()
+    await expect(page).toHaveURL(/#\/tasks$/)
 
     await page.getByRole('link', { name: 'You', exact: true }).click()
     await expect(page).toHaveURL(/#\/you$/)
     await expect(page.getByRole('heading', { level: 1, name: 'You' })).toBeVisible()
+    await expect(bar.locator('[aria-current]')).toHaveCount(0)
 
     await bar.getByRole('link', { name: 'Home' }).click()
     await expect(page).toHaveURL(/#\/$/)
     await expect(page.getByTestId('lifemap')).toBeVisible()
 
-    // Tap targets: every bottom-bar control is at least 44px tall.
-    for (const el of await bar.locator('a, button').all()) {
+    // Tap targets: every strip link is at least 32px tall.
+    for (const el of await bar.locator('a').all()) {
       const box = await el.boundingBox()
-      expect(box!.height).toBeGreaterThanOrEqual(44)
+      expect(box!.height).toBeGreaterThanOrEqual(32)
     }
 
-    await bar.getByRole('button', { name: 'Capture' }).click()
+    await page.getByRole('button', { name: 'Capture' }).click()
     const sheet = page.getByRole('dialog', { name: 'Capture' })
     await expect(sheet).toBeVisible()
     await sheet.getByRole('button', { name: 'Weigh-in' }).click()
@@ -55,13 +60,19 @@ test.describe('phone 390x844', () => {
   })
 })
 
-test('desktop 1440: rail with Home, Today and area groups; no right rail; old URLs sit inside their hub', async ({ page }) => {
+test('desktop 1440: district strip is the primary nav; no right rail; old URLs sit inside their district', async ({ page }) => {
   await page.goto('/')
-  const rail = page.getByRole('navigation', { name: 'Main' })
-  await expect(rail).toBeVisible()
-  for (const name of ['Home', 'Today', 'Plan', 'Body', 'Money', 'Mind', 'Career', 'People', 'Milestones', 'Settings']) {
-    await expect(rail.getByRole('link', { name, exact: false }).first()).toBeVisible()
-  }
+  const strip = page.getByRole('navigation', { name: 'Districts' })
+  await expect(strip).toBeVisible()
+  await expect(strip.getByRole('link')).toHaveText(['Home', 'Plan', 'Money', 'Body', 'Mind', 'Career', 'People'])
+  await expect(strip.getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page')
+  await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0)
+  // Keyboard: arrows move along the strip.
+  await strip.getByRole('link', { name: 'Home' }).focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(strip.getByRole('link', { name: 'Plan' })).toBeFocused()
+  await page.keyboard.press('End')
+  await expect(strip.getByRole('link', { name: 'People' })).toBeFocused()
   // The old right rail is gone: its season and week lines live in Home's Today tab.
   await expect(page.getByRole('complementary', { name: 'Plan and week' })).toHaveCount(0)
   const panel = page.getByTestId('home-panel')
@@ -73,6 +84,7 @@ test('desktop 1440: rail with Home, Today and area groups; no right rail; old UR
 
   // /food keeps working and lights Body in the hub strip and Food in the sub-strip.
   await page.goto('/#/food')
+  await expect(strip.getByRole('link', { name: 'Body' })).toHaveAttribute('aria-current', 'true')
   await expect(page.getByRole('navigation', { name: 'Areas sections' }).getByRole('link', { name: 'Body' })).toHaveAttribute('aria-current', 'true')
   await expect(page.getByRole('navigation', { name: 'Body pages' }).getByRole('link', { name: 'Food' })).toHaveAttribute('aria-current', 'page')
   await expect(page).toHaveTitle('Food | Northstar')

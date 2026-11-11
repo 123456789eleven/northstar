@@ -1,6 +1,6 @@
 // Live inputs for the Life map. Read-only: area week from the engine, plus balances, budgets, holdings, weight, people and milestones.
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useMemo } from 'react'
+import { createContext, createElement, useContext, useMemo, type ReactNode } from 'react'
 import { db, type Area } from '../../db'
 import { monthKey, startOfWeek, today as todayFn } from '../../lib/dates'
 import { netWorthSeries, monthRange, summarize } from '../finance/model'
@@ -15,8 +15,8 @@ import { buildLifeMap, type LifeMap, type WeightPath } from './model'
 
 const EVENT_AREA: Record<Area, SkillId> = { career: 'career', health: 'body', finance: 'money', learning: 'mind', personal: 'mind', relationships: 'people' }
 
-/** Undefined while loading. */
-export function useLifeMap(): LifeMap | undefined {
+/** Computes the city once for the whole app. Undefined while loading. */
+function useLifeMapData(): LifeMap | undefined {
   const p = usePlayerState()
   const target = p.streak.target || 5
   const areas = useAreaWeek(target)
@@ -56,4 +56,16 @@ export function useLifeMap(): LifeMap | undefined {
     if (!areas || !raw || p.loading) return undefined
     return buildLifeMap({ ...raw, areas, target, today: d, planLeft: p.quests.filter((q) => !q.done).length, planTotal: p.quests.length })
   }, [areas, raw, p.loading, p.quests, target, d])
+}
+
+const Ctx = createContext<LifeMap | undefined>(undefined)
+
+/** One shared city model for Home, the district strip, the mini-map and the backdrop (read-only queries, computed once). */
+export function LifeMapProvider({ children }: { children: ReactNode }) {
+  return createElement(Ctx.Provider, { value: useLifeMapData() }, children)
+}
+
+/** The shared Life map model. Undefined while loading. */
+export function useLifeMap(): LifeMap | undefined {
+  return useContext(Ctx)
 }

@@ -1,12 +1,12 @@
 // Home (/): the Life map as the main screen. Full-bleed city with a glass HUD: title bar, overview, the district strip,
-// and a breakout panel (desktop right, phone bottom sheet) that shows one tab at a time.
+// (the global district strip sits along the bottom) and a breakout panel (desktop right, phone bottom sheet) that shows one tab at a time.
 import { useCallback, useMemo, useState } from 'react'
 import { Skeleton } from '../components/ui'
 import { useMedia, PHONE_QUERY } from '../components/useMedia'
 import { usePlayerState } from '../features/game/ui/playerContext'
 import { useEngineOnMount } from '../features/game/ui/engineGate'
 import LifeMapView from '../features/lifemap/LifeMapView'
-import { BreakoutPanel, DistrictStrip, Overview, TitleBar, type HomeTab } from '../features/lifemap/HomeHud'
+import { BreakoutPanel, Overview, TitleBar, type HomeTab } from '../features/lifemap/HomeHud'
 import { useLifeMap } from '../features/lifemap/useLifeMap'
 import { useHomeHud } from '../features/lifemap/useHomeHud'
 import type { Inset } from '../features/lifemap/iso'
@@ -44,7 +44,6 @@ export default function Home() {
       {map && (
         <>
           <Overview map={map} hud={hud} p={p} />
-          {!phone && <DistrictStrip tab={tab} onTab={onFocus} districts={map.districts} />}
           <BreakoutPanel tab={tab} onTab={onFocus} open={phone ? sheet : open} onOpen={phone ? setSheet : setOpen} map={map} hud={hud} p={p} phone={phone} />
         </>
       )}

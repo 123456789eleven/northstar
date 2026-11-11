@@ -54,7 +54,7 @@ export interface HubDef { id: Exclude<HubId, 'today'>; label: string; to: string
 export const HUBS: Record<Exclude<HubId, 'today'>, HubDef> = {
   plan: {
     id: 'plan', label: 'Plan', to: '/plan', icon: 'planner',
-    tabs: [{ to: '/plan', label: 'Overview' }, { to: '/tasks', label: 'Tasks' }, { to: '/planner', label: 'Planner' }, { to: '/goals', label: 'Goals' }, { to: '/habits', label: 'Habits' }],
+    tabs: [{ to: '/today', label: 'Today' }, { to: '/plan', label: 'Overview' }, { to: '/tasks', label: 'Tasks' }, { to: '/planner', label: 'Planner' }, { to: '/goals', label: 'Goals' }, { to: '/habits', label: 'Habits' }],
   },
   money: { id: 'money', label: 'Money', to: '/finance', icon: 'finance', tabs: [{ to: '/finance', label: 'Money' }] },
   skills: {

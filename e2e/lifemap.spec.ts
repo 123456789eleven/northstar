@@ -20,10 +20,10 @@ test.describe('Home at 1440', () => {
     await expect(page).toHaveTitle('Home | Northstar')
   })
 
-  test('a bottom tab focuses its district and switches the right panel; only one tab shows', async ({ page }) => {
+  test('a panel tab focuses its district and switches the right panel; only one tab shows', async ({ page }) => {
     await page.goto('/')
-    const strip = page.getByRole('navigation', { name: 'Districts' })
     const panel = page.getByTestId('home-panel')
+    const strip = panel
     await expect(page.getByTestId('home-tabpanel')).toHaveCount(1)
     await expect(panel.getByRole('heading', { name: "Today's plan" })).toBeVisible()
     await expect(panel.getByRole('link', { name: /Open Today/ })).toHaveAttribute('href', /#\/today$/)
@@ -44,7 +44,7 @@ test.describe('Home at 1440', () => {
     // Tapping a district on the map does the same; Overview goes back to Today.
     await page.locator('.lm-hit[data-district="body"]').click()
     await expect(page.getByTestId('home-tabpanel')).toHaveAttribute('data-tab', 'body')
-    await strip.getByRole('tab', { name: 'Overview' }).click()
+    await strip.getByRole('tab', { name: 'Today' }).click()
     await expect(page.getByTestId('home-tabpanel')).toHaveAttribute('data-tab', 'today')
     await expect(page.locator('.lm-hit[aria-pressed="true"]')).toHaveCount(0)
 
@@ -55,10 +55,10 @@ test.describe('Home at 1440', () => {
     await expect(page.getByTestId('home-panel')).toBeVisible()
   })
 
-  test('keyboard: arrows move along the strip, Enter on a district focuses it, Escape clears', async ({ page }) => {
+  test('keyboard: arrows move along the panel tabs, Enter on a district focuses it, Escape clears', async ({ page }) => {
     await page.goto('/')
-    const strip = page.getByRole('navigation', { name: 'Districts' })
-    await strip.getByRole('tab', { name: 'Overview' }).focus()
+    const strip = page.getByTestId('home-panel')
+    await strip.getByRole('tab', { name: 'Today' }).focus()
     await page.keyboard.press('ArrowRight')
     await expect(strip.getByRole('tab', { name: 'Money' })).toBeFocused()
     await expect(page.getByTestId('home-tabpanel')).toHaveAttribute('data-tab', 'money')
@@ -84,7 +84,8 @@ test.describe('Home at 1440', () => {
     await expect(page).toHaveTitle('Today | Northstar')
     await expect(page.getByRole('heading', { name: /Today's plan|Plan done/ })).toBeVisible()
     await expect(page.getByRole('region', { name: 'Focus' })).toBeVisible()
-    await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Today' })).toHaveAttribute('aria-current', 'page')
+    await expect(page.getByRole('navigation', { name: 'Districts' }).getByRole('link', { name: 'Plan' })).toHaveAttribute('aria-current', 'page')
+    await expect(page.getByRole('navigation', { name: 'Plan sections' }).getByRole('link', { name: 'Today' })).toHaveAttribute('aria-current', 'page')
   })
 })
 
@@ -96,7 +97,6 @@ test.describe('Home at 390', () => {
     await expect(page.getByTestId('lifemap')).toBeVisible()
     const sheet = page.getByTestId('home-panel')
     await expect(sheet).toBeVisible()
-    await expect(page.getByRole('navigation', { name: 'Districts' })).toHaveCount(0)
     await sheet.getByRole('tab', { name: 'Body' }).click()
     await expect(page.getByTestId('home-tabpanel')).toHaveAttribute('data-tab', 'body')
     await expect(page.locator('.lm-hit[data-district="body"]')).toHaveAttribute('aria-pressed', 'true')
@@ -110,9 +110,11 @@ test.describe('Home at 390', () => {
     await page.locator('.lm-hit[data-district="money"]').tap()
     await expect(page.getByTestId('home-tabpanel')).toHaveAttribute('data-tab', 'money')
 
-    // Bottom bar: Home, Plan, capture, Money, Areas.
-    const bar = page.getByRole('navigation', { name: 'Main mobile' })
-    await expect(bar.getByRole('link')).toHaveText(['Home', 'Plan', 'Money', 'Areas'])
+    // The district strip sits below the sheet: Home, Plan, Money, Body, Mind, Career, People.
+    const bar = page.getByRole('navigation', { name: 'Districts' })
+    await expect(bar.getByRole('link')).toHaveText(['Home', 'Plan', 'Money', 'Body', 'Mind', 'Career', 'People'])
+    const sb = (await sheet.boundingBox())!
+    expect(sb.y + sb.height).toBeLessThanOrEqual((await bar.boundingBox())!.y + 16)
     for (const el of await sheet.getByRole('tab').all()) expect((await el.boundingBox())!.height).toBeGreaterThanOrEqual(32)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
   })

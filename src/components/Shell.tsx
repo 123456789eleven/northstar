@@ -1,6 +1,6 @@
-// App shell: desktop rail (Home, Today, Plan, Money, Areas, You), top bar (context, capture, search, sync, date; phone: plan pill and You),
-// and the phone bottom bar (Home | Plan | capture orb | Money | Areas) with the capture sheet.
-import { lazy, Suspense, useEffect, useState, type CSSProperties } from 'react'
+// App shell chrome: the top bar (district and tab, capture, search, sync, date, the You profile control), the phone capture
+// orb and capture sheet. Primary navigation is the district strip (DistrictStrip.tsx); see docs/redesign/CITY_SHELL_PLAN.md.
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { getSetting } from '../db'
@@ -10,10 +10,9 @@ import BulkHost from '../features/bulk/BulkHost'
 import { SetupHost } from '../features/onboarding/SetupWizard'
 import BottomSheet from './BottomSheet'
 import { Icon, type IconName } from './Icons'
-import { HUBS, hubForPath, navItemFor, NAV, tabActive, type HubId } from './nav'
+import { breadcrumb, districtForPath } from './districts'
 import { useMedia, PHONE_QUERY } from './useMedia'
 import { PlayerStrip } from '../features/game/ui/Mission'
-import type { SkillId } from '../features/game/types'
 import './shell.css'
 
 const CommandPalette = lazy(() => import('./CommandPalette'))
@@ -69,64 +68,6 @@ export function Mark() {
   )
 }
 
-/** The last page visited inside each hub, so Plan / Skills / You return you where you were. */
-const lastInHub: Partial<Record<HubId, string>> = {}
-function useRememberHubPath() {
-  const { pathname } = useLocation()
-  useEffect(() => { lastInHub[hubForPath(pathname)] = pathname }, [pathname])
-}
-
-interface RailEntry { to: string; label: string; icon: IconName; also?: string[]; skill?: SkillId }
-
-function RailLink({ e, pathname }: { e: RailEntry; pathname: string }) {
-  const active = tabActive(e, pathname)
-  const exact = pathname === e.to
-  return (
-    <Link to={e.to} className={`nav-link ${active ? 'active' : ''}`} aria-current={exact ? 'page' : active ? 'true' : undefined} style={e.skill ? ({ '--pip-c': `var(--skill-${e.skill})` } as CSSProperties) : undefined}>
-      <Icon name={e.icon} />
-      <span className="nav-label">{e.label}</span>
-    </Link>
-  )
-}
-
-const RAIL_TOP: RailEntry[] = [
-  { to: '/', label: 'Home', icon: 'home', also: ['/map'] },
-  { to: '/today', label: 'Today', icon: 'today' },
-  { to: '/plan', label: 'Plan', icon: 'planner', also: HUBS.plan.tabs.map((t) => t.to) },
-  { to: '/finance', label: 'Money', icon: 'finance', skill: 'money' },
-]
-const RAIL_SKILLS: RailEntry[] = [
-  { to: '/skills', label: 'Overview', icon: 'star' },
-  { to: '/body', label: 'Body', icon: 'body', also: ['/food'], skill: 'body' },
-  { to: '/mind', label: 'Mind', icon: 'mind', also: ['/journal', '/learning'], skill: 'mind' },
-  { to: '/career', label: 'Career', icon: 'career', skill: 'career' },
-  { to: '/people', label: 'People', icon: 'people', skill: 'people' },
-]
-const RAIL_YOU: RailEntry[] = ['/you', '/history', '/review', '/ops', '/settings', '/data'].map((to) => {
-  const n = NAV.find((x) => x.to === to)!
-  return { to, label: to === '/you' ? 'Overview' : n.label, icon: n.icon, also: to === '/data' ? ['/ontology'] : undefined }
-})
-
-export function Rail() {
-  const { pathname } = useLocation()
-  return (
-    <nav className="sidebar" aria-label="Main">
-      <div className="brand"><Mark />Northstar</div>
-      <div className="nav-group">{RAIL_TOP.map((e) => <RailLink key={e.to} e={e} pathname={pathname} />)}</div>
-      <div className="nav-group" role="group" aria-labelledby="rail-skills">
-        <div className="nav-section" id="rail-skills">Areas</div>
-        {RAIL_SKILLS.map((e) => (
-          <RailLink key={e.to} e={e} pathname={pathname} />
-        ))}
-      </div>
-      <div className="nav-group" role="group" aria-labelledby="rail-you">
-        <div className="nav-section" id="rail-you">You</div>
-        {RAIL_YOU.map((e) => <RailLink key={e.to} e={e} pathname={pathname} />)}
-      </div>
-    </nav>
-  )
-}
-
 interface SyncShape { state?: string; lastSyncedAt?: string | null }
 
 function ago(iso?: string | null) {
@@ -158,11 +99,12 @@ export function SyncChip({ dotOnly = false }: { dotOnly?: boolean }) {
   )
 }
 
+/** Top-bar context: district, then the tab inside it ("Money" / "Markets"). Home reads "Northstar". */
 function useRouteContext() {
-  const { pathname } = useLocation()
-  const item = navItemFor(pathname)
-  if (!item) return { label: 'Northstar', group: '' }
-  return { label: item.label, group: item.group === item.label ? '' : item.group }
+  const { pathname, search } = useLocation()
+  if (districtForPath(pathname) === 'home') return { label: 'Northstar', group: '' }
+  const [d, tab] = breadcrumb(pathname, search)
+  return tab ? { group: d, label: tab } : { group: '', label: d }
 }
 
 const dateLabel = () => parseISODate(today()).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
@@ -170,7 +112,8 @@ const dateLabel = () => parseISODate(today()).toLocaleDateString(undefined, { we
 export function TopBar() {
   const phone = useMedia(PHONE_QUERY)
   const ctx = useRouteContext()
-  const { search } = useLocation()
+  const { search, pathname } = useLocation()
+  const you = districtForPath(pathname) === 'you'
   const navigate = useNavigate()
   const openCapture = () => (phone ? window.dispatchEvent(new Event(OPEN_CAPTURE_SHEET)) : window.dispatchEvent(new KeyboardEvent('keydown', { key: '/' })))
   // PWA shortcut "Quick capture" opens #/?capture=1: focus the capture line (desktop) or open the sheet (phone).
@@ -189,6 +132,7 @@ export function TopBar() {
   return (
     <header className="topbar">
       <div className="topbar-ctx">
+        {!phone && <Mark />}
         {ctx.group && <span className="topbar-group">{ctx.group}</span>}
         <span className="topbar-title">{ctx.label}</span>
       </div>
@@ -196,9 +140,9 @@ export function TopBar() {
       <div className="topbar-right">
         {phone && <PlayerStrip />}
         <SearchButton compact={phone} />
-        {phone && <Link to="/you" className="icon-btn" aria-label="You"><Icon name="user" size={18} /></Link>}
         <SyncChip dotOnly={phone} />
         {!phone && <span className="topbar-date mono">{dateLabel()}</span>}
+        <Link to="/you" className={`icon-btn topbar-you${you ? ' is-active' : ''}`} aria-label="You" aria-current={you ? 'true' : undefined}><Icon name="user" size={18} /></Link>
       </div>
       <PaletteHost />
       <BulkHost />
@@ -244,57 +188,11 @@ export function CaptureHost() {
   return open ? <CaptureSheet onClose={() => setOpen(false)} /> : null
 }
 
-const BAR: Array<{ hub: HubId; to: string; label: string; icon: IconName }> = [
-  { hub: 'today', to: '/', label: 'Home', icon: 'home' },
-  { hub: 'plan', to: '/plan', label: 'Plan', icon: 'planner' },
-  { hub: 'money', to: '/finance', label: 'Money', icon: 'finance' },
-  { hub: 'skills', to: '/skills', label: 'Areas', icon: 'star' },
-]
-
-/** True while the page is being scrolled down; the phone tab bar shrinks to icons then and returns on scroll up or near the top. */
-function useScrollingDown(): boolean {
-  const [down, setDown] = useState(false)
-  useEffect(() => {
-    let last = window.scrollY
-    const on = () => {
-      const y = window.scrollY
-      if (Math.abs(y - last) < 8) return
-      setDown(y > last && y > 80)
-      last = y
-    }
-    window.addEventListener('scroll', on, { passive: true })
-    return () => window.removeEventListener('scroll', on)
-  }, [])
-  return down
-}
-
-export function TabBar() {
-  const { pathname } = useLocation()
-  useRememberHubPath()
-  const compact = useScrollingDown()
-  const hub = hubForPath(pathname)
-  const item = (b: (typeof BAR)[number]) => {
-    const active = hub === b.hub
-    // Re-tapping the current hub goes to its overview; coming from elsewhere returns to the last page you had open there.
-    const to = active || b.hub === 'today' ? b.to : (lastInHub[b.hub] ?? b.to)
-    return (
-      <Link key={b.hub} to={to} className={`tab-item ${active ? 'active' : ''}`} aria-current={active ? (pathname === b.to ? 'page' : 'true') : undefined}>
-        <Icon name={b.icon} size={22} />
-        <span>{b.label}</span>
-      </Link>
-    )
-  }
+/** Phone capture orb: floats bottom-right above the district strip (lifted above pages that pin an add line). */
+export function CaptureOrb() {
   return (
-    <nav className={`tabbar ${compact ? 'is-compact' : ''}`} aria-label="Main mobile" data-spec>
-      {item(BAR[0])}
-      {item(BAR[1])}
-      <div className="tab-orb-slot">
-        <button type="button" className="tab-orb" aria-label="Capture" aria-haspopup="dialog" onClick={() => window.dispatchEvent(new Event(OPEN_CAPTURE_SHEET))}>
-          <Icon name="plus" size={22} />
-        </button>
-      </div>
-      {item(BAR[2])}
-      {item(BAR[3])}
-    </nav>
+    <button type="button" className="capture-orb" aria-label="Capture" aria-haspopup="dialog" onClick={() => window.dispatchEvent(new Event(OPEN_CAPTURE_SHEET))}>
+      <Icon name="plus" size={22} />
+    </button>
   )
 }

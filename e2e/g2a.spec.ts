@@ -33,7 +33,7 @@ test.describe('phone 390x844', () => {
     // The add line is pinned above the floating tab bar (the bar is inset from the screen edge, so compare tops).
     await expect.poll(async () => {
       const sticky = await page.locator('.quick-add-sticky').boundingBox()
-      const bar = await page.getByRole('navigation', { name: 'Main mobile' }).boundingBox()
+      const bar = await page.getByRole('navigation', { name: 'Districts' }).boundingBox()
       return sticky!.y + sticky!.height <= bar!.y + 1 && bar!.y + bar!.height < 844
     }).toBe(true)
 

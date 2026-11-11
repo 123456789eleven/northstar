@@ -89,43 +89,6 @@ function useRoving(count: number, current: number, select: (i: number) => void) 
   return { refs, onKey }
 }
 
-/** Bottom strip: a gently curved glass band. Selecting a tab focuses its district and switches the panel. */
-export function DistrictStrip({ tab, onTab, districts }: { tab: HomeTab; onTab: (t: HomeTab) => void; districts: District[] }) {
-  const idx = TABS.findIndex((t) => t.id === tab)
-  const { refs, onKey } = useRoving(TABS.length, idx, (i) => onTab(TABS[i].id))
-  return (
-    <nav className="hm-strip" aria-label="Districts">
-      <svg className="hm-strip-bg" viewBox="0 0 660 82" preserveAspectRatio="none" aria-hidden="true">
-        <defs>
-          <linearGradient id="hm-rim" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" className="hm-rim-0" /><stop offset="0.5" className="hm-rim-1" /><stop offset="1" className="hm-rim-0" />
-          </linearGradient>
-        </defs>
-        <path d="M4 40 Q330 2 656 40 L656 80 Q330 48 4 80 Z" className="hm-strip-shape" />
-        <path d="M4 40 Q330 2 656 40" className="hm-strip-rim" />
-      </svg>
-      <div className="hm-strip-row" role="tablist" aria-label="Districts" onKeyDown={onKey}>
-        {TABS.map((t, i) => {
-          const d = districts.find((x) => x.id === t.id)
-          const u = (i + 0.5) / TABS.length
-          const off = Math.round(43 - 76 * u * (1 - u)) // follows the band's top curve
-          return (
-            <button
-              key={t.id} ref={(el) => { refs.current[i] = el }} type="button" role="tab" className="hm-strip-tab" data-tab={t.id}
-              aria-selected={tab === t.id} aria-controls="hm-panel" tabIndex={tab === t.id ? 0 : -1}
-              style={{ transform: `translateY(${off}px)` }} onClick={() => onTab(t.id)}
-            >
-              {t.strip}
-              {d?.beacon && <i className="hm-dot" aria-hidden="true" />}
-              {d?.gold && !d.beacon && <i className="hm-dot is-gold" aria-hidden="true" />}
-            </button>
-          )
-        })}
-      </div>
-    </nav>
-  )
-}
-
 function Num({ label, value, of, warn }: { label: string; value: string; of?: string; warn?: boolean }) {
   return (
     <div className="hm-num">

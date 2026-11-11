@@ -27,7 +27,7 @@ Pure function `districtForPath(pathname)` plus `subtabForPath` (tested) is the s
 5. Quiet motion: camera pan and a short slide of the content panel; nothing else.
 
 ## Phases (commit after each; update the checklist below)
-- [ ] P1 `districtForPath` + tests; DistrictStrip replaces TabBar and Rail; top-bar You control; palette and titles unchanged
+- [x] P1 `districtForPath` + tests; DistrictStrip replaces TabBar and Rail; top-bar You control; palette and titles unchanged. Done: `src/components/districts.ts` (+ tests), `DistrictStrip.tsx` + `city.css` on every width, You control in the top bar, phone capture orb bottom right (lifted over pinned add lines), Today joins the Plan strip, one shared `LifeMapProvider`; e2e 77/77.
 - [ ] P2 Mini-map component driven by the same scene model as the Life map (shared, not copied)
 - [ ] P3 Backdrop city layer with camera following the route
 - [ ] P4 District frame (header + breadcrumb) applied to every page; Today, Plan hub, Areas hub, You hub reviewed for density

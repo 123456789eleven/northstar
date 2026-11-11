@@ -119,7 +119,7 @@ test.describe('G3 phone only', () => {
     const quick = page.getByLabel('Quick add a meal')
     await expect(quick).toBeVisible()
     const q = await quick.boundingBox()
-    const bar = await page.getByRole('navigation', { name: 'Main mobile' }).boundingBox()
+    const bar = await page.getByRole('navigation', { name: 'Districts' }).boundingBox()
     expect(q!.y + q!.height).toBeLessThanOrEqual(bar!.y + 1)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
   })
