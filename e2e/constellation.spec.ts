@@ -20,6 +20,8 @@ test.describe('phone 390x844', () => {
 
     await bar.getByRole('link', { name: 'Body' }).click()
     await expect(page).toHaveURL(/#\/body$/)
+    await expect(bar.getByRole('link', { name: 'Body' })).toHaveAttribute('aria-current', 'page')
+    await expect(bar.getByRole('link', { name: /^Plan/ })).toHaveAttribute('href', /#\/tasks$/)
     // Coming back to Plan returns to the last page there.
     await bar.getByRole('link', { name: 'Plan' }).click()
     await expect(page).toHaveURL(/#\/tasks$/)
@@ -100,6 +102,12 @@ test('desktop 1440: district strip is the primary nav; no right rail; old URLs s
   await expect(crumb).toHaveCount(0)
   await strip.getByRole('link', { name: 'Money' }).click()
   await expect(page).toHaveURL(/#\/finance\?tab=markets$/)
+  // Groups: the URL carries the sub-tab id (as old deep links do) and the head reads Money / Cash / Budgets.
+  await page.getByRole('tab', { name: 'Cash', exact: true }).click()
+  await page.getByRole('tab', { name: 'Budgets', exact: true }).click()
+  await expect(page).toHaveURL(/#\/finance\?tab=budgets$/)
+  await expect(crumb).toContainText('Cash')
+  await expect(crumb.locator('[aria-current="page"]')).toHaveText('Budgets')
   // The mini-map lights the active district and goes where you tap.
   const mini = page.getByRole('group', { name: /City map, you are in Money/ })
   await expect(mini.getByRole('link', { name: 'Money' })).toHaveAttribute('aria-current', 'true')

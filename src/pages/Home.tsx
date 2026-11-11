@@ -9,6 +9,7 @@ import LifeMapView from '../features/lifemap/LifeMapView'
 import { BreakoutPanel, Overview, TitleBar, type HomeTab } from '../features/lifemap/HomeHud'
 import { useLifeMap } from '../features/lifemap/useLifeMap'
 import { useHomeHud } from '../features/lifemap/useHomeHud'
+import { useDayChange } from '../features/lifemap/useDayChange'
 import type { Inset } from '../features/lifemap/iso'
 import '../features/lifemap/lifemap.css'
 import '../features/lifemap/home.css'
@@ -20,6 +21,7 @@ export default function Home() {
   useEngineOnMount()
   const map = useLifeMap()
   const hud = useHomeHud()
+  const day = useDayChange()
   const p = usePlayerState()
   const phone = useMedia(PHONE_QUERY)
   const [tab, setTab] = useState<HomeTab>('today')
@@ -43,8 +45,8 @@ export default function Home() {
       <TitleBar />
       {map && (
         <>
-          <Overview map={map} hud={hud} p={p} />
-          <BreakoutPanel tab={tab} onTab={onFocus} open={phone ? sheet : open} onOpen={phone ? setSheet : setOpen} map={map} hud={hud} p={p} phone={phone} />
+          <Overview map={map} hud={hud} p={p} day={day} />
+          <BreakoutPanel tab={tab} onTab={onFocus} open={phone ? sheet : open} onOpen={phone ? setSheet : setOpen} map={map} hud={hud} p={p} phone={phone} day={day} />
         </>
       )}
     </div>

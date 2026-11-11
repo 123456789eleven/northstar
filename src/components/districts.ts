@@ -28,17 +28,16 @@ export interface DistrictDef {
   tabs: DistrictTab[]
 }
 
-/** In-page Money tabs (`/finance?tab=`), in display order. */
-export const MONEY_TABS: DistrictTab[] = [
-  { to: '/finance', tab: 'overview', label: 'Overview' },
-  { to: '/finance', tab: 'markets', label: 'Markets' },
-  { to: '/finance', tab: 'practice', label: 'Practice' },
-  { to: '/finance', tab: 'learn', label: 'Learn' },
-  { to: '/finance', tab: 'transactions', label: 'Transactions' },
-  { to: '/finance', tab: 'budgets', label: 'Budgets' },
-  { to: '/finance', tab: 'networth', label: 'Net worth' },
-  { to: '/finance', tab: 'investments', label: 'Investments' },
-  { to: '/finance', tab: 'import', label: 'Import' },
+/** Money's in-page groups and their sub-tabs (Finance.tsx). The URL carries the sub-tab id (`?tab=`); the group follows. */
+export const MONEY_GROUPS: (DistrictTab & { subs: DistrictTab[] })[] = [
+  { to: '/finance', tab: 'overview', label: 'Overview', subs: [{ to: '/finance', tab: 'overview', label: 'Overview' }] },
+  { to: '/finance', tab: 'markets', label: 'Markets', subs: [{ to: '/finance', tab: 'markets', label: 'Markets' }] },
+  {
+    to: '/finance', tab: 'cash', label: 'Cash',
+    subs: [{ to: '/finance', tab: 'transactions', label: 'Transactions' }, { to: '/finance', tab: 'budgets', label: 'Budgets' }, { to: '/finance', tab: 'import', label: 'Import' }],
+  },
+  { to: '/finance', tab: 'wealth', label: 'Wealth', subs: [{ to: '/finance', tab: 'networth', label: 'Net worth' }, { to: '/finance', tab: 'investments', label: 'Investments' }] },
+  { to: '/finance', tab: 'academy', label: 'Academy', subs: [{ to: '/finance', tab: 'practice', label: 'Practice' }, { to: '/finance', tab: 'learn', label: 'Learn' }] },
 ]
 
 export const DISTRICTS: Record<DistrictId, DistrictDef> = {
@@ -51,7 +50,7 @@ export const DISTRICTS: Record<DistrictId, DistrictDef> = {
       { to: '/planner', label: 'Planner' }, { to: '/goals', label: 'Goals' }, { to: '/habits', label: 'Habits' },
     ],
   },
-  money: { id: 'money', label: 'Money', to: '/finance', icon: 'finance', skill: 'money', routes: ['/finance'], tabs: MONEY_TABS },
+  money: { id: 'money', label: 'Money', to: '/finance', icon: 'finance', skill: 'money', routes: ['/finance'], tabs: MONEY_GROUPS },
   body: {
     id: 'body', label: 'Body', to: '/body', icon: 'body', skill: 'body', routes: ['/body', '/food'],
     tabs: [{ to: '/body', label: 'Weight' }, { to: '/food', label: 'Food' }],
@@ -87,23 +86,25 @@ export function districtForPath(pathname: string): DistrictId {
   return 'home'
 }
 
-export interface Location { district: DistrictDef; tab: DistrictTab | null }
+export interface Location { district: DistrictDef; tab: DistrictTab | null; /** Money: the sub-tab inside a group that has several. */ sub?: DistrictTab }
 
 /** District and sub-tab for a pathname (plus the query string, which picks the Money tab). */
 export function subtabForPath(pathname: string, search = ''): Location {
   const district = DISTRICTS[districtForPath(pathname)]
   if (district.id === 'money') {
-    const asked = new URLSearchParams(search).get('tab')
-    return { district, tab: MONEY_TABS.find((t) => t.tab === asked) ?? MONEY_TABS[0] }
+    const asked = new URLSearchParams(search).get('tab') ?? 'overview'
+    const group = MONEY_GROUPS.find((g) => g.subs.some((s) => s.tab === asked)) ?? MONEY_GROUPS[0]
+    const sub = group.subs.find((s) => s.tab === asked) ?? group.subs[0]
+    return { district, tab: group, sub: group.subs.length > 1 ? sub : undefined }
   }
   const tab = district.tabs.find((t) => owns(t.to, pathname) || !!t.also?.some((a) => owns(a, pathname))) ?? null
   return { district, tab }
 }
 
-/** "Money / Markets"; a district without tabs is just its name. */
+/** "Money / Cash / Budgets", "Plan / Tasks"; a district without tabs is just its name. */
 export function breadcrumb(pathname: string, search = ''): string[] {
-  const { district, tab } = subtabForPath(pathname, search)
-  return tab ? [district.label, tab.label] : [district.label]
+  const { district, tab, sub } = subtabForPath(pathname, search)
+  return [district.label, ...(tab ? [tab.label] : []), ...(sub ? [sub.label] : [])]
 }
 
 /** Remembers the last page per district so the strip returns you where you were. Module state: one per app session. */

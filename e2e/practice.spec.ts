@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 
 test('Practice: paper trade end to end and a journal entry', async ({ page }) => {
   await page.goto('/#/finance')
-  await page.getByRole('tab', { name: 'Practice' }).click()
+  await page.getByRole('tab', { name: 'Academy' }).click()
   await expect(page.getByText(/Paper account: simulated money/).first()).toBeVisible()
   await expect(page.getByText('Place your first paper trade')).toBeVisible()
 

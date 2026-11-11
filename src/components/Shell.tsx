@@ -103,8 +103,8 @@ export function SyncChip({ dotOnly = false }: { dotOnly?: boolean }) {
 function useRouteContext() {
   const { pathname, search } = useLocation()
   if (districtForPath(pathname) === 'home') return { label: 'Northstar', group: '' }
-  const [d, tab] = breadcrumb(pathname, search)
-  return tab ? { group: d, label: tab } : { group: '', label: d }
+  const [d, ...rest] = breadcrumb(pathname, search)
+  return rest.length ? { group: d, label: rest[rest.length - 1] } : { group: '', label: d }
 }
 
 const dateLabel = () => parseISODate(today()).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })

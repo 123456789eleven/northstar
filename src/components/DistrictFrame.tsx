@@ -14,7 +14,7 @@ export const hueFor = (d: DistrictDef) => (d.skill ? `var(--skill-${d.skill})` :
 export function CityHead() {
   const { pathname, search } = useLocation()
   const phone = useMedia(PHONE_QUERY)
-  const { district: d, tab } = subtabForPath(pathname, search)
+  const { district: d, tab, sub } = subtabForPath(pathname, search)
   if (d.id === 'home') return null
   return (
     <header className="city-head" data-district={d.id} style={{ '--d-hue': hueFor(d) } as CSSProperties}>
@@ -25,7 +25,8 @@ export function CityHead() {
           <nav aria-label="Breadcrumb" className="city-crumb">
             <ol>
               <li><Link to={d.to}>{d.label}</Link></li>
-              <li><span aria-current="page">{tab.label}</span></li>
+              {sub ? <li>{tab.label}</li> : <li><span aria-current="page">{tab.label}</span></li>}
+              {sub && <li><span aria-current="page">{sub.label}</span></li>}
             </ol>
           </nav>
         )}

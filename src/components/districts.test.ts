@@ -45,6 +45,9 @@ describe('subtabForPath and breadcrumb', () => {
   })
   it('reads the Money tab from the query string', () => {
     expect(breadcrumb('/finance', '?tab=markets')).toEqual(['Money', 'Markets'])
+    expect(breadcrumb('/finance', '?tab=budgets')).toEqual(['Money', 'Cash', 'Budgets'])
+    expect(breadcrumb('/finance', '?tab=investments')).toEqual(['Money', 'Wealth', 'Investments'])
+    expect(breadcrumb('/finance', '?tab=learn')).toEqual(['Money', 'Academy', 'Learn'])
     expect(breadcrumb('/finance', '?tab=bogus')).toEqual(['Money', 'Overview'])
     expect(breadcrumb('/finance')).toEqual(['Money', 'Overview'])
     expect(breadcrumb('/people')).toEqual(['People'])
