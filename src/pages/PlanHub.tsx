@@ -72,7 +72,7 @@ export default function PlanHub() {
 
   return (
     <>
-      <PageHeader title="Plan" sub="What is open, what is next, and where the season stands." />
+      <PageHeader title="Plan" sub="What is open, what is next, and how the season is shaping up." />
       {!loaded ? (
         <div className="plan-over">
           <div className="card plan-hero"><Skeleton lines={4} label="Loading plan" /></div>
@@ -121,7 +121,7 @@ export default function PlanHub() {
                   })}
                 </ul>
               ) : (
-                <p className="hub-empty">No season goal yet. <Link to="/goals">Set one on Goals</Link>.</p>
+                <p className="hub-empty">No season goal yet. <Link to="/goals">Pick the one that matters on Goals</Link>.</p>
               )}
             </div>
           </section>
@@ -153,7 +153,7 @@ export default function PlanHub() {
                 </div>
               </div>
             ) : (
-              <p className="hub-empty">No habits yet. <Link to="/habits">Add one</Link>.</p>
+              <p className="hub-empty">No habits yet. <Link to="/habits">Start with one small one</Link>.</p>
             )}
           </section>
 

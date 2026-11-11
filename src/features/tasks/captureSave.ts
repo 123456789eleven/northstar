@@ -25,7 +25,7 @@ export async function saveCapture(c: Capture): Promise<Saved | null> {
         goalId: c.goalId,
         createdAt: now,
       })
-      return { label: 'Task added', undo: () => db.tasks.delete(id) }
+      return { label: `Added: ${c.title}`, undo: () => db.tasks.delete(id) }
     }
     case 'transaction': {
       const id = await db.transactions.add({ date: c.date, amount: c.amount, description: c.description, category: 'Uncategorized' })
@@ -33,20 +33,20 @@ export async function saveCapture(c: Capture): Promise<Saved | null> {
     }
     case 'meal': {
       const id = await db.meals.add({ date: c.date, slot: c.slot, name: c.name, calories: c.calories })
-      return { label: 'Meal logged', undo: () => db.meals.delete(id) }
+      return { label: c.calories ? `Logged ${c.name}, ${c.calories} kcal` : `Logged ${c.name}`, undo: () => db.meals.delete(id) }
     }
     case 'journal': {
       const undo = await appendToToday(c.text)
-      return { label: 'Added to journal', undo }
+      return { label: "Added to today's journal", undo }
     }
     case 'weight': {
       const r = await logWeight(c.date, c.weight)
       if (!r) return null
-      return { label: r.updated ? 'Weight updated' : 'Weight logged', undo: r.undo }
+      return { label: r.updated ? `Weigh-in updated: ${c.weight} lb` : `Weigh-in logged: ${c.weight} lb`, undo: r.undo }
     }
     case 'win': {
       const id = await logEvent({ area: c.area, kind: 'win', title: c.title, milestone: true })
-      return { label: 'Win recorded', undo: () => db.events.delete(id) }
+      return { label: `Win recorded: ${c.title}`, undo: () => db.events.delete(id) }
     }
   }
 }

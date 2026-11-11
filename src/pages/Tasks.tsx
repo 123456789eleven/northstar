@@ -174,7 +174,7 @@ export default function Tasks() {
             {!loaded && <Skeleton rows={8} label="Loading tasks" />}
             {loaded && order.length === 0 && (
               <Empty title={done.length ? 'All clear' : 'No tasks yet'}>
-                Type a task in the add line. Add a day (fri, in 3d) and a priority (!1) and it lands in the right group.
+                Clear board. When something turns up, type it in the add line. Add a day (fri, in 3d) and a priority (!1) and it lands in the right group.
               </Empty>
             )}
 

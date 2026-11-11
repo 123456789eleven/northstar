@@ -79,7 +79,7 @@ export default function LogView({ items }: { items: LearningItem[] }) {
           </form>
         )}
         {sessions && sessions.length === 0 ? (
-          <Empty>No study time yet. Use the +15m / +30m / +60m buttons on an active item, or log a session above.</Empty>
+          <Empty>No study time logged yet. Tap +15m, +30m or +60m on an active item, or log a session above.</Empty>
         ) : (
           <div className="list">
             {(sessions ?? []).slice(0, shown).map((s) => (

@@ -97,7 +97,7 @@ export default function Learning() {
     <>
       <PageHeader
         title="Learning"
-        sub="Courses, certifications, books and skills."
+        sub="Courses, certifications, books and skills. What you are getting better at."
         actions={
           <>
           <FocusChip onOpen={() => { const r = getFocusRun(); const it = r.phase !== 'idle' ? all.find((x) => x.id === r.itemId) : null; if (it) setFocusFor(it) }} />
@@ -154,7 +154,7 @@ export default function Learning() {
         <Card>
           {planned.length === 0 ? (
             <Empty title="No planned items" action={<button className="btn" onClick={addFor('planned')}>Add a planned item</button>}>
-              Keep a short list of what’s next: the course after this one, a certification you want by year end.
+              Keep a short list of what's next: the course after this one, the certification you want by year end.
             </Empty>
           ) : (
             <div className="list">
@@ -170,7 +170,7 @@ export default function Learning() {
         <Card>
           {done.length === 0 ? (
             <Empty title="Nothing completed yet" action={<button className="btn" onClick={addFor('done')}>Add a completed item</button>}>
-              Finished items land here and on your Achievements wall. Already have a certification or course behind you? Add it as completed.
+              Finished items land here and on your Milestones. Already have a certification or course behind you? Add it as completed and give it its due.
             </Empty>
           ) : (
             <div className="list">

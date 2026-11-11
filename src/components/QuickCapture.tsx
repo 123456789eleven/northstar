@@ -81,7 +81,7 @@ export default function QuickCapture({ autoFocus = false, seed }: { autoFocus?: 
           autoFocus={autoFocus}
           className="qc-input"
           value={text}
-          placeholder="Capture: call mom fri !1 #career"
+          placeholder="Capture anything: call mom fri !1 #career"
           aria-label="Quick capture"
           onChange={(e) => {
             setText(e.target.value)

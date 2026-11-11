@@ -114,7 +114,7 @@ export default function Goals() {
     <>
       <PageHeader
         title="Goals"
-        sub={goals === undefined ? ' ' : all.length ? counts : 'No goals yet'}
+        sub={goals === undefined ? ' ' : all.length ? counts : 'Nothing set yet'}
         actions={
           all.length > 0 && (
             <button className="btn btn-primary" onClick={() => setEditing({ horizon: lifeGoals.length || hasQuarter ? 'quarter' : 'life' })}>

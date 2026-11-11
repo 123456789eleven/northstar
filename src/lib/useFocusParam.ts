@@ -80,7 +80,7 @@ export function useFocusTarget({ ready, exists, reveal, alsoClear = [] }: {
     if (!ready || handled.current === focus) return
     handled.current = focus
     if (!exists(focus)) {
-      toast({ message: 'That item no longer exists' })
+      toast({ message: 'That one has gone. Deleted or moved, either way it is not here anymore.' })
       clear(...alsoClear)
       return
     }

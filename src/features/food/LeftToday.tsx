@@ -76,7 +76,7 @@ export default function LeftToday({ targets, totals, isToday, hour, onTargets, r
   const sug = isDefault && weight ? suggestTargets(weight.lb) : null
   const saveCalories = async () => {
     const n = Math.round(Number(draft))
-    if (!Number.isFinite(n) || n < 500 || n > 10000) { toast({ message: 'Enter calories between 500 and 10,000' }); return }
+    if (!Number.isFinite(n) || n < 500 || n > 10000) { toast({ message: 'That target looks off. Try a number between 500 and 10,000 calories.' }); return }
     const cur = await db.settings.get(TARGETS_KEY)
     await setSetting(TARGETS_KEY, { ...((cur?.value as FoodTargets | undefined) ?? {}), calories: n } satisfies FoodTargets)
     setEditing(false)

@@ -111,7 +111,7 @@ export function GoalCard({
     if (wasDone) return
     const step = nextStepAfterMilestone(goal, msId)
     toast({
-      message: step.allDone ? step.text : `Milestone done: ${title}. ${step.text}`,
+      message: step.allDone ? step.text : `Milestone hit: ${title}. ${step.text}`,
       undo: () => undoMilestone(id, msId),
       action: step.allDone && goal.status === 'active' ? { label: 'Complete goal', run: () => finish() } : undefined,
     })

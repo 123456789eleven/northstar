@@ -122,7 +122,7 @@ export default function SlotCard({
           onSubmit={async (e) => {
             e.preventDefault()
             const ok = await createTemplate(tplName, meals)
-            toast({ message: ok ? `Saved template “${tplName.trim()}”` : 'Could not save template (name needed, max 20)' })
+            toast({ message: ok ? `Saved template “${tplName.trim()}”` : 'The template did not save. Give it a name of up to 20 characters.' })
             setTplName(null)
           }}
         >

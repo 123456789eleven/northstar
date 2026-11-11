@@ -119,7 +119,7 @@ export default function Journal() {
               </div>
             )}
             {groups.length === 0 ? (
-              <Empty>{q || tag ? 'Nothing matches.' : 'Past entries will collect here, grouped by month.'}</Empty>
+              <Empty>{q || tag ? 'Nothing matches.' : 'Your entries collect here by month. Write today’s and this stops being empty.'}</Empty>
             ) : (
               groups.map((g) => (
                 <div key={g.month}>

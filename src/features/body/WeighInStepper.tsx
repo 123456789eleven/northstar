@@ -18,7 +18,7 @@ export default function WeighInStepper({ loggedToday, last, first = false }: { l
   async function submit(e: FormEvent) {
     e.preventDefault()
     const r = await logWeight(date || t, parsed)
-    if (!r) { toast({ message: 'Enter a weight between 50 and 700 lb' }); return }
+    if (!r) { toast({ message: 'That weight looks off. Try a number between 50 and 700 lb.' }); return }
     setText('')
     setDate('')
     setShowDate(false)

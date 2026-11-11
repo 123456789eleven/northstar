@@ -112,7 +112,7 @@ test('Search deep link: a person opens with their details', async ({ page }) => 
   await expect(page.getByRole('dialog', { name: 'Fixture Wendell Marsh' })).toBeVisible()
   // A second search for the same person works again, and a missing record only toasts.
   await page.goto('/#/people?focus=99999')
-  await expect(page.getByText('That item no longer exists')).toBeVisible()
+  await expect(page.getByText('That one has gone')).toBeVisible()
 })
 
 test('Search deep link: a task opens in the task panel', async ({ page }) => {

@@ -35,7 +35,7 @@ export default function Career() {
 
   return (
     <>
-      <PageHeader title="Career" sub="Turn daily work into evidence." />
+      <PageHeader title="Career" sub="Turn daily work into a case you can make." />
       <div className="stack">
         <CaseMeter wins={wins} projects={projects} onAction={onAction} />
         <div className="car-top">

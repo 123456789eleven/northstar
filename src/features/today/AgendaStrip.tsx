@@ -20,7 +20,7 @@ export function AgendaStrip() {
         <Link className="card-link" to="/planner">Planner</Link>
       </header>
       {items.length === 0 ? (
-        <p className="tile-empty">Nothing scheduled today. Block time for a task in the <Link to="/planner">Planner</Link>.</p>
+        <p className="tile-empty">Nothing scheduled today. Block time for a task in the <Link to="/planner">Planner</Link> and it stops being a wish.</p>
       ) : (
         <ol className="agenda-rail" tabIndex={0} aria-label="Today's schedule">
           {items.map((i) => (

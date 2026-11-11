@@ -99,7 +99,7 @@ export default function Review() {
                 })}
               </div>
             ) : (
-              <Empty>Your first recap shows here. Fill in the form and save.</Empty>
+              <Empty>Your first recap lands here. Fill in the form, save it, and next week you have something to beat.</Empty>
             )}
           </Card>
         </div>

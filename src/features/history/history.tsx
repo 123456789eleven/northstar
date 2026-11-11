@@ -96,7 +96,7 @@ export function Timeline({ onAdd, revealAt }: { onAdd: () => void; /** Deep link
             <Empty title="Nothing matches that filter" action={<button className="btn btn-sm" onClick={clear}>Clear filters</button>} />
           ) : (
             <Empty title="Nothing here yet" action={<button className="btn btn-primary" onClick={onAdd}>Add something worth remembering</button>}>
-              Your history fills itself as you complete tasks, log meals, contact people and finish goals.
+              Your history writes itself as you finish tasks, log meals, contact people and close goals. Go do one thing and come back.
             </Empty>
           )}
         </section>
@@ -162,7 +162,7 @@ export function Achievements({ onAdd }: { onAdd: () => void }) {
     return (
       <section className="card">
         <Empty title="No milestones yet" action={<button className="btn btn-primary" onClick={onAdd}>Add a milestone</button>}>
-          Finished goals, completed courses and anything you add with Milestone switched on are logged here, with the date.
+          Finished goals, completed courses and anything you add with Milestone switched on are kept here, with the date. The first one is the hardest.
         </Empty>
       </section>
     )
