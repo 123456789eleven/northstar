@@ -38,7 +38,7 @@ export default function FormGuide({ txs, budgets, bills, onBudgets }: { txs: Tra
       <div className="fg-head">
         <div>
           <span className="mn-label">Form guide</span>
-          <h2 className="fg-title">{judged ? `${tally.w} wins, ${tally.d} draws, ${tally.l} losses in the last 8 weeks` : 'Your form starts with a budget'}</h2>
+          <h2 className="fg-title">{judged ? `${tally.w} ${tally.w === 1 ? 'win' : 'wins'}, ${tally.d} ${tally.d === 1 ? 'draw' : 'draws'}, ${tally.l} ${tally.l === 1 ? 'loss' : 'losses'} in the last 8 weeks` : 'Your form starts with a budget'}</h2>
         </div>
         {judged && runs.current > 0 && <span className="fg-run mn-num" data-testid="fg-run">{runs.current} {runs.current === 1 ? 'week' : 'weeks'} in a row within budget</span>}
       </div>

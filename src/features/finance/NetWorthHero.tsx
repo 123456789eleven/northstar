@@ -96,7 +96,7 @@ export function NetWorthPath({ data, name = 'Net worth' }: { data: { date: strin
               label={{ value: f.reached ? compactMoney(f.target) : `${compactMoney(f.target)}, ${whole(f.target - (data.at(-1)?.net ?? 0))} to go`, position: 'insideTopLeft', fill: f.reached ? MONEY : MUTED, fontSize: 12 }} />
           ))}
           {ms.high && data.length > 1 && !earned && <ReferenceLine y={ms.high.net} ifOverflow="hidden" stroke={MUTED} strokeDasharray="2 4" label={{ value: 'High', position: 'insideBottomRight', fill: MUTED, fontSize: 12 }} />}
-          {earned && <ReferenceDot x={rows.at(-1)!.x} y={rows.at(-1)!.net} r={6} fill="var(--reward)" stroke={CHART.surface} strokeWidth={2} ifOverflow="extendDomain" label={{ value: 'All-time high', position: 'top', fill: 'var(--reward)', fontSize: 12 }} />}
+          {earned && <ReferenceDot x={rows.at(-1)!.x} y={rows.at(-1)!.net} r={6} fill="var(--reward)" stroke={CHART.surface} strokeWidth={2} ifOverflow="extendDomain" label={{ value: 'All-time high', position: 'left', fill: 'var(--reward)', fontSize: 12 }} />}
           <Line type="monotone" dataKey="net" name={name} stroke={MONEY} strokeWidth={2.5} dot={data.length <= 24 ? { r: 3, fill: MONEY, stroke: CHART.surface, strokeWidth: 2 } : false} activeDot={ACTIVE_DOT(MONEY)} isAnimationActive={false} />
         </ComposedChart>
       </ResponsiveContainer>
