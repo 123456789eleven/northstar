@@ -12,7 +12,7 @@ describe('districtForPath', () => {
       mind: ['/mind', '/journal', '/learning'],
       career: ['/career'],
       people: ['/people'],
-      you: ['/you', '/history', '/review', '/ops', '/settings', '/data', '/ontology', '/interview', '/skills'],
+      you: ['/you', '/history', '/review', '/ops', '/settings', '/data', '/ontology', '/interview', '/skills', '/score'],
     }
     for (const [id, paths] of Object.entries(table)) for (const p of paths) expect(districtForPath(p), p).toBe(id)
   })

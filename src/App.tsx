@@ -46,6 +46,7 @@ const Home = lazy(() => import('./pages/Home'))
 const SkillsHub = lazy(() => import('./pages/SkillsHub'))
 const MindHub = lazy(() => import('./pages/MindHub'))
 const YouHub = lazy(() => import('./pages/YouHub'))
+const Score = lazy(() => import('./pages/Score'))
 
 type VTDoc = Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } }
 
@@ -112,6 +113,7 @@ function Shell() {
               <Route path="/career" element={<Career />} />
               <Route path="/people" element={<People />} />
               <Route path="/you" element={<YouHub />} />
+              <Route path="/score" element={<Score />} />
               <Route path="/skills" element={<SkillsHub />} />
               <Route path="/history" element={<History />} />
               <Route path="/review" element={<Review />} />

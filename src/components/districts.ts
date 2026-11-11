@@ -63,9 +63,9 @@ export const DISTRICTS: Record<DistrictId, DistrictDef> = {
   people: { id: 'people', label: 'People', to: '/people', icon: 'people', skill: 'people', routes: ['/people'], tabs: [] },
   you: {
     id: 'you', label: 'You', to: '/you', icon: 'user',
-    routes: ['/you', '/history', '/review', '/ops', '/settings', '/data', '/ontology', '/interview', '/skills', '/style'],
+    routes: ['/you', '/history', '/review', '/ops', '/settings', '/data', '/ontology', '/interview', '/skills', '/score', '/style'],
     tabs: [
-      { to: '/you', label: 'Overview' }, { to: '/skills', label: 'Areas' }, { to: '/history', label: 'Milestones' },
+      { to: '/you', label: 'Overview' }, { to: '/skills', label: 'Areas' }, { to: '/score', label: 'Scoreboard' }, { to: '/history', label: 'Milestones' },
       { to: '/review', label: 'Season' }, { to: '/ops', label: 'Intel' }, { to: '/settings', label: 'Settings' },
       { to: '/data', label: 'Data' }, { to: '/ontology', label: 'Ontology' },
     ],
