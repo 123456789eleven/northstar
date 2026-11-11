@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test'
 
 test('learn: open lesson, answer the check, complete it, progress updates', async ({ page }) => {
   await page.goto('/#/finance')
+  await page.getByRole('tab', { name: 'Academy' }).click()
   await page.getByRole('tab', { name: 'Learn' }).click()
   await expect(page.getByText('0 of 34 lessons')).toBeVisible()
   await page.getByRole('button', { name: /^How markets work/ }).click()

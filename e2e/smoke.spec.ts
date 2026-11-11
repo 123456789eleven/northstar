@@ -22,6 +22,7 @@ test('Settings: add from a data file (2 transactions, 1 balance)', async ({ page
 
 test('Finance > Budgets: add a bill', async ({ page }) => {
   await page.goto('/#/finance')
+  await page.getByRole('tab', { name: 'Cash' }).click()
   await page.getByRole('tab', { name: 'Budgets' }).click()
   await page.getByRole('button', { name: 'Add bill' }).click()
   const dialog = page.getByRole('dialog', { name: 'Add bill' })

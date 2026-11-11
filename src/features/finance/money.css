@@ -98,3 +98,17 @@
 
 /* Inside Money, "good" is powder blue (no green in the palette). */
 .mn-scope .good, .mn-scope .pos { color: var(--accent-text); }
+
+/* Money: five groups, sub-tabs as small pills under the strip. */
+.mn-scope .fin-groups.has-subs .tabs { margin-bottom: 10px; }
+.mn-scope .fin-subwrap { position: relative; margin-bottom: 18px; }
+.mn-scope .fin-subs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-right: 28px; }
+.mn-scope .fin-subs::-webkit-scrollbar { display: none; }
+.mn-scope .fin-subwrap::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 28px; pointer-events: none; background: linear-gradient(90deg, transparent, var(--page)); }
+.mn-scope .fin-sub { flex: none; min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink-2); font: inherit; font-size: var(--fs-2); cursor: pointer; white-space: nowrap; }
+.mn-scope .fin-sub:hover { color: var(--ink); }
+.mn-scope .fin-sub.active { color: var(--ink); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+@media (max-width: 560px) {
+  .mn-scope .fin-groups .tabs { flex-wrap: nowrap; gap: 0; }
+  .mn-scope .fin-groups .tab { flex: 1 1 0; padding: 0 4px; font-size: var(--fs-2); }
+}

@@ -92,6 +92,7 @@ for (const vp of viewports) {
       await expect(page.getByTestId('safe-inputs')).toContainText('$600 budget')
       await expect(page.getByTestId('safe-left')).toContainText('550')
       // Budgets tab shows the health bars with a state in words.
+      await page.getByRole('tab', { name: 'Cash' }).click()
       await page.getByRole('tab', { name: 'Budgets' }).click()
       await expect(page.getByText('On pace').first()).toBeVisible()
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
@@ -105,7 +106,7 @@ test.describe('G3 phone only', () => {
   test('Money: a transaction row opens the category sheet', async ({ page }) => {
     await seed(page, { transactions: [{ date: iso(new Date()), amount: -12.5, description: 'Fictional Cafe', category: 'Uncategorized' }] })
     await page.goto('/#/finance')
-    await page.getByRole('tab', { name: /Transactions/ }).click()
+    await page.getByRole('tab', { name: /Cash/ }).click()
     await page.getByRole('button', { name: /Fictional Cafe/ }).click()
     const sheet = page.getByRole('dialog', { name: 'Categorize' })
     await expect(sheet).toBeVisible()
