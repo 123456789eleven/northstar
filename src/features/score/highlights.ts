@@ -46,6 +46,8 @@ export function deriveHighlights(s: ScoreSnapshot): Highlight[] {
   for (const r of computeRecords(s)) {
     const copy = RECORD_COPY[r.id]
     if (!copy || age(r.date) > RECORD_WINDOW || age(r.date) < 0 || r.series.length < 1) continue
+    // A week or month that has not finished yet is not a highlight; point-in-time and run records are.
+    if (r.date === s.today && ['saving-month', 'tasks-week', 'people-month', 'study-week'].includes(r.id)) continue
     const c = copy(r)
     add({ id: `rec-${r.id}`, kind: r.id.endsWith('run') ? 'run' : 'record', headline: c.headline, detail: c.detail, date: r.date, weight: r.id === 'net-worth' ? 3 : 2, visual: { type: c.visual, values: r.series } })
   }
@@ -66,7 +68,8 @@ export function deriveHighlights(s: ScoreSnapshot): Highlight[] {
   }
 
   // Milestones off the timeline.
-  s.events.filter((e) => e.milestone && age(day(e.at)) <= EVENT_WINDOW && age(day(e.at)) >= 0).forEach((e, i) => {
+  const hasNw = out.some((h) => h.id === 'rec-net-worth')
+  s.events.filter((e) => e.milestone && !(hasNw && /net worth/i.test(e.title)) && age(day(e.at)) <= EVENT_WINDOW && age(day(e.at)) >= 0).forEach((e, i) => {
     add({ id: `ms-${day(e.at)}-${i}`, kind: 'milestone', headline: e.title.endsWith('.') ? e.title : `${e.title}.`, detail: 'Milestone reached.', date: day(e.at), weight: 3, visual: { type: 'dots', values: [1] } })
   })
 

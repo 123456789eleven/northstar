@@ -279,7 +279,7 @@ export function computeRecords(s: ScoreSnapshot): ScoreRecord[] {
   const wmap = (f: (w: WeekRow) => number) => new Map(weeks.map((w) => [w.weekOf, f(w)]))
   const weekEnd = (w: string) => addDays(w, 6)
   const push = (r: Omit<ScoreRecord, 'dateLabel' | 'progress' | 'holding'> & { progress?: number }) =>
-    out.push({ ...r, dateLabel: formatDate(r.date, FULL), progress: r.progress ?? (r.value > 0 ? Math.min(1, r.current / r.value) : 0), holding: r.current >= r.value && r.value > 0 })
+    out.push({ ...r, date: r.date > s.today ? s.today : r.date, dateLabel: formatDate(r.date > s.today ? s.today : r.date, FULL), progress: r.progress ?? (r.value > 0 ? Math.min(1, r.current / r.value) : 0), holding: r.current >= r.value && r.value > 0 })
   const togo = (cur: number, rec: number, fmt: (n: number) => string, unit: string) =>
     cur >= rec ? 'You are level with this one right now.' : `${fmt(rec - cur)} ${unit} to match it.`
 

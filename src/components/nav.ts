@@ -36,6 +36,7 @@ export const NAV: NavItem[] = [
   { to: '/career', label: 'Career', icon: 'career', group: 'Areas', hub: 'skills', skill: 'career', aka: 'Wins' },
   { to: '/people', label: 'People', icon: 'people', group: 'Areas', hub: 'skills', skill: 'people' },
   { to: '/you', label: 'You', icon: 'user', group: 'You', hub: 'you', aka: 'Overview' },
+  { to: '/score', label: 'Scoreboard', icon: 'trophy', group: 'You', hub: 'you', aka: 'Records Standing Highlights Ghost' },
   { to: '/history', label: 'Milestones', icon: 'trophy', group: 'You', hub: 'you', aka: 'Trophies History' },
   { to: '/review', label: 'Season', icon: 'review', group: 'You', hub: 'you', aka: 'Weekly review' },
   { to: '/ops', label: 'Intel', icon: 'command', group: 'You', hub: 'you', aka: 'Briefings' },
