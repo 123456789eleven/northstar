@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { breadcrumb, districtForPath, DISTRICTS, rememberPath, STRIP, stripTarget, subtabForPath } from './districts'
+import { breadcrumb, districtForPath, DISTRICTS, FLOOR_ALIASES, floorForPath, floorIndex, hasElevator, rememberPath, STRIP, stripTarget, subtabForPath } from './districts'
 import { NAV } from './nav'
 
 describe('districtForPath', () => {
@@ -8,7 +8,7 @@ describe('districtForPath', () => {
       home: ['/', '/map'],
       plan: ['/today', '/plan', '/tasks', '/planner', '/goals', '/habits'],
       money: ['/finance'],
-      body: ['/body', '/food'],
+      body: ['/body', '/food', '/training'],
       mind: ['/mind', '/journal', '/learning'],
       career: ['/career'],
       people: ['/people'],
@@ -27,7 +27,7 @@ describe('districtForPath', () => {
     for (const n of NAV) expect(DISTRICTS[districtForPath(n.to)]).toBeDefined()
     for (const d of Object.values(DISTRICTS)) {
       expect(districtForPath(d.to)).toBe(d.id)
-      for (const t of d.tabs) expect(districtForPath(t.to)).toBe(d.id)
+      for (const t of d.floors) expect(districtForPath(t.to)).toBe(d.id)
     }
   })
   it('strip is the seven districts without You', () => {
@@ -37,21 +37,51 @@ describe('districtForPath', () => {
 
 describe('subtabForPath and breadcrumb', () => {
   it('finds the tab inside a district', () => {
-    expect(subtabForPath('/food').tab?.label).toBe('Food')
+    expect(subtabForPath('/food').tab?.label).toBe('Kitchen')
     expect(subtabForPath('/tasks').district.id).toBe('plan')
     expect(subtabForPath('/ontology/Task').tab?.label).toBe('Ontology')
     expect(subtabForPath('/career').tab).toBeNull()
     expect(subtabForPath('/').tab).toBeNull()
   })
   it('reads the Money tab from the query string', () => {
-    expect(breadcrumb('/finance', '?tab=markets')).toEqual(['Money', 'Markets'])
-    expect(breadcrumb('/finance', '?tab=budgets')).toEqual(['Money', 'Cash', 'Budgets'])
-    expect(breadcrumb('/finance', '?tab=investments')).toEqual(['Money', 'Wealth', 'Investments'])
-    expect(breadcrumb('/finance', '?tab=learn')).toEqual(['Money', 'Academy', 'Learn'])
-    expect(breadcrumb('/finance', '?tab=bogus')).toEqual(['Money', 'Overview'])
-    expect(breadcrumb('/finance')).toEqual(['Money', 'Overview'])
-    expect(breadcrumb('/people')).toEqual(['People'])
-    expect(breadcrumb('/review')).toEqual(['You', 'Season'])
+    expect(breadcrumb('/finance', '?tab=markets')).toEqual(['Bank', 'Markets'])
+    expect(breadcrumb('/finance', '?tab=budgets')).toEqual(['Bank', 'Cash', 'Budgets'])
+    expect(breadcrumb('/finance', '?tab=investments')).toEqual(['Bank', 'Wealth', 'Investments'])
+    expect(breadcrumb('/finance', '?tab=learn')).toEqual(['Bank', 'Academy', 'Learn'])
+    expect(breadcrumb('/finance', '?tab=bogus')).toEqual(['Bank', 'Overview'])
+    expect(breadcrumb('/finance')).toEqual(['Bank', 'Overview'])
+    expect(breadcrumb('/people')).toEqual(['Park'])
+    expect(breadcrumb('/review')).toEqual(['Home base', 'Season'])
+    expect(breadcrumb('/food')).toEqual(['Gym', 'Kitchen'])
+  })
+})
+
+describe('floors', () => {
+  it('maps the Gym routes to its three floors, top to bottom', () => {
+    expect(DISTRICTS.body.floors.map((f) => f.label)).toEqual(['Weigh-in', 'Kitchen', 'Training'])
+    expect(floorForPath('/body').floor?.id).toBe('weigh-in')
+    expect(floorForPath('/food').floor?.id).toBe('kitchen')
+    expect(floorForPath('/training').floor?.id).toBe('training')
+    expect(floorIndex('/training')).toBe(2)
+    expect(floorIndex('/career')).toBe(-1)
+  })
+  it('sends every alias to a real floor of the same building', () => {
+    for (const [from, to] of Object.entries(FLOOR_ALIASES)) {
+      expect(floorForPath(from).floor?.to, from).toBe(to)
+      expect(districtForPath(from)).toBe(districtForPath(to))
+    }
+  })
+  it('keeps floor labels under four words and gives every building a name', () => {
+    for (const d of Object.values(DISTRICTS)) {
+      expect(d.building.length).toBeGreaterThan(0)
+      for (const f of d.floors) expect(f.label.split(' ').length, f.label).toBeLessThan(4)
+    }
+  })
+  it('shows an elevator only where the frame switches floors', () => {
+    expect(hasElevator(DISTRICTS.body)).toBe(true)
+    expect(hasElevator(DISTRICTS.plan)).toBe(true)
+    expect(hasElevator(DISTRICTS.money)).toBe(false)
+    expect(hasElevator(DISTRICTS.career)).toBe(false)
   })
 })
 

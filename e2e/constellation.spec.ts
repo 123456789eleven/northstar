@@ -14,7 +14,7 @@ test.describe('phone 390x844', () => {
     await bar.getByRole('link', { name: 'Plan' }).click()
     await expect(page).toHaveURL(/#\/today$/)
     await expect(bar.getByRole('link', { name: 'Plan' })).toHaveAttribute('aria-current', 'page')
-    await page.getByRole('navigation', { name: 'Plan sections' }).getByRole('link', { name: 'Tasks' }).click()
+    await page.getByRole('navigation', { name: 'Town hall floors' }).getByRole('link', { name: 'Tasks' }).click()
     await expect(page).toHaveURL(/#\/tasks$/)
     await expect(bar.getByRole('link', { name: 'Plan' })).toHaveAttribute('aria-current', 'true')
 
@@ -84,13 +84,24 @@ test('desktop 1440: district strip is the primary nav; no right rail; old URLs s
   await page.goto('/#/today')
   await expect(page).toHaveTitle('Today | Northstar')
 
-  // /food keeps working and lights Body in the hub strip and Food in the sub-strip.
+  // /food keeps working: Body lights in the strip, the Gym's Kitchen floor lights in the elevator.
   await page.goto('/#/food')
   await expect(strip.getByRole('link', { name: 'Body' })).toHaveAttribute('aria-current', 'true')
-  await expect(page.getByRole('navigation', { name: 'Body sections' }).getByRole('link', { name: 'Food' })).toHaveAttribute('aria-current', 'page')
+  const lift = page.getByRole('navigation', { name: 'Gym floors' })
+  await expect(lift.getByRole('link', { name: 'Kitchen' })).toHaveAttribute('aria-current', 'page')
   const crumb = page.getByRole('navigation', { name: 'Breadcrumb' })
-  await expect(crumb.getByRole('link', { name: 'Body' })).toHaveAttribute('href', /#\/body$/)
-  await expect(crumb.locator('[aria-current="page"]')).toHaveText('Food')
+  await expect(crumb.getByRole('link', { name: 'Gym' })).toHaveAttribute('href', /#\/body$/)
+  await expect(crumb.locator('[aria-current="page"]')).toHaveText('Kitchen')
+  // Arrow keys ride the elevator; aliases land on their floor.
+  await lift.getByRole('link', { name: 'Kitchen' }).focus()
+  await page.keyboard.press('ArrowDown')
+  await expect(lift.getByRole('link', { name: 'Training' })).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(page).toHaveURL(/#\/training$/)
+  await expect(lift.getByRole('link', { name: 'Training' })).toHaveAttribute('aria-current', 'page')
+  await page.goto('/#/kitchen')
+  await expect(page).toHaveURL(/#\/food$/)
+  await page.goto('/#/food')
   await expect(page).toHaveTitle('Food | Northstar')
   // Money tabs live in the URL, so the head reads Money / Markets and the strip returns there.
   await page.goto('/#/finance')
@@ -99,7 +110,8 @@ test('desktop 1440: district strip is the primary nav; no right rail; old URLs s
   await expect(crumb.locator('[aria-current="page"]')).toHaveText('Markets')
   await strip.getByRole('link', { name: 'People' }).click()
   await expect(page.locator('.city-head')).toHaveAttribute('data-district', 'people')
-  await expect(crumb).toHaveCount(0)
+  await expect(crumb.getByRole('link')).toHaveCount(0)
+  await expect(crumb).toHaveText('Park')
   await strip.getByRole('link', { name: 'Money' }).click()
   await expect(page).toHaveURL(/#\/finance\?tab=markets$/)
   // Groups: the URL carries the sub-tab id (as old deep links do) and the head reads Money / Cash / Budgets.

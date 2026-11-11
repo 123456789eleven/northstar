@@ -58,8 +58,7 @@ for (const vp of viewports) {
 
     test('Body: Log workout moves the training ring and Undo restores it', async ({ page }) => {
       await seed(page, { habits: [{ name: 'Lift', area: 'health', perWeek: 4, createdAt: new Date().toISOString() }], weights: [{ date: daysAgo(1), weight: 136 }] })
-      await page.goto('/#/body')
-      await page.getByRole('tab', { name: 'Training' }).click()
+      await page.goto('/#/training')
       const count = page.getByTestId('train-count')
       await expect(count).toHaveText('0')
       await page.getByRole('button', { name: 'Log workout' }).click()

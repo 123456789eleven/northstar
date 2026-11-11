@@ -1,4 +1,4 @@
-// Page loading fallback and the keyed route fade. The district frame (DistrictFrame.tsx) wraps every non-home page.
+// Page loading fallback and the keyed route fade. The building frame (BuildingFrame.tsx) wraps every non-home page.
 import { Suspense, type ReactNode } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 

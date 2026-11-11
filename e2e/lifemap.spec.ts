@@ -85,7 +85,7 @@ test.describe('Home at 1440', () => {
     await expect(page.getByRole('heading', { name: /Today's plan|Plan done/ })).toBeVisible()
     await expect(page.getByRole('region', { name: 'Focus' })).toBeVisible()
     await expect(page.getByRole('navigation', { name: 'Districts' }).getByRole('link', { name: 'Plan' })).toHaveAttribute('aria-current', 'page')
-    await expect(page.getByRole('navigation', { name: 'Plan sections' }).getByRole('link', { name: 'Today' })).toHaveAttribute('aria-current', 'page')
+    await expect(page.getByRole('navigation', { name: 'Town hall floors' }).getByRole('link', { name: 'Today' })).toHaveAttribute('aria-current', 'page')
   })
 })
 

@@ -4,6 +4,7 @@
 .cb { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; opacity: 1; transition: opacity var(--t-smooth) var(--spring-gentle); }
 .cb.is-home { opacity: 0; }
 .cb-plane { position: absolute; inset: -12% -18% 0; transform: perspective(1100px) rotateX(26deg); transform-origin: 50% 40%; }
+.cb-zoom { position: absolute; inset: 0; transform-origin: 68vw 52vh; }
 .cb-cam {
   position: absolute; left: 0; top: 0; will-change: transform;
   transform: translate3d(calc(68vw - var(--px, 0px)), calc(52vh - var(--py, 0px)), 0);

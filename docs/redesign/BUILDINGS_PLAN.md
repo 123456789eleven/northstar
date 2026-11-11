@@ -29,7 +29,7 @@ Home is the city. Each district is a **building you walk into**. Entering zooms 
 Money groups and sub-tabs become floors; Overview/Wealth duplicates merge; "Spending detail" folds into Archive. Areas hub goes (the city is the overview). Body, Food and Training pages merge into one building. Plan hub overview duplicates Today and goes. Milestones logbook and timeline merge. Mind hub overview goes. Intel and Ontology move under Settings > Power tools. Every route stays working via redirect; no feature is deleted.
 
 ## Phases (commit after each; tick here)
-- [ ] B1 Foundation: floors in `districts.ts` (routes to floors), `BuildingFrame` replaces `DistrictFrame` (floor selector: vertical elevator on desktop, pill row on phone; enter animation; header with stage meter), stage model (pure, tested), redirects for merged routes.
+- [x] B1 Foundation: floors in `districts.ts` (routes to floors), `BuildingFrame` replaces `DistrictFrame` (floor selector: vertical elevator on desktop, pill row on phone; enter animation; header with stage meter), stage model (pure, tested), redirects for merged routes. Done: `Floor`/`floors`/`building`/`floorForPath`/`FLOOR_ALIASES` in `districts.ts`; `BuildingFrame.tsx` + `building.css` (elevator with sliding lit car, arrow keys, floor slide up/down, building rise, backdrop zoom in `CityBackdrop`); `features/buildings/stage.ts` + `useBuildingStage.ts` + `StageMeter.tsx` (Gym only so far; other buildings return null until their phase); `/training` floor; Money keeps in-page tabs (`elevator: false`) until B3.
 - [ ] B2 Reference building: Gym (Weigh-in, Kitchen, Training) fully reworked to the rules, with screenshots.
 - [ ] B3 Bank (Money): five floors.
 - [ ] B4 Town hall (Plan) and Park (People).

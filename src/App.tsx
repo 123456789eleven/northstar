@@ -1,17 +1,17 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { flushSync } from 'react-dom'
-import { HashRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { HashRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { prefersReducedMotion } from './components/motion'
 import { routeTitle } from './components/nav'
 import { CaptureHost, TopBar } from './components/Shell'
 import DistrictStrip from './components/DistrictStrip'
-import { districtForPath } from './components/districts'
+import { districtForPath, FLOOR_ALIASES } from './components/districts'
 import { useMedia, PHONE_QUERY } from './components/useMedia'
 import { LifeMapProvider } from './features/lifemap/useLifeMap'
 import { CityDefs } from './features/lifemap/CityScene'
 import CityBackdrop from './features/lifemap/CityBackdrop'
 import { RouteFade } from './components/HubLayout'
-import DistrictFrame from './components/DistrictFrame'
+import BuildingFrame from './components/BuildingFrame'
 import { GlassDefs } from './components/GlassDefs'
 import { PlayerProvider } from './features/game/ui/PlayerProvider'
 import './features/game/ui/game.css'
@@ -28,6 +28,7 @@ const Tasks = lazy(() => import('./pages/Tasks'))
 const Goals = lazy(() => import('./pages/Goals'))
 const Food = lazy(() => import('./pages/Food'))
 const Body = lazy(() => import('./pages/Body'))
+const Training = lazy(() => import('./pages/Training'))
 const Interview = lazy(() => import('./pages/Interview'))
 const StyleTile = lazy(() => import('./pages/StyleTile'))
 const Finance = lazy(() => import('./pages/Finance'))
@@ -47,6 +48,12 @@ const SkillsHub = lazy(() => import('./pages/SkillsHub'))
 const MindHub = lazy(() => import('./pages/MindHub'))
 const YouHub = lazy(() => import('./pages/YouHub'))
 const Score = lazy(() => import('./pages/Score'))
+
+/** Old or alternative floor URLs land on their floor, keeping the query (?focus= and friends). */
+function Alias({ to }: { to: string }) {
+  const { search } = useLocation()
+  return <Navigate to={to + search} replace />
+}
 
 type VTDoc = Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } }
 
@@ -97,7 +104,7 @@ function Shell() {
               <Route path="/" element={<Home />} />
               <Route path="/map" element={<Home />} />
             </Route>
-            <Route element={<DistrictFrame />}>
+            <Route element={<BuildingFrame />}>
               <Route path="/today" element={<Today />} />
               <Route path="/plan" element={<PlanHub />} />
               <Route path="/tasks" element={<Tasks />} />
@@ -107,6 +114,7 @@ function Shell() {
               <Route path="/finance" element={<Finance />} />
               <Route path="/body" element={<Body />} />
               <Route path="/food" element={<Food />} />
+              <Route path="/training" element={<Training />} />
               <Route path="/mind" element={<MindHub />} />
               <Route path="/journal" element={<Journal />} />
               <Route path="/learning" element={<Learning />} />
@@ -124,6 +132,7 @@ function Shell() {
               <Route path="/interview" element={<Interview />} />
               <Route path="/style" element={<StyleTile />} />
             </Route>
+            {Object.entries(FLOOR_ALIASES).map(([from, to]) => <Route key={from} path={from} element={<Alias to={to} />} />)}
           </Routes>
         </main>
         </div>

@@ -2,14 +2,13 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo, useState } from 'react'
 import ChartFrame from '../components/ChartFrame'
 import DataTable from '../components/DataTable'
-import { Card, PageHeader, PageSkeleton, Tabs } from '../components/ui'
+import { Card, PageHeader, PageSkeleton } from '../components/ui'
 import { useToast } from '../components/toastContext'
 import { db } from '../db'
 import BodyHero from '../features/body/BodyHero'
 import { GoalPanel, GuidanceCard } from '../features/body/BodyPanels'
 import { readBodySettings, removeWeight } from '../features/body/bodyData'
 import { checkpointFlags, ghostLine } from '../features/body/pathModel'
-import TrainingPanel from '../features/body/TrainingPanel'
 import WeighInStepper from '../features/body/WeighInStepper'
 import WeightPath from '../features/body/WeightPath'
 import { averageAt, HEALTHY_RATE, movingAverage, projectDate, weeklyRate } from '../features/body/model'
@@ -25,10 +24,7 @@ export default function Body() {
   const toast = useToast()
   const weights = useLiveQuery(() => db.weights.orderBy('date').toArray(), [])
   const settingRows = useLiveQuery(() => db.settings.where('key').startsWith('body.').toArray(), [])
-  const habits = useLiveQuery(() => db.habits.toArray(), [])
-  const logs = useLiveQuery(() => db.habitLogs.where('date').between(addDays(today(), -7), today(), true, true).toArray(), [])
   const meals = useLiveQuery(() => db.meals.where('date').between(addDays(today(), -27), today(), true, true).toArray(), [])
-  const [tab, setTab] = useState<'weight' | 'training'>('weight')
   const [range, setRange] = useState<30 | 90 | 0>(90)
 
   const s = useMemo(() => readBodySettings(settingRows ?? []), [settingRows])
@@ -40,7 +36,7 @@ export default function Body() {
     return [...by.values()]
   }, [meals])
 
-  if (!weights || !settingRows || !habits || !logs || !meals) {
+  if (!weights || !settingRows || !meals) {
     return (
       <div className="stack" style={{ gap: 16 }}>
         <PageHeader title="Body" sub=" " />
@@ -68,16 +64,7 @@ export default function Body() {
   return (
     <div className="stack body-page" style={{ gap: 16 }}>
       <PageHeader title="Body" sub={sub} />
-      <Tabs value={tab} onChange={setTab} options={[{ value: 'weight', label: 'Weight' }, { value: 'training', label: 'Training' }]} />
-
-      {tab === 'training' && (
-        <div className="body-split">
-          <TrainingPanel habits={habits} target={s.trainDays} />
-          <GoalPanel s={s} firstWeight={w[0]?.weight} />
-        </div>
-      )}
-
-      {tab === 'weight' && (w.length === 0 ? (
+      {w.length === 0 ? (
         <>
           <Card title="Your first weigh-in">
             <ol className="body-first">
@@ -162,7 +149,7 @@ export default function Body() {
             <GoalPanel s={s} firstWeight={w[0]?.weight} />
           </div>
         </>
-      ))}
+      )}
 
     </div>
   )
