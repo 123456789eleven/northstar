@@ -1,95 +1,49 @@
 // Learn tab (Money): a structured path through stocks, bonds and funds. All content is local; progress lives in the `learn.progress` setting.
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getSetting, logEvent, setSetting } from '../../db'
 import { glossary, LESSONS, TRACKS, type LearnProgress, type Lesson, type Question } from './content'
 import {
-  completeLesson, isDone, nextLesson, normalizeProgress, overall, PASS_PCT, PROGRESS_KEY, recordQuiz,
+  completeLesson, isDone, normalizeProgress, PASS_PCT, PROGRESS_KEY, recordQuiz,
   scoreQuiz, searchLessons, searchTerms, touch, trackStats, uncompleteLesson,
 } from './logic'
 import './learn.css'
 
-type View = { kind: 'home' } | { kind: 'glossary' } | { kind: 'lesson'; id: string }
+export type View = { kind: 'home' } | { kind: 'glossary' } | { kind: 'lesson'; id: string }
 
-function useProgress() {
+export function useProgress() {
   const row = useLiveQuery(async () => ({ v: await getSetting<unknown>(PROGRESS_KEY, null) }), [])
   const progress = useMemo(() => normalizeProgress(row?.v), [row])
   const save = async (next: LearnProgress) => { await setSetting(PROGRESS_KEY, next) }
   return { progress, ready: row !== undefined, save }
 }
 
-export default function LearnTab() {
-  const { progress, ready, save } = useProgress()
-  const [view, setView] = useState<View>({ kind: 'home' })
-  const topRef = useRef<HTMLDivElement>(null)
-  const go = (v: View) => { setView(v); requestAnimationFrame(() => { topRef.current?.scrollIntoView({ block: 'start' }); topRef.current?.focus({ preventScroll: true }) }) }
-
-  if (!ready) return <p className="muted" role="status">Loading</p>
-  return (
-    <div className="ln" ref={topRef} tabIndex={-1}>
-      {view.kind === 'home' && <Home progress={progress} open={(id) => go({ kind: 'lesson', id })} glossary={() => go({ kind: 'glossary' })} />}
-      {view.kind === 'glossary' && <Glossary back={() => go({ kind: 'home' })} />}
-      {view.kind === 'lesson' && <LessonView key={view.id} id={view.id} progress={progress} save={save} go={go} />}
-    </div>
-  )
-}
-
-function Ring({ pct, label }: { pct: number; label: string }) {
-  const r = 34
-  const c = 2 * Math.PI * r
-  return (
-    <svg className="ln-ring" viewBox="0 0 80 80" role="img" aria-label={label}>
-      <circle cx="40" cy="40" r={r} className="ln-ring-bg" />
-      <circle cx="40" cy="40" r={r} className="ln-ring-fg" strokeDasharray={c} strokeDashoffset={c * (1 - pct / 100)} transform="rotate(-90 40 40)" />
-      <text x="40" y="45" textAnchor="middle" className="ln-ring-t">{pct}%</text>
-    </svg>
-  )
-}
-
-function Home({ progress, open, glossary: openGlossary }: { progress: LearnProgress; open: (id: string) => void; glossary: () => void }) {
+/** Every lesson by track, with search. The Academy floor opens this as its "All lessons" view. */
+export function LessonsIndex({ progress, open }: { progress: LearnProgress; open: (id: string) => void }) {
   const [q, setQ] = useState('')
-  const total = overall(progress, LESSONS)
-  const next = nextLesson(progress, LESSONS)
-  const started = total.done > 0 || !!progress.last
   const found = useMemo(() => searchLessons(LESSONS, q), [q])
   const searching = q.trim().length > 0
   return (
-    <>
-      <section className="ln-hero" aria-labelledby="ln-hero-h">
-        <div className="ln-hero-main">
-          <p className="ln-eyebrow">{next ? (started ? 'Continue where you left off' : 'Start here') : 'Path complete'}</p>
-          <h2 id="ln-hero-h" className="ln-hero-title">{next ? next.title : 'Every lesson is done'}</h2>
-          <p className="muted">{next ? `${TRACKS.find((t) => t.id === next.track)!.title}, ${next.minutes} min read. ${next.summary}` : 'Revisit any lesson below, or retake a check.'}</p>
-          {next && <button className="btn btn-primary" onClick={() => open(next.id)}>{started ? 'Continue lesson' : 'Start first lesson'}</button>}
-        </div>
-        <div className="ln-hero-side">
-          <Ring pct={total.pct} label={`${total.done} of ${total.total} lessons complete`} />
-          <p className="ln-count mn-num"><strong>{total.done}</strong> of {total.total} lessons</p>
-        </div>
-      </section>
-
+    <div className="ln">
       <div className="ln-bar">
         <label className="sr-only" htmlFor="ln-search">Search lessons</label>
         <input id="ln-search" className="input ln-search" type="search" placeholder="Search lessons" value={q} onChange={(e) => setQ(e.target.value)} />
-        <button className="btn btn-sm" onClick={openGlossary}>Glossary ({glossary.length})</button>
       </div>
-
       {searching ? (
         <section aria-label="Search results">
-          {found.length === 0 ? <p className="muted">No lesson matches "{q}". Try a word like bond, fee or stop, or search the glossary.</p> : <LessonList lessons={found} progress={progress} open={open} />}
+          {found.length === 0 ? <p className="muted">No lesson matches "{q}". Try bond, fee or stop.</p> : <LessonList lessons={found} progress={progress} open={open} />}
         </section>
       ) : (
         <div className="ln-tracks">
           {TRACKS.map((t) => {
             const s = trackStats(progress, LESSONS, t.id)
             return (
-              <section key={t.id} className="ln-track" aria-labelledby={`ln-t-${t.id}`}>
+              <section key={t.id} id={`ln-track-${t.id}`} className="ln-track" aria-labelledby={`ln-t-${t.id}`}>
                 <header className="ln-track-head">
                   <h3 id={`ln-t-${t.id}`}>{t.title}</h3>
                   <span className={`ln-track-count mn-num ${s.complete ? 'is-complete' : ''}`}>{s.complete ? 'Complete' : `${s.done} of ${s.total}`}</span>
                 </header>
-                <p className="muted ln-track-blurb">{t.blurb}</p>
                 <LessonList lessons={LESSONS.filter((l) => l.track === t.id)} progress={progress} open={open} />
               </section>
             )
@@ -97,11 +51,11 @@ function Home({ progress, open, glossary: openGlossary }: { progress: LearnProgr
         </div>
       )}
       <p className="ln-foot">Education, not advice.</p>
-    </>
+    </div>
   )
 }
 
-function LessonList({ lessons, progress, open }: { lessons: Lesson[]; progress: LearnProgress; open: (id: string) => void }) {
+export function LessonList({ lessons, progress, open }: { lessons: Lesson[]; progress: LearnProgress; open: (id: string) => void }) {
   return (
     <ul className="ln-list">
       {lessons.map((l) => {
@@ -120,13 +74,12 @@ function LessonList({ lessons, progress, open }: { lessons: Lesson[]; progress: 
   )
 }
 
-function Glossary({ back }: { back: () => void }) {
+export function Glossary() {
   const [q, setQ] = useState('')
   const list = useMemo(() => searchTerms(glossary, q), [q])
   return (
     <section aria-labelledby="ln-gl-h" className="ln-read">
-      <button className="btn btn-sm btn-ghost ln-back" onClick={back}>All lessons</button>
-      <h2 id="ln-gl-h" className="ln-title">Glossary</h2>
+      <h2 id="ln-gl-h" className="sr-only">Glossary</h2>
       <p className="muted">{glossary.length} terms, in plain language.</p>
       <label className="sr-only" htmlFor="ln-gl-q">Search the glossary</label>
       <input id="ln-gl-q" className="input ln-search" type="search" placeholder="Search terms" value={q} onChange={(e) => setQ(e.target.value)} />
@@ -140,7 +93,7 @@ function Glossary({ back }: { back: () => void }) {
   )
 }
 
-function LessonView({ id, progress, save, go }: { id: string; progress: LearnProgress; save: (p: LearnProgress) => Promise<void>; go: (v: View) => void }) {
+export function LessonView({ id, progress, save, go }: { id: string; progress: LearnProgress; save: (p: LearnProgress) => Promise<void>; go: (v: View) => void }) {
   const idx = LESSONS.findIndex((l) => l.id === id)
   const lesson = LESSONS[idx]
   const done = isDone(progress, id)
@@ -163,7 +116,6 @@ function LessonView({ id, progress, save, go }: { id: string; progress: LearnPro
 
   return (
     <article className="ln-read" aria-labelledby="ln-title">
-      <button className="btn btn-sm btn-ghost ln-back" onClick={() => go({ kind: 'home' })}>All lessons</button>
       <p className="ln-eyebrow">{track.title}, lesson {LESSONS.filter((l) => l.track === lesson.track).findIndex((l) => l.id === id) + 1} &middot; {lesson.minutes} min read{done ? ' · complete' : ''}</p>
       <h2 id="ln-title" className="ln-title">{lesson.title}</h2>
       <p className="ln-lede">{lesson.summary}</p>
@@ -193,7 +145,7 @@ function LessonView({ id, progress, save, go }: { id: string; progress: LearnPro
         </section>
       )}
 
-      {lesson.tool && <p className="ln-tool"><Link className="btn btn-sm" to={lesson.tool.to}>{lesson.tool.label}</Link> <span className="muted">Opens the Money page.</span></p>}
+      {lesson.tool && <p className="ln-tool"><Link className="btn btn-sm" to={lesson.tool.to}>{lesson.tool.label}</Link> </p>}
 
       <Quiz questions={lesson.quiz} best={progress.lessons[id]?.best} onScored={(pct) => save(recordQuiz(progress, id, pct))} />
 

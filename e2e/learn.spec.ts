@@ -2,11 +2,10 @@
 import { expect, test } from '@playwright/test'
 
 test('learn: open lesson, answer the check, complete it, progress updates', async ({ page }) => {
-  await page.goto('/#/finance')
-  await page.getByRole('tab', { name: 'Academy' }).click()
-  await page.getByRole('tab', { name: 'Learn' }).click()
+  await page.goto('/#/finance/academy')
   await expect(page.getByText('0 of 34 lessons')).toBeVisible()
-  await page.getByRole('button', { name: /^How markets work/ }).click()
+  await expect(page.getByRole('link', { name: 'Foundations: 0 of 8' })).toBeVisible()
+  await page.getByRole('link', { name: 'Start lesson' }).click()
   await expect(page.getByRole('heading', { level: 2, name: 'How markets work' })).toBeVisible()
   await expect(page.getByText('Education, not advice.')).toBeVisible()
 
@@ -19,7 +18,11 @@ test('learn: open lesson, answer the check, complete it, progress updates', asyn
 
   await page.getByRole('button', { name: 'Mark complete' }).click()
   await expect(page.getByText('Marked complete.')).toBeVisible()
-  await page.getByRole('button', { name: 'All lessons' }).click()
+  // The track ring beside the lesson fills; back on the floor the count and the ring move.
+  await expect(page.getByRole('img', { name: '1 of 8 lessons in this track' })).toBeVisible()
+  await page.getByRole('link', { name: /Academy/ }).first().click()
   await expect(page.getByText('1 of 34 lessons')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Foundations: 1 of 8' })).toBeVisible()
+  await page.getByRole('link', { name: /^Foundations/ }).click()
   await expect(page.getByRole('button', { name: /^How markets work.*complete/ })).toBeVisible()
 })
