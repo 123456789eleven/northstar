@@ -110,8 +110,8 @@ test('desktop 1440: district strip is the primary nav; no right rail; old URLs s
   await expect(crumb.locator('[aria-current="page"]')).toHaveText('Markets')
   await strip.getByRole('link', { name: 'People' }).click()
   await expect(page.locator('.city-head')).toHaveAttribute('data-district', 'people')
-  await expect(crumb.getByRole('link')).toHaveCount(0)
-  await expect(crumb).toHaveText('Park')
+  await expect(crumb.locator('[aria-current="page"]')).toHaveText('Tree')
+  await expect(crumb).toHaveText(/Park\s*Tree/)
   await strip.getByRole('link', { name: 'Money' }).click()
   await expect(page).toHaveURL(/#\/finance\?tab=markets$/)
   // Groups: the URL carries the sub-tab id (as old deep links do) and the head reads Money / Cash / Budgets.

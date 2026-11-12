@@ -7,14 +7,14 @@ import { today } from '../../lib/dates'
 import { agendaForDay } from './agenda'
 
 /** Mini time-rail of today's events and time blocks. Phone: a horizontal scroll-snap strip; desktop: a compact vertical rail. */
-export function AgendaStrip() {
+export function AgendaStrip({ bare = false }: { bare?: boolean }) {
   const d = today()
   const now = useNow()
   const events = useLiveQuery(() => db.calendar.where('date').between(addPrev(d), d, true, true).toArray(), [d])
   if (events === undefined) return <section className="card agenda-card agenda-skel skel-pulse" aria-hidden />
   const items = agendaForDay(events, d, now.getHours() * 60 + now.getMinutes())
   return (
-    <section className="card agenda-card" aria-label="Today's agenda">
+    <section className={bare ? 'agenda-card' : 'card agenda-card'} aria-label="Today's agenda">
       <header className="focus-head">
         <h2 className="focus-title">Agenda</h2>
         <Link className="card-link" to="/planner">Planner</Link>

@@ -36,7 +36,33 @@ export interface GymSnapshot {
   flagsCrossed: number
 }
 
-export interface BuildingSnapshot { body?: GymSnapshot }
+/** Town hall (Plan) inputs. */
+export interface TownSnapshot {
+  /** Tasks pinned to today's focus (open or done today). */
+  focusPinned: number
+  doneToday: number
+  /** Time blocks on this Monday-to-Sunday week. */
+  blocksThisWeek: number
+  /** Active quarter (season) goals. */
+  seasonGoals: number
+  /** Distinct days this week with at least one habit check-in. */
+  habitDaysThisWeek: number
+}
+
+/** Park (People) inputs. */
+export interface ParkSnapshot {
+  people: number
+  /** People with a check-in rhythm. */
+  withRhythm: number
+  /** Distinct people reached this Monday-to-Sunday week. */
+  reachedThisWeek: number
+  /** Circle warmth 0..100, null with nobody on a rhythm. */
+  warmthPct: number | null
+  /** People whose check-in is overdue. */
+  overdue: number
+}
+
+export interface BuildingSnapshot { body?: GymSnapshot; plan?: TownSnapshot; people?: ParkSnapshot }
 
 export const GYM_WEIGH_INS = 4
 export const GYM_MEAL_DAYS = 5
@@ -54,12 +80,40 @@ function gymSteps(s: GymSnapshot): StageStep[] {
   ]
 }
 
-const FULL: Partial<Record<DistrictId, string>> = { body: 'Every window lit' }
+export const PARK_PEOPLE = 5
+export const PARK_RHYTHMS = 3
+export const PARK_REACHED = 2
+export const PARK_WARM = 70
+export const TOWN_HABIT_DAYS = 3
+
+function townSteps(s: TownSnapshot): StageStep[] {
+  return [
+    { id: 'focus', label: 'Focus pinned', done: s.focusPinned > 0, todo: 'pin a task to today' },
+    { id: 'done', label: 'Task done today', done: s.doneToday > 0, todo: 'finish one task' },
+    { id: 'block', label: 'Time blocked', done: s.blocksThisWeek > 0, todo: 'block time for a task' },
+    { id: 'season', label: 'Season goal set', done: s.seasonGoals > 0, todo: 'set a season goal' },
+    { id: 'habits', label: `Habits ${TOWN_HABIT_DAYS} days`, done: s.habitDaysThisWeek >= TOWN_HABIT_DAYS, todo: `habits ${more(TOWN_HABIT_DAYS - s.habitDaysThisWeek, 'day')}` },
+  ]
+}
+
+function parkSteps(s: ParkSnapshot): StageStep[] {
+  return [
+    { id: 'people', label: `${PARK_PEOPLE} people`, done: s.people >= PARK_PEOPLE, todo: more(PARK_PEOPLE - s.people, 'person', 'people') },
+    { id: 'rhythm', label: `${PARK_RHYTHMS} rhythms set`, done: s.withRhythm >= PARK_RHYTHMS, todo: `${more(PARK_RHYTHMS - s.withRhythm, 'rhythm')} to set` },
+    { id: 'reach', label: 'Reached out', done: s.reachedThisWeek >= PARK_REACHED, todo: `reach ${PARK_REACHED - s.reachedThisWeek} more ${PARK_REACHED - s.reachedThisWeek === 1 ? 'person' : 'people'}` },
+    { id: 'warm', label: `Circle ${PARK_WARM}% warm`, done: (s.warmthPct ?? 0) >= PARK_WARM, todo: `warm the circle to ${PARK_WARM}%` },
+    { id: 'clear', label: 'Nobody waiting', done: s.withRhythm > 0 && s.overdue === 0, todo: s.overdue ? `${s.overdue} waiting to hear from you` : 'set a rhythm' },
+  ]
+}
+
+const FULL: Partial<Record<DistrictId, string>> = { body: 'Every window lit', plan: 'Every window lit', people: 'Every window lit' }
 
 /** The building's stage from its snapshot, or null for a building that has no stage yet. */
 export function buildingStage(district: DistrictId, snap: BuildingSnapshot): BuildingStage | null {
   let steps: StageStep[] | null = null
   if (district === 'body' && snap.body) steps = gymSteps(snap.body)
+  if (district === 'plan' && snap.plan) steps = townSteps(snap.plan)
+  if (district === 'people' && snap.people) steps = parkSteps(snap.people)
   if (!steps) return null
   const stage = steps.filter((s) => s.done).length
   const next = steps.find((s) => !s.done) ?? null

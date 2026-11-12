@@ -42,7 +42,7 @@ const Journal = lazy(() => import('./pages/Journal'))
 const Planner = lazy(() => import('./pages/Planner'))
 const DataHub = lazy(() => import('./pages/DataHub'))
 const Career = lazy(() => import('./pages/Career'))
-const PlanHub = lazy(() => import('./pages/PlanHub'))
+const ReachOut = lazy(() => import('./pages/ReachOut'))
 const Home = lazy(() => import('./pages/Home'))
 const SkillsHub = lazy(() => import('./pages/SkillsHub'))
 const MindHub = lazy(() => import('./pages/MindHub'))
@@ -106,7 +106,6 @@ function Shell() {
             </Route>
             <Route element={<BuildingFrame />}>
               <Route path="/today" element={<Today />} />
-              <Route path="/plan" element={<PlanHub />} />
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/planner" element={<Planner />} />
               <Route path="/goals" element={<Goals />} />
@@ -120,6 +119,7 @@ function Shell() {
               <Route path="/learning" element={<Learning />} />
               <Route path="/career" element={<Career />} />
               <Route path="/people" element={<People />} />
+              <Route path="/reach-out" element={<ReachOut />} />
               <Route path="/you" element={<YouHub />} />
               <Route path="/score" element={<Score />} />
               <Route path="/skills" element={<SkillsHub />} />

@@ -69,7 +69,7 @@ export const DISTRICTS: Record<DistrictId, DistrictDef> = {
     id: 'plan', label: 'Plan', building: 'Town hall', to: '/today', icon: 'planner',
     routes: ['/today', '/plan', '/tasks', '/planner', '/goals', '/habits'],
     floors: [
-      { id: 'today', to: '/today', label: 'Today', icon: 'today' }, { id: 'overview', to: '/plan', label: 'Overview', icon: 'planner' },
+      { id: 'today', to: '/today', label: 'Today', icon: 'today' },
       { id: 'tasks', to: '/tasks', label: 'Tasks', icon: 'tasks' }, { id: 'planner', to: '/planner', label: 'Planner', icon: 'calendar' },
       { id: 'goals', to: '/goals', label: 'Goals', icon: 'goals' }, { id: 'habits', to: '/habits', label: 'Habits', icon: 'habits' },
     ],
@@ -91,7 +91,13 @@ export const DISTRICTS: Record<DistrictId, DistrictDef> = {
     ],
   },
   career: { id: 'career', label: 'Career', building: 'Office', to: '/career', icon: 'career', skill: 'career', routes: ['/career'], floors: [] },
-  people: { id: 'people', label: 'People', building: 'Park', to: '/people', icon: 'people', skill: 'people', routes: ['/people'], floors: [] },
+  people: {
+    id: 'people', label: 'People', building: 'Park', to: '/people', icon: 'people', skill: 'people', routes: ['/people', '/reach-out'],
+    floors: [
+      { id: 'tree', to: '/people', label: 'Tree', icon: 'people' },
+      { id: 'reach-out', to: '/reach-out', label: 'Reach out', icon: 'capture' },
+    ],
+  },
   you: {
     id: 'you', label: 'You', building: 'Home base', to: '/you', icon: 'user',
     routes: ['/you', '/history', '/review', '/ops', '/settings', '/data', '/ontology', '/interview', '/skills', '/score', '/style'],
@@ -114,6 +120,7 @@ export const FLOOR_ALIASES: Record<string, string> = {
   '/meals': '/food',
   '/body/training': '/training',
   '/lift': '/training',
+  '/plan': '/today',
 }
 
 /** The bottom strip, left to right. You lives behind the profile control in the top bar. */

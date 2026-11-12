@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Kbd } from '../components/Shortcuts'
 import { openShortcuts } from '../components/shortcutsData'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
-import { Card, Empty, PageHeader, Skeleton } from '../components/ui'
-import KpiStrip from '../components/KpiStrip'
+import { Card, Empty, Skeleton } from '../components/ui'
 import SidePanel from '../components/SidePanel'
 import { useMedia, PHONE_QUERY } from '../components/useMedia'
 import { addDays, today } from '../lib/dates'
@@ -17,9 +15,12 @@ import { doneMessage } from '../features/tasks/winCopy'
 import { useToast } from '../components/toastContext'
 import { useFocusTarget } from '../lib/useFocusParam'
 import { FocusBar } from '../features/tasks/FocusBar'
+import { TasksHero } from '../features/town/TasksHero'
+import { FloorMore, FloorView } from '../features/buildings/Floor'
 import '../features/tasks/tasks.css'
 import '../features/tasks/g2a.css'
 import '../features/tasks/tasks2.css'
+import '../features/town/town.css'
 
 export default function Tasks() {
   const d = today()
@@ -147,83 +148,87 @@ export default function Tasks() {
     </>
   )
 
+  const doneToday = useMemo(() => (tasks ?? []).filter((t) => t.status === 'done' && (t.doneAt ?? '').slice(0, 10) === d).length, [tasks, d])
+
+  const hero = loaded ? (
+    <TasksHero
+      open={order.length}
+      overdue={overdueCount}
+      dueToday={todayCount}
+      doneToday={doneToday}
+      add={!phone ? quickAdd : undefined}
+      focus={<FocusBar tasks={tasks} d={d} onEdit={(t) => pick(t.id!)} bare />}
+    />
+  ) : (
+    <div className="skel skel-strip skel-pulse" aria-hidden />
+  )
+
+  const list = (
+    <div key="list" className="tq">
+      <div className="tq-main">
+        <Card>
+          {note && <div className="focus-note" style={{ marginBottom: 10 }}>{note}</div>}
+
+          {!loaded && <Skeleton rows={8} label="Loading tasks" />}
+          {loaded && order.length === 0 && (
+            <Empty title={done.length ? 'All clear' : 'No tasks yet'}>
+              Clear board. When something turns up, type it in the add line. Add a day (fri, in 3d) and a priority (!1) and it lands in the right group.
+            </Empty>
+          )}
+
+          {groups.map((g) => (
+            <div key={g.key} className="task-section">
+              <div className="section-head">
+                <span className={g.tone}>{g.label}</span>
+                <span className="count">{g.tasks.length}</span>
+              </div>
+              <div className="list">{g.tasks.map(row)}</div>
+            </div>
+          ))}
+
+          {done.length > 0 && (
+            <div className="task-section">
+              <div className="section-head">
+                <button className="section-toggle" onClick={() => setShowDone((v) => !v)} aria-expanded={showDone}>
+                  {showDone ? 'Hide' : 'Show'} completed
+                </button>
+                <span className="count">{done.length} in the last 14 days</span>
+              </div>
+              {showDone && <div className="list">{done.map(row)}</div>}
+            </div>
+          )}
+        </Card>
+      </div>
+
+      {selected && (
+        <SidePanel inline title="Task" onClose={() => setClosed(true)}>
+          <TaskForm
+            key={selected.id}
+            task={selected}
+            goals={goals ?? []}
+            keepOpen
+            onClose={() => setClosed(true)}
+            onDeleted={(t) => pick(selectionAfterRemoval(order, t.id!, order.filter((id) => id !== t.id)))}
+          />
+        </SidePanel>
+      )}
+    </div>
+  )
+
+  const more = (
+    <FloorMore
+      floor="Tasks"
+      items={[
+        ...(done.length > 0 ? [{ id: 'done', label: showDone ? 'Hide completed' : 'Show completed', value: done.length, onSelect: () => setShowDone((v) => !v) }] : []),
+        ...(!phone ? [{ id: 'keys', label: 'Keyboard shortcuts', onSelect: openShortcuts }] : []),
+        { id: 'planner', label: 'Block time', to: '/planner' },
+      ]}
+    />
+  )
+
   return (
     <>
-      <PageHeader title="Tasks" sub={loaded ? `${order.length} open${overdueCount ? ` · ${overdueCount} overdue` : ''}` : ' '} />
-
-      {!loaded && <div className="skel skel-strip skel-pulse" style={{ marginBottom: 16 }} aria-hidden />}
-      {loaded && order.length > 0 && (
-        <div className="tq-kpi"><KpiStrip
-          items={[
-            { label: 'Open', value: order.length },
-            { label: 'Overdue', value: overdueCount, deltaTone: overdueCount ? 'warn' : 'neutral', note: overdueCount ? 'Reschedule or finish' : 'None late' },
-            { label: 'Due today', value: todayCount },
-            { label: 'Done in 14 days', value: done.length },
-          ]}
-        /></div>
-      )}
-
-      {loaded && <div className="tq-focus"><FocusBar tasks={tasks} d={d} onEdit={(t) => pick(t.id!)} /></div>}
-
-      <div className="tq">
-        <div className="tq-main">
-          <Card>
-            {!phone && quickAdd}
-            {note && <div className="focus-note" style={{ marginBottom: 10 }}>{note}</div>}
-
-            {!loaded && <Skeleton rows={8} label="Loading tasks" />}
-            {loaded && order.length === 0 && (
-              <Empty title={done.length ? 'All clear' : 'No tasks yet'}>
-                Clear board. When something turns up, type it in the add line. Add a day (fri, in 3d) and a priority (!1) and it lands in the right group.
-              </Empty>
-            )}
-
-            {groups.map((g) => (
-              <div key={g.key} className="task-section">
-                <div className="section-head">
-                  <span className={g.tone}>{g.label}</span>
-                  <span className="count">{g.tasks.length}</span>
-                </div>
-                <div className="list">{g.tasks.map(row)}</div>
-              </div>
-            ))}
-
-            {done.length > 0 && (
-              <div className="task-section">
-                <div className="section-head">
-                  <button className="section-toggle" onClick={() => setShowDone((v) => !v)} aria-expanded={showDone}>
-                    {showDone ? 'Hide' : 'Show'} completed
-                  </button>
-                  <span className="count">{done.length} in the last 14 days</span>
-                </div>
-                {showDone && <div className="list">{done.map(row)}</div>}
-              </div>
-            )}
-          </Card>
-          {!phone && order.length > 0 && (
-            <button type="button" className="key-hint tq-keys" onClick={openShortcuts}>
-              <span className="sr-only">Keyboard shortcuts: </span><span><Kbd k={['j']} /><Kbd k={['k']} /> move</span><span><Kbd k={['x']} /> complete</span><span><Kbd k={['?']} /> all shortcuts</span>
-            </button>
-          )}
-        </div>
-
-        {selected && (
-          <SidePanel
-            inline
-            title="Task"
-            onClose={() => setClosed(true)}
-          >
-            <TaskForm
-              key={selected.id}
-              task={selected}
-              goals={goals ?? []}
-              keepOpen
-              onClose={() => setClosed(true)}
-              onDeleted={(t) => pick(selectionAfterRemoval(order, t.id!, order.filter((id) => id !== t.id)))}
-            />
-          </SidePanel>
-        )}
-      </div>
+      <FloorView label="Tasks" className="town-floor" hero={hero} support={[list]} more={more} />
       {phone && <div className="tq-phone-pad" aria-hidden />}
       {phone && <div className="quick-add-sticky">{quickAdd}</div>}
     </>
