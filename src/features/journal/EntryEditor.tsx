@@ -13,17 +13,21 @@ import type { JournalPrefs } from './prefs'
 import { Ring } from '../game/ui/Ring'
 import { useGoalPulse } from './useGoalPulse'
 import { fraction } from './constellation'
+import { useNumberRoll } from '../../components/motion'
+import { PHONE_QUERY, useMedia } from '../../components/useMedia'
 
 interface Props {
   date: ISODate
   entry?: JournalEntry
   entries: JournalEntry[]
+  /** One short line under the word count (the week so far). */
+  weekNote?: string
   prefs: JournalPrefs
   onPref: (patch: Partial<JournalPrefs>) => void
 }
 
 /** Autosaving editor for one day's entry. Remount (key) per date. */
-export function EntryEditor({ date, entry, entries, prefs, onPref }: Props) {
+export function EntryEditor({ date, entry, entries, weekNote, prefs, onPref }: Props) {
   const [text, setText] = useState(entry?.text ?? '')
   const [mood, setMood] = useState(entry?.mood)
   const [energy, setEnergy] = useState(entry?.energy)
@@ -80,7 +84,9 @@ export function EntryEditor({ date, entry, entries, prefs, onPref }: Props) {
   const empty = !text.trim()
   const prompt = dailyPrompt(date, skip)
   const words = wordCount(text)
+  const phone = useMedia(PHONE_QUERY)
   const pulse = useGoalPulse(words, prefs.goal)
+  const shownWords = useNumberRoll(words, 350)
   const streak = useMemo(
     () => wordStreak([...entries.filter((e) => e.date !== date), { date, text }], today()),
     [entries, date, text],
@@ -97,9 +103,10 @@ export function EntryEditor({ date, entry, entries, prefs, onPref }: Props) {
   return (
     <div className="stack">
       <div className={`jr-edhead ${pulse ? 'is-pulsing' : ''}`}>
-        <Ring value={fraction(words, prefs.goal)} size={36} stroke={3} tone="mind" label={`Today's words: ${words} of ${prefs.goal}`} className="jr-wordring" />
+        <Ring value={fraction(words, prefs.goal)} size={phone ? 48 : 64} stroke={phone ? 4 : 5} tone={words >= prefs.goal ? 'reward' : 'mind'} label={`Today's words: ${words} of ${prefs.goal}`} className="jr-wordring" />
         <span className="jr-edhead-text">
-          <span className="mono">{words}</span> / {prefs.goal} words{words >= prefs.goal ? ' · goal met' : ''}
+          <span className="jr-edhead-big"><span className="mono jr-edhead-num">{shownWords}</span><span className="jr-edhead-of"> of {prefs.goal} words</span></span>
+          <span className="jr-edhead-note">{words >= prefs.goal ? 'Word goal met.' : weekNote ?? 'Your words settle as you type.'}</span>
         </span>
       </div>
       {empty && !focus && (
@@ -149,7 +156,7 @@ export function EntryEditor({ date, entry, entries, prefs, onPref }: Props) {
       )}
       <div className="jr-foot">
         <span className="jr-tags">{tags.length ? tags.map((t) => `#${t}`).join(' ') : 'Stays on this device'}</span>
-        <span aria-live="polite">{words} words · {saved === null ? 'Saving…' : saved ? `Saved ${saved}` : 'Saved'}</span>
+        <span aria-live="polite">{words} words · {saved === null ? 'Saving…' : saved ? <span key={saved} className="jr-saved">Saved {saved}</span> : 'Saved'}</span>
       </div>
       <div className="row jr-actions">
         <button ref={focusBtn} type="button" className="btn btn-sm" onClick={() => setFocus(true)} aria-haspopup="dialog">Focus</button>

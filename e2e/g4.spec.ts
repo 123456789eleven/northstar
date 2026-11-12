@@ -18,7 +18,8 @@ for (const s of sizes) {
     test('Learning: a focus run logs minutes and Undo takes them back', async ({ page }) => {
       await page.clock.install()
       await page.goto('/#/learning')
-      await page.getByRole('button', { name: 'Add item' }).click()
+      await page.getByTestId('floor-more').click()
+      await page.getByRole('button', { name: 'Add item', exact: true }).click()
       const modal = page.getByRole('dialog', { name: 'Add learning item' })
       await modal.getByLabel('Title').fill('Fixture Spreadsheet Course')
       await modal.getByRole('button', { name: 'Add', exact: true }).click()
@@ -43,18 +44,38 @@ for (const s of sizes) {
       await noHScroll(page)
     })
 
-    test('Career: the case meter rises after logging a win', async ({ page }) => {
-      await page.goto('/#/career')
+    test('Career: a logged win rises into the case meter; Case shows inputs and the rules', async ({ page }) => {
+      await page.goto('/#/case')
       const score = page.getByTestId('case-score')
       await expect(score).toHaveAttribute('data-score', '0')
-      await expect(page.getByText('Next: ')).toBeVisible()
-      await page.getByRole('button', { name: 'Log a win' }).first().click()
+      await expect(page.getByTestId('case-meter').getByText('Next: ')).toBeVisible()
+      await page.getByRole('button', { name: 'Log a win', exact: true }).click()
+      await expect(page).toHaveURL(/#\/career$/)
       await page.getByLabel('Log a win', { exact: true }).fill('Fixture: shipped the handoff checklist #reliability')
       await page.getByRole('button', { name: 'Log win', exact: true }).click()
       await expect(page.getByText('Win logged')).toBeVisible()
+      await expect(page.getByTestId('wins-month')).toHaveText('1')
+      await page.goto('/#/case')
       await expect.poll(async () => Number(await score.getAttribute('data-score'))).toBeGreaterThan(0)
-      await page.getByText('How this is scored').click()
+      await expect(page.getByRole('list', { name: 'Case inputs' })).toBeVisible()
+      await page.getByTestId('floor-more').click()
+      await page.getByRole('button', { name: 'How it is scored', exact: true }).click()
       await expect(page.getByText('Five parts, 20 points each')).toBeVisible()
+      await noHScroll(page)
+    })
+
+    test('Career: project status slides and Leadership coverage is in More', async ({ page }) => {
+      await page.goto('/#/projects')
+      await page.getByRole('button', { name: 'Start a project' }).click()
+      await page.getByLabel('Name').fill('Fixture handoff errors')
+      await page.getByRole('button', { name: 'Save', exact: true }).click()
+      await expect(page.getByRole('heading', { name: 'Fixture handoff errors' })).toBeVisible()
+      await page.getByRole('button', { name: 'piloting' }).click()
+      await expect(page.getByRole('button', { name: 'piloting' })).toHaveAttribute('aria-pressed', 'true')
+      await page.goto('/#/career')
+      await page.getByTestId('floor-more').click()
+      await page.getByRole('button', { name: 'Leadership coverage', exact: true }).click()
+      await expect(page.getByText('Informal leadership')).toBeVisible()
       await noHScroll(page)
     })
 
@@ -125,7 +146,7 @@ for (const s of sizes) {
       await noHScroll(page)
     })
 
-    test('Journal: the word ring fills as you type; Mind hub shows the overview', async ({ page }) => {
+    test('Journal: the word ring fills as you type; /mind opens the Journal', async ({ page }) => {
       await page.goto('/#/journal')
       const ring = page.getByRole('img', { name: /^Today's words: \d+ of \d+$/ })
       await expect(ring).toHaveAttribute('aria-label', /^Today's words: 0 of/)
@@ -134,8 +155,8 @@ for (const s of sizes) {
       await expect(page.getByTestId('journal-hero')).toBeVisible()
       await noHScroll(page)
       await page.goto('/#/mind')
-      await expect(page.getByTestId('mind-overview')).toBeVisible()
-      await expect(page.getByTestId('mood-preview')).toBeVisible()
+      await expect(page).toHaveURL(/#\/journal$/)
+      await expect(page.getByTestId('journal-hero')).toBeVisible()
       await noHScroll(page)
     })
   })

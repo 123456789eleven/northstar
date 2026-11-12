@@ -84,13 +84,20 @@ export const DISTRICTS: Record<DistrictId, DistrictDef> = {
     ],
   },
   mind: {
-    id: 'mind', label: 'Mind', building: 'Library', to: '/mind', icon: 'mind', skill: 'mind', routes: ['/mind', '/journal', '/learning'],
+    id: 'mind', label: 'Mind', building: 'Library', to: '/journal', icon: 'mind', skill: 'mind', routes: ['/journal', '/learning'],
     floors: [
-      { id: 'overview', to: '/mind', label: 'Overview', icon: 'mind' }, { id: 'journal', to: '/journal', label: 'Journal', icon: 'journal' },
-      { id: 'learning', to: '/learning', label: 'Learning', icon: 'learning' },
+      { id: 'journal', to: '/journal', label: 'Journal', icon: 'journal' },
+      { id: 'study', to: '/learning', label: 'Study', icon: 'learning' },
     ],
   },
-  career: { id: 'career', label: 'Career', building: 'Office', to: '/career', icon: 'career', skill: 'career', routes: ['/career'], floors: [] },
+  career: {
+    id: 'career', label: 'Career', building: 'Office', to: '/career', icon: 'career', skill: 'career', routes: ['/career', '/case', '/projects'],
+    floors: [
+      { id: 'wins', to: '/career', label: 'Wins', icon: 'career' },
+      { id: 'case', to: '/case', label: 'Case', icon: 'goals' },
+      { id: 'projects', to: '/projects', label: 'Projects', icon: 'tasks' },
+    ],
+  },
   people: { id: 'people', label: 'People', building: 'Park', to: '/people', icon: 'people', skill: 'people', routes: ['/people'], floors: [] },
   you: {
     id: 'you', label: 'You', building: 'Home base', to: '/you', icon: 'user',
@@ -114,6 +121,7 @@ export const FLOOR_ALIASES: Record<string, string> = {
   '/meals': '/food',
   '/body/training': '/training',
   '/lift': '/training',
+  '/mind': '/journal',
 }
 
 /** The bottom strip, left to right. You lives behind the profile control in the top bar. */

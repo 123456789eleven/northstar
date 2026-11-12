@@ -65,7 +65,7 @@ test('Ctrl+K palette: search and navigate', async ({ page }) => {
 
 test('Career: log a win and see it listed', async ({ page }) => {
   await page.goto('/#/career')
-  await page.getByLabel('Log a win').fill('Fixture shipped the new checklist #reliability #impact 3h/week')
+  await page.getByLabel('Log a win', { exact: true }).fill('Fixture shipped the new checklist #reliability #impact 3h/week')
   await page.getByRole('button', { name: 'Log win' }).click()
   await expect(page.getByRole('list', { name: 'Wins' }).getByText('Fixture shipped the new checklist')).toBeVisible()
   await expect(page.getByRole('list', { name: 'Wins' }).getByText('3h/week')).toBeVisible()

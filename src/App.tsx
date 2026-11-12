@@ -42,10 +42,11 @@ const Journal = lazy(() => import('./pages/Journal'))
 const Planner = lazy(() => import('./pages/Planner'))
 const DataHub = lazy(() => import('./pages/DataHub'))
 const Career = lazy(() => import('./pages/Career'))
+const Case = lazy(() => import('./pages/Case'))
+const Projects = lazy(() => import('./pages/Projects'))
 const PlanHub = lazy(() => import('./pages/PlanHub'))
 const Home = lazy(() => import('./pages/Home'))
 const SkillsHub = lazy(() => import('./pages/SkillsHub'))
-const MindHub = lazy(() => import('./pages/MindHub'))
 const YouHub = lazy(() => import('./pages/YouHub'))
 const Score = lazy(() => import('./pages/Score'))
 
@@ -115,10 +116,11 @@ function Shell() {
               <Route path="/body" element={<Body />} />
               <Route path="/food" element={<Food />} />
               <Route path="/training" element={<Training />} />
-              <Route path="/mind" element={<MindHub />} />
               <Route path="/journal" element={<Journal />} />
               <Route path="/learning" element={<Learning />} />
               <Route path="/career" element={<Career />} />
+              <Route path="/case" element={<Case />} />
+              <Route path="/projects" element={<Projects />} />
               <Route path="/people" element={<People />} />
               <Route path="/you" element={<YouHub />} />
               <Route path="/score" element={<Score />} />

@@ -1,12 +1,11 @@
-import { useState } from 'react'
-import { Empty, Field, Modal } from '../../components/ui'
+import { Field, Modal } from '../../components/ui'
 import { useToast } from '../../components/toastContext'
 import { today } from '../../lib/dates'
 import { newId } from '../goals/progress'
 import { saveProjects } from './careerData'
-import { MAX_PROJECTS, STATUSES, barWidths, improvementPct, resultSentence, type Metric, type Project } from './projects'
+import { STATUSES, type Metric, type Project } from './projects'
 
-interface Draft {
+export interface Draft {
   id: string; name: string; problem: string; better: 'lower' | 'higher'
   bv: string; bu: string; bd: string; change: string; rv: string; ru: string; rd: string
   status: Project['status']; next: string; featured: boolean
@@ -14,7 +13,7 @@ interface Draft {
 
 const metric = (v: string, u: string, d: string): Metric | undefined => (v.trim() !== '' && Number.isFinite(Number(v)) ? { value: Number(v), unit: u.trim(), date: d || today() } : undefined)
 
-function toDraft(p?: Project, first = false): Draft {
+export function toDraft(p?: Project, first = false): Draft {
   return {
     id: p?.id ?? newId(), name: p?.name ?? '', problem: p?.problem ?? '', better: p?.better ?? 'lower',
     bv: p?.baseline ? String(p.baseline.value) : '', bu: p?.baseline?.unit ?? '', bd: p?.baseline?.date ?? today(),
@@ -23,42 +22,9 @@ function toDraft(p?: Project, first = false): Draft {
   }
 }
 
-function ProjectCard({ p, onEdit }: { p: Project; onEdit: () => void }) {
-  const bars = barWidths(p)
-  const pct = improvementPct(p)
-  const sentence = resultSentence(p)
-  return (
-    <section className={`card car-project ${p.featured ? 'car-featured' : ''}`}>
-      <div className="row-between">
-        <h2 className="car-h">{p.name}</h2>
-        <span className="chip">{p.status}</span>
-      </div>
-      {p.problem && <p className="muted small">{p.problem}</p>}
-      {bars ? (
-        <div className="car-ba" role="img" aria-label={`Before ${p.baseline!.value}, after ${p.result!.value}`}>
-          <span className="car-ba-label">Before</span>
-          <span className="car-ba-track"><span className="car-ba-fill car-ba-before" style={{ width: `${bars.before}%` }} /></span>
-          <span className="car-ba-val">{p.baseline!.value}</span>
-          <span className="car-ba-label">After</span>
-          <span className="car-ba-track"><span className="car-ba-fill car-ba-after" style={{ width: `${bars.after}%` }} /></span>
-          <span className="car-ba-val">{p.result!.value}</span>
-        </div>
-      ) : (
-        <p className="muted small">{p.baseline ? 'Add a result metric to see the before and after.' : 'Capture a baseline first: measure before you change anything.'}</p>
-      )}
-      {sentence && <p className="car-sentence">{sentence}{pct == null ? '' : '.'}</p>}
-      {p.change && <p className="small"><span className="muted">Change: </span>{p.change}</p>}
-      {p.next && <p className="small"><span className="muted">Next step: </span>{p.next}</p>}
-      <div className="row"><button className="btn btn-sm" type="button" onClick={onEdit}>Edit {p.name}</button></div>
-    </section>
-  )
-}
-
-export function ProjectPanel({ projects }: { projects: Project[] }) {
+/** The add / edit project dialog. The floor owns `editing`; null closes it. */
+export function ProjectEditor({ projects, editing, setEditing }: { projects: Project[]; editing: Draft | null; setEditing: (d: Draft | null) => void }) {
   const toast = useToast()
-  const [editing, setEditing] = useState<Draft | null>(null)
-  const sorted = [...projects].sort((a, b) => Number(b.featured) - Number(a.featured))
-
   const save = async () => {
     if (!editing || !editing.name.trim()) return
     const d = editing
@@ -82,18 +48,10 @@ export function ProjectPanel({ projects }: { projects: Project[] }) {
     setEditing(null)
     toast({ message: 'Project deleted', undo: () => saveProjects(before) })
   }
-  const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setEditing((d) => (d ? { ...d, [k]: v } : d))
-  const atMax = projects.length >= MAX_PROJECTS
+  const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setEditing(editing ? { ...editing, [k]: v } : null)
 
   return (
-    <div className="stack">
-      {!sorted.length && (
-        <Empty title="No improvement project yet" action={<button className="btn btn-primary" type="button" onClick={() => setEditing(toDraft(undefined, true))}>Start a project</button>}>
-          Pick one measurable thing to make better. Write down the number today, before you change anything.
-        </Empty>
-      )}
-      {sorted.map((p) => <ProjectCard key={p.id} p={p} onEdit={() => setEditing(toDraft(p))} />)}
-      {!!sorted.length && <div><button className="btn" type="button" disabled={atMax} onClick={() => setEditing(toDraft())}>Add project</button></div>}
+    <>
       {editing && (
         <Modal title={projects.some((p) => p.id === editing.id) ? 'Edit project' : 'New project'} onClose={() => setEditing(null)} wide>
           <div className="stack">
@@ -133,6 +91,6 @@ export function ProjectPanel({ projects }: { projects: Project[] }) {
           </div>
         </Modal>
       )}
-    </div>
+    </>
   )
 }

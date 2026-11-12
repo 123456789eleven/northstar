@@ -6,6 +6,7 @@ import { addDays, startOfWeek, today } from '../../lib/dates'
 import { BODY_DEFAULTS, findLiftHabit, readBodySettings } from '../body/bodyData'
 import { averageAt, movingAverage } from '../body/model'
 import { checkpointFlags } from '../body/pathModel'
+import { librarySnapshot, officeSnapshot } from './stageMindCareer'
 import { buildingStage, type BuildingStage, type GymSnapshot } from './stage'
 
 export interface GymRaw {
@@ -44,6 +45,8 @@ export function gymSnapshotFrom(raw: GymRaw, t: ISODate): GymSnapshot {
 /** Live stage for a building, undefined while loading, null when the building has no stage yet. */
 export function useBuildingStage(id: DistrictId): BuildingStage | null | undefined {
   return useLiveQuery(async () => {
+    if (id === 'mind') return buildingStage('mind', { mind: await librarySnapshot() })
+    if (id === 'career') return buildingStage('career', { career: await officeSnapshot() })
     if (id !== 'body') return null
     const t = today()
     const wk = startOfWeek(t)

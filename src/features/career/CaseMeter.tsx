@@ -1,23 +1,20 @@
-// Hero: case strength as a five-part meter with five labelled segments, a "Next to strengthen" line with a
-// one-tap action, and a plain "How this is scored" disclosure. The score itself is pure (caseStrength.ts).
+// Case floor hero: case strength as a count-up score over five spring-filled segments, and the one next thing to strengthen.
+// The score itself is pure (caseStrength.ts); the rules are listed in "How it is scored" behind More.
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { useNumberRoll } from '../../components/motion'
-import { CASE_RULES, type NextAction } from './caseStrength'
+import { type NextAction } from './caseStrength'
 import { useCaseStrength } from './useCaseStrength'
 import type { Win } from './leadership'
 import type { Project } from './projects'
 
 export function CaseMeter({ wins, projects, onAction }: { wins: Win[]; projects: Project[]; onAction: (a: Exclude<NextAction, 'goals'>) => void }) {
   const r = useCaseStrength(wins, projects)
-  const shown = useNumberRoll(r.score)
+  const shown = useNumberRoll(r.score, 700)
   return (
-    <section className="card car-meter" aria-label="Case strength" data-testid="case-meter">
+    <section className="card floor-hero car-meter" aria-label="Case strength" data-testid="case-meter">
       <div className="car-meter-head">
-        <div>
-          <h2 className="car-meter-title">Case strength</h2>
-          <p className="small muted">How much of a promotion case your records cover. The inputs are below.</p>
-        </div>
+        <span className="stat-label">Case strength</span>
         <div className="car-meter-score" aria-label={`Score ${r.score} out of 100`}>
           <span className="car-meter-num mono" data-testid="case-score" data-score={r.score}>{shown}</span><span className="muted small"> / 100</span>
         </div>
@@ -35,17 +32,10 @@ export function CaseMeter({ wins, projects, onAction }: { wins: Win[]; projects:
         <div className="car-next">
           <p className="car-next-text"><span className="muted">Next: </span><strong>{r.next.label}</strong> <span className="muted small">({r.next.detail})</span></p>
           {r.next.action === 'goals'
-            ? <Link className="btn btn-sm btn-primary" to="/goals">{r.next.actionLabel}</Link>
-            : <button type="button" className="btn btn-sm btn-primary" onClick={() => onAction(r.next!.action as Exclude<NextAction, 'goals'>)}>{r.next.actionLabel}</button>}
+            ? <Link className="btn btn-primary" to="/goals">{r.next.actionLabel}</Link>
+            : <button type="button" className="btn btn-primary" onClick={() => onAction(r.next!.action as Exclude<NextAction, 'goals'>)}>{r.next.actionLabel}</button>}
         </div>
-      ) : <p className="car-next-text muted">Every part of the case is covered. Keep logging as things happen.</p>}
-      <details className="car-how">
-        <summary>How this is scored</summary>
-        <p className="small muted">Five parts, 20 points each, added up. Nothing else counts and nothing is weighted in secret. Only the last 90 days of wins and 1:1 notes are used.</p>
-        <ul className="car-how-list small">
-          {(Object.keys(CASE_RULES) as (keyof typeof CASE_RULES)[]).map((k) => <li key={k}><strong>{CASE_RULES[k].label}.</strong> {CASE_RULES[k].rule}</li>)}
-        </ul>
-      </details>
+      ) : <p className="car-next-text muted">Every part is covered. Keep logging as it happens.</p>}
     </section>
   )
 }

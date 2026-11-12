@@ -10,7 +10,7 @@ describe('districtForPath', () => {
       money: ['/finance'],
       body: ['/body', '/food', '/training'],
       mind: ['/mind', '/journal', '/learning'],
-      career: ['/career'],
+      career: ['/career', '/case', '/projects'],
       people: ['/people'],
       you: ['/you', '/history', '/review', '/ops', '/settings', '/data', '/ontology', '/interview', '/skills', '/score'],
     }
@@ -40,7 +40,8 @@ describe('subtabForPath and breadcrumb', () => {
     expect(subtabForPath('/food').tab?.label).toBe('Kitchen')
     expect(subtabForPath('/tasks').district.id).toBe('plan')
     expect(subtabForPath('/ontology/Task').tab?.label).toBe('Ontology')
-    expect(subtabForPath('/career').tab).toBeNull()
+    expect(subtabForPath('/career').tab?.label).toBe('Wins')
+    expect(subtabForPath('/mind').tab?.label).toBe('Journal')
     expect(subtabForPath('/').tab).toBeNull()
   })
   it('reads the Money tab from the query string', () => {
@@ -63,7 +64,14 @@ describe('floors', () => {
     expect(floorForPath('/food').floor?.id).toBe('kitchen')
     expect(floorForPath('/training').floor?.id).toBe('training')
     expect(floorIndex('/training')).toBe(2)
-    expect(floorIndex('/career')).toBe(-1)
+    expect(floorIndex('/career')).toBe(0)
+    expect(floorIndex('/home-nope')).toBe(-1)
+  })
+  it('maps Library and Office floors', () => {
+    expect(DISTRICTS.mind.floors.map((f) => f.label)).toEqual(['Journal', 'Study'])
+    expect(DISTRICTS.career.floors.map((f) => f.label)).toEqual(['Wins', 'Case', 'Projects'])
+    expect(floorForPath('/learning').floor?.id).toBe('study')
+    expect(floorForPath('/projects').floor?.id).toBe('projects')
   })
   it('sends every alias to a real floor of the same building', () => {
     for (const [from, to] of Object.entries(FLOOR_ALIASES)) {
@@ -81,7 +89,9 @@ describe('floors', () => {
     expect(hasElevator(DISTRICTS.body)).toBe(true)
     expect(hasElevator(DISTRICTS.plan)).toBe(true)
     expect(hasElevator(DISTRICTS.money)).toBe(false)
-    expect(hasElevator(DISTRICTS.career)).toBe(false)
+    expect(hasElevator(DISTRICTS.career)).toBe(true)
+    expect(hasElevator(DISTRICTS.mind)).toBe(true)
+    expect(hasElevator(DISTRICTS.people)).toBe(false)
   })
 })
 
