@@ -36,7 +36,22 @@ export interface GymSnapshot {
   flagsCrossed: number
 }
 
-export interface BuildingSnapshot { body?: GymSnapshot }
+/** Home base (You) inputs. */
+export interface HomeBaseSnapshot {
+  /** A backup file was made in the current calendar month. */
+  backupThisMonth: boolean
+  /** Encrypted sync is on, or the last backup was encrypted. */
+  safeCopy: boolean
+  /** Interview questions answered. */
+  interviewAnswers: number
+  badgesEarned: number
+  /** The scoreboard has enough weeks to show a standing. */
+  standingReady: boolean
+}
+
+export interface BuildingSnapshot { body?: GymSnapshot; you?: HomeBaseSnapshot }
+
+export const HOME_INTERVIEW_ANSWERS = 10
 
 export const GYM_WEIGH_INS = 4
 export const GYM_MEAL_DAYS = 5
@@ -54,12 +69,23 @@ function gymSteps(s: GymSnapshot): StageStep[] {
   ]
 }
 
-const FULL: Partial<Record<DistrictId, string>> = { body: 'Every window lit' }
+function homeSteps(s: HomeBaseSnapshot): StageStep[] {
+  return [
+    { id: 'backup', label: 'Backup this month', done: s.backupThisMonth, todo: 'make a backup this month' },
+    { id: 'safe', label: 'Sync or encrypted', done: s.safeCopy, todo: 'turn on sync or encrypt a backup' },
+    { id: 'interview', label: `${HOME_INTERVIEW_ANSWERS} interview answers`, done: s.interviewAnswers >= HOME_INTERVIEW_ANSWERS, todo: more(HOME_INTERVIEW_ANSWERS - s.interviewAnswers, 'interview answer') },
+    { id: 'badge', label: 'First badge', done: s.badgesEarned > 0, todo: 'earn a badge' },
+    { id: 'standing', label: 'Standing unlocked', done: s.standingReady, todo: 'finish a week to unlock your standing' },
+  ]
+}
+
+const FULL: Partial<Record<DistrictId, string>> = { body: 'Every window lit', you: 'Home base fully lit' }
 
 /** The building's stage from its snapshot, or null for a building that has no stage yet. */
 export function buildingStage(district: DistrictId, snap: BuildingSnapshot): BuildingStage | null {
   let steps: StageStep[] | null = null
   if (district === 'body' && snap.body) steps = gymSteps(snap.body)
+  if (district === 'you' && snap.you) steps = homeSteps(snap.you)
   if (!steps) return null
   const stage = steps.filter((s) => s.done).length
   const next = steps.find((s) => !s.done) ?? null

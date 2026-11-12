@@ -22,3 +22,20 @@
 .bdg-how { margin: 0; font-size: var(--fs-2); }
 .bdg-actions { justify-content: flex-end; }
 @media (max-width: 519px) { .bdg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; } }
+
+/* Shelf (Milestones hero): one mark per badge, earned ones light in sequence. */
+.bdg-hero-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+.bdg-hero .bdg-count { display: flex; align-items: baseline; gap: 8px; }
+.bdg-shelf { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: var(--sp-2); }
+.bdg-mini { all: unset; box-sizing: border-box; width: 100%; min-height: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px 4px; border-radius: var(--radius-tile); color: var(--ink-3); cursor: pointer; text-align: center; }
+.bdg-mini:hover { background: var(--surface-3); }
+.bdg-mini:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bdg-mini.is-earned { color: var(--ink); }
+.bdg-mini:not(.is-earned) .bdg-mark { opacity: 0.4; }
+.bdg-mini-t { font-size: var(--fs-1); line-height: 1.2; color: var(--ink-2); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bdg-mini.is-earned .bdg-gold { animation: bdg-light 900ms var(--spring-gentle) both; animation-delay: calc(var(--i, 0) * 70ms + 150ms); }
+.bdg-mini.is-earned .bdg-mark { animation: bdg-rise 600ms var(--spring-gentle) both; animation-delay: calc(var(--i, 0) * 70ms + 100ms); }
+@keyframes bdg-light { 0% { transform: scale(0); box-shadow: 0 0 0 0 var(--reward); } 60% { transform: scale(1.6); } 100% { transform: scale(1); box-shadow: 0 0 0 6px transparent; } }
+@keyframes bdg-rise { from { opacity: 0.4; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .bdg-mini.is-earned .bdg-gold, .bdg-mini.is-earned .bdg-mark { animation: none; } }
+:root[data-motion='reduced'] .bdg-mini.is-earned .bdg-gold, :root[data-motion='reduced'] .bdg-mini.is-earned .bdg-mark { animation: none; }

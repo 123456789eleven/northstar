@@ -44,9 +44,7 @@ const DataHub = lazy(() => import('./pages/DataHub'))
 const Career = lazy(() => import('./pages/Career'))
 const PlanHub = lazy(() => import('./pages/PlanHub'))
 const Home = lazy(() => import('./pages/Home'))
-const SkillsHub = lazy(() => import('./pages/SkillsHub'))
 const MindHub = lazy(() => import('./pages/MindHub'))
-const YouHub = lazy(() => import('./pages/YouHub'))
 const Score = lazy(() => import('./pages/Score'))
 
 /** Old or alternative floor URLs land on their floor, keeping the query (?focus= and friends). */
@@ -120,9 +118,7 @@ function Shell() {
               <Route path="/learning" element={<Learning />} />
               <Route path="/career" element={<Career />} />
               <Route path="/people" element={<People />} />
-              <Route path="/you" element={<YouHub />} />
               <Route path="/score" element={<Score />} />
-              <Route path="/skills" element={<SkillsHub />} />
               <Route path="/history" element={<History />} />
               <Route path="/review" element={<Review />} />
               <Route path="/ops" element={<Ops />} />

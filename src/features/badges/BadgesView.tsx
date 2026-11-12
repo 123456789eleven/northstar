@@ -1,34 +1,13 @@
 // The quiet badges grid on Milestones. Earned: insignia, small gold mark, date. Unearned: outlined, one-line hint, progress.
-import { useState } from 'react'
-import { Empty, Modal, Skeleton } from '../../components/ui'
+import { useState, type CSSProperties } from 'react'
+import { Modal } from '../../components/ui'
 import { formatDate } from '../../lib/dates'
 import type { Badge, BadgeGroup } from './badges'
 import { BadgeMarkSvg } from './marks'
-import { useBadges } from './useBadges'
 import './badges.css'
 
 const GROUPS: BadgeGroup[] = ['Body', 'Money', 'Career and learning', 'Consistency']
 const FULL: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' }
-
-function Tile({ b, onOpen }: { b: Badge; onOpen: (b: Badge) => void }) {
-  return (
-    <li>
-      <button
-        type="button"
-        className={`bdg ${b.earned ? 'is-earned' : ''}`}
-        onClick={() => onOpen(b)}
-        data-testid="badge"
-        data-earned={b.earned}
-        aria-label={b.earned ? `${b.title}, earned${b.earnedAt ? ` ${formatDate(b.earnedAt, FULL)}` : ''}` : `${b.title}, not yet: ${b.have} of ${b.need}`}
-      >
-        <span className="bdg-mark"><BadgeMarkSvg mark={b.mark} />{b.earned && <i className="bdg-gold" aria-hidden />}</span>
-        <span className="bdg-title">{b.title}</span>
-        <span className="bdg-sub">{b.earned ? (b.earnedAt ? formatDate(b.earnedAt, FULL) : 'Earned') : b.hint}</span>
-        {!b.earned && <span className="bdg-prog mono">{b.have} of {b.need}</span>}
-      </button>
-    </li>
-  )
-}
 
 export function BadgeSheet({ b, onClose }: { b: Badge; onClose: () => void }) {
   return (
@@ -47,22 +26,31 @@ export function BadgeSheet({ b, onClose }: { b: Badge; onClose: () => void }) {
   )
 }
 
-export function BadgesView() {
-  const badges = useBadges()
+/** The shelf: every badge as one mark. Earned ones light gold in sequence; tap one for what it means. */
+export function BadgeShelf({ badges }: { badges: Badge[] }) {
   const [open, setOpen] = useState<Badge | null>(null)
-  if (!badges) return <Skeleton rows={4} label="Loading badges" />
-  if (badges.length === 0) return <Empty title="No badges yet">Log a weigh-in, a workout or a budget and the first one appears here.</Empty>
-  const earned = badges.filter((b) => b.earned).length
+  let n = 0
   return (
-    <section className="bdg-view" aria-label="Badges">
-      <p className="bdg-count"><span className="bdg-count-n">{earned}</span> of {badges.length} earned</p>
-      {GROUPS.map((g) => (
-        <div key={g} className="bdg-group">
-          <h3 className="bdg-group-h">{g}</h3>
-          <ul className="bdg-grid">{badges.filter((b) => b.group === g).map((b) => <Tile key={b.id} b={b} onOpen={setOpen} />)}</ul>
-        </div>
-      ))}
+    <>
+      <ul className="bdg-shelf" aria-label="Badges">
+        {GROUPS.flatMap((g) => badges.filter((b) => b.group === g)).map((b) => (
+          <li key={b.id} style={{ '--i': b.earned ? n++ : 0 } as CSSProperties}>
+            <button
+              type="button"
+              className={`bdg-mini ${b.earned ? 'is-earned' : ''}`}
+              onClick={() => setOpen(b)}
+              title={b.earned ? b.title : `${b.title}: ${b.have} of ${b.need}`}
+              data-testid="badge"
+              data-earned={b.earned}
+              aria-label={b.earned ? `${b.title}, earned${b.earnedAt ? ` ${formatDate(b.earnedAt, FULL)}` : ''}` : `${b.title}, not yet: ${b.have} of ${b.need}`}
+            >
+              <span className="bdg-mark"><BadgeMarkSvg mark={b.mark} size={30} />{b.earned && <i className="bdg-gold" aria-hidden />}</span>
+              <span className="bdg-mini-t">{b.title}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
       {open && <BadgeSheet b={open} onClose={() => setOpen(null)} />}
-    </section>
+    </>
   )
 }

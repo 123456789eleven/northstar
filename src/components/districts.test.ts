@@ -5,14 +5,14 @@ import { NAV } from './nav'
 describe('districtForPath', () => {
   it('follows the plan table', () => {
     const table: Record<string, string[]> = {
-      home: ['/', '/map'],
+      home: ['/', '/map', '/skills'],
       plan: ['/today', '/plan', '/tasks', '/planner', '/goals', '/habits'],
       money: ['/finance'],
       body: ['/body', '/food', '/training'],
       mind: ['/mind', '/journal', '/learning'],
       career: ['/career'],
       people: ['/people'],
-      you: ['/you', '/history', '/review', '/ops', '/settings', '/data', '/ontology', '/interview', '/skills', '/score'],
+      you: ['/you', '/history', '/review', '/ops', '/settings', '/data', '/ontology', '/interview', '/score'],
     }
     for (const [id, paths] of Object.entries(table)) for (const p of paths) expect(districtForPath(p), p).toBe(id)
   })

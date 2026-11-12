@@ -93,14 +93,13 @@ export const DISTRICTS: Record<DistrictId, DistrictDef> = {
   career: { id: 'career', label: 'Career', building: 'Office', to: '/career', icon: 'career', skill: 'career', routes: ['/career'], floors: [] },
   people: { id: 'people', label: 'People', building: 'Park', to: '/people', icon: 'people', skill: 'people', routes: ['/people'], floors: [] },
   you: {
-    id: 'you', label: 'You', building: 'Home base', to: '/you', icon: 'user',
-    routes: ['/you', '/history', '/review', '/ops', '/settings', '/data', '/ontology', '/interview', '/skills', '/score', '/style'],
+    id: 'you', label: 'You', building: 'Home base', to: '/score', icon: 'user',
+    routes: ['/score', '/history', '/review', '/settings', '/ops', '/data', '/ontology', '/interview', '/style'],
     floors: [
-      { id: 'overview', to: '/you', label: 'Overview', icon: 'user' }, { id: 'areas', to: '/skills', label: 'Areas', icon: 'star' },
-      { id: 'scoreboard', to: '/score', label: 'Scoreboard', icon: 'trophy' }, { id: 'milestones', to: '/history', label: 'Milestones', icon: 'history' },
-      { id: 'season', to: '/review', label: 'Season', icon: 'review' }, { id: 'intel', to: '/ops', label: 'Intel', icon: 'command' },
-      { id: 'settings', to: '/settings', label: 'Settings', icon: 'settings' }, { id: 'data', to: '/data', label: 'Data', icon: 'data' },
-      { id: 'ontology', to: '/ontology', label: 'Ontology', icon: 'ontology' },
+      { id: 'scoreboard', to: '/score', label: 'Scoreboard', icon: 'trophy' },
+      { id: 'milestones', to: '/history', label: 'Milestones', icon: 'history' },
+      { id: 'season', to: '/review', label: 'Season', icon: 'review' },
+      { id: 'settings', to: '/settings', label: 'Settings', icon: 'settings', also: ['/ops', '/data', '/ontology', '/interview', '/style'] },
     ],
   },
 }
@@ -114,6 +113,8 @@ export const FLOOR_ALIASES: Record<string, string> = {
   '/meals': '/food',
   '/body/training': '/training',
   '/lift': '/training',
+  '/you': '/score',
+  '/skills': '/',
 }
 
 /** The bottom strip, left to right. You lives behind the profile control in the top bar. */

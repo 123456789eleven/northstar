@@ -1,17 +1,18 @@
 // Scoreboard sections: standing, ghost, up next, records, highlights reel. Presentation only; numbers come from model.ts.
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { formatDate } from '../../lib/dates'
 import type { FormMark, GhostLine, ScoreRecord, Standing, UpNext } from './model'
 import type { Highlight } from './highlights'
 import { renderHighlightCard, saveShareCard } from './highlightCard'
+import { FloorCard } from '../buildings/Floor'
 
 export function FormMarks({ marks, weeks }: { marks: FormMark[]; weeks: string[] }) {
   const label = { full: 'strong week', half: 'steady week', empty: 'quiet week' } as const
   return (
     <ol className="sc-form" aria-label="Form guide, last 8 finished weeks, oldest first">
       {marks.map((m, i) => (
-        <li key={weeks[i]} title={`Week of ${formatDate(weeks[i])}: ${label[m]}`}>
+        <li key={weeks[i]} style={{ '--i': i } as CSSProperties} title={`Week of ${formatDate(weeks[i])}: ${label[m]}`}>
           <svg viewBox="0 0 20 20" width="22" height="22" role="img" aria-label={`Week of ${formatDate(weeks[i])}: ${label[m]}`}>
             <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" strokeWidth="1.6" />
             {m === 'full' && <circle cx="10" cy="10" r="8" fill="currentColor" />}
@@ -23,9 +24,9 @@ export function FormMarks({ marks, weeks }: { marks: FormMark[]; weeks: string[]
   )
 }
 
-export function StandingCard({ st }: { st: Standing }) {
+export function StandingCard({ st, next }: { st: Standing; next?: UpNext }) {
   return (
-    <section className="card sc-hero" aria-labelledby="sc-standing-h" data-testid="standing">
+    <section className="card floor-hero sc-hero" aria-labelledby="sc-standing-h" data-testid="standing">
       <p className="sc-kicker" id="sc-standing-h">{st.quarter} standing</p>
       <div className="sc-hero-main">
         <div>
@@ -35,7 +36,7 @@ export function StandingCard({ st }: { st: Standing }) {
         {st.form.length > 0 && (
           <div className="sc-formwrap">
             <FormMarks marks={st.form} weeks={st.formWeeks} />
-            <p className="sc-cap">Last 8 weeks. Filled is strong, half is steady, open is quiet.</p>
+            <p className="sc-cap" title="Filled is strong, half is steady, open is quiet">Last 8 weeks</p>
           </div>
         )}
       </div>
@@ -51,6 +52,14 @@ export function StandingCard({ st }: { st: Standing }) {
             </li>
           ))}
         </ul>
+      )}
+      {next && (
+        <Link to={next.href} className="sc-upnext" data-testid="up-next">
+          <span className="sc-upnext-k">Up next</span>
+          <span className="sc-upnext-t">{next.title}</span>
+          <span className="sc-upnext-h">{next.hint}</span>
+          <span className="sc-bar" aria-hidden><span style={{ transform: `scaleX(${next.progress})` }} /></span>
+        </Link>
       )}
     </section>
   )
@@ -76,58 +85,42 @@ function GhostRow({ g }: { g: GhostLine }) {
 
 export function GhostCard({ week, month, hasData }: { week: GhostLine; month: GhostLine; hasData: boolean }) {
   return (
-    <section className="card sc-card" aria-labelledby="sc-ghost-h">
-      <h2 className="sc-h" id="sc-ghost-h">Ghost</h2>
-      <p className="sc-sub">You against your own best. Counts everything you did: tasks, habits, journal days, study sessions, people reached, weigh-ins, workouts and wins.</p>
-      {hasData ? <><GhostRow g={week} /><GhostRow g={month} /></> : <p className="sc-note">Nothing to race yet. Finish a week and your ghost appears.</p>}
-    </section>
+    <FloorCard title="Ghost" label="Ghost: you against your own best">
+      {hasData ? <><GhostRow g={week} /><GhostRow g={month} /></> : <p className="sc-note">Nothing to race yet. Finish a week and your ghost shows up.</p>}
+    </FloorCard>
   )
 }
 
-export function UpNextCard({ items }: { items: UpNext[] }) {
-  return (
-    <section className="card sc-card" aria-labelledby="sc-next-h">
-      <h2 className="sc-h" id="sc-next-h">Up next</h2>
-      {items.length === 0 ? <p className="sc-note">Nothing close yet. Log a few things and the nearest record or milestone lands here.</p> : (
-        <ul className="sc-next">
-          {items.map((n) => (
-            <li key={n.id}>
-              <Link to={n.href} className="sc-next-link" data-testid="up-next">
-                <span className="sc-next-t">{n.title}</span>
-                <span className="sc-next-h">{n.hint}</span>
-                <span className="sc-bar" aria-hidden><span style={{ transform: `scaleX(${n.progress})` }} /></span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+export function UpNextList({ items }: { items: UpNext[] }) {
+  return items.length === 0 ? <p className="sc-note">Nothing close yet. Log a few things.</p> : (
+    <ul className="sc-next">
+      {items.map((n) => (
+        <li key={n.id}>
+          <Link to={n.href} className="sc-next-link">
+            <span className="sc-next-t">{n.title}</span>
+            <span className="sc-next-h">{n.hint}</span>
+            <span className="sc-bar" aria-hidden><span style={{ transform: `scaleX(${n.progress})` }} /></span>
+          </Link>
+        </li>
+      ))}
+    </ul>
   )
 }
 
-export function RecordsSection({ records }: { records: ScoreRecord[] }) {
+export function RecordsList({ records, limit }: { records: ScoreRecord[]; limit?: number }) {
+  if (records.length === 0) return <p className="sc-note" data-testid="records-empty">No records yet. Finish a week and the first one posts.</p>
   return (
-    <section aria-labelledby="sc-rec-h" className="sc-section">
-      <h2 className="sc-h" id="sc-rec-h">Records</h2>
-      {records.length === 0 ? (
-        <div className="card sc-card" data-testid="records-empty">
-          <p className="sc-big sc-big-quiet">No records yet.</p>
-          <p className="sc-sub">A record appears the first time you finish a week or month of something: tasks done, a saving month, weigh-ins, study minutes, people reached or a daily run. Log a few days and the first ones post themselves, each with its date and how far the next one is.</p>
-        </div>
-      ) : (
-        <ul className="sc-records">
-          {records.map((r) => (
-            <li key={r.id} className="card sc-rec" data-testid="record">
-              <p className="sc-rec-l">{r.label}</p>
-              <p className="sc-rec-v sc-num">{r.display}</p>
-              <p className="sc-rec-d">{r.holding ? <span className="sc-gold">Holding it now</span> : null}{r.holding ? ' · ' : ''}{r.dateLabel}</p>
-              <span className="sc-bar" aria-hidden><span style={{ transform: `scaleX(${r.progress})` }} /></span>
-              <p className="sc-rec-h"><Link to={r.href}>{r.hint}</Link></p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+    <ul className="sc-records">
+      {records.slice(0, limit).map((r) => (
+        <li key={r.id} className="sc-rec" data-testid="record">
+          <p className="sc-rec-l">{r.label}</p>
+          <p className="sc-rec-v sc-num">{r.display}</p>
+          <p className="sc-rec-d">{r.holding ? <span className="sc-gold">Holding it now</span> : null}{r.holding ? ' · ' : ''}{r.dateLabel}</p>
+          <span className="sc-bar" aria-hidden><span style={{ transform: `scaleX(${r.progress})` }} /></span>
+          <p className="sc-rec-h"><Link to={r.href}>{r.hint}</Link></p>
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -164,7 +157,7 @@ function HighlightCardView({ h }: { h: Highlight }) {
     } catch { setState('fail') }
   }
   return (
-    <li className="card sc-hl" data-testid="highlight">
+    <li className="sc-hl" data-testid="highlight">
       <p className="sc-hl-date">{h.dateLabel}</p>
       <p className="sc-hl-h">{h.headline}</p>
       <p className="sc-hl-d">{h.detail}</p>
@@ -179,18 +172,15 @@ function HighlightCardView({ h }: { h: Highlight }) {
 
 export function Reel({ items }: { items: Highlight[] }) {
   return (
-    <section aria-labelledby="sc-reel-h" className="sc-section">
-      <h2 className="sc-h" id="sc-reel-h">Highlights</h2>
+    <FloorCard title="Highlights" className="sc-reelcard">
       {items.length === 0 ? (
-        <div className="card sc-card" data-testid="reel-empty">
-          <p className="sc-sub">Highlights are real moments from the last few months: a net worth high, a record week, a friend you got back in touch with, a milestone. None yet. They appear on their own as you log.</p>
-        </div>
+        <p className="sc-note" data-testid="reel-empty">No highlights yet. Real moments land here as you log.</p>
       ) : (
         <ul className="sc-reel" aria-label="Highlights reel, swipe sideways">
           {items.map((h) => <HighlightCardView key={h.id} h={h} />)}
-          <li className="card sc-hl sc-hl-end" data-testid="reel-end"><p className="sc-hl-h">You&apos;re caught up.</p><p className="sc-hl-d">That is every highlight from the last few months.</p></li>
+          <li className="sc-hl sc-hl-end" data-testid="reel-end"><p className="sc-hl-h">You're caught up.</p></li>
         </ul>
       )}
-    </section>
+    </FloorCard>
   )
 }

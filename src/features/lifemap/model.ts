@@ -321,7 +321,7 @@ export function buildCivic(planDone: number): Civic[] {
       ],
     },
     {
-      id: 'you', label: 'You', to: '/you', plot: home,
+      id: 'you', label: 'You', to: '/score', plot: home,
       buildings: [
         b(home.o.x + 0.8, home.o.y + 0.8, 1.6, 1.4, 22, true, 0.35, 'pyramid', 0, 0, 22),
         b(home.o.x + 2.6, home.o.y + 1.0, 0.9, 1.1, 14, false, 0, 'pyramid', 0, 0, 14),

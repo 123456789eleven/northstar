@@ -83,3 +83,12 @@
   .rv-rate-btns { display: none; }
   .rv-fact-value { font-size: 14pt; }
 }
+
+/* Season floor: the five story cards sit in one row on desktop; swipe on phone. */
+.rv-hero { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.rv-hero .rv-weeknav { margin-bottom: 0; border-bottom: 0; padding-bottom: 0; }
+.rv-hero .story { margin-bottom: 0; }
+@media (min-width: 820px) {
+  .rv-hero .story-track { flex-wrap: nowrap; overflow: visible; }
+  .rv-hero .story-card { flex: 1 1 0; min-width: 0; }
+}
