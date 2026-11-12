@@ -5,7 +5,6 @@ import ChartFrame from '../../components/ChartFrame'
 import { ACTIVE_DOT, CHART, GRID_PROPS, MARGIN, X_AXIS, Y_AXIS, tooltipProps } from '../../components/chartTheme'
 import { ChartTip } from '../../components/ChartTip'
 import { NetWorthHero, NetWorthPath } from '../finance/NetWorthHero'
-import { SavingsEngine } from '../finance/WealthPanels'
 import StatusChip from '../../components/StatusChip'
 import { Card, Empty, PageSkeleton, Progress } from '../../components/ui'
 import { db, setSetting, type BalanceSnapshot, type Contribution, type Holding } from '../../db'
@@ -59,7 +58,6 @@ export default function Investments() {
           <NetWorthPath data={path} name="Invested" />
         </ChartFrame>
       )}
-      <SavingsEngine />
       {holdings.length === 0 && (
         <Card title="Add your first holding">
           <Empty>Start with VTI: type your balance and today's price. Prices are typed by hand here, nothing is looked up online.</Empty>

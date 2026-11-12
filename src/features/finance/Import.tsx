@@ -11,6 +11,8 @@ import { isOfxText, ofxKey, parseOfx, type OfxParse } from './ofx'
 import { useImports, useRules } from './model'
 
 interface Result {
+  /** Transactions on this device before the import. */
+  before: number
   added: number
   skipped: number
   errors: number
@@ -111,9 +113,10 @@ export default function Import({ onDone }: { onDone: (category?: string, month?:
     try {
       const name = file?.name ?? ofx!.name
       const rows = built.flatMap((b, i) => (plan[i] === 'new' && b.tx ? [b.tx] : []))
+      const before = await db.transactions.count()
       const { batch } = await commitImport(name, rows, counts.dup, counts.error)
       const dates = rows.map((r) => r.date).sort()
-      setResult({ added: rows.length, skipped: counts.dup, errors: counts.error, uncategorized: rows.filter((r) => r.category === UNCATEGORIZED).length, from: dates[0], to: dates.at(-1), batch })
+      setResult({ before, added: rows.length, skipped: counts.dup, errors: counts.error, uncategorized: rows.filter((r) => r.category === UNCATEGORIZED).length, from: dates[0], to: dates.at(-1), batch })
       if (file && map) await setSetting(MAP_KEY_PREFIX + headerSignature(file.headers), map)
       if (ofx && snap) {
         for (const a of ofx.parsed.accounts) {
@@ -158,6 +161,11 @@ export default function Import({ onDone }: { onDone: (category?: string, month?:
     <div className="stack" style={{ gap: 16 }}>
       {result && (
         <Card title="Import complete">
+          <div className="ar-ba" data-testid="import-before-after">
+            <div><span className="stat-label">Before</span><span className="ar-ba-num">{result.before.toLocaleString()}</span></div>
+            <span className="ar-ba-arrow" aria-hidden="true">→</span>
+            <div className="is-after"><span className="stat-label">After</span><span className="ar-ba-num">{(result.before + result.added).toLocaleString()}</span></div>
+          </div>
           <p className="small" style={{ margin: '0 0 10px' }}>
             Added <strong>{result.added}</strong> transaction{result.added === 1 ? '' : 's'}
             {result.from && result.to && (

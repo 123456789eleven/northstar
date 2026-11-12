@@ -1,20 +1,12 @@
-// Markets tab (Money): hero, watchlist, portfolio, screener. Live prices are opt-in (own Finnhub key); everything shows a
-// quiet preview from saved data without one. Information only: no advice, no trades.
-import { useEffect, useState } from 'react'
-import { Tabs } from '../../components/ui'
+// Trading floor hero (Bank): portfolio value with the day change and a sparkline, plus the one status banner. Live prices are
+// opt-in (own Finnhub key); without one it shows saved prices. Information only: no advice, no trades.
+import { useEffect, useState, type ReactNode } from 'react'
 import { useNumberRoll } from '../../components/motion'
-import KeySetup from './KeySetup'
-import Watchlist from './Watchlist'
-import PortfolioView from './PortfolioView'
-import Screener from './Screener'
-import Detail from './Detail'
-import { useMarketsData, type MarketsData } from './useMarketsData'
-import { ADVICE_NOTE, backoffSeconds, direction, fmtMoney, fmtPct, fmtSignedMoney, freshness, sparkPath } from './view'
+import type { MarketsData } from './useMarketsData'
+import { backoffSeconds, direction, fmtMoney, fmtPct, fmtSignedMoney, freshness, sparkPath } from './view'
 import './markets.css'
 
-type Section = 'watchlist' | 'portfolio' | 'screener'
-
-function useClock(ms = 1000) {
+export function useClock(ms = 1000) {
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), ms)
@@ -23,7 +15,7 @@ function useClock(ms = 1000) {
   return now
 }
 
-function Banner({ d, now }: { d: MarketsData; now: number }) {
+export function Banner({ d, now }: { d: MarketsData; now: number }) {
   const err = d.error
   const [startedAt, setStartedAt] = useState(now)
   useEffect(() => { setStartedAt(Date.now()) }, [err])
@@ -41,7 +33,7 @@ function Banner({ d, now }: { d: MarketsData; now: number }) {
   )
 }
 
-function Hero({ d, now }: { d: MarketsData; now: number }) {
+export function Hero({ d, now, empty }: { d: MarketsData; now: number; empty?: ReactNode }) {
   const p = d.portfolio
   const hasHoldings = p.positions.length > 0
   const shown = useNumberRoll(Math.round(p.totalValue * 100), 600) / 100
@@ -88,52 +80,8 @@ function Hero({ d, now }: { d: MarketsData; now: number }) {
           </div>
         </div>
       ) : (
-        <p className="muted mkt-hero-empty">No holdings on the board yet. Add shares under Wealth, then Investments, and your value and day change show up here.</p>
+        <div className="mkt-hero-empty row"><span className="muted">No holdings yet.</span>{empty}</div>
       )}
     </section>
-  )
-}
-
-export default function MarketsTab() {
-  const d = useMarketsData()
-  const now = useClock()
-  const [section, setSection] = useState<Section>('watchlist')
-  const [selected, setSelected] = useState<string | null>(null)
-  const hasKey = d.key.hasKey
-
-  return (
-    <div className="mkt stack">
-      {!d.key.loading && !hasKey && (
-        <div className="mkt-setup">
-          <p className="mkt-intro">
-            Live prices are optional and use your own free Finnhub key. Only ticker symbols leave this device, never your balances, shares or notes.
-            Until then this tab shows your saved prices.
-          </p>
-          <KeySetup />
-        </div>
-      )}
-      <Banner d={d} now={now} />
-      <Hero d={d} now={now} />
-      <Tabs
-        value={section}
-        onChange={(v) => { setSection(v); setSelected(null) }}
-        options={[{ value: 'watchlist', label: 'Watchlist' }, { value: 'portfolio', label: 'Portfolio' }, { value: 'screener', label: 'Screener' }]}
-      />
-      <div className={`mkt-split ${selected ? 'has-detail' : ''}`}>
-        <div className="mkt-main">
-          {section === 'watchlist' && <Watchlist d={d} selected={selected} onSelect={setSelected} />}
-          {section === 'portfolio' && <PortfolioView d={d} onSelect={setSelected} />}
-          {section === 'screener' && <Screener d={d} onSelect={setSelected} />}
-        </div>
-        {selected && <Detail key={selected} d={d} symbol={selected} onClose={() => setSelected(null)} />}
-      </div>
-      {hasKey && (
-        <details className="mkt-keydetails">
-          <summary>Key settings</summary>
-          <KeySetup />
-        </details>
-      )}
-      <p className="mkt-advice">{ADVICE_NOTE} Prices come from Finnhub, may be delayed, and are for reference only. Northstar places no trades.</p>
-    </div>
   )
 }

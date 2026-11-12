@@ -1,6 +1,7 @@
 // Building stage (BUILDINGS_PLAN.md): five windows per building, each lit by one concrete thing you did, never by points.
 // Pure: the hook in useBuildingStage.ts reads the data; this file only decides. A building without a stage returns null.
 import type { DistrictId } from '../../components/districts'
+import { bankSteps, type BankSnapshot } from './bankStage'
 
 export const STAGES = 5
 
@@ -86,7 +87,7 @@ export interface ParkSnapshot {
   overdue: number
 }
 
-export interface BuildingSnapshot { body?: GymSnapshot; mind?: LibrarySnapshot; career?: OfficeSnapshot; plan?: TownSnapshot; people?: ParkSnapshot }
+export interface BuildingSnapshot { body?: GymSnapshot; mind?: LibrarySnapshot; career?: OfficeSnapshot; plan?: TownSnapshot; people?: ParkSnapshot; money?: BankSnapshot }
 
 export const LIBRARY_DAYS = 3
 export const OFFICE_WINS = 3
@@ -154,7 +155,7 @@ function parkSteps(s: ParkSnapshot): StageStep[] {
   ]
 }
 
-const FULL: Partial<Record<DistrictId, string>> = { body: 'Every window lit', mind: 'Every window lit', career: 'Every window lit', plan: 'Every window lit', people: 'Every window lit' }
+const FULL: Partial<Record<DistrictId, string>> = { body: 'Every window lit', money: 'Every window lit. The Bank is open late', mind: 'Every window lit', career: 'Every window lit', plan: 'Every window lit', people: 'Every window lit' }
 
 /** The building's stage from its snapshot, or null for a building that has no stage yet. */
 export function buildingStage(district: DistrictId, snap: BuildingSnapshot): BuildingStage | null {
@@ -164,6 +165,7 @@ export function buildingStage(district: DistrictId, snap: BuildingSnapshot): Bui
   if (district === 'career' && snap.career) steps = officeSteps(snap.career)
   if (district === 'plan' && snap.plan) steps = townSteps(snap.plan)
   if (district === 'people' && snap.people) steps = parkSteps(snap.people)
+  if (district === 'money' && snap.money) steps = bankSteps(snap.money)
   if (!steps) return null
   const stage = steps.filter((s) => s.done).length
   const next = steps.find((s) => !s.done) ?? null

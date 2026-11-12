@@ -186,7 +186,7 @@ function MoneyTab({ hud, map, day }: { hud?: HomeHud; map: LifeMap; day?: DayCha
         <div className="hm-day" data-testid="day-change">
           <span className={`mono hm-day-value is-${day.amount < 0 ? 'down' : 'up'}`}>{dayText(day)} today</span>
           <span className="hm-muted">{freshness(day.asOf)}</span>
-          <Link className="hm-open" to="/finance?tab=markets">Markets<span aria-hidden="true">&nbsp;&rarr;</span></Link>
+          <Link className="hm-open" to="/finance/trading">Markets<span aria-hidden="true">&nbsp;&rarr;</span></Link>
         </div>
       )}
     </>

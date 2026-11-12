@@ -1,6 +1,6 @@
 import type { Lesson } from './types'
 
-const PRACTICE = { label: 'Open Practice', to: '/finance?tab=practice' }
+const PRACTICE = { label: 'Open Practice', to: '/finance/academy?view=practice' }
 
 export const trading: Lesson[] = [
   {
@@ -104,7 +104,7 @@ export const trading: Lesson[] = [
     summary: 'The cheapest edge: a record that shows what you actually do.',
     minutes: 3,
     terms: ['r-multiple', 'expectancy'],
-    tool: { label: 'Open the Practice journal', to: '/finance' },
+    tool: { label: 'Open the Practice journal', to: '/finance/academy?view=journal' },
     body: [
       { p: ['A trade journal records every trade with the reasoning behind it. Memory flatters us: we remember the winners and soften the losers. A journal replaces memory with data, and it is where trading skill is built or discovered to be missing.'] },
       { h: 'What to record before the trade', list: ['Date, symbol, long or short.', 'Why: the setup in one or two sentences.', 'Entry, stop, target, size, and the dollar risk.', 'Your state: rested, rushed, angry, bored.'] },
@@ -149,7 +149,7 @@ export const trading: Lesson[] = [
     summary: 'Practice with simulated money: what it teaches, and what it cannot.',
     minutes: 3,
     terms: ['paper-trading', 'slippage'],
-    tool: { label: 'Open Practice', to: '/finance?tab=practice' },
+    tool: { label: 'Open Practice', to: '/finance/academy?view=practice' },
     body: [
       { p: ['Paper trading is trading with simulated money at real prices. Nothing is bought, so nothing can be lost. It is the right place to learn the mechanics and test a method before risking a dollar.'] },
       { h: 'What it is good for', list: ['Learning order types and how the quote screen behaves.', 'Practising your position sizing and stop rules until they are habit.', 'Testing whether your method has a positive expectancy over dozens of trades.', 'Building a journal and a review routine.'] },

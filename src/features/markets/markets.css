@@ -139,3 +139,5 @@ html[data-motion="reduced"] .mkt-tick.tick-up, html[data-motion="reduced"] .mkt-
   .mkt-two { grid-template-columns: 1fr; }
   .mkt-name { max-width: 16ch; }
 }
+.mkt-keysetup .mkt-note { margin: 0 0 4px; }
+.mkt-box > summary { cursor: pointer; min-height: 28px; display: flex; align-items: center; }

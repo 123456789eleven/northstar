@@ -2,8 +2,8 @@
 import { expect, test } from '@playwright/test'
 
 test('Practice: paper trade end to end and a journal entry', async ({ page }) => {
-  await page.goto('/#/finance')
-  await page.getByRole('tab', { name: 'Academy' }).click()
+  await page.goto('/#/finance/academy')
+  await page.getByRole('link', { name: 'Trade', exact: true }).click()
   await expect(page.getByText(/Paper account: simulated money/).first()).toBeVisible()
   await expect(page.getByText('Take your first practice trade')).toBeVisible()
 
@@ -27,7 +27,8 @@ test('Practice: paper trade end to end and a journal entry', async ({ page }) =>
   await page.getByRole('button', { name: 'Undo', exact: true }).last().click()
   await expect(page.getByText('No open positions.')).toBeVisible()
 
-  await page.getByRole('tab', { name: 'Journal' }).click()
+  await page.getByRole('link', { name: /Academy/ }).first().click()
+  await page.getByRole('link', { name: 'Write', exact: true }).click()
   await page.getByRole('button', { name: 'New entry' }).first().click()
   const dlg = page.getByRole('dialog', { name: 'New journal entry' })
   await dlg.getByRole('button', { name: 'Save entry' }).click()

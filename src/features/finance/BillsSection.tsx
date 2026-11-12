@@ -12,6 +12,17 @@ import { moneyExact } from './model'
 const nowISO = () => new Date().toISOString()
 const dueText = (d: number) => (d < 0 ? `${-d} day${d === -1 ? '' : 's'} overdue` : d === 0 ? 'due today' : `in ${d} day${d === 1 ? '' : 's'}`)
 
+/** Saves a bill (new or edited); a new one goes on the timeline. */
+export async function upsertBill(b: Bill, isNew: boolean) {
+  const cur = await readBills()
+  const next = cur.some((x) => x.id === b.id) ? cur.map((x) => (x.id === b.id ? b : x)) : [...cur, b]
+  await saveBills(next)
+  if (isNew) await logEvent({ area: 'finance', kind: 'finance.bill', title: `Added bill: ${b.name} ${money(b.amount)} every ${b.everyMonths} mo` })
+}
+
+/** A blank bill for the Add bill form. */
+export const blankBill = (): Bill => ({ id: crypto.randomUUID(), name: '', amount: 0, everyMonths: 6, lastPaid: today(), category: 'Insurance' })
+
 export default function BillsSection({ bills }: { bills: Bill[] }) {
   const toast = useToast()
   const allTx = useLiveQuery(() => db.transactions.toArray(), [])
@@ -23,12 +34,7 @@ export default function BillsSection({ bills }: { bills: Bill[] }) {
   const suggestions = useMemo(() => (allTx && budgets ? detectBillSuggestions(allTx, budgets, bills, now) : []), [allTx, budgets, bills, now])
   const full = bills.length >= MAX_BILLS
 
-  async function upsert(b: Bill, isNew: boolean) {
-    const cur = await readBills()
-    const next = cur.some((x) => x.id === b.id) ? cur.map((x) => (x.id === b.id ? b : x)) : [...cur, b]
-    await saveBills(next)
-    if (isNew) await logEvent({ area: 'finance', kind: 'finance.bill', title: `Added bill: ${b.name} ${money(b.amount)} every ${b.everyMonths} mo` })
-  }
+  const upsert = upsertBill
   async function remove(b: Bill) {
     const before = await readBills()
     await saveBills(before.filter((x) => x.id !== b.id))
@@ -119,7 +125,7 @@ export default function BillsSection({ bills }: { bills: Bill[] }) {
   )
 }
 
-function BillModal({ bill, isNew, onClose, onSave, onDelete }: { bill: Bill; isNew: boolean; onClose: () => void; onSave: (b: Bill, isNew: boolean) => Promise<void>; onDelete: (b: Bill) => void }) {
+export function BillModal({ bill, isNew, onClose, onSave, onDelete }: { bill: Bill; isNew: boolean; onClose: () => void; onSave: (b: Bill, isNew: boolean) => Promise<void>; onDelete: (b: Bill) => void }) {
   const [name, setName] = useState(bill.name)
   const [amount, setAmount] = useState(bill.amount ? String(bill.amount) : '')
   const [every, setEvery] = useState(PRESET_CADENCES.includes(bill.everyMonths) ? String(bill.everyMonths) : 'custom')

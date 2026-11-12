@@ -7,6 +7,7 @@ import { BODY_DEFAULTS, findLiftHabit, readBodySettings } from '../body/bodyData
 import { averageAt, movingAverage } from '../body/model'
 import { checkpointFlags } from '../body/pathModel'
 import { librarySnapshot, officeSnapshot } from './stageMindCareer'
+import { loadBankSnapshot } from './bankStage'
 import { blockMeta } from '../planner/timeBlock'
 import { circleWarmth } from '../people/warmth'
 import { personStatus } from '../people/people'
@@ -90,6 +91,7 @@ export function useBuildingStage(id: DistrictId): BuildingStage | null | undefin
   return useLiveQuery(async () => {
     if (id === 'mind') return buildingStage('mind', { mind: await librarySnapshot() })
     if (id === 'career') return buildingStage('career', { career: await officeSnapshot() })
+    if (id === 'money') return buildingStage('money', { money: await loadBankSnapshot() })
     const t = today()
     const wk = startOfWeek(t)
     if (id === 'plan') {

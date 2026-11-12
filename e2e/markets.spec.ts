@@ -24,8 +24,7 @@ async function mockFinnhub(page: Page, opts: { rateLimit?: boolean } = {}) {
 }
 
 async function openMarkets(page: Page) {
-  await page.goto('/#/finance')
-  await page.getByRole('tab', { name: 'Markets' }).click()
+  await page.goto('/#/finance/trading')
 }
 
 for (const size of [{ name: 'phone 390', viewport: { width: 390, height: 844 } }, { name: 'desktop 1440', viewport: { width: 1440, height: 900 } }]) {
@@ -80,7 +79,8 @@ for (const size of [{ name: 'phone 390', viewport: { width: 390, height: 844 } }
 
     // Screener lists matches for criteria the owner sets.
     await panel.getByRole('button', { name: /Close/ }).click()
-    await page.getByRole('tab', { name: 'Screener' }).click()
+    await page.getByTestId('floor-more').click()
+    await page.getByRole('link', { name: 'Screener' }).click()
     await page.getByLabel('Price minimum').fill('200')
     await expect(page.getByText('1 of 2 match')).toBeVisible()
   })
@@ -97,6 +97,6 @@ test('Markets: rate limit shows a countdown and keeps the tab usable', async ({ 
 test('Markets: copy never reads as advice', async ({ page }) => {
   await mockFinnhub(page)
   await openMarkets(page)
-  const text = await page.locator('.mkt').innerText()
+  const text = await page.locator('.tf').innerText()
   expect(text).not.toMatch(/\b(buy|sell|recommend\w*)\b/i)
 })

@@ -41,27 +41,34 @@ export interface DistrictDef {
   elevator?: boolean
 }
 
-/** Money's in-page groups and their sub-tabs (Finance.tsx). The URL carries the sub-tab id (`?tab=`); the group follows. */
-export const MONEY_GROUPS: (Floor & { subs: Floor[] })[] = [
-  { id: 'overview', to: '/finance', tab: 'overview', label: 'Overview', subs: [{ id: 'overview', to: '/finance', tab: 'overview', label: 'Overview' }] },
-  { id: 'markets', to: '/finance', tab: 'markets', label: 'Markets', subs: [{ id: 'markets', to: '/finance', tab: 'markets', label: 'Markets' }] },
-  {
-    id: 'cash', to: '/finance', tab: 'cash', label: 'Cash',
-    subs: [
-      { id: 'transactions', to: '/finance', tab: 'transactions', label: 'Transactions' },
-      { id: 'budgets', to: '/finance', tab: 'budgets', label: 'Budgets' },
-      { id: 'import', to: '/finance', tab: 'import', label: 'Import' },
-    ],
-  },
-  {
-    id: 'wealth', to: '/finance', tab: 'wealth', label: 'Wealth',
-    subs: [{ id: 'networth', to: '/finance', tab: 'networth', label: 'Net worth' }, { id: 'investments', to: '/finance', tab: 'investments', label: 'Investments' }],
-  },
-  {
-    id: 'academy', to: '/finance', tab: 'academy', label: 'Academy',
-    subs: [{ id: 'practice', to: '/finance', tab: 'practice', label: 'Practice' }, { id: 'learn', to: '/finance', tab: 'learn', label: 'Learn' }],
-  },
+/** Bank floors (B3), top to bottom. Each is its own route; heavy screens open as a view on their floor (`?view=`). */
+export const MONEY_FLOORS: Floor[] = [
+  { id: 'lobby', to: '/finance', label: 'Lobby', icon: 'home' },
+  { id: 'vault', to: '/finance/vault', label: 'Vault', icon: 'data' },
+  { id: 'trading', to: '/finance/trading', label: 'Trading floor', icon: 'finance' },
+  { id: 'academy', to: '/finance/academy', label: 'Academy', icon: 'learning' },
+  { id: 'archive', to: '/finance/archive', label: 'Archive', icon: 'history' },
 ]
+/** Old Money `?tab=` ids (and the old group ids) and where they live now. Search deep links keep `focus` and `month`. */
+export const MONEY_TABS: Record<string, string> = {
+  overview: '/finance', wealth: '/finance',
+  budgets: '/finance/vault',
+  markets: '/finance/trading', investments: '/finance/trading?view=holdings',
+  academy: '/finance/academy', learn: '/finance/academy', practice: '/finance/academy?view=practice',
+  cash: '/finance/archive', transactions: '/finance/archive', import: '/finance/archive?view=import', networth: '/finance/archive?view=networth',
+}
+/** Where an old `/finance?tab=x...` URL goes now (null when it has no known tab): the floor path, its view, the other params kept. */
+export function moneyTabTarget(search: string): string | null {
+  const q = new URLSearchParams(search)
+  const to = MONEY_TABS[q.get('tab') ?? '']
+  if (!to) return null
+  q.delete('tab')
+  const [path, own] = to.split('?')
+  const out = new URLSearchParams(own)
+  q.forEach((v, k) => { if (!out.has(k)) out.set(k, v) })
+  const rest = out.toString()
+  return rest ? `${path}?${rest}` : path
+}
 
 export const DISTRICTS: Record<DistrictId, DistrictDef> = {
   home: { id: 'home', label: 'Home', building: 'City', to: '/', icon: 'home', routes: ['/', '/map'], floors: [] },
@@ -74,7 +81,7 @@ export const DISTRICTS: Record<DistrictId, DistrictDef> = {
       { id: 'goals', to: '/goals', label: 'Goals', icon: 'goals' }, { id: 'habits', to: '/habits', label: 'Habits', icon: 'habits' },
     ],
   },
-  money: { id: 'money', label: 'Money', building: 'Bank', to: '/finance', icon: 'finance', skill: 'money', routes: ['/finance'], floors: MONEY_GROUPS, elevator: false },
+  money: { id: 'money', label: 'Money', building: 'Bank', to: '/finance', icon: 'finance', skill: 'money', routes: ['/finance'], floors: MONEY_FLOORS, elevator: true },
   body: {
     id: 'body', label: 'Body', building: 'Gym', to: '/body', icon: 'body', skill: 'body', routes: ['/body', '/food', '/training'],
     floors: [
@@ -129,6 +136,11 @@ export const FLOOR_ALIASES: Record<string, string> = {
   '/lift': '/training',
   '/mind': '/journal',
   '/plan': '/today',
+  '/bank': '/finance',
+  '/money': '/finance',
+  '/budgets': '/finance/vault',
+  '/markets': '/finance/trading',
+  '/transactions': '/finance/archive',
 }
 
 /** The bottom strip, left to right. You lives behind the profile control in the top bar. */
@@ -159,17 +171,17 @@ export interface Location {
   sub?: Floor
 }
 
-/** Building and floor for a pathname (plus the query string, which picks the Money tab). */
+/** Building and floor for a pathname (plus the query string: an old Money `?tab=` picks its Bank floor). */
 export function floorForPath(pathname: string, search = ''): Location {
-  const p = resolve(pathname)
+  let p = resolve(pathname)
+  if (p === '/finance') { const to = moneyTabTarget(search); if (to) p = pathOf(to) }
   const district = DISTRICTS[districtForPath(p)]
-  if (district.id === 'money') {
-    const asked = new URLSearchParams(search).get('tab') ?? 'overview'
-    const group = MONEY_GROUPS.find((g) => g.subs.some((s) => s.tab === asked)) ?? MONEY_GROUPS[0]
-    const sub = group.subs.find((s) => s.tab === asked) ?? group.subs[0]
-    return { district, floor: group, tab: group, sub: group.subs.length > 1 ? sub : undefined }
+  // The longest matching floor path wins, so /finance/vault is the Vault, not the Lobby at /finance.
+  let floor: Floor | null = null
+  let best = -1
+  for (const f of district.floors) {
+    for (const r of [pathOf(f.to), ...(f.also ?? [])]) if (owns(r, p) && r.length > best) { floor = f; best = r.length }
   }
-  const floor = district.floors.find((f) => owns(pathOf(f.to), p) || !!f.also?.some((a) => owns(a, p))) ?? null
   return { district, floor, tab: floor }
 }
 /** Kept for older imports. */

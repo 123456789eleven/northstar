@@ -8,7 +8,7 @@ export const numbers: Lesson[] = [
     summary: 'What a company is worth to the market, and what it is not.',
     minutes: 3,
     terms: ['market-cap', 'enterprise-value'],
-    tool: { label: 'Open Markets', to: '/finance?tab=markets' },
+    tool: { label: 'Open Markets', to: '/finance/trading' },
     body: [
       { p: ['Market capitalization, or market cap, is the price of one share multiplied by the number of shares outstanding. It is the market\'s current price for the whole equity of the company. It changes every second the stock trades.'] },
       { h: 'Size buckets', p: ['People loosely sort companies as large cap, mid cap and small cap. There are no official lines, and sources use different cutoffs, but large caps are the biggest, most widely held companies, and small caps are smaller, less liquid and usually more volatile. A fund that says "mid cap" is telling you the size of what it holds.'] },
@@ -30,7 +30,7 @@ export const numbers: Lesson[] = [
     summary: 'Earnings per share, and the price you pay for each unit of earnings.',
     minutes: 5,
     terms: ['eps', 'pe-ratio'],
-    tool: { label: 'Open Markets', to: '/finance?tab=markets' },
+    tool: { label: 'Open Markets', to: '/finance/trading' },
     body: [
       { p: ['Earnings per share (EPS) is the company\'s profit divided by its shares. A company that earned 50 million with 25 million shares has an EPS of 2.00. It is the standard way to say how much profit each share is backed by.'] },
       { h: 'The price-to-earnings ratio', p: ['The P/E ratio is the share price divided by EPS. A stock at 40 with EPS of 2 has a P/E of 20: you pay 20 for each 1 of current yearly earnings. Put another way, the earnings yield is 1 / 20 = 5%.'] },
@@ -53,7 +53,7 @@ export const numbers: Lesson[] = [
     summary: 'Income as a share of price, and why a high number is a question, not an answer.',
     minutes: 3,
     terms: ['dividend-yield', 'ex-dividend'],
-    tool: { label: 'Open Investments', to: '/finance?tab=investments' },
+    tool: { label: 'Open Investments', to: '/finance/trading?view=holdings' },
     body: [
       { p: ['Dividend yield is the yearly dividend per share divided by the share price. A stock at 50.00 paying 2.00 a year has a 4.0% yield. It tells you the income you would receive relative to what you pay, if the dividend stays the same.'] },
       { h: 'Yield moves with price', p: ['The dividend itself is fixed by the company, so when the price falls, the yield rises. A sudden jump in yield is often caused by a falling price, not a better payout. A very high yield can be a warning that the market expects a cut.'] },
@@ -76,7 +76,7 @@ export const numbers: Lesson[] = [
     summary: 'Every field on a typical stock quote: price, range, volume and the rest.',
     minutes: 5,
     terms: ['52-week-range', 'volume', 'bid', 'ask'],
-    tool: { label: 'Open Markets', to: '/finance?tab=markets' },
+    tool: { label: 'Open Markets', to: '/finance/trading' },
     body: [
       { p: ['A quote screen packs many numbers into one view. Most are simple once you know what each answers.'] },
       { h: 'Price and change', list: ['Last price: the most recent trade. It may not be what you can buy at right now; the ask is.', 'Change: the difference from the previous close, shown in dollars and percent.', 'Previous close: the final price from the prior session, the base for the day\'s change.', 'Open, high, low: today\'s first trade, highest and lowest prices so far.'] },
@@ -100,7 +100,7 @@ export const numbers: Lesson[] = [
     summary: 'The six things worth checking before you own a fund.',
     minutes: 4,
     terms: ['expense-ratio', 'benchmark'],
-    tool: { label: 'Open Investments', to: '/finance?tab=investments' },
+    tool: { label: 'Open Investments', to: '/finance/trading?view=holdings' },
     body: [
       { p: ['A fund fact sheet is a one or two page summary from the fund company. The full document is the prospectus. A sheet is marketing, so know where to look.'] },
       { h: 'The checklist', list: ['Objective and benchmark: what the fund tries to do, and the index or yardstick it is compared with.', 'Expense ratio: the yearly cost. For a plain index fund, lower is better.', 'Holdings: top 10 holdings and what share of the fund they make up. Heavy concentration in a few names means less diversification than the label suggests.', 'Sector and country weights: shows what you actually own.', 'Returns vs benchmark: look at 5 and 10 years and calendar years, not only the best period. Check returns are after fees. Compare with the benchmark, not with other things.', 'Risk figures: some sheets show standard deviation or worst year. Larger means bumpier.'] },
@@ -123,7 +123,7 @@ export const numbers: Lesson[] = [
     summary: 'Coupon, price, yield, maturity, duration and credit quality on one line.',
     minutes: 5,
     terms: ['coupon', 'ytm', 'duration', 'credit-rating', 'maturity', 'face-value'],
-    tool: { label: 'Open Practice', to: '/finance?tab=practice' },
+    tool: { label: 'Open Practice', to: '/finance/academy?view=practice' },
     body: [
       { p: ['A bond listing is dense but regular. Once you know the fields you can read any of them.'] },
       { h: 'The fields', list: ['Issuer: who borrowed the money (a government, a municipality, a company).', 'Coupon: the fixed interest rate on face value, such as 4.50%.', 'Maturity: when the face value is repaid.', 'Price: quoted per 100 of face value. A price of 97.00 means 97% of face value.', 'Yield to maturity (YTM): the annual return if you buy at that price and hold to maturity and the issuer pays everything on time.', 'Credit rating: agencies grade borrowers. Investment grade ranges from AAA down to BBB-; below that is high yield, sometimes called junk, with higher default risk.', 'Duration: roughly how much the price moves for a one percentage point change in yield, stated in years.'] },

@@ -63,7 +63,7 @@ function Edit({ id, label, field, value }: { id: number; label: string; field: '
   )
 }
 
-export default function Detail({ d, symbol, onClose }: { d: MarketsData; symbol: string; onClose: () => void }) {
+export default function Detail({ d, symbol, onClose, inline = true }: { d: MarketsData; symbol: string; onClose: () => void; inline?: boolean }) {
   const row = d.rows.find((r) => r.symbol === symbol)
   const item = d.watchlist.find((w) => w.symbol === symbol)
   const q = d.quotes[symbol]
@@ -77,7 +77,7 @@ export default function Detail({ d, symbol, onClose }: { d: MarketsData; symbol:
   const [note, setNote] = useState(item?.note ?? '')
 
   return (
-    <SidePanel title={symbol} onClose={onClose} inline>
+    <SidePanel title={symbol} onClose={onClose} inline={inline}>
       <div className="mkt-detail stack">
         <div>
           <div className="mkt-detail-price"><Tick value={price}>{price === undefined ? '—' : `$${fmtPrice(price)}`}</Tick> <Change pct={q?.changePct} /></div>
