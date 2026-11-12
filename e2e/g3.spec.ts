@@ -90,9 +90,9 @@ for (const vp of viewports) {
       await expect(page.getByTestId('safe-hero')).toBeVisible()
       await expect(page.getByTestId('safe-inputs')).toContainText('$600 budget')
       await expect(page.getByTestId('safe-left')).toContainText('550')
-      // Budgets tab shows the health bars with a state in words.
-      await page.getByRole('tab', { name: 'Cash' }).click()
-      await page.getByRole('tab', { name: 'Budgets' }).click()
+      // The Vault shows the envelopes with the pace in words.
+      await page.goto('/#/finance/vault')
+      await expect(page.getByRole('link', { name: /^Groceries: \$50\.00 of \$400\.00/ })).toBeVisible()
       await expect(page.getByText('On pace').first()).toBeVisible()
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
     })
@@ -104,8 +104,7 @@ test.describe('G3 phone only', () => {
 
   test('Money: a transaction row opens the category sheet', async ({ page }) => {
     await seed(page, { transactions: [{ date: iso(new Date()), amount: -12.5, description: 'Fictional Cafe', category: 'Uncategorized' }] })
-    await page.goto('/#/finance')
-    await page.getByRole('tab', { name: /Cash/ }).click()
+    await page.goto('/#/finance/archive')
     await page.getByRole('button', { name: /Fictional Cafe/ }).click()
     const sheet = page.getByRole('dialog', { name: 'Categorize' })
     await expect(sheet).toBeVisible()

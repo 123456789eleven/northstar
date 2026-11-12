@@ -20,16 +20,20 @@ test('Settings: add from a data file (2 transactions, 1 balance)', async ({ page
   await expect(page.getByText(/2 transactions/)).toBeVisible()
 })
 
-test('Finance > Budgets: add a bill', async ({ page }) => {
-  await page.goto('/#/finance')
-  await page.getByRole('tab', { name: 'Cash' }).click()
-  await page.getByRole('tab', { name: 'Budgets' }).click()
+test('Bank > Vault: add a bill, then mark it paid', async ({ page }) => {
+  await page.goto('/#/finance/vault')
   await page.getByRole('button', { name: 'Add bill' }).click()
   const dialog = page.getByRole('dialog', { name: 'Add bill' })
   await dialog.getByLabel('Name').fill('Fixture Car Insurance')
   await dialog.getByLabel('Amount per payment').fill('600')
   await dialog.getByRole('button', { name: 'Save' }).click()
   await expect(dialog).toBeHidden()
+  await expect(page.getByText('Fixture Car Insurance').first()).toBeVisible()
+  await page.getByRole('button', { name: 'Mark Fixture Car Insurance paid' }).click()
+  await expect(page.getByText(/Fixture Car Insurance paid\. Next due/)).toBeVisible()
+  // The full bill list still lives under More: Limits and bills.
+  await page.getByTestId('floor-more').click()
+  await page.getByRole('link', { name: /Limits and bills/ }).click()
   await expect(page.getByRole('button', { name: 'Edit Fixture Car Insurance' })).toBeVisible()
 })
 
