@@ -1,6 +1,6 @@
-// Setup card for optional live prices. Place it wherever the Markets UI needs it; it renders nothing else.
+// Setup for optional live prices (the caller supplies the card). One line on what leaves the device; the detail is a tap away.
 import { useState } from 'react'
-import { Card, Field } from '../../components/ui'
+import { Field } from '../../components/ui'
 import { finnhub, isPlausibleKey, MarketError } from './finnhub'
 import { useFinnhubKey } from './hooks'
 import './markets.css'
@@ -52,25 +52,17 @@ export default function KeySetup() {
   const plausible = isPlausibleKey(value.trim())
 
   return (
-    <Card title="Live prices" sub={hasKey ? `On. Key ending ${hint.slice(-4)}.` : 'Off until you add your own free Finnhub key.'}>
-      <div className="mkt-box">
-        <b>What leaves this device</b>
+    <div className="mkt-keysetup">
+      <p className="mkt-note">{hasKey ? `On. Key ending ${hint.slice(-4)}.` : 'Off. Add your own free key.'} Only ticker symbols leave this device.</p>
+      <details className="mkt-box">
+        <summary>What leaves this device</summary>
         <ul>
-          <li>Ticker symbols, such as VTI, are sent to Finnhub to get prices. Nothing else is sent.</li>
-          <li>Your balances, share counts, cost basis and notes never leave this device.</li>
-          <li>Your key is stored on this device only. It is not synced and not included in backups.</li>
+          <li>Ticker symbols, such as VTI. Nothing else.</li>
+          <li>Balances, shares, cost basis and notes stay here.</li>
+          <li>The key stays on this device: not synced, not in backups.</li>
+          <li>Prices may be delayed. No advice, no trades.</li>
         </ul>
-      </div>
-      <p className="mkt-note">
-        Prices are for reference and may be delayed or wrong. Northstar gives no investment advice and cannot place trades.
-      </p>
-      <p className="mkt-note">
-        No key yet?{' '}
-        <a href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer">
-          Get a free key at finnhub.io
-        </a>
-        .
-      </p>
+      </details>
       <Field label={hasKey ? 'Replace key' : 'Finnhub API key'} error={msg?.tone === 'error' ? msg.text : undefined} hint={msg?.tone === 'ok' ? msg.text : undefined}>
         <input
           className="input"
@@ -89,18 +81,11 @@ export default function KeySetup() {
         />
       </Field>
       <div className="row mkt-actions">
-        <button type="button" className="btn" disabled={busy || !plausible} onClick={test}>
-          Test
-        </button>
-        <button type="button" className="btn btn-primary" disabled={busy || !plausible} onClick={save}>
-          Save
-        </button>
-        {hasKey && (
-          <button type="button" className="btn" disabled={busy} onClick={remove}>
-            Remove key
-          </button>
-        )}
+        <button type="button" className="btn" disabled={busy || !plausible} onClick={test}>Test</button>
+        <button type="button" className="btn btn-primary" disabled={busy || !plausible} onClick={save}>Save</button>
+        {hasKey && <button type="button" className="btn" disabled={busy} onClick={remove}>Remove key</button>}
+        {!hasKey && <a className="btn btn-ghost btn-sm" href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer">Get a free key</a>}
       </div>
-    </Card>
+    </div>
   )
 }
