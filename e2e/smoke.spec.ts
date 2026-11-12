@@ -1,11 +1,21 @@
 // Smoke flows against the real UI text. Run: npm run build && npx playwright test (see docs/dev-setup.md).
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import { fileURLToPath } from 'node:url'
+
+
+/** Home base Settings: open the More sheet and pick an item (steps back out of an open panel first). */
+async function moreItem(page: Page, name: string) {
+  const back = page.getByRole('button', { name: /Back$/ })
+  if (await back.isVisible().catch(() => false)) await back.click()
+  else await page.getByTestId('floor-more').click()
+  await page.locator('.floor-more-item', { hasText: name }).first().click()
+}
 
 const fixture = fileURLToPath(new URL('./fixtures/two-tx-one-balance.json', import.meta.url))
 
 test('Settings: add from a data file (2 transactions, 1 balance)', async ({ page }) => {
   await page.goto('/#/settings')
+  await moreItem(page, 'Backup and restore')
   const [chooser] = await Promise.all([
     page.waitForEvent('filechooser'),
     page.getByRole('button', { name: /Add from a data file/ }).click(),
@@ -151,12 +161,14 @@ test('Settings: encrypted backup round trip (export, erase, import with passphra
   await download.saveAs(saved)
   await expect(page.getByText(/rows, encrypted/)).toBeVisible()
 
+  await moreItem(page, 'Danger zone')
   await page.getByRole('button', { name: 'Erase all data…' }).click()
   const erase = page.getByRole('dialog', { name: 'Erase all data' })
   await erase.getByLabel('Type ERASE to confirm').fill('ERASE')
   await erase.getByRole('button', { name: 'Erase everything' }).click()
   await expect(erase).toBeHidden()
 
+  await moreItem(page, 'Backup and restore')
   const [chooser] = await Promise.all([
     page.waitForEvent('filechooser'),
     page.getByRole('button', { name: /Import backup/ }).click(),

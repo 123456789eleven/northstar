@@ -27,8 +27,8 @@ test.describe('phone 390x844', () => {
     await expect(page).toHaveURL(/#\/tasks$/)
 
     await page.getByRole('link', { name: 'You', exact: true }).click()
-    await expect(page).toHaveURL(/#\/you$/)
-    await expect(page.getByRole('heading', { level: 1, name: 'You' })).toBeVisible()
+    await expect(page).toHaveURL(/#\/score$/)
+    await expect(page.getByRole('heading', { level: 1, name: 'Scoreboard' })).toBeVisible()
     await expect(bar.locator('[aria-current]')).toHaveCount(0)
 
     await bar.getByRole('link', { name: 'Home' }).click()
@@ -54,7 +54,7 @@ test.describe('phone 390x844', () => {
     await expect(sheet).toBeHidden()
 
     // No horizontal scroll on the hubs at phone width.
-    for (const r of ['/', '/today', '/plan', '/skills', '/mind', '/you', '/food']) {
+    for (const r of ['/', '/today', '/plan', '/skills', '/mind', '/you', '/history', '/review', '/settings', '/food']) {
       await page.goto('/#' + r)
       await expect(page.locator('.route-view')).toBeVisible()
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
@@ -129,13 +129,12 @@ test('desktop 1440: district strip is the primary nav; no right rail; old URLs s
   await expect(page).toHaveTitle('Career | Northstar')
 })
 
-test('Areas hub shows five rings with their inputs and a table view, no levels', async ({ page }) => {
+test('Areas hub and You hub are gone: /skills opens the city, /you opens the Scoreboard', async ({ page }) => {
   await page.goto('/#/skills')
-  await expect(page.getByRole('heading', { level: 1, name: 'Areas' })).toBeVisible()
-  await expect(page.locator('.area-card')).toHaveCount(5)
-  await expect(page.getByText(/Level \d|XP/)).toHaveCount(0)
-  await page.getByRole('button', { name: 'Table view' }).click()
-  await expect(page.getByRole('table', { name: 'Areas this week' })).toBeVisible()
+  await expect(page).toHaveURL(/#\/$/)
+  await page.goto('/#/you')
+  await expect(page).toHaveURL(/#\/score$/)
+  await expect(page.getByRole('heading', { level: 1, name: 'Scoreboard' })).toBeVisible()
 })
 
 test('a weigh-in quest completes itself when you log a weight', async ({ page }) => {

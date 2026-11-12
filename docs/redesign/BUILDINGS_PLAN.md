@@ -34,7 +34,7 @@ Money groups and sub-tabs become floors; Overview/Wealth duplicates merge; "Spen
 - [ ] B3 Bank (Money): five floors.
 - [ ] B4 Town hall (Plan) and Park (People).
 - [ ] B5 Library (Mind) and Office (Career).
-- [ ] B6 Home base (You): Scoreboard, Milestones, Season, Settings.
+- [x] B6 Home base (You): Scoreboard, Milestones, Season, Settings. Done: four floors (`/score`, `/history`, `/review`, `/settings` with Intel, Data, Ontology and Interview lit on Settings), `/you` redirects to Scoreboard and `/skills` to the city, Home base stage model (backup this month, sync or encrypted backup, 10 interview answers, first badge, standing unlocked), Power tools in Settings More.
 - [ ] B7 City reflects stages (buildings grow with the meter); polish pass; word audit; e2e and a11y.
 
 ## Rules that stay

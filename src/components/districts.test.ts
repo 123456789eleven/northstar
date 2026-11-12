@@ -39,7 +39,7 @@ describe('subtabForPath and breadcrumb', () => {
   it('finds the tab inside a district', () => {
     expect(subtabForPath('/food').tab?.label).toBe('Kitchen')
     expect(subtabForPath('/tasks').district.id).toBe('plan')
-    expect(subtabForPath('/ontology/Task').tab?.label).toBe('Ontology')
+    expect(subtabForPath('/ontology/Task').tab?.label).toBe('Settings')
     expect(subtabForPath('/career').tab).toBeNull()
     expect(subtabForPath('/').tab).toBeNull()
   })
@@ -65,8 +65,14 @@ describe('floors', () => {
     expect(floorIndex('/training')).toBe(2)
     expect(floorIndex('/career')).toBe(-1)
   })
+  it('maps Home base to four floors and keeps Intel, Data and Ontology on Settings', () => {
+    expect(DISTRICTS.you.floors.map((f) => f.label)).toEqual(['Scoreboard', 'Milestones', 'Season', 'Settings'])
+    for (const p of ['/ops', '/data', '/ontology/Task', '/interview']) expect(floorForPath(p).floor?.id, p).toBe('settings')
+    expect(floorForPath('/you').floor?.id).toBe('scoreboard')
+  })
   it('sends every alias to a real floor of the same building', () => {
     for (const [from, to] of Object.entries(FLOOR_ALIASES)) {
+      if (to === '/') { expect(districtForPath(from)).toBe('home'); continue }
       expect(floorForPath(from).floor?.to, from).toBe(to)
       expect(districtForPath(from)).toBe(districtForPath(to))
     }

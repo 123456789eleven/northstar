@@ -39,3 +39,4 @@
 @keyframes bdg-rise { from { opacity: 0.4; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .bdg-mini.is-earned .bdg-gold, .bdg-mini.is-earned .bdg-mark { animation: none; } }
 :root[data-motion='reduced'] .bdg-mini.is-earned .bdg-gold, :root[data-motion='reduced'] .bdg-mini.is-earned .bdg-mark { animation: none; }
+@media (max-width: 519px) { .bdg-shelf { grid-template-columns: repeat(4, minmax(0, 1fr)); } .bdg-mini { min-height: 68px; } .bdg-mini-t { font-size: 11px; } }

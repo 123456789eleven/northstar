@@ -49,7 +49,7 @@ for (const vp of [{ name: '390', size: { width: 390, height: 844 }, touch: true 
       await page.goto('/#/score')
       await expect(page.getByRole('heading', { level: 1, name: 'Scoreboard' })).toBeVisible()
       await expect(page.getByTestId('standing-headline')).toHaveText('No standing yet.')
-      await expect(page.getByTestId('records-empty')).toContainText('A record appears')
+      await expect(page.getByTestId('records-empty')).toContainText('No records yet')
       await expect(page.getByTestId('reel-empty')).toBeVisible()
       await noHScroll(page)
     })
