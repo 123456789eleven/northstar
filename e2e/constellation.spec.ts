@@ -103,23 +103,21 @@ test('desktop 1440: district strip is the primary nav; no right rail; old URLs s
   await expect(page).toHaveURL(/#\/food$/)
   await page.goto('/#/food')
   await expect(page).toHaveTitle('Food | Northstar')
-  // Money tabs live in the URL, so the head reads Money / Markets and the strip returns there.
+  // Bank floors are routes, so the head reads Bank / Trading floor and the strip returns there.
   await page.goto('/#/finance')
-  await page.getByRole('tab', { name: 'Markets' }).click()
-  await expect(page).toHaveURL(/#\/finance\?tab=markets$/)
-  await expect(crumb.locator('[aria-current="page"]')).toHaveText('Markets')
+  await page.getByRole('navigation', { name: 'Bank floors' }).getByRole('link', { name: 'Trading floor' }).click()
+  await expect(page).toHaveURL(/#\/finance\/trading$/)
+  await expect(crumb.locator('[aria-current="page"]')).toHaveText('Trading floor')
   await strip.getByRole('link', { name: 'People' }).click()
   await expect(page.locator('.city-head')).toHaveAttribute('data-district', 'people')
   await expect(crumb.getByRole('link')).toHaveCount(0)
   await expect(crumb).toHaveText('Park')
   await strip.getByRole('link', { name: 'Money' }).click()
-  await expect(page).toHaveURL(/#\/finance\?tab=markets$/)
-  // Groups: the URL carries the sub-tab id (as old deep links do) and the head reads Money / Cash / Budgets.
-  await page.getByRole('tab', { name: 'Cash', exact: true }).click()
-  await page.getByRole('tab', { name: 'Budgets', exact: true }).click()
-  await expect(page).toHaveURL(/#\/finance\?tab=budgets$/)
-  await expect(crumb).toContainText('Cash')
-  await expect(crumb.locator('[aria-current="page"]')).toHaveText('Budgets')
+  await expect(page).toHaveURL(/#\/finance\/trading$/)
+  // An old Money deep link lands on its floor: Bank / Vault.
+  await page.goto('/#/finance?tab=budgets')
+  await expect(page).toHaveURL(/#\/finance\/vault$/)
+  await expect(crumb.locator('[aria-current="page"]')).toHaveText('Vault')
   // The mini-map lights the active district and goes where you tap.
   const mini = page.getByRole('group', { name: /City map, you are in Money/ })
   await expect(mini.getByRole('link', { name: 'Money' })).toHaveAttribute('aria-current', 'true')

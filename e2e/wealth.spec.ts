@@ -58,17 +58,20 @@ for (const [name, size] of [['phone', { width: 390, height: 844 }], ['desktop', 
 
     test('wealth: net worth headline, high marker, next milestone, records', async ({ page }) => {
       await seedAll(page)
-      await page.goto('/#/finance?tab=networth')
+      await page.goto('/#/finance')
       await expect(page.getByTestId('networth-hero')).toContainText('$3,900')
       await expect(page.getByTestId('nw-high')).toBeVisible()
       await expect(page.getByTestId('nw-next')).toContainText('$4,000')
+      await page.goto('/#/finance/archive')
       await expect(page.getByTestId('records')).toContainText('Biggest net worth jump')
       await expect(page.getByTestId('records')).toContainText('+$1,300')
     })
 
     test('investments: savings engine shows surplus, limit and an illustration', async ({ page }) => {
       await seedAll(page)
-      await page.goto('/#/finance?tab=investments')
+      await page.goto('/#/finance/archive')
+      await page.getByTestId('floor-more').click()
+      await page.getByRole('button', { name: 'Savings engine', exact: true }).click()
       const eng = page.getByTestId('savings-engine')
       await expect(eng).toContainText('Put it to work')
       await expect(page.getByTestId('invest-monthly')).toContainText('$83')

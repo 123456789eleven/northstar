@@ -8,7 +8,7 @@ export const assets: Lesson[] = [
     summary: 'Individual bonds versus funds, Treasuries, corporates, and what changes when you hold a fund.',
     minutes: 5,
     terms: ['treasury', 'corporate-bond', 'municipal-bond', 'bond-fund', 'ytm', 'duration', 'credit-rating'],
-    tool: { label: 'Open Practice', to: '/finance?tab=practice' },
+    tool: { label: 'Open Practice', to: '/finance/academy?view=practice' },
     body: [
       { p: ['Bonds are not one thing. The issuer, the term and the credit quality produce very different risks.'] },
       { h: 'Main types', list: ['US Treasuries: backed by the US government. Bills mature in a year or less, notes in 2 to 10 years, bonds in 20 to 30. Treasury interest is exempt from state income tax.', 'Corporate bonds: loans to companies. Higher yield than Treasuries to compensate for default risk.', 'Municipal bonds: issued by states and cities. Interest is generally exempt from federal income tax, which suits people in higher tax brackets.', 'Inflation-linked bonds such as TIPS: the principal adjusts with inflation.'] },
@@ -31,7 +31,7 @@ export const assets: Lesson[] = [
     summary: 'Real estate exposure through a stock-like fund, and how it behaves.',
     minutes: 4,
     terms: ['reit', 'ffo', 'dividend-yield'],
-    tool: { label: 'Open Markets', to: '/finance?tab=markets' },
+    tool: { label: 'Open Markets', to: '/finance/trading' },
     body: [
       { p: ['A real estate investment trust (REIT) is a company that owns, and often operates, income-producing property such as apartments, warehouses, offices, shopping centres, data centres or cell towers. In the US, a REIT is generally required to pay out most of its taxable income to shareholders, which is why REITs tend to have high dividend yields.'] },
       { h: 'Why people own them', list: ['Property exposure without buying a building.', 'Liquidity: shares trade like stocks, unlike a house.', 'Income from rent, passed on as dividends.', 'A different mix of drivers from other stocks, though not an immune one.'] },
@@ -54,7 +54,7 @@ export const assets: Lesson[] = [
     summary: 'Gold, oil, grain: no earnings, no coupon, and a tricky way to own them.',
     minutes: 4,
     terms: ['commodity', 'futures', 'contango', 'etf'],
-    tool: { label: 'Open Markets', to: '/finance?tab=markets' },
+    tool: { label: 'Open Markets', to: '/finance/trading' },
     body: [
       { p: ['Commodities are raw materials: energy such as oil and natural gas, metals such as gold and copper, and farm products such as wheat. They produce no earnings, dividends or interest. Their price depends on supply, demand, weather, politics, and currency.'] },
       { h: 'Ways to own them', list: ['Physical: bullion or coins. Storage, insurance and dealer markups apply.', 'Funds backed by the physical metal, such as a gold ETF, hold bars in a vault and track the spot price less a fee.', 'Futures-based funds: they hold futures contracts, not the commodity. Oil funds usually work this way.', 'Producer stocks: miners and drillers are businesses and are affected by operating costs and management as well as by the price.'] },
@@ -76,7 +76,7 @@ export const assets: Lesson[] = [
     summary: 'A high-risk, unproven asset class. What it is and what can go wrong.',
     minutes: 4,
     terms: ['crypto', 'blockchain', 'volatility', 'custody'],
-    tool: { label: 'Open Markets', to: '/finance?tab=markets' },
+    tool: { label: 'Open Markets', to: '/finance/trading' },
     body: [
       { p: ['Cryptocurrencies are digital tokens recorded on a blockchain, a shared ledger kept by many computers. Bitcoin is the oldest. Many other tokens exist, with different purposes and a wide range of quality. Most have no earnings, coupon or rent behind them. Their value comes from what others will pay.'] },
       { h: 'Why it is high risk', list: ['Volatility: drops of 50% or more have happened more than once, and can occur within months.', 'No cash flows: nothing to value it against, so prices swing with sentiment.', 'Fraud and failure: exchanges and projects have collapsed, and customers have lost deposits. Scams are common.', 'Custody: if you hold your own keys and lose them, the coins are gone. If an exchange holds them, you rely on the exchange.', 'Regulation and tax: rules vary and change. In the US, selling or spending crypto is generally a taxable event.', 'Not insured: there is no deposit insurance like a bank account has.'] },
@@ -98,7 +98,7 @@ export const assets: Lesson[] = [
     summary: 'Premium, strike and expiration. A high-risk tool that can expire worthless.',
     minutes: 5,
     terms: ['option', 'call', 'put', 'premium', 'strike', 'expiration', 'leverage'],
-    tool: { label: 'Open Practice', to: '/finance?tab=practice' },
+    tool: { label: 'Open Practice', to: '/finance/academy?view=practice' },
     body: [
       { p: ['An option is a contract that gives its buyer the right, but not the obligation, to buy or sell an asset at a set price before a set date. Each standard US stock option covers 100 shares.'] },
       { h: 'The terms', list: ['Call: the right to buy at the strike price.', 'Put: the right to sell at the strike price.', 'Strike: the fixed price in the contract.', 'Expiration: the date the contract ends. After it, the option is worthless if not exercised or in the money.', 'Premium: what the buyer pays the seller up front, quoted per share. A premium of 2.50 costs 250.00 for one contract (100 shares).'] },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { breadcrumb, districtForPath, DISTRICTS, FLOOR_ALIASES, floorForPath, floorIndex, hasElevator, rememberPath, STRIP, stripTarget, subtabForPath } from './districts'
+import { breadcrumb, districtForPath, DISTRICTS, FLOOR_ALIASES, floorForPath, floorIndex, hasElevator, moneyTabTarget, rememberPath, STRIP, stripTarget, subtabForPath } from './districts'
 import { NAV } from './nav'
 
 describe('districtForPath', () => {
@@ -43,13 +43,18 @@ describe('subtabForPath and breadcrumb', () => {
     expect(subtabForPath('/career').tab).toBeNull()
     expect(subtabForPath('/').tab).toBeNull()
   })
-  it('reads the Money tab from the query string', () => {
-    expect(breadcrumb('/finance', '?tab=markets')).toEqual(['Bank', 'Markets'])
-    expect(breadcrumb('/finance', '?tab=budgets')).toEqual(['Bank', 'Cash', 'Budgets'])
-    expect(breadcrumb('/finance', '?tab=investments')).toEqual(['Bank', 'Wealth', 'Investments'])
-    expect(breadcrumb('/finance', '?tab=learn')).toEqual(['Bank', 'Academy', 'Learn'])
-    expect(breadcrumb('/finance', '?tab=bogus')).toEqual(['Bank', 'Overview'])
-    expect(breadcrumb('/finance')).toEqual(['Bank', 'Overview'])
+  it('puts each Bank floor and every old Money ?tab= on its floor', () => {
+    expect(breadcrumb('/finance')).toEqual(['Bank', 'Lobby'])
+    expect(breadcrumb('/finance/vault')).toEqual(['Bank', 'Vault'])
+    expect(breadcrumb('/finance/trading', '?view=screener')).toEqual(['Bank', 'Trading floor'])
+    expect(breadcrumb('/finance', '?tab=markets')).toEqual(['Bank', 'Trading floor'])
+    expect(breadcrumb('/finance', '?tab=budgets')).toEqual(['Bank', 'Vault'])
+    expect(breadcrumb('/finance', '?tab=investments')).toEqual(['Bank', 'Trading floor'])
+    expect(breadcrumb('/finance', '?tab=learn')).toEqual(['Bank', 'Academy'])
+    expect(breadcrumb('/finance', '?tab=practice')).toEqual(['Bank', 'Academy'])
+    expect(breadcrumb('/finance', '?tab=transactions&focus=4&month=2026-04')).toEqual(['Bank', 'Archive'])
+    expect(breadcrumb('/finance', '?tab=networth')).toEqual(['Bank', 'Archive'])
+    expect(breadcrumb('/finance', '?tab=bogus')).toEqual(['Bank', 'Lobby'])
     expect(breadcrumb('/people')).toEqual(['Park'])
     expect(breadcrumb('/review')).toEqual(['Home base', 'Season'])
     expect(breadcrumb('/food')).toEqual(['Gym', 'Kitchen'])
@@ -80,8 +85,20 @@ describe('floors', () => {
   it('shows an elevator only where the frame switches floors', () => {
     expect(hasElevator(DISTRICTS.body)).toBe(true)
     expect(hasElevator(DISTRICTS.plan)).toBe(true)
-    expect(hasElevator(DISTRICTS.money)).toBe(false)
+    expect(hasElevator(DISTRICTS.money)).toBe(true)
     expect(hasElevator(DISTRICTS.career)).toBe(false)
+  })
+})
+
+describe('moneyTabTarget', () => {
+  it('sends old Money links to their floor and view, keeping focus and month', () => {
+    expect(moneyTabTarget('?tab=transactions&focus=12&month=2026-04')).toBe('/finance/archive?focus=12&month=2026-04')
+    expect(moneyTabTarget('?tab=practice')).toBe('/finance/academy?view=practice')
+    expect(moneyTabTarget('?tab=import')).toBe('/finance/archive?view=import')
+    expect(moneyTabTarget('?tab=overview')).toBe('/finance')
+    expect(moneyTabTarget('?tab=nope')).toBeNull()
+    expect(moneyTabTarget('')).toBeNull()
+    expect(DISTRICTS.money.floors.map((f) => f.label)).toEqual(['Lobby', 'Vault', 'Trading floor', 'Academy', 'Archive'])
   })
 })
 
@@ -91,8 +108,8 @@ describe('stripTarget', () => {
     rememberPath('/food')
     expect(stripTarget('body', 'home')).toBe('/food')
     expect(stripTarget('body', 'body')).toBe('/body')
-    rememberPath('/finance', '?tab=markets')
-    expect(stripTarget('money', 'plan')).toBe('/finance?tab=markets')
+    rememberPath('/finance/trading')
+    expect(stripTarget('money', 'plan')).toBe('/finance/trading')
     expect(stripTarget('home', 'plan')).toBe('/')
   })
 })

@@ -32,6 +32,10 @@ const Training = lazy(() => import('./pages/Training'))
 const Interview = lazy(() => import('./pages/Interview'))
 const StyleTile = lazy(() => import('./pages/StyleTile'))
 const Finance = lazy(() => import('./pages/Finance'))
+const Vault = lazy(() => import('./pages/Vault'))
+const TradingFloor = lazy(() => import('./pages/TradingFloor'))
+const Academy = lazy(() => import('./pages/Academy'))
+const Archive = lazy(() => import('./pages/Archive'))
 const Learning = lazy(() => import('./pages/Learning'))
 const People = lazy(() => import('./pages/People'))
 const History = lazy(() => import('./pages/History'))
@@ -112,6 +116,10 @@ function Shell() {
               <Route path="/goals" element={<Goals />} />
               <Route path="/habits" element={<Habits />} />
               <Route path="/finance" element={<Finance />} />
+              <Route path="/finance/vault" element={<Vault />} />
+              <Route path="/finance/trading" element={<TradingFloor />} />
+              <Route path="/finance/academy" element={<Academy />} />
+              <Route path="/finance/archive" element={<Archive />} />
               <Route path="/body" element={<Body />} />
               <Route path="/food" element={<Food />} />
               <Route path="/training" element={<Training />} />

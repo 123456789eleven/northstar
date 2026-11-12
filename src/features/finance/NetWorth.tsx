@@ -6,10 +6,21 @@ import DataTable from '../../components/DataTable'
 import KpiStrip from '../../components/KpiStrip'
 import { db, logEvent, type BalanceSnapshot } from '../../db'
 import { formatDate, money, today } from '../../lib/dates'
-import { NetWorthHero, NetWorthPath } from './NetWorthHero'
+import { NetWorthPath } from './NetWorthHero'
 import { netWorthSeries } from './model'
-import { RecordsStrip } from './WealthPanels'
 
+/** Adds one balance snapshot; logs a milestone and returns the new net worth when it is an all-time high (else null). */
+export async function addBalanceSnapshot(s: Omit<BalanceSnapshot, 'id'>): Promise<number | null> {
+  const before = netWorthSeries(await db.balances.toArray())
+  const prevHigh = before.length ? Math.max(...before.map((p) => p.net)) : null
+  const id = await db.balances.add(s)
+  const now = netWorthSeries(await db.balances.toArray()).at(-1)?.net ?? 0
+  if (prevHigh === null || now <= prevHigh) return null
+  await logEvent({ area: 'finance', kind: 'finance.networth-high', title: `New net worth high: ${money(now)}`, refTable: 'balances', refId: id, milestone: true })
+  return now
+}
+
+/** Net worth history (Bank, Archive): add or update balances, the growth path as a table, every account's latest balance. */
 export default function NetWorth() {
   const snaps = useLiveQuery(() => db.balances.toArray(), [])
   const [date, setDate] = useState(today)
@@ -30,14 +41,9 @@ export default function NetWorth() {
   const liabilities = accounts.filter((a) => a.kind === 'liability').reduce((s, a) => s + a.balance, 0)
 
   async function addSnapshot(s: Omit<BalanceSnapshot, 'id'>) {
-    const before = netWorthSeries(await db.balances.toArray())
-    const prevHigh = before.length ? Math.max(...before.map((p) => p.net)) : null
-    const id = await db.balances.add(s)
-    const after = netWorthSeries(await db.balances.toArray())
-    const now = after.at(-1)?.net ?? 0
-    if (prevHigh !== null && now > prevHigh) {
-      await logEvent({ area: 'finance', kind: 'finance.networth-high', title: `New net worth high: ${money(now)}`, refTable: 'balances', refId: id, milestone: true })
-      setFlash(`New all-time high: ${money(now)}. That is your best net worth yet.`)
+    const high = await addBalanceSnapshot(s)
+    if (high != null) {
+      setFlash(`New all-time high: ${money(high)}.`)
       setTimeout(() => setFlash(''), 5000)
     }
   }
@@ -65,7 +71,6 @@ export default function NetWorth() {
 
   return (
     <div className="stack" style={{ gap: 16 }}>
-      {current && <NetWorthHero series={series} />}
       {current && (
         <KpiStrip
           items={[
@@ -74,7 +79,6 @@ export default function NetWorth() {
           ]}
         />
       )}
-      {current && <RecordsStrip />}
       {flash && <div className="small good">{flash}</div>}
 
       <form className="card fin-add" onSubmit={submit}>

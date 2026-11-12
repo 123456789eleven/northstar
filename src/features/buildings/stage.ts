@@ -1,6 +1,7 @@
 // Building stage (BUILDINGS_PLAN.md): five windows per building, each lit by one concrete thing you did, never by points.
 // Pure: the hook in useBuildingStage.ts reads the data; this file only decides. A building without a stage returns null.
 import type { DistrictId } from '../../components/districts'
+import { bankSteps, type BankSnapshot } from './bankStage'
 
 export const STAGES = 5
 
@@ -36,7 +37,7 @@ export interface GymSnapshot {
   flagsCrossed: number
 }
 
-export interface BuildingSnapshot { body?: GymSnapshot }
+export interface BuildingSnapshot { body?: GymSnapshot; money?: BankSnapshot }
 
 export const GYM_WEIGH_INS = 4
 export const GYM_MEAL_DAYS = 5
@@ -54,12 +55,13 @@ function gymSteps(s: GymSnapshot): StageStep[] {
   ]
 }
 
-const FULL: Partial<Record<DistrictId, string>> = { body: 'Every window lit' }
+const FULL: Partial<Record<DistrictId, string>> = { body: 'Every window lit', money: 'Every window lit. The Bank is open late' }
 
 /** The building's stage from its snapshot, or null for a building that has no stage yet. */
 export function buildingStage(district: DistrictId, snap: BuildingSnapshot): BuildingStage | null {
   let steps: StageStep[] | null = null
   if (district === 'body' && snap.body) steps = gymSteps(snap.body)
+  if (district === 'money' && snap.money) steps = bankSteps(snap.money)
   if (!steps) return null
   const stage = steps.filter((s) => s.done).length
   const next = steps.find((s) => !s.done) ?? null

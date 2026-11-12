@@ -1,54 +1,23 @@
-// Money overview cards, in reading order: net worth path, cash flow, budgets, bills calendar, subscriptions,
-// investments, money goals, monthly recap. Every card owns its empty state. Read-only over existing tables.
+// Bank cards shown on floor sheets: cash flow, bills calendar, subscriptions, money goals, monthly recap.
+// Every card owns its empty state. Read-only over existing tables.
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, Empty } from '../../components/ui'
-import { db, getSetting, type Budget, type Goal, type Transaction } from '../../db'
+import { db, type Goal, type Transaction } from '../../db'
 import { formatDate, money, today } from '../../lib/dates'
-import { Ring } from '../game/ui/Ring'
-import { DEFAULT_IRA_LIMIT, holdingValue, monthlyToMax, remainingRoom, ytdContributions } from '../investments/model'
 import { goalMetric } from '../progress/metrics'
 import { loadMetricData } from '../progress/metricsData'
-import { accrued, daysToDue, monthlySetAside, nextDue, type Bill } from './bills'
+import { accrued, nextDue, type Bill } from './bills'
 import { merchantLabel } from './categories'
-import { NetWorthPath } from './NetWorthHero'
-import { dayOfMonthFor, daysInMonthOf, noSpendCount, noSpendDays } from './moneyGame'
-import { moneyExact, monthLabel, netWorthSeries, pct, shiftMonth, topMerchants, type MonthSummary } from './model'
+import { daysInMonthOf } from './moneyGame'
+import { moneyExact, monthLabel, pct, shiftMonth, topMerchants, type MonthSummary } from './model'
 import { detectRecurring, monthlyTotal, splitRecurring } from './recurring'
 import { dueText } from './safeToSpend'
 
 export type Go = (tab: 'transactions' | 'import' | 'budgets' | 'networth' | 'investments', category?: string) => void
 
 const signed = (n: number) => `${n < 0 ? '-' : ''}${money(Math.abs(n))}`
-
-/* ---------- Net worth path ---------- */
-export function NetWorthCard({ go }: { go: Go }) {
-  const snaps = useLiveQuery(() => db.balances.toArray(), [])
-  if (!snaps) return <div className="card mn-skel" aria-busy="true" />
-  const series = netWorthSeries(snaps)
-  const now = series.at(-1)
-  const prev = series.length > 1 ? series.at(-2)! : null
-  return (
-    <Card title="Net worth" action={<button className="btn btn-ghost btn-sm" onClick={() => go('networth')}>{now ? 'Update balances' : 'Add balances'}</button>}>
-      {!now ? (
-        <Empty>Add what you own and what you owe, one balance per account. Update it now and then and your growth path draws itself.</Empty>
-      ) : (
-        <>
-          <div className="mn-row">
-            <span className="mn-big mn-num" data-testid="networth-now">{signed(now.net)}</span>
-            {prev && (
-              <span className={`mn-delta mn-num ${now.net - prev.net < 0 ? 'is-down' : ''}`}>
-                {now.net - prev.net >= 0 ? '+' : '-'}{money(Math.abs(now.net - prev.net))} since {formatDate(prev.date, { month: 'short', day: 'numeric' })}
-              </span>
-            )}
-          </div>
-          {series.length > 1 ? <NetWorthPath data={series} /> : <p className="mn-note">One update so far. Add another next month to draw the path.</p>}
-        </>
-      )}
-    </Card>
-  )
-}
 
 /* ---------- Cash flow ---------- */
 function Delta({ cur, before, good }: { cur: number; before: number | undefined; good: 'up' | 'down' }) {
@@ -61,50 +30,12 @@ function Delta({ cur, before, good }: { cur: number; before: number | undefined;
 export function CashFlowCard({ month, s, prev }: { month: string; s: MonthSummary; prev: MonthSummary | null }) {
   const inProgress = month === today().slice(0, 7)
   return (
-    <Card title="Cash flow" sub={`All spending, budgeted or not. ${monthLabel(month)}${inProgress ? ' so far' : ''} ${inProgress ? 'compared with the same days of' : 'compared with'} ${monthLabel(shiftMonth(month, -1), true)}`}>
+    <Card title="Cash flow" sub={`All spending, vs ${monthLabel(shiftMonth(month, -1), true)}${inProgress ? ' at this point' : ''}`}>
       <div className="mn-trio">
         <div><span className="mn-label">Income</span><span className="mn-fig mn-num">{money(s.income)}</span><Delta cur={s.income} before={prev?.income} good="up" /></div>
         <div><span className="mn-label">Spending</span><span className="mn-fig mn-num">{money(s.spending)}</span><Delta cur={s.spending} before={prev?.spending} good="down" /></div>
         <div><span className="mn-label">Net</span><span className={`mn-fig mn-num ${s.net < 0 ? 'is-bad' : ''}`}>{signed(s.net)}</span><Delta cur={s.net} before={prev?.net} good="up" /></div>
       </div>
-    </Card>
-  )
-}
-
-/* ---------- Budgets as rings ---------- */
-export function BudgetsCard({ month, budgets, spent, go }: { month: string; budgets: Budget[]; spent: Map<string, number>; go: Go }) {
-  const t = today()
-  const marker = daysInMonthOf(month) ? dayOfMonthFor(month, t) / daysInMonthOf(month) : 0
-  const rows = budgets
-    .filter((b) => b.monthlyLimit > 0)
-    .map((b) => {
-      const sp = Math.max(0, spent.get(b.category) ?? 0)
-      const ratio = sp / b.monthlyLimit
-      return { ...b, spent: sp, ratio, hot: ratio > 1 || (month >= t.slice(0, 7) && ratio > marker + 0.1 && ratio >= 0.5) }
-    })
-    .sort((a, b) => b.ratio - a.ratio)
-  return (
-    <Card title="Budgets" action={<button className="btn btn-ghost btn-sm" onClick={() => go('budgets')}>{rows.length ? 'All budgets' : 'Set budgets'}</button>}>
-      {rows.length === 0 ? (
-        <Empty>Pick a few categories and give each a monthly limit. Each one gets a ring that fills as you spend.</Empty>
-      ) : (
-        <ul className="mn-rings">
-          {rows.map((r) => (
-            <li key={r.category}>
-              <button className="mn-ring-btn" onClick={() => go('transactions', r.category)} aria-label={`${r.category}: ${moneyExact(r.spent)} of ${moneyExact(r.monthlyLimit)}. Open transactions`}>
-                <Ring value={r.ratio} size={52} stroke={5} className={r.hot ? 'mn-ring-hot' : ''} label={`${Math.round(r.ratio * 100)} percent used`}>
-                  <span className="mn-ring-pct mn-num">{Math.round(r.ratio * 100)}</span>
-                </Ring>
-                <span className="mn-ring-text">
-                  <span className="mn-ring-name">{r.category}</span>
-                  <span className="mn-sub mn-num">{moneyExact(r.spent)} of {moneyExact(r.monthlyLimit)}</span>
-                  <span className={`mn-sub mn-num ${r.ratio > 1 ? 'is-bad' : ''}`}>{r.ratio > 1 ? `${moneyExact(r.spent - r.monthlyLimit)} over` : `${moneyExact(r.monthlyLimit - r.spent)} left`}</span>
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
     </Card>
   )
 }
@@ -204,85 +135,6 @@ export function SubscriptionsCard({ allTx }: { allTx: Transaction[] }) {
           </summary>
           <RecRows rows={bills} />
         </details>
-      )}
-    </Card>
-  )
-}
-
-/* ---------- Secondary month strip: bills set aside, no-spend days ---------- */
-export function MonthStrip({ month, txs, bills }: { month: string; txs: Transaction[]; bills: Bill[] }) {
-  const t = today()
-  const days = noSpendDays(txs, month, t)
-  const ns = noSpendCount(days)
-  const setAside = monthlySetAside(bills)
-  const upcoming = [...bills].sort((a, b) => daysToDue(a, t) - daysToDue(b, t)).slice(0, 4)
-  return (
-    <div className="mn-strip">
-      <span className="mn-strip-item"><span className="mn-label">No-spend days</span><span className="mn-num" data-testid="nospend-count">{ns}</span></span>
-      {bills.length > 0 && (
-        <>
-          <span className="mn-strip-item"><span className="mn-label">Bills set aside</span><span className="mn-num">{money(setAside)} a month</span></span>
-          <ul className="mn-chips" aria-label="Next bills">
-            {upcoming.map((b) => (
-              <li key={b.id} className="chip">{b.name} <span className="mn-num faint">{daysToDue(b, t) < 0 ? 'due' : `${daysToDue(b, t)}d`}</span></li>
-            ))}
-          </ul>
-        </>
-      )}
-    </div>
-  )
-}
-
-/* ---------- Investments ---------- */
-export function InvestmentsCard({ go }: { go: Go }) {
-  const d = useLiveQuery(async () => {
-    const [holdings, contribs, limit] = await Promise.all([db.holdings.toArray(), db.contributions.toArray(), getSetting<number>('invest.iraLimit', DEFAULT_IRA_LIMIT)])
-    return { holdings, contribs, limit: Number(limit) || DEFAULT_IRA_LIMIT }
-  }, [])
-  if (!d) return <div className="card mn-skel" aria-busy="true" />
-  const t = today()
-  const year = Number(t.slice(0, 4))
-  const ytd = ytdContributions(d.contribs, year)
-  const room = remainingRoom(d.limit, ytd)
-  const total = d.holdings.reduce((s, h) => s + (holdingValue(h) ?? 0), 0)
-  const empty = d.holdings.length === 0 && d.contribs.length === 0
-  return (
-    <Card title="Investments" action={<button className="btn btn-ghost btn-sm" onClick={() => go('investments')}>{empty ? 'Set up' : 'Open'}</button>}>
-      {empty ? (
-        <Empty>Add a holding such as VTI with its shares and price, then log Roth contributions to see how close you are to the yearly limit.</Empty>
-      ) : (
-        <div className="mn-stack">
-          {d.holdings.length > 0 && (
-            <div>
-              <div className="mn-row"><span className="mn-label">Holdings</span><span className="mn-fig mn-num">{money(total)}</span></div>
-              <ul className="mn-list">
-                {d.holdings.slice(0, 5).map((h) => {
-                  const v = holdingValue(h)
-                  return (
-                    <li key={h.id} className="mn-li">
-                      <span className="mn-li-main">
-                        <span><strong>{h.ticker}</strong> <span className="mn-sub">{h.account}</span></span>
-                        <span className="mn-sub mn-num">{h.shares != null && h.price != null ? `${h.shares.toLocaleString(undefined, { maximumFractionDigits: 3 })} shares x ${moneyExact(h.price)}` : 'Shares or price not set'}</span>
-                      </span>
-                      <span className="mn-num">{v != null ? money(v) : 'No value'}</span>
-                    </li>
-                  )
-                })}
-                {d.holdings.length > 5 && <li className="mn-sub">and {d.holdings.length - 5} more</li>}
-              </ul>
-            </div>
-          )}
-          <div className="mn-limit">
-            <Ring value={d.limit > 0 ? ytd / d.limit : 0} size={52} stroke={5} label={`${year} contribution progress`}>
-              <span className="mn-ring-pct mn-num">{Math.round(d.limit > 0 ? Math.min(1, ytd / d.limit) * 100 : 0)}</span>
-            </Ring>
-            <span className="mn-ring-text">
-              <span className="mn-ring-name">{year} Roth limit</span>
-              <span className="mn-sub mn-num">{money(ytd)} of {money(d.limit)}</span>
-              <span className="mn-sub mn-num">{room === 0 ? 'Limit reached' : `${money(room)} room, ${money(monthlyToMax(d.limit, ytd, t))} a month to fill it`}</span>
-            </span>
-          </div>
-        </div>
       )}
     </Card>
   )

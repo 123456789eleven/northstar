@@ -123,11 +123,11 @@ export function WinsFeed() {
   if (!data || !bills) return null
   const wins = deriveWins({ today: today(), series: netWorthSeries(data.snaps), txs: data.tx, budgets: data.budgets, bills, contribs: data.contribs })
   return (
-    <section className="wl-wins" aria-label="Wins" data-testid="wins">
-      <h2 className="wl-h">Recent wins</h2>
-      {wins.length === 0 && <p className="small muted">Nothing on the board yet. Log a week under budget or update a balance and the first win lands here.</p>}
+    <section className="card floor-card wl-wins" aria-label="Highlights" data-testid="wins">
+      <div className="floor-card-head"><h2>Highlights</h2></div>
+      {wins.length === 0 && <p className="small muted">Nothing on the board yet. A week under budget gets you on it.</p>}
       <ul>
-        {wins.map((w) => (
+        {wins.slice(0, 5).map((w) => (
           <li key={w.id}><span className="wl-win-text">{w.text}</span><span className="tiny faint">{formatDate(w.date)}</span></li>
         ))}
       </ul>

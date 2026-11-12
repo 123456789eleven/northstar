@@ -311,7 +311,7 @@ export function computeRecords(s: ScoreSnapshot): ScoreRecord[] {
     if (bestRun > 0) {
       push({
         id: 'under-budget', label: 'Longest under-budget run', domain: 'Money', value: bestRun, display: `${bestRun} ${plural(bestRun, 'month')}`,
-        date: lastDayOfMonth(bestEnd), current: cur, series: runs.slice(-8), href: '/finance?tab=budgets',
+        date: lastDayOfMonth(bestEnd), current: cur, series: runs.slice(-8), href: '/finance/vault',
         hint: cur >= bestRun ? 'You are level with this one right now.' : `Current run ${cur}. ${bestRun - cur} more ${plural(bestRun - cur, 'month')} to match it.`,
       })
     }
@@ -326,7 +326,7 @@ export function computeRecords(s: ScoreSnapshot): ScoreRecord[] {
     if (top.total > 0) {
       push({
         id: 'net-worth', label: 'Net worth high', domain: 'Money', value: top.total, display: money(top.total), date: top.date, current: Math.max(0, cur),
-        series: nw.filter((p) => p.date <= top.date).slice(-8).map((p) => p.total), href: '/finance?tab=networth',
+        series: nw.filter((p) => p.date <= top.date).slice(-8).map((p) => p.total), href: '/finance/archive?view=networth',
         hint: cur >= top.total ? 'The latest snapshot is the high.' : `${money(top.total - cur)} below it on the latest snapshot.`,
       })
     }
