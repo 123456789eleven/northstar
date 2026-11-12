@@ -20,8 +20,7 @@ export interface NavItem {
 
 export const NAV: NavItem[] = [
   { to: '/', label: 'Home', icon: 'home', group: 'Home', hub: 'today', aka: 'Life map City Overview' },
-  { to: '/today', label: 'Today', icon: 'today', group: 'Today', hub: 'today', aka: "Today's plan Agenda Focus" },
-  { to: '/plan', label: 'Plan', icon: 'planner', group: 'Plan', hub: 'plan', aka: 'Overview' },
+  { to: '/today', label: 'Today', icon: 'today', group: 'Today', hub: 'today', aka: "Today's plan Agenda Focus Overview Plan" },
   { to: '/tasks', label: 'Tasks', icon: 'tasks', group: 'Plan', hub: 'plan' },
   { to: '/planner', label: 'Planner', icon: 'calendar', group: 'Plan', hub: 'plan', aka: 'Calendar' },
   { to: '/goals', label: 'Goals', icon: 'goals', group: 'Plan', hub: 'plan', aka: 'Season goals' },
@@ -35,7 +34,8 @@ export const NAV: NavItem[] = [
   { to: '/journal', label: 'Journal', icon: 'journal', group: 'Areas', hub: 'skills', skill: 'mind' },
   { to: '/learning', label: 'Learning', icon: 'learning', group: 'Areas', hub: 'skills', skill: 'mind' },
   { to: '/career', label: 'Career', icon: 'career', group: 'Areas', hub: 'skills', skill: 'career', aka: 'Wins' },
-  { to: '/people', label: 'People', icon: 'people', group: 'Areas', hub: 'skills', skill: 'people' },
+  { to: '/people', label: 'People', icon: 'people', group: 'Areas', hub: 'skills', skill: 'people', aka: 'Tree Friends' },
+  { to: '/reach-out', label: 'Reach out', icon: 'capture', group: 'Areas', hub: 'skills', skill: 'people', aka: 'Contact Warmth Birthdays' },
   { to: '/you', label: 'You', icon: 'user', group: 'You', hub: 'you', aka: 'Overview' },
   { to: '/score', label: 'Scoreboard', icon: 'trophy', group: 'You', hub: 'you', aka: 'Records Standing Highlights Ghost' },
   { to: '/history', label: 'Milestones', icon: 'trophy', group: 'You', hub: 'you', aka: 'Trophies History' },

@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db, getSetting, setSetting, type CalendarEvent, type ISODate } from '../db'
-import { Link } from 'react-router-dom'
-import { Card, PageHeader } from '../components/ui'
+import { db, type CalendarEvent, type ISODate } from '../db'
+import { Card } from '../components/ui'
 import { useMedia, PHONE_QUERY } from '../components/useMedia'
 import { useNow } from '../components/useNow'
 import { addDays, formatDate, today } from '../lib/dates'
@@ -14,11 +13,12 @@ import { BlockDialog, type BlockDefaults } from '../features/planner/BlockDialog
 import { useBlocks } from '../features/planner/useBlocks'
 import { blockMeta, conflictIds } from '../features/planner/timeBlock'
 import type { BlockOps } from '../features/planner/GridEvent'
-import { GCAL_DISMISS_KEY } from '../features/gcal/help'
+import { FloorMore, FloorView } from '../features/buildings/Floor'
 import '../features/gcal/gcal.css'
 import '../features/planner/planner.css'
 import '../features/planner/g2a.css'
 import '../features/planner/planner2.css'
+import '../features/town/town.css'
 
 type View = 'week' | 'day'
 type Editing = { event: CalendarEvent | null; date: ISODate; start?: string }
@@ -33,10 +33,6 @@ export default function Planner() {
   const [anchor, setAnchor] = useState<ISODate>(t)
   const [editing, setEditing] = useState<Editing | null>(null)
 
-  const showGcalPrompt = useLiveQuery(async () => {
-    const [st, dismissed] = await Promise.all([getSetting<{ state?: string }>('gcal.status', { state: 'off' }), getSetting<boolean>(GCAL_DISMISS_KEY, false)])
-    return (st.state ?? 'off') === 'off' && !dismissed
-  }, [], false)
   const events = useLiveQuery(() => db.calendar.toArray(), [])
   const tasks = useLiveQuery(() => db.tasks.toArray(), [])
   const habits = useLiveQuery(() => db.habits.filter((h) => !h.archived).toArray(), [])
@@ -59,7 +55,6 @@ export default function Planner() {
   const tasksOn = (d: ISODate) => (tasks ?? []).filter((x) => x.due === d)
   const birthdaysOn = (d: ISODate) => (people ?? []).filter((p) => p.birthday === d.slice(5))
   const dailyHabits = (habits ?? []).filter((h) => h.perWeek >= 7)
-  const habitsOpenToday = dailyHabits.filter((h) => !logSet.has(`${h.id}|${t}`)).length
   const openNew = (date: ISODate, start?: string) => setEditing({ event: null, date, start })
   const openEvent = (x: CalendarEvent) => (blockMeta(x) ? setBlockEd({ event: x, defaults: { date: x.date } }) : setEditing({ event: x, date: x.date }))
   const openBlock = (date: ISODate, start?: string, taskId?: number) => setBlockEd({ event: null, defaults: { date, start, taskId } })
@@ -101,41 +96,28 @@ export default function Planner() {
     )
   }
 
-  return (
-    <>
-      <PageHeader
-        title="Planner" sub={events === undefined ? ' ' : `${evs.filter((e) => days.includes(e.date)).length} events in view${habitsOpenToday ? ` · ${habitsOpenToday} daily ${habitsOpenToday === 1 ? 'habit' : 'habits'} open today` : ''}`}
-        actions={(
-          <>
-            <button className="btn" onClick={() => openBlock(view === 'day' ? anchor : t)}>{phone ? 'Add block' : 'Block time'}</button>
-            <button className="btn btn-primary" onClick={() => openNew(view === 'day' ? anchor : t)}>New event</button>
-          </>
-        )}
-      />
-
-      {showGcalPrompt && (
-        <div className="gcal-prompt">
-          <span>Want your Google Calendar here? Read-only, stays on this device.</span>
-          <Link className="btn btn-sm" to="/data#gcal">Connect Google Calendar</Link>
-          <button className="btn btn-sm btn-ghost" onClick={() => void setSetting(GCAL_DISMISS_KEY, true)}>Dismiss</button>
-        </div>
-      )}
-
-      <div className="pl-bar">
-        <button className="btn btn-sm" onClick={() => setAnchor(addDays(anchor, -step))} aria-label="Previous period">Previous</button>
-        <button className="btn btn-sm" onClick={() => setAnchor(t)}>Today</button>
-        <button className="btn btn-sm" onClick={() => setAnchor(addDays(anchor, step))} aria-label="Next period">Next</button>
-        <span className="pl-title">{title}</span>
-        <span className="grow" />
-        <div className="pl-toggle" role="group" aria-label="View">
-          {(['week', 'day'] as View[]).map((v) => (
-            <button key={v} className="btn btn-sm" aria-pressed={view === v} onClick={() => setView(v)}>
-              {v === 'week' ? 'Week' : 'Day'}
-            </button>
-          ))}
-        </div>
+  const bar = (
+    <div className="pl-bar">
+      <button className="btn btn-sm" onClick={() => setAnchor(addDays(anchor, -step))} aria-label="Previous period">Previous</button>
+      <button className="btn btn-sm" onClick={() => setAnchor(t)}>Today</button>
+      <button className="btn btn-sm" onClick={() => setAnchor(addDays(anchor, step))} aria-label="Next period">Next</button>
+      <span className="pl-title">{title}</span>
+      <span className="grow" />
+      <div className="pl-toggle" role="group" aria-label="View">
+        {(['week', 'day'] as View[]).map((v) => (
+          <button key={v} className="btn btn-sm" aria-pressed={view === v} onClick={() => setView(v)}>
+            {v === 'week' ? 'Week' : 'Day'}
+          </button>
+        ))}
       </div>
+      <button className="btn" onClick={() => openBlock(view === 'day' ? anchor : t)}>{phone ? 'Add block' : 'Block time'}</button>
+      <button className="btn btn-primary" onClick={() => openNew(view === 'day' ? anchor : t)}>New event</button>
+    </div>
+  )
 
+  const hero = (
+    <div className="plan-hero-wrap" aria-label="Planner">
+      {bar}
       <div className={`pl-main ${view}`}>
         <div style={{ minWidth: 0 }}>
           {view === 'week' && wide ? (
@@ -184,6 +166,22 @@ export default function Planner() {
           <PlanPanel tasks={tasks ?? []} date={planDate} label={planDate === t ? 'today' : formatDate(planDate, { weekday: 'short', month: 'short', day: 'numeric' })} />
         </div>
       </div>
+    </div>
+  )
+
+  const more = (
+    <FloorMore
+      floor="Planner"
+      items={[
+        { id: 'gcal', label: 'Google Calendar', to: '/data#gcal' },
+        { id: 'tasks', label: 'All tasks', to: '/tasks' },
+      ]}
+    />
+  )
+
+  return (
+    <>
+      <FloorView label="Planner" className="town-floor" hero={hero} more={more} />
 
       {blockEd && <BlockDialog block={blockEd.event} defaults={blockEd.defaults} tasks={tasks ?? []} phone={phone} api={api} onClose={() => setBlockEd(null)} />}
       {editing && <EventModal event={editing.event} defaults={{ date: editing.date, start: editing.start }} onClose={() => setEditing(null)} />}

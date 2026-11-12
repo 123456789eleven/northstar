@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { buildingStage, STAGES, type GymSnapshot, type LibrarySnapshot, type OfficeSnapshot } from './stage'
-import { gymSnapshotFrom } from './useBuildingStage'
+import { buildingStage, STAGES, type GymSnapshot, type LibrarySnapshot, type OfficeSnapshot, type ParkSnapshot, type TownSnapshot } from './stage'
+import { gymSnapshotFrom, parkSnapshotFrom, townSnapshotFrom } from './useBuildingStage'
 
 const empty: GymSnapshot = { goalSet: false, weighInsThisMonth: 0, mealDaysThisWeek: 0, trainingThisWeek: 0, trainingTarget: 4, flagsCrossed: 0 }
 
@@ -78,5 +78,41 @@ describe('Library and Office stages', () => {
     expect(s.stage).toBe(5)
     expect(s.line).toBe('Every window lit')
     expect(buildingStage('career', { career: { ...off, winsThisWeek: 1, winsThisMonth: 1 } })!.line).toBe('Next: 2 more wins')
+  })
+})
+
+describe('Town hall and Park stages', () => {
+  const town: TownSnapshot = { focusPinned: 0, doneToday: 0, blocksThisWeek: 0, seasonGoals: 0, habitDaysThisWeek: 0 }
+  const park: ParkSnapshot = { people: 0, withRhythm: 0, reachedThisWeek: 0, warmthPct: null, overdue: 0 }
+
+  it('lights Town hall windows from real plan activity', () => {
+    expect(buildingStage('plan', { plan: town })!.line).toBe('Next: pin a task to today')
+    const s = buildingStage('plan', { plan: { ...town, doneToday: 2, seasonGoals: 1, habitDaysThisWeek: 3 } })!
+    expect(s.stage).toBe(3)
+    expect(s.next?.id).toBe('focus')
+    expect(buildingStage('plan', { plan: { focusPinned: 1, doneToday: 1, blocksThisWeek: 1, seasonGoals: 1, habitDaysThisWeek: 4 } })!.line).toBe('Every window lit')
+  })
+
+  it('counts Town hall data from rows for the week containing the day', () => {
+    const snap = townSnapshotFrom({
+      tasks: [{ status: 'open', focusDate: '2026-11-11' }, { status: 'done', doneAt: '2026-11-11T09:00:00.000Z', focusDate: '2026-11-10' }],
+      goals: [{ status: 'active', horizon: 'quarter' }, { status: 'done', horizon: 'quarter' }],
+      events: [{ title: 'Focus', date: '2026-11-12', allDay: false, uid: 'tb:task:3:abc' }, { title: 'Lunch', date: '2026-11-12', allDay: false }],
+      logs: [{ date: '2026-11-09' }, { date: '2026-11-09' }, { date: '2026-11-10' }, { date: '2026-11-02' }],
+    }, '2026-11-11')
+    expect(snap).toEqual({ focusPinned: 1, doneToday: 1, blocksThisWeek: 1, seasonGoals: 1, habitDaysThisWeek: 2 })
+  })
+
+  it('lights Park windows and names who is waiting', () => {
+    expect(buildingStage('people', { people: park })!.line).toBe('Next: 5 more people')
+    const s = buildingStage('people', { people: { people: 6, withRhythm: 3, reachedThisWeek: 2, warmthPct: 40, overdue: 2 } })!
+    expect(s.stage).toBe(3)
+    expect(s.next?.id).toBe('warm')
+  })
+
+  it('reads the Park from people and weekly interactions', () => {
+    const p = (id: number, cadenceDays: number, lastContact?: string) => ({ id, name: `P${id}`, relation: '', cadenceDays, lastContact })
+    const snap = parkSnapshotFrom({ people: [p(1, 7, '2026-11-10'), p(2, 7, '2026-10-01'), p(3, 0)], interactions: [{ personId: 1, date: '2026-11-10' }, { personId: 1, date: '2026-11-11' }] }, '2026-11-11')
+    expect(snap).toMatchObject({ people: 3, withRhythm: 2, reachedThisWeek: 1, overdue: 1 })
   })
 })

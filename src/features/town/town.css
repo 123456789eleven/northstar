@@ -1,0 +1,50 @@
+/* Town hall floors (BUILDINGS_PLAN.md B4). Tokens only: powder blue interactive, poppy only for overdue, gold only for earned. */
+.today-hero.mission { margin-bottom: 0; }
+.today-date { margin: 0 0 2px; font-size: var(--fs-2); color: var(--ink-3); }
+.today-counts { list-style: none; margin: 0 0 var(--sp-4); padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: var(--fs-2); color: var(--ink-2); }
+.today-counts b { font-size: var(--fs-3); color: var(--ink); font-weight: 650; margin-right: 3px; }
+.today-counts .is-late, .today-counts .is-late b { color: var(--warn); }
+.today-merge { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp-5); }
+.today-merge > * { min-width: 0; }
+.today-merge .focus-bar, .today-merge .agenda-card { background: none; border: 0; box-shadow: none; padding: 0; }
+.today-merge .agenda-card { border-left: 1px solid var(--line); padding-left: var(--sp-5); border-radius: 0; }
+@media (max-width: 819px) {
+  .today-merge { grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); }
+  .today-merge .agenda-card { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: var(--sp-4); }
+}
+
+/* Tasks floor */
+.tasks-hero { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--sp-6); align-items: start; }
+.tasks-hero-main, .tasks-hero-focus { min-width: 0; }
+.tasks-hero-num { display: flex; align-items: baseline; gap: 10px; }
+.tasks-hero-big { font-size: 56px; line-height: 1; font-weight: 650; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.tasks-hero-unit { font-size: var(--fs-3); color: var(--ink-2); }
+.tasks-counts { margin: 10px 0 var(--sp-4); }
+.tasks-hero .quick-add { margin: 0; }
+.tasks-hero-focus .focus-bar { padding: 0; background: none; border: 0; box-shadow: none; }
+@media (max-width: 819px) {
+  .tasks-hero { grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); }
+  .tasks-hero-big { font-size: 44px; }
+}
+
+/* Planner floor: a block that lands (dropped or added) settles with a spring. */
+.plan-hero-wrap { display: flex; flex-direction: column; min-width: 0; }
+.plan-hero-wrap .pl-bar { margin-bottom: var(--sp-3); }
+.pl-ev.block:not(.dragging) { animation: pl-snap 380ms var(--spring-snappy); }
+@keyframes pl-snap { 0% { transform: scale(1.07); opacity: 0.6; } 100% { transform: scale(1); opacity: 1; } }
+:root[data-motion='reduced'] .pl-ev.block { animation: none; }
+@media (prefers-reduced-motion: reduce) { .pl-ev.block { animation: none; } }
+
+/* Goals and Habits floors */
+.goals-hero .quest-h-row, .habits-list-block .quest-h-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: var(--sp-3); }
+.goals-list { margin-top: var(--sp-3); }
+.today-hero .quest { min-height: 50px; }
+
+/* Planner, week view: the task tray and plan sit above the grid as a strip, so a task is always one drag from its day. */
+@media (min-width: 820px) {
+  .plan-hero-wrap .pl-main.week .pl-side { order: -1; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
+  .plan-hero-wrap .pl-main.week .pl-tray { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+  .plan-hero-wrap .pl-main.week .pl-tray-item { flex: 0 0 210px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 4px 8px; background: var(--surface-2); }
+  .plan-hero-wrap .pl-main.week .pl-tray-item:last-child { border-bottom: 1px solid var(--line); }
+  .plan-hero-wrap .pl-main.week .pl-note { display: none; }
+}

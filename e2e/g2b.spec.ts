@@ -50,7 +50,7 @@ for (const size of SIZES) {
       await expect(panel).toBeHidden()
 
       // A second boss tracked automatically from weight: live number and +5 lb flags.
-      await page.getByRole('button', { name: 'New goal' }).click()
+      await page.getByRole('button', { name: 'New goal', exact: true }).click()
       const editor = page.getByRole('dialog', { name: /New quarter goal/ })
       await editor.getByLabel('Goal').fill('Reach 165 lb')
       await editor.getByLabel('Track automatically').selectOption('weight')
@@ -85,7 +85,7 @@ for (const size of SIZES) {
       await expect(panel.locator('.mheat-cell.on')).toHaveCount(1)
     })
 
-    test('Plan hub: overview renders with data', async ({ page }) => {
+    test('Plan hub folds into Today: /plan redirects, the plan and counts render with data', async ({ page }) => {
       await page.goto('/#/goals')
       await page.getByRole('button', { name: 'Adopt this goal' }).first().click()
       await expect(page.getByTestId('boss-card').first()).toBeVisible()
@@ -93,15 +93,12 @@ for (const size of SIZES) {
       await page.getByRole('button', { name: /check in today/ }).click()
 
       await page.goto('/#/plan')
-      await expect(page.getByRole('heading', { level: 1, name: 'Plan' })).toBeVisible()
-      await expect(page.getByRole('heading', { name: "Today's focus" })).toBeVisible()
-      await expect(page.getByText('Open slot: pin a task')).toHaveCount(3)
-      await expect(page.getByRole('heading', { name: 'Season goals' })).toBeVisible()
-      await expect(page.locator('.plan-hero-seasons')).toContainText('Run a 5K without stopping')
-      await expect(page.locator('.plan-hero-seasons')).toContainText('0')
-      await expect(page.getByTestId('plan-ring')).toHaveText('1/7')
-      await expect(page.getByLabel('Plan overview')).toBeVisible()
-      await expect(page.getByRole('navigation', { name: 'Plan tools' }).getByRole('link', { name: 'Goals' })).toBeVisible()
+      await expect(page).toHaveURL(/#\/today$/)
+      await expect(page.getByRole('heading', { level: 1, name: 'Today' })).toBeAttached()
+      await expect(page.getByRole('heading', { name: /Today's plan|Plan done/ })).toBeVisible()
+      await expect(page.getByRole('list', { name: 'Today in numbers' })).toContainText('open')
+      await expect(page.getByRole('region', { name: 'Focus' })).toBeVisible()
+      await expect(page.getByRole('navigation', { name: 'Town hall floors' }).getByRole('link', { name: 'Habits' })).toBeVisible()
       await noHScroll(page)
     })
   })

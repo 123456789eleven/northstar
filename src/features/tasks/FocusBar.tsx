@@ -23,7 +23,7 @@ function Slot({ task, onEdit }: { task: Task; onEdit?: (t: Task) => void }) {
   )
 }
 
-export function FocusBar({ tasks, d, onEdit }: { tasks: Task[]; d: string; onEdit?: (t: Task) => void }) {
+export function FocusBar({ tasks, d, onEdit, bare = false }: { tasks: Task[]; d: string; onEdit?: (t: Task) => void; bare?: boolean }) {
   const [picking, setPicking] = useState(false)
   const doneToday = (t: Task) => t.status === 'done' && t.doneAt?.slice(0, 10) === d
   const pinned = tasks.filter((t) => t.focusDate === d && (t.status === 'open' || doneToday(t))).sort(byUrgency)
@@ -36,7 +36,7 @@ export function FocusBar({ tasks, d, onEdit }: { tasks: Task[]; d: string; onEdi
     if (free <= 1) setPicking(false)
   }
   return (
-    <section className="card focus-bar" aria-label="Focus">
+    <section className={bare ? 'focus-bar' : 'card focus-bar'} aria-label="Focus">
       <header className="focus-head">
         <h2 className="focus-title">Focus</h2>
         <span className="faint mono">{openPinned} of {MAX_FOCUS} open</span>

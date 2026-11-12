@@ -1,0 +1,33 @@
+/* Park floors (BUILDINGS_PLAN.md B4). Tokens only. Poppy never appears here; the powder-blue ring is the only colour. */
+.warm-head { display: flex; align-items: center; gap: var(--sp-4); min-width: 0; }
+.warm-ring-n { font-size: var(--fs-2); font-weight: 650; color: var(--ink); }
+.warm-title { margin: 0; font-size: var(--fs-4); font-weight: 650; letter-spacing: -0.015em; }
+.warm-inputs { margin: 2px 0 0; font-size: var(--fs-2); color: var(--ink-3); }
+.reach-head { margin-bottom: var(--sp-4); }
+.reach-sub { margin: 0 0 var(--sp-2); font-size: var(--fs-2); font-weight: 600; letter-spacing: 0.02em; color: var(--ink-2); }
+.reach-list { list-style: none; margin: 0; padding: 0; }
+.reach-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); min-height: 52px; max-height: 80px; border-top: 1px solid var(--line-soft); transition: transform 280ms var(--spring-gentle), opacity 240ms var(--ease-out), max-height 280ms var(--ease-out); }
+.reach-row:first-child { border-top: 0; }
+.reach-row.is-leaving { transform: translateX(28px); opacity: 0; max-height: 0; overflow: hidden; }
+.reach-line { flex: 1 1 auto; min-width: 0; text-align: left; background: none; border: 0; padding: 6px 0; color: var(--ink); font: inherit; font-size: var(--fs-3); cursor: pointer; min-height: 32px; }
+.reach-line:hover { text-decoration: underline; text-decoration-color: var(--ink-3); text-underline-offset: 3px; }
+.reach-clear { margin: 0; color: var(--ink-2); font-size: var(--fs-3); }
+.reach-form .cw-form-title, .reach-rec .ppl-soon-h { display: none; }
+.reach-form .cw-form, .reach-rec .rec { margin: 0; padding: 0; }
+.reach-bdays { list-style: none; margin: 0; padding: 0; }
+.park-floor .ppl-feed-list { display: grid; gap: var(--sp-3); }
+
+/* Tree floor */
+.tree-hero { padding: 16px 18px; }
+.tree-head { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-3); }
+.tree-head .grow { flex: 1 1 auto; }
+.tree-warm { display: inline-flex; align-items: center; gap: 10px; font-size: var(--fs-3); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.tree-hero .ppl-tree { margin-bottom: 0; }
+.tree-hero .ppl-canvas { height: clamp(360px, 54vh, 620px); }
+.tree-list { display: flex; flex-direction: column; gap: var(--sp-3); }
+@media (prefers-reduced-motion: reduce) { .reach-row { transition: none; } }
+:root[data-motion='reduced'] .reach-row { transition: none; }
+@media (max-width: 819px) { .tree-hero { padding: 12px; } .tree-hero .ppl-canvas { height: clamp(320px, 50vh, 520px); } }
+.park-floor .ppl-feed-list { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.park-floor .fr-name { background: none; border: 0; padding: 0; box-shadow: none; }
+.reach-rec .rec-list { grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }

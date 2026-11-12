@@ -6,12 +6,12 @@ describe('districtForPath', () => {
   it('follows the plan table', () => {
     const table: Record<string, string[]> = {
       home: ['/', '/map'],
-      plan: ['/today', '/plan', '/tasks', '/planner', '/goals', '/habits'],
+      plan: ['/today', '/tasks', '/planner', '/goals', '/habits'],
       money: ['/finance'],
       body: ['/body', '/food', '/training'],
       mind: ['/mind', '/journal', '/learning'],
       career: ['/career', '/case', '/projects'],
-      people: ['/people'],
+      people: ['/people', '/reach-out'],
       you: ['/you', '/history', '/review', '/ops', '/settings', '/data', '/ontology', '/interview', '/skills', '/score'],
     }
     for (const [id, paths] of Object.entries(table)) for (const p of paths) expect(districtForPath(p), p).toBe(id)
@@ -51,7 +51,7 @@ describe('subtabForPath and breadcrumb', () => {
     expect(breadcrumb('/finance', '?tab=learn')).toEqual(['Bank', 'Academy', 'Learn'])
     expect(breadcrumb('/finance', '?tab=bogus')).toEqual(['Bank', 'Overview'])
     expect(breadcrumb('/finance')).toEqual(['Bank', 'Overview'])
-    expect(breadcrumb('/people')).toEqual(['Park'])
+    expect(breadcrumb('/people')).toEqual(['Park', 'Tree'])
     expect(breadcrumb('/review')).toEqual(['Home base', 'Season'])
     expect(breadcrumb('/food')).toEqual(['Gym', 'Kitchen'])
   })
@@ -73,6 +73,13 @@ describe('floors', () => {
     expect(floorForPath('/learning').floor?.id).toBe('study')
     expect(floorForPath('/projects').floor?.id).toBe('projects')
   })
+  it('gives Town hall five floors and the Park two, with /plan folded into Today', () => {
+    expect(DISTRICTS.plan.floors.map((f) => f.label)).toEqual(['Today', 'Tasks', 'Planner', 'Goals', 'Habits'])
+    expect(DISTRICTS.people.floors.map((f) => f.label)).toEqual(['Tree', 'Reach out'])
+    expect(floorForPath('/plan').floor?.id).toBe('today')
+    expect(floorForPath('/reach-out').floor?.id).toBe('reach-out')
+    expect(floorForPath('/people').floor?.id).toBe('tree')
+  })
   it('sends every alias to a real floor of the same building', () => {
     for (const [from, to] of Object.entries(FLOOR_ALIASES)) {
       expect(floorForPath(from).floor?.to, from).toBe(to)
@@ -91,7 +98,7 @@ describe('floors', () => {
     expect(hasElevator(DISTRICTS.money)).toBe(false)
     expect(hasElevator(DISTRICTS.career)).toBe(true)
     expect(hasElevator(DISTRICTS.mind)).toBe(true)
-    expect(hasElevator(DISTRICTS.people)).toBe(false)
+    expect(hasElevator(DISTRICTS.people)).toBe(true)
   })
 })
 

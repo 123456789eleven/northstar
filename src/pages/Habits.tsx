@@ -1,18 +1,20 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Habit, type ISODate } from '../db'
-import { Card, Empty, PageHeader, Skeleton } from '../components/ui'
+import { Card, Empty, Skeleton } from '../components/ui'
 import { today } from '../lib/dates'
 import { useFocusTarget } from '../lib/useFocusParam'
 import { HabitModal } from '../features/habits/HabitParts'
 import { HabitCard, HabitDetail, TodayRow } from '../features/habits/HabitRow'
 import { isDueToday } from '../features/habits/week'
 import { HabitHero } from '../features/habits/HabitHero'
+import { FloorMore, FloorView } from '../features/buildings/Floor'
 import '../features/goals/quest.css'
 import '../features/habits/habits.css'
 import '../features/habits/rings.css'
 import '../features/habits/hero.css'
 import '../features/goals/season.css'
+import '../features/town/town.css'
 
 export default function Habits() {
   const d = today()
@@ -42,45 +44,50 @@ export default function Habits() {
   })
   const dueToday = active.filter((h) => isDueToday(byHabit.get(h.id!) ?? new Set(), d, h.perWeek))
   const opened = openId != null ? (habits ?? []).find((h) => h.id === openId) : undefined
-  const doneToday = active.filter((h) => byHabit.get(h.id!)?.has(d)).length
   const card = (h: Habit) => (
     <HabitCard key={h.id} habit={h} dates={byHabit.get(h.id!) ?? new Set()} today={d} goalTitle={h.goalId != null ? goalTitle.get(h.goalId) : undefined} onOpen={(x) => setOpenId(x.id ?? null)} />
   )
 
+  const loading = habits === undefined
+  const hero = loading ? (
+    <Card><Skeleton lines={4} label="Loading habits" /></Card>
+  ) : active.length === 0 ? (
+    <Card className="floor-hero">
+      <Empty title="No habits yet" action={<button className="btn btn-primary" onClick={() => setEditing('new')}>New habit</button>}>
+        Pick one small enough for your worst day, like a 10-minute walk. Check it off here or on Today and the form guide starts filling in.
+      </Empty>
+    </Card>
+  ) : (
+    <>
+      {logs !== undefined && <HabitHero habits={active} byHabit={byHabit} today={d} />}
+      <TodayRow habits={dueToday} byHabit={byHabit} today={d} />
+    </>
+  )
+
+  const list = active.length > 0 && (
+    <div key="list" className="habits-list-block">
+      <div className="quest-h-row">
+        <h2 className="quest-h">Your habits</h2>
+        <button className="btn btn-primary btn-sm" onClick={() => setEditing('new')}>New habit</button>
+      </div>
+      <div className="habit-list">{active.map(card)}</div>
+      {showArchived && archived.length > 0 && <div className="habit-list" style={{ marginTop: 12 }}>{archived.map(card)}</div>}
+    </div>
+  )
+
+  const more = (
+    <FloorMore
+      floor="Habits"
+      items={[
+        ...(archived.length > 0 ? [{ id: 'archived', label: showArchived ? 'Hide archived' : 'Show archived', value: archived.length, onSelect: () => setShowArchived((v) => !v) }] : []),
+        { id: 'goals', label: 'Goals', to: '/goals' },
+      ]}
+    />
+  )
+
   return (
     <>
-      <PageHeader
-        title="Habits"
-        sub={habits === undefined ? ' ' : active.length ? `${doneToday} of ${active.length} checked in today` : 'Start with one'}
-        actions={<button className="btn btn-primary" onClick={() => setEditing('new')}>New habit</button>}
-      />
-      {habits !== undefined && logs !== undefined && active.length > 0 && <HabitHero habits={active} byHabit={byHabit} today={d} />}
-      <TodayRow habits={dueToday} byHabit={byHabit} today={d} />
-      {habits === undefined && (
-        <div className="habit-list" aria-busy="true">
-          <Card><Skeleton lines={4} label="Loading habits" /></Card>
-          <Card><Skeleton lines={4} label="Loading habits" /></Card>
-        </div>
-      )}
-      {habits !== undefined && active.length === 0 && (
-        <Card>
-          <Empty
-            title="No habits yet"
-            action={<button className="btn btn-primary" onClick={() => setEditing('new')}>New habit</button>}
-          >
-            Pick one small enough to do on your worst day, like a 10-minute walk. Check it off here or on Today and the form guide starts filling in.
-          </Empty>
-        </Card>
-      )}
-      <div className="habit-list">{active.map(card)}</div>
-      {archived.length > 0 && (
-        <div style={{ marginTop: 24 }}>
-          <button className="btn btn-ghost btn-sm" onClick={() => setShowArchived((v) => !v)}>
-            {showArchived ? 'Hide' : 'Show'} archived ({archived.length})
-          </button>
-          {showArchived && <div className="habit-list" style={{ marginTop: 12 }}>{archived.map(card)}</div>}
-        </div>
-      )}
+      <FloorView label="Habits" className="town-floor" hero={hero} support={[list]} more={loading ? undefined : more} />
       {opened && (
         <HabitDetail
           habit={opened}
