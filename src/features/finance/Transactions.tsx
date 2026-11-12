@@ -17,7 +17,7 @@ interface Offer {
   matches: number
 }
 
-export default function Transactions({ month, category, setCategory, onImport }: { month: string; category: string; setCategory: (c: string) => void; onImport: () => void }) {
+export default function Transactions({ month, category, setCategory, onImport, add = true }: { month: string; category: string; setCategory: (c: string) => void; onImport: () => void; add?: boolean }) {
   const [q, setQ] = useState('')
   const [allTime, setAllTime] = useState(false)
   const [offer, setOffer] = useState<Offer | null>(null)
@@ -74,7 +74,7 @@ export default function Transactions({ month, category, setCategory, onImport }:
 
   return (
     <div className="stack" style={{ gap: 16 }}>
-      <AddRow month={month} rules={rules.all} />
+      {add && <AddRow month={month} rules={rules.all} />}
 
       <div className="row wrap fin-filters">
         <input className="input grow" style={{ minWidth: 160 }} placeholder="Search description, account, amount" value={q} onChange={(e) => setQ(e.target.value)} />
