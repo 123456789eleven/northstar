@@ -50,8 +50,6 @@ const Case = lazy(() => import('./pages/Case'))
 const Projects = lazy(() => import('./pages/Projects'))
 const ReachOut = lazy(() => import('./pages/ReachOut'))
 const Home = lazy(() => import('./pages/Home'))
-const SkillsHub = lazy(() => import('./pages/SkillsHub'))
-const YouHub = lazy(() => import('./pages/YouHub'))
 const Score = lazy(() => import('./pages/Score'))
 
 /** Old or alternative floor URLs land on their floor, keeping the query (?focus= and friends). */
@@ -130,9 +128,7 @@ function Shell() {
               <Route path="/projects" element={<Projects />} />
               <Route path="/people" element={<People />} />
               <Route path="/reach-out" element={<ReachOut />} />
-              <Route path="/you" element={<YouHub />} />
               <Route path="/score" element={<Score />} />
-              <Route path="/skills" element={<SkillsHub />} />
               <Route path="/history" element={<History />} />
               <Route path="/review" element={<Review />} />
               <Route path="/ops" element={<Ops />} />

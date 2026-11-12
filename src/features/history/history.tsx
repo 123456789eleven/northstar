@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { AREAS, db, logEvent, type Area, type LifeEvent } from '../../db'
 import { AREA_LABEL, Empty, Field, Modal, Skeleton } from '../../components/ui'
 import { formatDate, parseISODate, today } from '../../lib/dates'
-import { countByArea, dayOf, groupByWeek, weekLabel } from './group'
+import { dayOf, groupByWeek, weekLabel } from './group'
 
 const PAGE = 100
 const EVENT_AREAS: LifeEvent['area'][] = [...AREAS, 'tasks', 'food', 'body']
@@ -130,80 +130,6 @@ export function Timeline({ onAdd, revealAt }: { onAdd: () => void; /** Deep link
       {hasMore && (
         <div className="hist-more"><button className="btn" onClick={() => setPages((p) => p + 1)}>Load {PAGE} more</button></div>
       )}
-    </div>
-  )
-}
-
-export function Achievements({ onAdd }: { onAdd: () => void }) {
-  const all = useLiveQuery(() => db.events.orderBy('at').reverse().filter((e) => e.milestone).toArray(), [])
-  const [area, setArea] = useState<'' | LifeEvent['area']>('')
-  const items = useMemo(() => (all ?? []).filter((e) => !area || e.area === area), [all, area])
-  const areaCounts = useMemo(() => countByArea(all ?? []), [all])
-
-  const years = useMemo(() => {
-    const out: { year: string; total: number; areas: [string, number][]; months: { key: string; items: LifeEvent[] }[] }[] = []
-    for (const e of items) {
-      const d = dayOf(e)
-      const year = d.slice(0, 4)
-      const mk = d.slice(0, 7)
-      let y = out[out.length - 1]
-      if (!y || y.year !== year) { y = { year, total: 0, areas: [], months: [] }; out.push(y) }
-      y.total++
-      const m = y.months[y.months.length - 1]
-      if (m && m.key === mk) m.items.push(e)
-      else y.months.push({ key: mk, items: [e] })
-    }
-    for (const y of out) y.areas = countByArea(y.months.flatMap((m) => m.items))
-    return out
-  }, [items])
-
-  if (!all) return <section className="card"><Skeleton rows={6} label="Loading the logbook" /></section>
-  if (all.length === 0)
-    return (
-      <section className="card">
-        <Empty title="No milestones yet" action={<button className="btn btn-primary" onClick={onAdd}>Add a milestone</button>}>
-          Finished goals, completed courses and anything you add with Milestone switched on are kept here, with the date. The first one is the hardest.
-        </Empty>
-      </section>
-    )
-
-  const latest = all[0]
-  return (
-    <div>
-      <p className="ach-summary small">
-        <b>{all.length}</b> {all.length === 1 ? 'milestone' : 'milestones'} since {formatDate(dayOf(all[all.length - 1]), { month: 'long', year: 'numeric' })}.
-        {' '}Latest: <span className="ach-latest">{latest.title}</span> <span className="faint">({formatDate(dayOf(latest))})</span>
-      </p>
-      {areaCounts.length > 1 && (
-        <div className="hist-filters">
-          <AreaChips<LifeEvent['area']> value={area} onChange={setArea} areas={areaCounts.map(([a]) => a as LifeEvent['area'])} label="Filter milestones by area" />
-        </div>
-      )}
-      {years.map((y) => (
-        <section className="ach-year" key={y.year}>
-          <div className="ach-year-head">
-            <h2><span className="ach-year-num">{y.year}</span><span className="ach-year-total">{y.total} {y.total === 1 ? 'milestone' : 'milestones'}</span></h2>
-            <div className="ach-areas">
-              {y.areas.map(([a, n]) => <span key={a}>{AREA_LABEL[a as LifeEvent['area']] ?? a} <b>{n}</b></span>)}
-            </div>
-          </div>
-          {y.months.map((m) => (
-            <div className="ach-month" key={m.key}>
-              <div className="ach-month-name">{formatDate(`${m.key}-01`, { month: 'long' })}<span className="faint"> · {m.items.length}</span></div>
-              <div className="ach-list">
-                {m.items.map((e) => (
-                  <div className="ach-entry" key={e.id}>
-                    <span className="ach-mark" aria-hidden />
-                    <span className="ach-entry-date">{formatDate(dayOf(e))}</span>
-                    <span className="ach-entry-title">{e.title}</span>
-                    <span className="ach-entry-meta">{AREA_LABEL[e.area] ?? e.area}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </section>
-      ))}
     </div>
   )
 }

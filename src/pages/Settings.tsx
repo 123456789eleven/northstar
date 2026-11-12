@@ -1,48 +1,15 @@
-import { useEffect, useState } from 'react'
+// Home base, Settings floor: backup and sync status (hero), then sync, progress and preferences. Backup and restore, data
+// on this device, about, the danger zone, the data hub, interview, setup and Power tools (Intel, Ontology) sit behind More.
+import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { PageHeader } from '../components/ui'
-import { AboutSection, BackupSection, DangerSection, ProfileSection, StatusStrip, StorageSection } from '../features/settings/Sections'
+import { FloorMore, FloorView } from '../features/buildings/Floor'
+import { AboutSection, BackupSection, DangerSection, ProfileSection, StorageSection } from '../features/settings/Sections'
 import { SyncSection } from '../features/settings/SyncSection'
 import { GameSection } from '../features/settings/GameSection'
+import SettingsHero from '../features/settings/SettingsHero'
+import SavedTick from '../features/settings/SavedTick'
+import { openSetup } from '../features/onboarding/setupLogic'
 import '../features/settings/settings.css'
-
-const SECTIONS = [
-  { id: 'set-game', label: 'Progress' },
-  { id: 'set-sync', label: 'Sync' },
-  { id: 'set-backup', label: 'Backup & restore' },
-  { id: 'set-data', label: 'Data on this device' },
-  { id: 'set-prefs', label: 'Preferences' },
-  { id: 'set-about', label: 'About & privacy' },
-  { id: 'set-danger', label: 'Danger zone' },
-]
-
-function SectionIndex() {
-  const [active, setActive] = useState(SECTIONS[0].id)
-  useEffect(() => {
-    if (typeof IntersectionObserver === 'undefined') return
-    const seen = new Map<string, boolean>()
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) seen.set(e.target.id, e.isIntersecting)
-      const first = SECTIONS.find((s) => seen.get(s.id))
-      if (first) setActive(first.id)
-    }, { rootMargin: '-10% 0px -70% 0px' })
-    for (const s of SECTIONS) { const el = document.getElementById(s.id); if (el) io.observe(el) }
-    return () => io.disconnect()
-  }, [])
-  // Buttons rather than #anchors: the app uses hash routing, so a bare #id link would navigate away.
-  const go = (id: string) => {
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    document.getElementById(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
-    setActive(id)
-  }
-  return (
-    <nav className="set-index" aria-label="Settings sections">
-      {SECTIONS.map((s) => (
-        <button key={s.id} type="button" className={s.id === 'set-danger' ? 'is-danger' : undefined} aria-current={active === s.id ? 'true' : undefined} onClick={() => go(s.id)}>{s.label}</button>
-      ))}
-    </nav>
-  )
-}
 
 export default function Settings() {
   const { hash } = useLocation()
@@ -51,21 +18,38 @@ export default function Settings() {
     if (hash === '#game') requestAnimationFrame(() => document.getElementById('set-game')?.scrollIntoView({ block: 'start' }))
   }, [hash])
   return (
-    <>
-      <PageHeader title="Settings" sub="Sync, backups, data on this device and privacy. The boring bits, handled." />
-      <StatusStrip />
-      <div className="set-layout">
-        <SectionIndex />
-        <div className="set-page">
-          <div id="set-game" className="set-anchor"><GameSection /></div>
-          <div id="set-sync" className="set-anchor"><SyncSection /></div>
-          <div id="set-backup" className="set-anchor"><BackupSection /></div>
-          <div id="set-data" className="set-anchor"><StorageSection /></div>
-          <div id="set-prefs" className="set-anchor"><ProfileSection /></div>
-          <div id="set-about" className="set-anchor"><AboutSection /></div>
-          <div id="set-danger" className="set-anchor set-danger-wrap"><DangerSection /></div>
-        </div>
-      </div>
-    </>
+    <FloorView
+      label="Settings"
+      className="set-floor"
+      hero={<><SettingsHero /><SavedTick /></>}
+      support={[
+        <div key="sync" id="set-sync" className="set-anchor"><SyncSection /></div>,
+        <div key="game" id="set-game" className="set-anchor"><GameSection /></div>,
+        <div key="prefs" id="set-prefs" className="set-anchor"><ProfileSection /></div>,
+      ]}
+      more={
+        <FloorMore
+          floor="Settings"
+          items={[
+            { id: 'data', label: 'Data hub', to: '/data' },
+            { id: 'backup', label: 'Backup and restore', panel: <div id="set-backup"><BackupSection /></div> },
+            { id: 'device', label: 'On this device', panel: <div id="set-data"><StorageSection /></div> },
+            { id: 'interview', label: 'Interview', to: '/interview?full=1' },
+            { id: 'setup', label: 'Setup', onSelect: openSetup },
+            {
+              id: 'power', label: 'Power tools',
+              panel: (close) => (
+                <ul className="floor-more-items">
+                  <li><a className="floor-more-item" href="#/ops" onClick={close}><span>Intel</span><span aria-hidden="true">›</span></a></li>
+                  <li><a className="floor-more-item" href="#/ontology" onClick={close}><span>Ontology</span><span aria-hidden="true">›</span></a></li>
+                </ul>
+              ),
+            },
+            { id: 'about', label: 'About and privacy', panel: <div id="set-about"><AboutSection /></div> },
+            { id: 'danger', label: 'Danger zone', panel: <div id="set-danger"><DangerSection /></div> },
+          ]}
+        />
+      }
+    />
   )
 }

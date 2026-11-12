@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
-import { Card, Empty, PageHeader } from '../components/ui'
+import { Empty } from '../components/ui'
+import { FloorMore, FloorView } from '../features/buildings/Floor'
 import { addDays, formatDate, parseISODate, startOfWeek, today } from '../lib/dates'
 import { avgRating, reviewStreak, type LockableReview } from '../features/review/summary'
 import { Digest, ReviewForm } from '../features/review/ReviewParts'
@@ -9,7 +10,6 @@ import { RatingsTrend } from '../features/review/RatingsTrend'
 import { WeekInNumbers } from '../features/review/WeekInNumbers'
 import { InsightsWeek } from '../features/insights/InsightsCard'
 import { SeasonHeader, SeasonStories } from '../features/review/SeasonParts'
-import { useMedia, PHONE_QUERY } from '../components/useMedia'
 import '../features/review/review.css'
 import '../features/hubs/palette.css'
 
@@ -31,7 +31,6 @@ export default function Review() {
   const thisWeek = startOfWeek(today())
   const lastWeek = addDays(thisWeek, -7)
   const [weekOf, setWeekOf] = useState(thisWeek)
-  const phone = useMedia(PHONE_QUERY)
 
   const reviews = useLiveQuery(() => db.reviews.orderBy('weekOf').reverse().toArray(), [])
   const loaded = useLiveQuery(async () => ({ weekOf, row: (await db.reviews.where('weekOf').equals(weekOf).first()) ?? null }), [weekOf])
@@ -44,23 +43,8 @@ export default function Review() {
   const planned = reviews?.find((r) => r.weekOf === addDays(weekOf, -7))?.focusNext || undefined
   const streak = reviews ? reviewStreak(reviews) : 0
 
-  const sub = reviews === undefined ? '' : reviews.length === 0
-    ? 'Weekly recap: ten minutes a week on what went well, what did not, and what is next.'
-    : streak > 0 ? `Weekly recap · ${streak}-week run · ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'} in total` : `Weekly recap · ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'}`
-
-  return (
-    <div className="pal-powder">
-      <PageHeader title="Season" sub={sub} actions={<button className="btn btn-ghost no-print" onClick={() => window.print()}>Print</button>} />
-
-      <SeasonHeader />
-
-      {suggestLast && (
-        <div className="rv-suggest">
-          <span>It’s early in the week. Review last week ({weekRange(lastWeek)}) instead?</span>
-          <button className="btn btn-sm btn-primary" onClick={() => setWeekOf(lastWeek)}>Review last week</button>
-        </div>
-      )}
-
+  const hero = (
+    <section className="rv-hero" aria-label="Weekly recap">
       <div className="rv-weeknav">
         <button className="btn" aria-label="Previous week" onClick={() => setWeekOf(addDays(weekOf, -7))}><Chevron dir="l" /></button>
         <button className="btn" aria-label="Next week" disabled={weekOf >= thisWeek} onClick={() => setWeekOf(addDays(weekOf, 7))}><Chevron dir="r" /></button>
@@ -69,41 +53,55 @@ export default function Review() {
         </span>
         <span className={current ? 'rv-week-state is-done' : 'rv-week-state'}>{current ? ((current as LockableReview).lockedAt ? 'Reviewed and locked' : 'Reviewed') : current === null ? 'Not reviewed yet' : ''}</span>
         {weekOf !== thisWeek && <button className="btn btn-ghost btn-sm" style={{ width: 'auto', padding: '0 10px' }} onClick={() => setWeekOf(thisWeek)}>Back to this week</button>}
+        {suggestLast && <button className="btn btn-sm btn-primary" onClick={() => setWeekOf(lastWeek)}>Review last week</button>}
       </div>
+      {current !== undefined && <SeasonStories weekOf={weekOf} snapshot={(current as LockableReview | null)?.numbers} wins={current?.wins} focusNext={current?.focusNext} planned={planned} />}
+    </section>
+  )
 
-      <div className="rv-layout">
-        <div className="stack" style={{ gap: 16 }}>
-          {current !== undefined && <SeasonStories weekOf={weekOf} snapshot={(current as LockableReview | null)?.numbers} wins={current?.wins} focusNext={current?.focusNext} planned={planned} />}
-          {current !== undefined && <WeekInNumbers weekOf={weekOf} snapshot={(current as LockableReview | null)?.numbers} />}
-          {!phone && <Digest weekOf={weekOf} />}
-          {weekOf === thisWeek && <InsightsWeek />}
-          {current !== undefined && <ReviewForm key={weekOf} weekOf={weekOf} existing={current} planned={planned} />}
-        </div>
-        <div className="stack" style={{ gap: 16 }}>
-          <Card title="Ratings over time">
-            <RatingsTrend reviews={reviews ?? []} />
-          </Card>
-          <Card title="Past weekly recaps">
-            {reviews && reviews.length > 0 ? (
-              <div className="rv-past">
-                {reviews.slice(0, 30).map((r) => {
-                  const avg = avgRating(r)
-                  const line = r.wins || r.focusNext || r.struggles || 'No notes'
-                  return (
-                    <button key={r.id} className={r.weekOf === weekOf ? 'rv-past-item is-current' : 'rv-past-item'} onClick={() => setWeekOf(r.weekOf)}>
-                      <span className="rv-past-week">{formatDate(r.weekOf)}</span>
-                      <span className="rv-past-text">{line.split('\n')[0]}</span>
-                      {avg != null && <span className="rv-past-avg" title="Average rating">{avg.toFixed(1)}</span>}
-                    </button>
-                  )
-                })}
-              </div>
-            ) : (
-              <Empty>Your first recap lands here. Fill in the form, save it, and next week you have something to beat.</Empty>
-            )}
-          </Card>
-        </div>
-      </div>
+  const more = (
+    <FloorMore
+      floor="Season"
+      items={[
+        {
+          id: 'past', label: 'Past recaps', value: reviews?.length || undefined,
+          panel: (close) => reviews && reviews.length > 0 ? (
+            <div className="rv-past">
+              {reviews.slice(0, 30).map((r) => {
+                const avg = avgRating(r)
+                const line = r.wins || r.focusNext || r.struggles || 'No notes'
+                return (
+                  <button key={r.id} className={r.weekOf === weekOf ? 'rv-past-item is-current' : 'rv-past-item'} onClick={() => { setWeekOf(r.weekOf); close() }}>
+                    <span className="rv-past-week">{formatDate(r.weekOf)}</span>
+                    <span className="rv-past-text">{line.split('\n')[0]}</span>
+                    {avg != null && <span className="rv-past-avg" title="Average rating">{avg.toFixed(1)}</span>}
+                  </button>
+                )
+              })}
+            </div>
+          ) : <Empty>Your first recap lands here. Save one and next week you have something to beat.</Empty>,
+        },
+        { id: 'ratings', label: 'Ratings', value: streak > 0 ? `${streak}-week run` : undefined, panel: <RatingsTrend reviews={reviews ?? []} /> },
+        { id: 'numbers', label: 'Week in numbers', panel: current !== undefined ? <WeekInNumbers weekOf={weekOf} snapshot={(current as LockableReview | null)?.numbers} /> : null },
+        { id: 'digest', label: 'Week digest', panel: <Digest weekOf={weekOf} /> },
+        ...(weekOf === thisWeek ? [{ id: 'insights', label: 'Insights', panel: <InsightsWeek /> }] : []),
+        { id: 'print', label: 'Print', onSelect: () => window.print() },
+      ]}
+    />
+  )
+
+  return (
+    <div className="pal-powder">
+      <FloorView
+        label="Season"
+        className="rv-floor"
+        hero={hero}
+        support={[
+          <SeasonHeader key="season" />,
+          current !== undefined && <ReviewForm key={weekOf} weekOf={weekOf} existing={current} planned={planned} />,
+        ]}
+        more={more}
+      />
     </div>
   )
 }

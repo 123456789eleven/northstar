@@ -130,7 +130,7 @@ export function TopBar() {
         <SearchButton compact={phone} />
         <SyncChip dotOnly={phone} />
         {!phone && <span className="topbar-date mono">{dateLabel()}</span>}
-        <Link to="/you" className={`icon-btn topbar-you${you ? ' is-active' : ''}`} aria-label="You" aria-current={you ? 'true' : undefined}><Icon name="user" size={18} /></Link>
+        <Link to="/score" className={`icon-btn topbar-you${you ? ' is-active' : ''}`} aria-label="You" aria-current={you ? 'true' : undefined}><Icon name="user" size={18} /></Link>
         {phone && <CaptureOrb />}
       </div>
       <PaletteHost />

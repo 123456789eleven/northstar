@@ -1,4 +1,4 @@
-// G5a (You hub: Trophies, Season, Intel, You, Settings): key flows at phone (390x844) and desktop (1440x900). Fictional data only.
+// G5a (Home base: Milestones, Season, Intel, Settings): key flows at phone (390x844) and desktop (1440x900). Fictional data only.
 import { expect, test, type Page } from '@playwright/test'
 
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -37,10 +37,9 @@ for (const vp of [{ name: '390', size: { width: 390, height: 844 }, touch: true 
   test.describe(`G5a at ${vp.name}`, () => {
     test.use({ viewport: vp.size, hasTouch: vp.touch })
 
-    test('Milestones: badges tab shows badges and opens a sheet', async ({ page }) => {
+    test('Milestones: the badge shelf shows badges and opens a sheet', async ({ page }) => {
       await seed(page, { events: milestones })
       await page.goto('/#/history')
-      await page.getByRole('tab', { name: 'Badges' }).click()
       await expect(page.getByTestId('badge')).toHaveCount(25)
       await page.getByTestId('badge').first().click()
       await expect(page.getByRole('dialog')).toBeVisible()
@@ -55,7 +54,10 @@ for (const vp of [{ name: '390', size: { width: 390, height: 844 }, touch: true 
       await expect(page.getByTestId('milestone-row')).toHaveCount(3)
       await expect(page.getByTestId('milestone-row').filter({ hasText: 'first 5 lb down' })).not.toContainText(/Rare|New/)
       await expect(page.getByRole('list', { name: 'Next milestones' })).toBeVisible()
-      await expect(page.getByRole('tab', { name: 'Timeline' })).toBeVisible()
+      await expect(page.getByRole('tab')).toHaveCount(0)
+      await page.getByTestId('floor-more').click()
+      await expect(page.locator('.floor-more-item', { hasText: 'Full timeline' })).toBeVisible()
+      await page.getByRole('button', { name: 'Close' }).click()
       await noHScroll(page)
     })
 
@@ -78,7 +80,8 @@ for (const vp of [{ name: '390', size: { width: 390, height: 844 }, touch: true 
         await track.evaluate((el) => el.scrollTo({ left: el.clientWidth, behavior: 'instant' as ScrollBehavior }))
         await expect(stories.getByRole('button', { name: /^Show / }).nth(1)).toHaveAttribute('aria-current', 'true')
       } else {
-        await expect(page.getByText('Week in numbers')).toBeVisible()
+        await page.getByTestId('floor-more').click()
+        await expect(page.locator('.floor-more-item', { hasText: 'Week in numbers' })).toBeVisible()
       }
       await noHScroll(page)
     })
@@ -95,20 +98,24 @@ for (const vp of [{ name: '390', size: { width: 390, height: 844 }, touch: true 
       await noHScroll(page)
     })
 
-    test('You hub: backup status and links', async ({ page }) => {
-      await page.goto('/#/you')
+    test('Settings: backup status, and Power tools, Data hub and Interview behind More', async ({ page }) => {
+      await page.goto('/#/settings')
       const backup = page.getByTestId('backup-status')
-      await expect(backup).toContainText('No backup yet')
+      await expect(backup).toContainText('Never')
       await expect(backup.getByRole('button', { name: 'Export encrypted backup' })).toBeVisible()
-      await expect(page.locator('.hub-grid').getByRole('link', { name: /Settings/ })).toBeVisible()
-      await noHScroll(page)
+      await page.getByTestId('floor-more').click()
+      const items = page.locator('.floor-more-item')
+      await expect(items.filter({ hasText: 'Data hub' })).toHaveAttribute('href', /#\/data$/)
+      await expect(items.filter({ hasText: 'Interview' })).toHaveAttribute('href', /#\/interview\?full=1$/)
+      await items.filter({ hasText: 'Power tools' }).click()
+      await expect(page.getByRole('link', { name: /^Intel/ })).toBeVisible()
+      await expect(page.getByRole('link', { name: /^Ontology/ })).toBeVisible()
     })
 
-    test('Settings: Progress is the first section card and Calm mode is gone', async ({ page }) => {
+    test('Settings: Progress is a floor card and Calm mode is gone', async ({ page }) => {
       await page.goto('/#/settings')
-      const first = page.locator('.set-page .set-anchor').first()
-      await expect(first).toHaveAttribute('id', 'set-game')
-      await expect(first.getByText('Progress', { exact: true })).toBeVisible()
+      const game = page.locator('#set-game')
+      await expect(game.getByText('Progress', { exact: true })).toBeVisible()
       await expect(page.getByRole('switch', { name: 'Calm mode' })).toHaveCount(0)
       await noHScroll(page)
     })

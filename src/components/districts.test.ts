@@ -5,14 +5,14 @@ import { NAV } from './nav'
 describe('districtForPath', () => {
   it('follows the plan table', () => {
     const table: Record<string, string[]> = {
-      home: ['/', '/map'],
+      home: ['/', '/map', '/skills'],
       plan: ['/today', '/tasks', '/planner', '/goals', '/habits'],
       money: ['/finance'],
       body: ['/body', '/food', '/training'],
       mind: ['/mind', '/journal', '/learning'],
       career: ['/career', '/case', '/projects'],
       people: ['/people', '/reach-out'],
-      you: ['/you', '/history', '/review', '/ops', '/settings', '/data', '/ontology', '/interview', '/skills', '/score'],
+      you: ['/you', '/history', '/review', '/ops', '/settings', '/data', '/ontology', '/interview', '/score'],
     }
     for (const [id, paths] of Object.entries(table)) for (const p of paths) expect(districtForPath(p), p).toBe(id)
   })
@@ -39,7 +39,7 @@ describe('subtabForPath and breadcrumb', () => {
   it('finds the tab inside a district', () => {
     expect(subtabForPath('/food').tab?.label).toBe('Kitchen')
     expect(subtabForPath('/tasks').district.id).toBe('plan')
-    expect(subtabForPath('/ontology/Task').tab?.label).toBe('Ontology')
+    expect(subtabForPath('/ontology/Task').tab?.label).toBe('Settings')
     expect(subtabForPath('/career').tab?.label).toBe('Wins')
     expect(subtabForPath('/mind').tab?.label).toBe('Journal')
     expect(subtabForPath('/').tab).toBeNull()
@@ -85,8 +85,14 @@ describe('floors', () => {
     expect(floorForPath('/reach-out').floor?.id).toBe('reach-out')
     expect(floorForPath('/people').floor?.id).toBe('tree')
   })
+  it('maps Home base to four floors and keeps Intel, Data and Ontology on Settings', () => {
+    expect(DISTRICTS.you.floors.map((f) => f.label)).toEqual(['Scoreboard', 'Milestones', 'Season', 'Settings'])
+    for (const p of ['/ops', '/data', '/ontology/Task', '/interview']) expect(floorForPath(p).floor?.id, p).toBe('settings')
+    expect(floorForPath('/you').floor?.id).toBe('scoreboard')
+  })
   it('sends every alias to a real floor of the same building', () => {
     for (const [from, to] of Object.entries(FLOOR_ALIASES)) {
+      if (to === '/') { expect(districtForPath(from)).toBe('home'); continue }
       expect(floorForPath(from).floor?.to, from).toBe(to)
       expect(districtForPath(from)).toBe(districtForPath(to))
     }

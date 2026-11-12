@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildingStage, STAGES, type GymSnapshot, type LibrarySnapshot, type OfficeSnapshot, type ParkSnapshot, type TownSnapshot } from './stage'
-import { gymSnapshotFrom, parkSnapshotFrom, townSnapshotFrom } from './useBuildingStage'
+import { gymSnapshotFrom, homeSnapshotFrom, parkSnapshotFrom, townSnapshotFrom } from './useBuildingStage'
 
 const empty: GymSnapshot = { goalSet: false, weighInsThisMonth: 0, mealDaysThisWeek: 0, trainingThisWeek: 0, trainingTarget: 4, flagsCrossed: 0 }
 
@@ -114,5 +114,20 @@ describe('Town hall and Park stages', () => {
     const p = (id: number, cadenceDays: number, lastContact?: string) => ({ id, name: `P${id}`, relation: '', cadenceDays, lastContact })
     const snap = parkSnapshotFrom({ people: [p(1, 7, '2026-11-10'), p(2, 7, '2026-10-01'), p(3, 0)], interactions: [{ personId: 1, date: '2026-11-10' }, { personId: 1, date: '2026-11-11' }] }, '2026-11-11')
     expect(snap).toMatchObject({ people: 3, withRhythm: 2, reachedThisWeek: 1, overdue: 1 })
+  })
+})
+
+describe('home base stage', () => {
+  it('lights one window per real step', () => {
+    const none = buildingStage('you', { you: { backupThisMonth: false, safeCopy: false, interviewAnswers: 3, badgesEarned: 0, standingReady: false } })!
+    expect(none.stage).toBe(0)
+    expect(none.line).toBe('Next: make a backup this month')
+    const some = homeSnapshotFrom({ backupAt: '2026-11-02T10:00:00Z', backupEncrypted: true, syncOn: false, answers: {}, badgesEarned: 2, standingReady: true }, '2026-11-11')
+    const s = buildingStage('you', { you: some })!
+    expect(s.steps.filter((x) => x.done).map((x) => x.id)).toEqual(['backup', 'safe', 'badge', 'standing'])
+    expect(s.next?.id).toBe('interview')
+  })
+  it('a backup from another month does not count', () => {
+    expect(homeSnapshotFrom({ backupAt: '2026-10-30T10:00:00Z', backupEncrypted: null, syncOn: true, answers: {}, badgesEarned: 0, standingReady: false }, '2026-11-11').backupThisMonth).toBe(false)
   })
 })

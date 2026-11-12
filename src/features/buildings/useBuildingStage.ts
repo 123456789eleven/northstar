@@ -11,7 +11,12 @@ import { loadBankSnapshot } from './bankStage'
 import { blockMeta } from '../planner/timeBlock'
 import { circleWarmth } from '../people/warmth'
 import { personStatus } from '../people/people'
-import { buildingStage, type BuildingStage, type GymSnapshot, type ParkSnapshot, type TownSnapshot } from './stage'
+import { buildingStage, type BuildingStage, type GymSnapshot, type HomeBaseSnapshot, type ParkSnapshot, type TownSnapshot } from './stage'
+import { BACKUP_LAST_ENCRYPTED_KEY, BACKUP_LAST_KEY } from '../../lib/backup'
+import { loadBadges } from '../badges/useBadges'
+import { loadScoreSnapshot } from '../score/useScore'
+import { computeStanding } from '../score/model'
+import { PROFILE_KEY, progress, type Answers } from '../interview/questions'
 
 export interface GymRaw {
   settings: { key: string; value: unknown }[]
@@ -86,6 +91,26 @@ export function parkSnapshotFrom(raw: ParkRaw, t: ISODate): ParkSnapshot {
   }
 }
 
+export interface HomeRaw {
+  backupAt: string | null
+  backupEncrypted: boolean | null
+  syncOn: boolean
+  answers: Answers
+  badgesEarned: number
+  standingReady: boolean
+}
+
+/** Pure: the Home base snapshot from raw values, counted for the month containing `t`. */
+export function homeSnapshotFrom(raw: HomeRaw, t: ISODate): HomeBaseSnapshot {
+  return {
+    backupThisMonth: !!raw.backupAt && raw.backupAt.slice(0, 7) === t.slice(0, 7),
+    safeCopy: raw.syncOn || raw.backupEncrypted === true,
+    interviewAnswers: progress(raw.answers).done,
+    badgesEarned: raw.badgesEarned,
+    standingReady: raw.standingReady,
+  }
+}
+
 /** Live stage for a building, undefined while loading, null when the building has no stage yet. */
 export function useBuildingStage(id: DistrictId): BuildingStage | null | undefined {
   return useLiveQuery(async () => {
@@ -93,6 +118,15 @@ export function useBuildingStage(id: DistrictId): BuildingStage | null | undefin
     if (id === 'career') return buildingStage('career', { career: await officeSnapshot() })
     if (id === 'money') return buildingStage('money', { money: await loadBankSnapshot() })
     const t = today()
+    if (id === 'you') {
+      const get = async <T,>(k: string, d: T) => ((await db.settings.get(k))?.value as T | undefined) ?? d
+      const [backupAt, backupEncrypted, syncOn, answers, badges, snap] = await Promise.all([
+        get<string | null>(BACKUP_LAST_KEY, null), get<boolean | null>(BACKUP_LAST_ENCRYPTED_KEY, null),
+        get<boolean>('sync.enabled', false), get<Answers>(PROFILE_KEY, {}), loadBadges(), loadScoreSnapshot().catch(() => null),
+      ])
+      const standingReady = !!snap && computeStanding(snap).status === 'ready'
+      return buildingStage('you', { you: homeSnapshotFrom({ backupAt, backupEncrypted, syncOn, answers, badgesEarned: badges.filter((b) => b.earned).length, standingReady }, t) })
+    }
     const wk = startOfWeek(t)
     if (id === 'plan') {
       const [tasks, goals, events, logs] = await Promise.all([
