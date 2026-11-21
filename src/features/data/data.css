@@ -3,5 +3,5 @@
 @media (max-width: 819px) { .dh-feeds a { min-height: 32px; } }
 
 /* Phase 3: the privacy note under Sources reads as a footnote of the table, not a loose paragraph. */
-.dh-where { margin: 0; padding: 12px 16px; border-top: 1px solid var(--line); max-width: 110ch; line-height: 20px; }
+.dh-where { margin: 0; padding: 12px 16px; border-top: 0; max-width: 110ch; line-height: 20px; }
 #import-calendar, #gcal, #import-contacts, #simplefin { scroll-margin-top: 64px; }

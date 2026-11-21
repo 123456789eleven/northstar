@@ -12,18 +12,18 @@
 
 .habit-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .habit-day {
-  min-height: 44px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--surface-2);
+  min-height: 44px; border-radius: var(--radius-sm); border: 0; background: var(--surface-2);
   color: var(--ink-2); font: inherit; font-size: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
 }
 .habit-day b { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .habit-day { transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
-.habit-day:hover { border-color: var(--ink-3); }
+
 .habit-day:active { transform: scale(0.96); }
-.habit-day.today { border-color: var(--ink-2); color: var(--ink); }
+.habit-day.today { color: var(--ink); }
 /* Done = soft amber with an amber check line; calmer than a solid fill across 7 x N tiles. */
-.habit-day.on { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent-text); }
+.habit-day.on { background: var(--accent-soft); color: var(--accent-text); }
 .habit-day.on b { color: var(--ink); }
-.habit-day.on.today { border-color: var(--accent); }
+
 .habit-day.on:focus { animation: check-pop var(--dur-slow) var(--ease-out); }
 
 .habit-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -35,11 +35,11 @@
 
 .seg { display: flex; gap: 4px; flex-wrap: wrap; }
 .seg button {
-  min-height: 36px; min-width: 40px; padding: 0 12px; border-radius: var(--radius-sm); border: 1px solid var(--line);
+  min-height: 36px; min-width: 40px; padding: 0 12px; border-radius: var(--radius-sm); border: 0;
   background: var(--surface-2); color: var(--ink-2); font: inherit; font-size: 14px; cursor: pointer;
 }
-.seg button:hover { border-color: var(--ink-3); }
-.seg button[aria-pressed='true'] { background: var(--surface-3); border-color: var(--line-strong); color: var(--ink); }
+
+.seg button[aria-pressed='true'] { background: var(--surface-3); color: var(--ink); }
 
 .habit-tile-row { display: flex; align-items: center; gap: 10px; min-height: 36px; }
 .habit-tile-row .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -53,7 +53,18 @@
 /* Form guide: 8 weekly marks. Filled powder blue = target met, half = some days, outline = none. */
 .form-guide { display: flex; align-items: center; gap: 6px; margin-top: var(--sp-3); }
 .form-guide-label { font-size: 12px; color: var(--ink-3); margin-right: 4px; }
-.form-mark { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--ink-3); box-sizing: border-box; background: transparent; }
-.form-mark.is-met { background: var(--accent); border-color: var(--accent); }
-.form-mark.is-part { background: linear-gradient(90deg, var(--accent) 50%, transparent 50%); border-color: var(--accent); }
-.form-mark.is-current { outline: 1px solid var(--ink-3); outline-offset: 2px; }
+.form-mark { width: 14px; height: 14px; border-radius: 50%; background: var(--lum-4); box-sizing: border-box; }
+.form-mark.is-met { background: var(--accent); }
+.form-mark.is-part { background: linear-gradient(90deg, var(--accent) 50%, var(--lum-4) 50%); }
+
+
+/* Liquid v2: habit cards are wells, week days are tiles on them */
+.habit.card { background-color: var(--lum-2); background-image: none; box-shadow: none; }
+.habit.card::before, .habit.card::after { content: none; }
+.habit-day { background: var(--lum-3); }
+.habit-day.on { background: var(--accent-soft); }
+.habit-name { color: var(--ink); }
+.habit-meta, .habit-streak span { color: var(--ink-2-glass); }
+.seg button { background: var(--lum-2); color: var(--ink-2-glass); }
+.seg button:hover { background: var(--lum-3); }
+.seg button[aria-pressed='true'] { background: var(--accent-soft); color: var(--ink); font-weight: 650; }

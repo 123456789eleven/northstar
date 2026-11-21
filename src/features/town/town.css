@@ -7,10 +7,10 @@
 .today-merge { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp-5); }
 .today-merge > * { min-width: 0; }
 .today-merge .focus-bar, .today-merge .agenda-card { background: none; border: 0; box-shadow: none; padding: 0; }
-.today-merge .agenda-card { border-left: 1px solid var(--line); padding-left: var(--sp-5); border-radius: 0; }
+.today-merge .agenda-card { border-left: 0; padding-left: var(--sp-5); border-radius: 0; }
 @media (max-width: 819px) {
   .today-merge { grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); }
-  .today-merge .agenda-card { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: var(--sp-4); }
+  .today-merge .agenda-card { border-left: 0; padding-left: 0; border-top: 0; padding-top: var(--sp-4); }
 }
 
 /* Tasks floor */
@@ -44,7 +44,7 @@
 @media (min-width: 820px) {
   .plan-hero-wrap .pl-main.week .pl-side { order: -1; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
   .plan-hero-wrap .pl-main.week .pl-tray { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
-  .plan-hero-wrap .pl-main.week .pl-tray-item { flex: 0 0 210px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 4px 8px; background: var(--surface-2); }
-  .plan-hero-wrap .pl-main.week .pl-tray-item:last-child { border-bottom: 1px solid var(--line); }
+  .plan-hero-wrap .pl-main.week .pl-tray-item { flex: 0 0 210px; border: 0; border-radius: var(--radius-sm); padding: 4px 8px; background: var(--surface-2); }
+  .plan-hero-wrap .pl-main.week .pl-tray-item:last-child { border-bottom: 0; }
   .plan-hero-wrap .pl-main.week .pl-note { display: none; }
 }

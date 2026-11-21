@@ -9,7 +9,7 @@
 .hub-card-stat .hub-card-sub { font-family: var(--font); }
 .hub-card-body { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
 .hub-list { display: flex; flex-direction: column; }
-.hub-li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); padding: 6px 0; border-top: 1px solid var(--line-soft); font-size: var(--text-sm); min-width: 0; }
+.hub-li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); padding: 6px 0; border-top: 0; font-size: var(--text-sm); min-width: 0; }
 .hub-li-goal { flex-direction: column; align-items: stretch; gap: 6px; }
 .hub-li-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hub-li-meta { flex: 0 0 auto; font-size: var(--text-xs); color: var(--ink-2); font-variant-numeric: tabular-nums; }

@@ -29,11 +29,11 @@
 .food-favs { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 2px; }
 .food-fav {
   display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px;
-  border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2);
+  border-radius: 999px; border: 0; background: var(--surface-2);
   color: var(--ink); font-size: 13px; cursor: pointer; max-width: 100%;
 }
 .food-fav span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.food-fav:hover { border-color: var(--accent); }
+
 .food-fav:active { background: var(--accent-soft); }
 
 .food-add { display: flex; gap: 6px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
@@ -84,7 +84,7 @@
 .food-quick-preview { flex: 1 0 100%; }
 .food-mult { min-width: 40px; justify-content: center; color: var(--accent); }
 .food-tpl-save { margin: 8px 0 0; gap: 6px; }
-.food-tpl { padding: 8px 0; border-top: 1px solid var(--line); }
+.food-tpl { padding: 8px 0; border-top: 0; }
 .food-tpl:first-child { border-top: 0; }
 .food-tpl-item { gap: 6px; flex-wrap: wrap; }
 .food-tpl-item .input.grow { flex: 1 1 140px; min-width: 0; }
@@ -92,10 +92,10 @@
 .food-strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .food-strip-day {
   display: flex; flex-direction: column; gap: 4px; align-items: stretch; min-height: 32px; padding: 8px 6px; text-align: center;
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); color: var(--ink); cursor: pointer; min-width: 0;
+  background: var(--surface); border: 0; border-radius: var(--radius-sm); color: var(--ink); cursor: pointer; min-width: 0;
 }
-.food-strip-day:hover { border-color: var(--accent); }
-.food-st { display: flex; flex-direction: column; border-top: 1px solid var(--line); padding-top: 4px; color: var(--ink-3); }
+
+.food-st { display: flex; flex-direction: column; border-top: 0; padding-top: 4px; color: var(--ink-3); }
 .food-st-met { color: var(--good); }
 .food-st-close { color: var(--accent); }
 .food-st-missed { color: var(--warn); }
@@ -126,15 +126,15 @@
 @keyframes mring-pulse { 0% { transform: scale(1); } 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
 
 .fday { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
-.fday-day { width: 100%; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: var(--surface-1); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); color: var(--ink); cursor: pointer; }
-.fday-day:hover { border-color: var(--line-strong); }
-.fday-day.is-sel { border-color: var(--accent-line); background: var(--accent-soft); }
+.fday-day { width: 100%; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: var(--surface-1); border: 0; border-radius: var(--radius-sm); color: var(--ink); cursor: pointer; }
+
+.fday-day.is-sel { background: var(--accent-soft); }
 .fday-wd { font-size: 10px; color: var(--ink-2); line-height: 1; }
 .fday-n { font-size: var(--text-sm); line-height: 1; font-variant-numeric: tabular-nums; }
-.fday-dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--line-strong); }
-.fday-dot.dot-met { background: var(--accent); border-color: var(--accent); }
-.fday-dot.dot-close { background: transparent; border-color: var(--accent); }
-.fday-dot.dot-missed { background: var(--surface-3); border-color: var(--line-strong); }
+.fday-dot { width: 8px; height: 8px; border-radius: 50%; border: 0; }
+.fday-dot.dot-met { background: var(--accent); }
+.fday-dot.dot-close { background: transparent; }
+.fday-dot.dot-missed { background: var(--surface-3); }
 .dstrip-dot.dot-none, .dstrip-dot.dot-empty { background: transparent; }
 
 .food-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); align-items: start; }
@@ -152,7 +152,7 @@
   .food-quickdock { order: -1; }
 }
 @media (max-width: 819px) {
-  .food-quickdock { position: sticky; bottom: calc(64px + env(safe-area-inset-bottom)); z-index: 5; padding: 8px; border-radius: var(--radius); background: var(--glass-bg-bar); border: 1px solid var(--glass-border); }
+  .food-quickdock { position: sticky; bottom: calc(64px + env(safe-area-inset-bottom)); z-index: 5; padding: 8px; border-radius: var(--radius); background: var(--glass-bg-bar); border: 0; }
   .mring { min-width: 120px; }
 }
 @media (prefers-reduced-motion: reduce) { .mring.is-pulse .ring { animation: none; } }
