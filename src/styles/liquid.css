@@ -210,3 +210,31 @@ html[data-lens] .toast { -webkit-backdrop-filter: url(#ns-lens) blur(14px) satur
 .card-title { margin-bottom: 14px; }
 .page-head, .page-header { margin-bottom: var(--head-gap, 28px); }
 @media (max-width: 819px) { :root:not([data-density='compact']) { --pad: 18px; --gap: 16px; --main-pt: 20px; --head-gap: 20px; } }
+
+/* ---------- Liquid v2 tokens (docs/redesign/LIQUID_V2.md): borderless surfaces, one light from the top-left ---------- */
+:root {
+  --lum-0: #08090c;
+  --lum-1: #0d0f14; /* well: +2.5% white */
+  --lum-2: #12151c; /* surface: +4.5% */
+  --lum-3: #191d26; /* raised: +7% */
+  --lum-4: #1d2431; /* hero: +9% with a powder tint */
+  --ink-2-glass: #cdd3dd; /* secondary text on glass, about 4.7:1 on the worst backdrop */
+  --lg-tint-thin: rgba(14, 18, 26, 0.38);
+  --lg-tint-regular: rgba(14, 18, 26, 0.42);
+  --lg-tint-thick: rgba(12, 15, 22, 0.52);
+  --lg-body: radial-gradient(120% 60% at 50% -10%, rgba(255, 255, 255, 0.10), transparent 55%), radial-gradient(90% 50% at 50% 115%, rgba(156, 200, 230, 0.16), transparent 60%);
+  --lg-depth: inset 0 14px 22px -16px rgba(255, 255, 255, 0.22), inset 0 -18px 26px -18px rgba(156, 200, 230, 0.30), inset 0 0 30px -8px rgba(0, 0, 0, 0.35);
+  --lg-drop: 0 2px 6px rgba(0, 0, 0, 0.28), 0 22px 48px -18px rgba(0, 0, 0, 0.70);
+  --lg-spec: radial-gradient(180px 120px at var(--mx, 20%) var(--my, 0%), rgba(255, 255, 255, 0.16), transparent 70%);
+  /* springs v2 (linear() easings sampled from the council's integrator) */
+  --spring-snappy-2: cubic-bezier(0.3, 1.5, 0.5, 1);
+  --t-snappy-2: 436ms;
+  --t-smooth-2: 498ms;
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --spring-snappy-2: linear(0, 0.354 10%, 0.795 20%, 1.01 30%, 1.053 40%, 1.033 50%, 1.01 60%, 0.999 70%, 1);
+    --spring-smooth-2: linear(0, 0.244 10%, 0.609 20%, 0.867 30%, 0.99 40%, 1.029 50%, 1.028 60%, 1.017 70%, 1.007 80%, 1);
+  }
+}
+.lg { border: 0; background: var(--lg-spec), var(--lg-body), var(--lg-tint-regular); box-shadow: var(--lg-depth), var(--lg-drop); }
