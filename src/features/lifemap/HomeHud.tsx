@@ -11,6 +11,9 @@ import { openSetup } from '../onboarding/setupLogic'
 import { freshness, type DayChange } from './useDayChange'
 import { clamp01, money as whole, weightProgress, type District, type LifeMap } from './model'
 import type { HomeHud } from './useHomeHud'
+import { useThumb } from '../../components/useThumb'
+import { useTilt } from '../../components/useTilt'
+import '../../components/liquid-chrome.css'
 
 export type HomeTab = 'today' | SkillId
 export const TABS: { id: HomeTab; label: string; strip: string }[] = [
@@ -57,8 +60,11 @@ export function Overview({ map, hud, p, day }: { map: LifeMap; hud: HomeHud | un
   const overdue = Number(map.overview.toContact)
   const tracked = people?.trees.filter((t) => !t.placeholder).length ?? 0
   const [busy, setBusy] = useState(false)
+  const panel = useRef<HTMLElement>(null)
+  useTilt(panel)
   return (
-    <section className="hm-overview hm-glass" aria-label="Overview">
+    <section ref={panel} className="hm-overview hm-glass" aria-label="Overview">
+      <span className="lq-spec-clip" aria-hidden="true"><i className="lq-spec" /></span>
       <StatRow to="/finance" label="Net worth" value={map.overview.netWorth} ring={money?.glow ?? 0} note={day ? `${dayText(day)} today` : undefined} noteTone={day ? (day.amount < 0 ? 'down' : 'up') : undefined} />
       <StatRow to="/today" label="Today's plan" value={total ? `${p.questsDone} of ${total}` : 'None yet'} ring={total ? p.questsDone / total : 0} />
       <StatRow to="/food" label="Calories" value={hud ? num(hud.cal) : '0'} note={hud ? `of ${num(hud.calTarget)}` : undefined} ring={hud ? clamp01(hud.cal / hud.calTarget) : 0} />
@@ -297,6 +303,11 @@ export function BreakoutPanel({ tab, onTab, open, onOpen, map, hud, p, phone, da
   const idx = TABS.findIndex((t) => t.id === tab)
   const { refs, onKey } = useRoving(TABS.length, idx, (i) => onTab(TABS[i].id))
   const current = TABS[idx]
+  const tabRow = useRef<HTMLDivElement>(null)
+  const thumb = useRef<HTMLSpanElement>(null)
+  const aside = useRef<HTMLElement>(null)
+  useThumb(tabRow, thumb, '.hm-tab', idx)
+  useTilt(aside, !phone && open)
   const body = tab === 'today' ? <TodayTab p={p} hud={hud} map={map} />
     : tab === 'money' ? <MoneyTab hud={hud} map={map} day={day} />
     : tab === 'body' ? <BodyTab hud={hud} map={map} />
@@ -311,13 +322,15 @@ export function BreakoutPanel({ tab, onTab, open, onOpen, map, hud, p, phone, da
     )
   }
   return (
-    <aside className={`hm-panel hm-glass${phone ? ' is-sheet' : ''}${phone && open ? ' is-open' : ''}`} aria-label="Details" data-testid="home-panel">
+    <aside ref={aside} className={`hm-panel hm-glass${phone ? ' is-sheet' : ''}${phone && open ? ' is-open' : ''}`} aria-label="Details" data-testid="home-panel">
+      <span className="lq-spec-clip" aria-hidden="true"><i className="lq-spec" /></span>
       {phone && (
         <button type="button" className="hm-grab" onClick={() => onOpen(!open)} aria-expanded={open} aria-controls="hm-panel">
           <span aria-hidden="true" /><span className="sr-only">{open ? 'Shrink details' : 'Expand details'}</span>
         </button>
       )}
-      <div className="hm-tabs" role="tablist" aria-label="Details" onKeyDown={onKey}>
+      <div ref={tabRow} className="hm-tabs has-thumb" role="tablist" aria-label="Details" onKeyDown={onKey}>
+        <span ref={thumb} className="hm-thumb" aria-hidden="true" />
         {TABS.map((t, i) => (
           <button
             key={t.id} ref={(el) => { refs.current[i] = el }} type="button" role="tab" id={`hm-tab-${t.id}`} className="hm-tab" data-panel-tab={t.id}
