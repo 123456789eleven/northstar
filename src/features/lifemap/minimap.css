@@ -22,7 +22,7 @@
 .mm-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .mm-tip {
   padding: 1px 6px; border-radius: 999px; font-size: 10px; font-weight: 600; line-height: 14px; white-space: nowrap; color: var(--ink);
-  background: var(--mat-thick-bg); box-shadow: inset 0 0 0 1px var(--accent-line); opacity: 0; transform: translateY(2px);
+  background: var(--mat-thick-bg); box-shadow: none; opacity: 0; transform: translateY(2px);
   transition: opacity var(--t-snappy) var(--spring-gentle), transform var(--t-snappy) var(--spring-gentle); pointer-events: none;
 }
 .mm-hit:hover .mm-tip, .mm-hit:focus-visible .mm-tip { opacity: 1; transform: none; }

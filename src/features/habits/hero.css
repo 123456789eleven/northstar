@@ -14,7 +14,7 @@
 .cgrid-cell.l2 { background: color-mix(in srgb, var(--accent) 60%, var(--surface-3)); }
 .cgrid-cell.l3 { background: var(--accent); }
 .cgrid-cell.is-future { opacity: 0.35; }
-.cgrid-cell.is-today { outline: 1px solid var(--ink-2); outline-offset: 1px; }
+
 .cgrid-legend { display: flex; align-items: center; gap: 4px; font-size: var(--fs-1); color: var(--ink-2); }
 .cgrid-legend .cgrid-cell { width: 12px; height: 12px; border-radius: 3px; }
 .habit-hero .cgrid-cell { transition: background-color var(--t-snappy) var(--spring-gentle); }

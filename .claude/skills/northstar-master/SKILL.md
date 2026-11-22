@@ -56,7 +56,7 @@ Validate this index any time: `python "C:\Users\bearf\OneDrive\Desktop\The One\t
 - **Verification:** northstar-fast-verify, northstar-definition-of-done, verification-before-completion
 - **Testing:** test-driven-development, northstar-browser-qa, northstar-live-verify
 - **Debugging:** northstar-bugfix-loop, systematic-debugging
-- **Review:** northstar-design-review, northstar-privacy-audit
+- **Review:** northstar-design-review, northstar-privacy-audit, northstar-elite-quality-bar
 
 ### 4. Operations (how it reaches users)
 - **Release:** northstar-ship

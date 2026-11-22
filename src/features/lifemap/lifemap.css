@@ -195,23 +195,23 @@
 .lm-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .lm-label {
   display: inline-flex; flex-direction: column; align-items: center; gap: 1px; padding: 5px 11px; border-radius: 999px; white-space: nowrap;
-  background: var(--mat-thin-bg); border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent); box-shadow: var(--elev-1);
+  background: var(--mat-thin-bg); border: 0; box-shadow: var(--elev-1);
   font-size: var(--fs-2); line-height: 16px; color: var(--ink); transition: border-color var(--t-snappy) var(--spring-gentle), transform var(--t-snappy) var(--spring-snappy);
 }
 .lm-label-name { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
 .lm-label-fig { font-size: var(--fs-1); line-height: 14px; color: var(--accent-text); }
 .lm-label-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--poppy); }
-.lm-hit.is-on .lm-label { border-color: var(--accent-line); transform: translateY(-3px); }
-.lm-hit.is-selected .lm-label { background: color-mix(in srgb, var(--accent) 16%, var(--mat-thin-bg)); border-color: var(--accent); }
+.lm-hit.is-on .lm-label { transform: translateY(-3px); }
+.lm-hit.is-selected .lm-label { background: color-mix(in srgb, var(--accent) 16%, var(--mat-thin-bg)); }
 
 /* zoom controls */
 .lm-zoom { position: absolute; left: 16px; bottom: 20px; z-index: 3; display: flex; flex-direction: column; gap: 6px; }
 .lm-zbtn {
   width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; cursor: pointer; font: inherit; font-size: var(--fs-3); color: var(--ink);
-  background: var(--mat-thin-bg); border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent); box-shadow: var(--elev-1);
+  background: var(--mat-thin-bg); border: 0; box-shadow: var(--elev-1);
 }
 .lm-zbtn.is-text { font-size: var(--fs-1); font-weight: 600; }
-.lm-zbtn:hover { border-color: var(--accent-line); }
+
 .lm-zbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .lm-zbtn svg { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .lm-zbtn.is-rot + .lm-zbtn:not(.is-rot) { margin-top: 6px; }

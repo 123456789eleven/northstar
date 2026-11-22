@@ -6,7 +6,7 @@
 .car-tag { min-height: 32px; cursor: pointer; font: inherit; font-size: 12px; }
 .car-month { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .car-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.car-win, .car-note { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.car-win, .car-note { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: var(--surface); border: 0; border-radius: var(--radius-sm); }
 .car-note { flex-direction: column; align-items: stretch; gap: 6px; }
 .car-win-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .car-win-title { overflow-wrap: anywhere; }
@@ -30,7 +30,7 @@
 .car-strip td { padding: 4px 6px; position: relative; min-width: 56px; }
 .car-bar { display: inline-block; height: 8px; background: var(--accent); border-radius: 2px; vertical-align: middle; max-width: calc(100% - 20px); min-width: 0; }
 .car-bar-n { margin-left: 6px; font-variant-numeric: tabular-nums; }
-.car-case { margin: 0; padding: 12px; background: var(--page); border: 1px solid var(--line); border-radius: var(--radius-sm); white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/1.5 var(--font-body, inherit); max-height: 520px; overflow: auto; }
+.car-case { margin: 0; padding: 12px; background: var(--page); border: 0; border-radius: var(--radius-sm); white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/1.5 var(--font-body, inherit); max-height: 520px; overflow: auto; }
 
 @media (max-width: 640px) {
   .car-quick-row { flex-direction: column; }
@@ -58,7 +58,7 @@
 .car-hp-fill { display: block; height: 100%; width: 100%; background: var(--accent); border-radius: inherit; transform-origin: left center; transform: scaleX(var(--fill, 0)); transition: transform var(--dur-spring) var(--ease-spring-soft); }
 .car-hp-label { font-size: var(--text-xs); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .car-hp-pts { font-size: var(--text-xs); color: var(--ink); }
-.car-next { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; padding-top: var(--sp-3); border-top: 1px solid var(--line-soft); }
+.car-next { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; padding-top: var(--sp-3); border-top: 0; }
 .car-next-text { margin: 0; font-size: var(--text-sm); }
 .car-next .btn { min-height: 44px; display: inline-flex; align-items: center; }
 .car-how summary { cursor: pointer; font-size: var(--text-sm); color: var(--ink-2); min-height: 32px; display: flex; align-items: center; }

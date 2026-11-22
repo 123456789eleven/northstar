@@ -2,7 +2,7 @@
 .bdg-count { margin: 0; color: var(--ink-2); font-size: var(--fs-3); }
 .bdg-count-n { color: var(--ink); font-size: 40px; font-weight: 600; font-variant-numeric: tabular-nums; margin-right: 6px; letter-spacing: -0.02em; }
 .bdg-group { display: flex; flex-direction: column; gap: 16px; }
-.bdg-group-h { margin: 0; font-size: var(--fs-1); font-weight: 500; letter-spacing: 0.02em; color: var(--ink-3); padding-bottom: 8px; border-bottom: 1px solid var(--line-soft); }
+.bdg-group-h { margin: 0; font-size: var(--fs-1); font-weight: 500; letter-spacing: 0.02em; color: var(--ink-3); padding-bottom: 8px; border-bottom: 0; }
 .bdg-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 32px 24px; }
 .bdg { all: unset; box-sizing: border-box; width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 8px 0; min-height: 44px; cursor: pointer; color: var(--ink-3); border-radius: var(--radius-sm); }
 .bdg:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
@@ -40,3 +40,8 @@
 @media (prefers-reduced-motion: reduce) { .bdg-mini.is-earned .bdg-gold, .bdg-mini.is-earned .bdg-mark { animation: none; } }
 :root[data-motion='reduced'] .bdg-mini.is-earned .bdg-gold, :root[data-motion='reduced'] .bdg-mini.is-earned .bdg-mark { animation: none; }
 @media (max-width: 519px) { .bdg-shelf { grid-template-columns: repeat(4, minmax(0, 1fr)); } .bdg-mini { min-height: 68px; } .bdg-mini-t { font-size: 11px; } }
+
+/* Liquid v2: the badge shelf is a row of wells */
+.bdg { padding: 10px 12px; background: var(--lum-2); }
+.bdg:hover { background: var(--lum-3); }
+.bdg-count { color: var(--ink-2-glass); }

@@ -6,7 +6,7 @@
 .reach-head { margin-bottom: var(--sp-4); }
 .reach-sub { margin: 0 0 var(--sp-2); font-size: var(--fs-2); font-weight: 600; letter-spacing: 0.02em; color: var(--ink-2); }
 .reach-list { list-style: none; margin: 0; padding: 0; }
-.reach-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); min-height: 52px; max-height: 80px; border-top: 1px solid var(--line-soft); transition: transform 280ms var(--spring-gentle), opacity 240ms var(--ease-out), max-height 280ms var(--ease-out); }
+.reach-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); min-height: 52px; max-height: 80px; border-top: 0; transition: transform 280ms var(--spring-gentle), opacity 240ms var(--ease-out), max-height 280ms var(--ease-out); }
 .reach-row:first-child { border-top: 0; }
 .reach-row.is-leaving { transform: translateX(28px); opacity: 0; max-height: 0; overflow: hidden; }
 .reach-line { flex: 1 1 auto; min-width: 0; text-align: left; background: none; border: 0; padding: 6px 0; color: var(--ink); font: inherit; font-size: var(--fs-3); cursor: pointer; min-height: 32px; }

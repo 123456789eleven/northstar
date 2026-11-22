@@ -5,9 +5,9 @@
 .body-log-more { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-2); }
 .body-log-more .input { width: 160px; }
 .body-goalgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-.body-adv { padding: 8px 12px; border-left: 2px solid var(--line-strong); font-size: 14px; }
-.body-adv-warn { border-left-color: var(--warn); }
-.body-adv-good { border-left-color: var(--good); }
+.body-adv { padding: 8px 12px; border-left: 0; font-size: 14px; }
+
+
 .body-targets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .body-targets .input { width: 100%; }
 .body-slider { width: 100%; accent-color: var(--accent); min-height: 32px; }
@@ -57,8 +57,8 @@
 .wpath { width: 100%; height: 280px; }
 @media (max-width: 819px) { .wpath { height: 240px; } }
 ul.body-ms { list-style: none; margin: 0; padding: 0; }
-.flag-chip { display: inline-flex; gap: 8px; align-items: baseline; padding: 4px 10px; border-radius: var(--radius-pill); border: 1px solid var(--line); color: var(--ink-2); }
-.flag-chip.is-reached { color: var(--reward); background: var(--reward-soft); border-color: var(--reward-line); }
+.flag-chip { display: inline-flex; gap: 8px; align-items: baseline; padding: 4px 10px; border-radius: var(--radius-pill); border: 0; color: var(--ink-2); }
+.flag-chip.is-reached { color: var(--reward); background: var(--reward-soft); }
 .body-first { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-2); }
 .body-first strong { color: var(--ink); }
 
@@ -71,7 +71,7 @@ ul.body-ms { list-style: none; margin: 0; padding: 0; }
 .train-log { height: 48px; padding: 0 24px; }
 .train-recent { margin-top: var(--sp-4); }
 .train-list { list-style: none; margin: 4px 0 0; padding: 0; }
-.train-list li { display: flex; justify-content: space-between; padding: 6px 0; border-top: 1px solid var(--line-soft); }
+.train-list li { display: flex; justify-content: space-between; padding: 6px 0; border-top: 0; }
 .body-hero-stats dd .mono { white-space: nowrap; }
 @media (max-width: 819px) {
   .body-hero-stats dd { font-size: var(--text-base); }
