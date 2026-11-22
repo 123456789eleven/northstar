@@ -1,6 +1,6 @@
 // Net worth hero (big number, change, next milestone) and the path chart with a flag at every $5k crossed plus the previous high.
 import { useState } from 'react'
-import { CartesianGrid, ComposedChart, Line, ReferenceDot, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Area, CartesianGrid, ComposedChart, Line, ReferenceDot, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { ChartTip } from '../../components/ChartTip'
 import { ACTIVE_DOT, CHART, GRID_PROPS, MARGIN, X_AXIS, Y_AXIS, tooltipProps } from '../../components/chartTheme'
 import { useNumberRoll } from '../../components/motion'
@@ -97,6 +97,8 @@ export function NetWorthPath({ data, name = 'Net worth' }: { data: { date: strin
           ))}
           {ms.high && data.length > 1 && !earned && <ReferenceLine y={ms.high.net} ifOverflow="hidden" stroke={MUTED} strokeDasharray="2 4" label={{ value: 'High', position: 'insideBottomRight', fill: MUTED, fontSize: 12 }} />}
           {earned && <ReferenceDot x={rows.at(-1)!.x} y={rows.at(-1)!.net} r={6} fill="var(--reward)" stroke={CHART.surface} strokeWidth={2} ifOverflow="extendDomain" label={{ value: 'All-time high', position: 'left', fill: 'var(--reward)', fontSize: 12 }} />}
+          <defs><linearGradient id="nw-fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={MONEY} stopOpacity={0.28} /><stop offset="100%" stopColor={MONEY} stopOpacity={0} /></linearGradient></defs>
+          <Area type="monotone" dataKey="net" stroke="none" fill="url(#nw-fade)" isAnimationActive={false} legendType="none" tooltipType="none" activeDot={false} />
           <Line type="monotone" dataKey="net" name={name} stroke={MONEY} strokeWidth={2.5} dot={data.length <= 24 ? { r: 3, fill: MONEY, stroke: CHART.surface, strokeWidth: 2 } : false} activeDot={ACTIVE_DOT(MONEY)} isAnimationActive={false} />
         </ComposedChart>
       </ResponsiveContainer>

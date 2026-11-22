@@ -1,7 +1,7 @@
 /* Money (overview). Tokens only; cards are already regular glass, rows and plots stay solid. */
 .mn-scope .mn-num, .mn-num { font-variant-numeric: tabular-nums; }
 .mn-page { gap: var(--gap); }
-.mn-label { font-size: var(--fs-1); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); font-weight: 600; }
+.mn-label { font-size: var(--fs-1); letter-spacing: 0; color: var(--ink-2-glass); font-weight: 600; }
 .mn-sub { font-size: var(--fs-2); color: var(--ink-2); }
 .mn-note { font-size: var(--fs-2); color: var(--ink-2); margin: 0; max-width: 56ch; }
 .mn-row + .wpath { margin-top: 12px; }
@@ -19,7 +19,7 @@
 .mn-hero-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .mn-hero-num { font-size: var(--fs-6); font-weight: 650; letter-spacing: -0.035em; line-height: 1.05; }
 .mn-inputs { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: var(--fs-2); color: var(--ink-2); }
-.mn-pace { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line-soft); display: flex; flex-direction: column; gap: 2px; }
+.mn-pace { margin-top: 10px; padding-top: 10px; display: flex; flex-direction: column; gap: 2px; }
 .mn-pace-label { font-size: var(--fs-2); font-weight: 600; color: var(--accent-text); }
 .mn-pace.is-over .mn-pace-label, .mn-pace.is-watch .mn-pace-label { color: var(--warn); }
 .mn-pace-note { font-size: var(--fs-2); color: var(--ink-2); }
@@ -40,31 +40,32 @@
 /* Budget rings */
 .mn-rings { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 4px 12px; }
 .mn-ring-btn { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 6px 8px; background: none; border: 0; border-radius: var(--r-inner); color: inherit; font: inherit; text-align: left; cursor: pointer; transition: transform var(--t-snappy) var(--spring-snappy), background-color var(--t-snappy) var(--spring-gentle); }
-.mn-ring-btn:hover { background: var(--surface-2); }
+.mn-ring-btn:hover { background: rgba(255,255,255,.045); }
+.mn-ring-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .mn-ring-btn:active { transform: scale(0.97); }
 .mn-ring-text { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
 .mn-ring-name { font-size: var(--fs-3); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mn-limit { display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line-soft); }
+.mn-limit { display: flex; align-items: center; gap: 12px; padding-top: 12px; }
 
 /* Lists */
 .mn-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.mn-li { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 6px 0; border-top: 1px solid var(--line-soft); }
-.mn-li:first-child { border-top: 0; }
+.mn-li { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 6px 10px; border-radius: 10px; }
+.mn-li:nth-child(even) { background: rgba(255,255,255,.02); }
+.mn-li:hover { background: rgba(255,255,255,.045); }
 .mn-li-main { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
 .mn-li-end { display: flex; flex-direction: column; align-items: flex-end; flex: 0 0 auto; }
 .mn-list > li.mn-sub { padding: 6px 0 0; }
 .mn-recap { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: var(--fs-3); }
-.mn-goal { display: flex; flex-direction: column; gap: 6px; padding: 8px 0; border-top: 1px solid var(--line-soft); }
-.mn-goal:first-child { border-top: 0; }
-.mn-bar { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.mn-goal { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 10px; background: var(--lum-1); }
+.mn-bar { height: 8px; border-radius: 999px; background: var(--lum-1); overflow: hidden; }
 .mn-bar > span { display: block; height: 100%; background: var(--accent); transform-origin: 0 50%; transition: transform var(--t-smooth) var(--spring-smooth); }
 
 /* Bills calendar */
 .mn-bills { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 20px; align-items: start; }
 @media (max-width: 700px) { .mn-bills { grid-template-columns: minmax(0, 1fr); } }
 .mn-cal { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
-.mn-cal-day { aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%; font-size: var(--fs-1); color: var(--ink-3); border: 1px solid transparent; }
-.mn-cal-day.is-today { border-color: var(--line-strong, var(--line)); color: var(--ink); }
+.mn-cal-day { aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%; font-size: var(--fs-1); color: var(--ink-3); }
+.mn-cal-day.is-today { background: rgba(255,255,255,.08); color: var(--ink); }
 .mn-cal-day.has-bill { background: var(--accent); color: var(--accent-ink, var(--page)); font-weight: 650; }
 
 .mn-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 4px 0 8px; }
@@ -84,7 +85,7 @@
 .mn-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding: 0 4px; }
 .mn-strip-item { display: inline-flex; align-items: baseline; gap: 8px; font-size: var(--fs-2); }
 .mn-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.mn-fixed { margin-top: 8px; border-top: 1px solid var(--line-soft); }
+.mn-fixed { margin-top: 8px; }
 .mn-fixed > summary { display: flex; justify-content: space-between; gap: 12px; align-items: center; min-height: 44px; cursor: pointer; font-size: var(--fs-2); color: var(--ink-2); list-style: none; }
 .mn-fixed > summary::-webkit-details-marker { display: none; }
 
@@ -105,9 +106,11 @@
 .mn-scope .fin-subs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-right: 28px; }
 .mn-scope .fin-subs::-webkit-scrollbar { display: none; }
 .mn-scope .fin-subwrap::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 28px; pointer-events: none; background: linear-gradient(90deg, transparent, var(--page)); }
-.mn-scope .fin-sub { flex: none; min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink-2); font: inherit; font-size: var(--fs-2); cursor: pointer; white-space: nowrap; }
+.mn-scope .fin-sub { flex: none; min-height: 32px; padding: 0 12px; border-radius: 999px; border: 0; background: var(--lum-1); color: var(--ink-2-glass); font: inherit; font-size: var(--fs-2); cursor: pointer; white-space: nowrap; }
 .mn-scope .fin-sub:hover { color: var(--ink); }
-.mn-scope .fin-sub.active { color: var(--ink); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.mn-scope .fin-sub:hover { background: var(--lum-2); }
+.mn-scope .fin-sub.active { color: var(--ink); background: color-mix(in srgb, var(--accent) 18%, var(--lum-2)); box-shadow: inset 0 -2px 0 var(--accent); }
+.mn-scope .fin-sub:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (max-width: 560px) {
   .mn-scope .fin-groups .tabs { flex-wrap: nowrap; gap: 0; }
   .mn-scope .fin-groups .tab { flex: 1 1 0; padding: 0 4px; font-size: var(--fs-2); }
