@@ -59,7 +59,8 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
           render() {
             sh.style.transform = `translate3d(0,${-fresh.y.x}px,0) scale(${fresh.sx.x},${fresh.sy.x})`
             tx.style.transform = `translate3d(0,${-fresh.y.x}px,0)`
-            tx.style.opacity = String(Math.max(0, Math.min(1, fresh.o.x)))
+            // text only once the drop is nearly formed and in its slot, so it never spills past the shape or over a neighbour
+            tx.style.opacity = String(Math.max(0, Math.min(1, fresh.o.x, (fresh.sx.x - 0.75) / 0.25, fresh.o.t > 0 && fresh.o.x < 0.99 ? 1 - Math.abs(fresh.y.x - fresh.y.t) / 24 : 1)))
             if (anims.current.get(id) === fresh && fresh.y.rest && fresh.sy.rest && fresh.o.rest && fresh.o.t <= 0) drop(id)
           },
         } }

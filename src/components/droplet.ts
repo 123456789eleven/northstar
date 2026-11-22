@@ -88,8 +88,8 @@ export function useDroplet(sheet: RefObject<HTMLElement | null>, backdrop: RefOb
     }
     const remove = addSystem({ springs: [V, H], render })
     const finish = () => { if (finished) return; finished = true; done.current() }
-    render()
     V.to(1); H.to(1, { k: 150, z: 0.84 })
+    render() // the first frame (still on the trigger) lands before paint
     wake()
     let safety = 0
     ctl.current = {
