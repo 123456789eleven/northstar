@@ -1,8 +1,7 @@
 /* Insights: on-device weekly summary. One accent; severity is a text label, not a color set. */
 .ins-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .ins-row {
-  display: flex; gap: 12px; align-items: baseline; min-height: 40px; padding: 9px 0;
-  border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; font-size: 14px; line-height: 1.45;
+  display: flex; gap: 12px; align-items: baseline; min-height: 40px; padding: 9px 0; border-bottom: 0; color: var(--ink); text-decoration: none; font-size: 14px; line-height: 1.45;
 }
 .ins-list li:last-child .ins-row { border-bottom: 0; }
 .ins-row:hover .ins-text { color: var(--ink); text-decoration: underline; text-decoration-color: var(--ink-3); text-underline-offset: 3px; }

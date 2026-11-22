@@ -6,6 +6,6 @@
 .boss-coach.tone-behind { color: var(--warn); }
 .boss-coach.tone-met { color: var(--reward); }
 .boss-met-mark { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 50%; background: var(--reward); }
-.boss.is-met { border-color: var(--reward-line); }
+
 .bossbar-flag.is-reached { background: var(--accent); }
 :is(.quest-section, .plan-over, .today-row, .habit-hero, .habit-detail) .quest-h { font-family: var(--font); letter-spacing: 0; text-transform: none; font-size: var(--fs-3); font-weight: 600; color: var(--ink); }

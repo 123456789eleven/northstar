@@ -1,9 +1,9 @@
 /* Goals module styles. */
 .goal-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
 .filter-chip { height: 32px; padding: 0 12px; cursor: pointer; font-size: 13px; }
-.filter-chip[aria-pressed='true'] { background: var(--accent-soft); border-color: transparent; color: var(--ink); }
+.filter-chip[aria-pressed='true'] { background: var(--accent-soft); color: var(--ink); }
 
-.goal { border-top: 1px solid var(--line); padding: 12px 0; }
+.goal { border-top: 0; padding: 12px 0; }
 .goal-tree > div:first-child > .goal { border-top: 0; }
 .goal-tree > div { padding: 4px 0 8px; }
 .goal.paused { opacity: 0.7; }
@@ -21,7 +21,7 @@
 .goal-progress-label { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
 .goal-actions { display: flex; align-items: center; gap: 4px; flex: 0 0 auto; }
 .row-menu { position: relative; }
-.row-menu-pop { position: absolute; right: 0; top: 100%; z-index: 20; min-width: 200px; padding: 4px; background: var(--surface-3); border: 1px solid var(--line); border-radius: var(--radius-sm); box-shadow: var(--sheet-shadow); }
+.row-menu-pop { position: absolute; right: 0; top: 100%; z-index: 20; min-width: 200px; padding: 4px; background: var(--surface-3); border: 0; border-radius: var(--radius-sm); box-shadow: var(--sheet-shadow); }
 .row-menu-item { display: flex; align-items: center; width: 100%; min-height: 36px; padding: 0 10px; background: transparent; border: 0; border-radius: 4px; color: var(--ink); font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
 .row-menu-item:hover { background: var(--surface-2); }
 .row-menu-item:disabled { color: var(--ink-3); cursor: default; }
@@ -41,7 +41,7 @@
 .link-btn { background: none; border: 0; padding: 0 2px; min-height: 32px; color: var(--ink-2); cursor: pointer; font-size: 13px; }
 .link-btn:hover { color: var(--ink); }
 
-.goal-children { margin: 0 0 0 4px; padding-left: 16px; border-left: 1px solid var(--line-strong, var(--line)); }
+.goal-children { margin: 0 0 0 4px; padding-left: 16px; border-left: 0; }
 @media (max-width: 620px) { .goal-children { margin-left: 2px; padding-left: 10px; } }
 .goal-tree { display: flex; flex-direction: column; }
 
@@ -52,15 +52,15 @@
 
 /* v2: each life goal and its children sit on one surface, so the tree reads as a set of plans, not a flat list. */
 .goal-tree { gap: var(--gap); }
-.goal-tree > div { padding: 4px var(--pad) 8px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.goal-tree > div { padding: 4px var(--pad) 8px; background: var(--surface); border: 0; border-radius: var(--radius); }
 .goal-tree > div > .goal { border-top: 0; }
 .goal-life .goal-title { font-size: var(--text-md); line-height: 24px; letter-spacing: var(--track-tight); }
-.goal-actions .btn-sm { background: transparent; border-color: transparent; color: var(--ink-2); }
+.goal-actions .btn-sm { background: transparent; color: var(--ink-2); }
 .goal-actions .btn-sm:hover { background: var(--surface-2); color: var(--ink); }
 .goal-progress-btn { border-radius: var(--radius-sm); }
 .goal-progress-btn:hover .goal-chev { color: var(--ink); }
 .ms-title { transition: color var(--dur-base) var(--ease-out); }
-.goal-children { border-left-color: var(--line); }
+
 
 .goal-metric { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .goal-metric-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
@@ -68,7 +68,14 @@
 .goal-metric-tag { font-size: 12px; color: var(--ink-3); }
 .goal-metric-note { font-size: 12px; color: var(--ink-3); }
 .goal-links { display: flex; flex-direction: column; gap: 2px; }
-.goal-link-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 40px; padding: 4px 0; border-top: 1px solid var(--line); }
+.goal-link-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 40px; padding: 4px 0; border-top: 0; }
 .goal-link-row:first-of-type { border-top: 0; }
 .goal-link-text { min-width: 0; font-size: 14px; }
 .goal-link-text span { display: block; font-size: 12px; color: var(--ink-3); }
+
+/* Liquid v2: goal rows are tiles; hierarchy is indentation and fill, not rules */
+.goal-tree > div { background: var(--lum-2); }
+.goal { border-radius: 10px; padding: 12px 8px; }
+.goal:hover { background: rgba(255, 255, 255, 0.045); }
+.goal-children { border-left: 0; padding-left: 14px; margin-left: 8px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.03), transparent 6px) left / 2px 100% no-repeat; }
+.row-menu-pop { background: var(--lum-3); box-shadow: var(--elev-2); }

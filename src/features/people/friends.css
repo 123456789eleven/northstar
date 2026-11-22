@@ -23,13 +23,13 @@
 .cw-how p { margin: 4px 0 0; max-width: 56ch; }
 .cw-form-title { margin-bottom: var(--sp-2); }
 .cw-marks { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
-.cw-mark { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; min-height: 48px; border-radius: var(--r-2, 10px); background: var(--surface-2); border: 1px solid var(--line-soft); color: var(--ink-3); }
+.cw-mark { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; min-height: 48px; border-radius: var(--r-2, 10px); background: var(--surface-2); border: 0; color: var(--ink-3); }
 .cw-letter { font-weight: 700; font-size: 15px; }
 .cw-count { font-size: 11px; color: var(--ink-3); }
-.cw-mark.is-W { color: var(--accent-text); border-color: var(--accent-line); background: var(--accent-soft); }
+.cw-mark.is-W { color: var(--accent-text); background: var(--accent-soft); }
 .cw-mark.is-D { color: var(--ink-2); }
 .cw-mark.is-L { color: var(--ink-3); }
-.cw-mark.is-current { outline: 1px dashed var(--line-strong, var(--line)); outline-offset: 2px; }
+
 @media (prefers-reduced-motion: reduce) { .cw-bar span { transition: none; } }
 
 .ppl-feed { margin-top: var(--sp-6); }
@@ -37,7 +37,7 @@
 .ppl-feed-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2) var(--sp-6); margin-bottom: var(--sp-3); }
 @media (max-width: 900px) { .ppl-feed-list { grid-template-columns: 1fr; } }
 
-.fr-card { display: flex; gap: var(--sp-3); padding: var(--sp-4) 0; border-bottom: 1px solid var(--line-soft); min-width: 0; }
+.fr-card { display: flex; gap: var(--sp-3); padding: var(--sp-4) 0; border-bottom: 0; min-width: 0; }
 .fr-body { flex: 1; min-width: 0; }
 .fr-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--sp-3); }
 .fr-name { font-weight: 600; font-size: var(--text-md, 15px); }

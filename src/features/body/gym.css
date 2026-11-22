@@ -27,7 +27,7 @@
 .gym-flags { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
 .gym-flag { display: flex; justify-content: space-between; gap: 8px; min-height: 32px; align-items: center; padding: 0 10px; border-radius: 8px; color: var(--ink-3); font-size: var(--fs-2); }
 .gym-flag.is-reached { color: var(--reward); background: var(--reward-soft); }
-.gym-flag.is-next { color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent-line); }
+.gym-flag.is-next { color: var(--ink); box-shadow: none; }
 
 /* ---- Kitchen ---- */
 .kit-hero { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px var(--sp-6); align-items: center; }
@@ -42,11 +42,10 @@
 .kit-coach.is-behind::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--poppy); flex: 0 0 auto; }
 .kit-favs { display: flex; flex-wrap: wrap; gap: 6px; }
 .kit-fav {
-  display: inline-flex; align-items: baseline; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: var(--radius-pill);
-  border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); font: inherit; font-size: var(--fs-2); cursor: pointer;
+  display: inline-flex; align-items: baseline; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: var(--radius-pill); border: 0; background: var(--surface-2); color: var(--ink); font: inherit; font-size: var(--fs-2); cursor: pointer;
   transition: border-color var(--t-snappy) var(--spring-gentle), transform var(--t-snappy) var(--spring-snappy);
 }
-.kit-fav:hover { border-color: var(--accent-line); }
+
 .kit-fav:active { transform: scale(0.95); }
 .kit-fav:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .kit-fav .mono { color: var(--ink-3); font-size: var(--fs-1); }
@@ -56,7 +55,7 @@
 .kit-day strong { font-size: var(--fs-3); min-width: 64px; text-align: center; }
 .kit-day .btn { min-width: 36px; }
 .kit-meals { display: grid; gap: 0; }
-.kit-meals .food-slot { background: none; border: 0; box-shadow: none; padding: 10px 0; border-top: 1px solid var(--line-soft); border-radius: 0; }
+.kit-meals .food-slot { background: none; border: 0; box-shadow: none; padding: 10px 0; border-top: 0; border-radius: 0; }
 .kit-meals .food-slot:first-child { border-top: 0; padding-top: 0; }
 .kit-meals .card-title { margin-bottom: 4px; }
 .kit-suggest .food-favs { margin: 0; display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
@@ -73,16 +72,16 @@
 .tr-week { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; max-width: 420px; }
 .tr-day {
   width: 100%; aspect-ratio: 1; min-height: 40px; max-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink-2); font: inherit; font-size: var(--fs-1); cursor: pointer;
+  border-radius: 12px; border: 0; background: var(--surface-2); color: var(--ink-2); font: inherit; font-size: var(--fs-1); cursor: pointer;
   transition: background-color var(--t-snappy) var(--spring-gentle), border-color var(--t-snappy) var(--spring-gentle), transform var(--t-snappy) var(--spring-snappy);
 }
 .tr-day .mono { font-size: var(--fs-2); color: var(--ink); }
-.tr-day:hover:not(:disabled) { border-color: var(--accent-line); }
+
 .tr-day:active:not(:disabled) { transform: scale(0.92); }
 .tr-day:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.tr-day.is-on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.tr-day.is-on { background: var(--accent); color: var(--accent-ink); }
 .tr-day.is-on .mono { color: var(--accent-ink); }
-.tr-day.is-today:not(.is-on) { border-color: var(--accent-line); color: var(--ink); }
+.tr-day.is-today:not(.is-on) { color: var(--ink); }
 .tr-day:disabled { opacity: 0.4; cursor: default; }
 .tr-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .tr-target { display: flex; align-items: center; gap: 10px; }

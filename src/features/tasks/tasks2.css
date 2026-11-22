@@ -1,6 +1,6 @@
 /* Tasks redesign: the phone add line sits above the floating tab bar. Tokens only. */
 @media (max-width: 819px) {
-  .quick-add-sticky { bottom: calc(82px + env(safe-area-inset-bottom)); background: var(--mat-thick-bg); border-top-color: var(--line-soft); }
+  .quick-add-sticky { bottom: calc(82px + env(safe-area-inset-bottom)); background: var(--mat-thick-bg); }
   .tq-phone-pad { height: 120px; }
 }
 
@@ -12,7 +12,7 @@
 /* Phone: the numbers become one compact row so the list stays above the fold; the add line is solid, not glass. */
 @media (max-width: 819px) {
   .tq-kpi .kpi-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: var(--sp-3); }
-  .tq-kpi .kpi-cell { padding: 8px 8px; border-top: 0; border-left: 1px solid var(--line-soft); }
+  .tq-kpi .kpi-cell { padding: 8px 8px; border-top: 0; border-left: 0; }
   .tq-kpi .kpi-cell:first-child { border-left: 0; }
   .tq-kpi .kpi-note, .tq-kpi .kpi-delta { display: none; }
   .tq-kpi .kpi-label { font-size: var(--fs-1); letter-spacing: 0; text-transform: none; white-space: normal; }
@@ -20,3 +20,19 @@
   .quick-add-sticky { background: var(--surface); padding: 6px 12px; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .quick-add-sticky::before, .quick-add-sticky::after { display: none; }
 }
+
+/* Liquid v2: wells, not outlines */
+.focus-bar { padding: 14px var(--pad); }
+.focus-slots { gap: 6px; }
+.focus-slot { min-height: 48px; padding: 0 8px; border-radius: 12px; background: var(--lum-1); }
+.focus-slot.is-filled { background: var(--lum-3); }
+.focus-slot.is-empty { color: var(--ink-3); background: rgba(255, 255, 255, 0.03); }
+.focus-title { color: var(--ink-2-glass); font-weight: 600; }
+.task-row { border-radius: 10px; margin-bottom: 2px; }
+.task-row:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+.task-row:hover:not(.selected) { background: rgba(255, 255, 255, 0.045); }
+.task-swipe + .task-swipe, .task-swipe { margin-bottom: 2px; }
+.task-swipe .task-row { background: var(--lum-1); }
+.task-swipe:nth-child(even) .task-row { background: var(--lum-2); }
+.task-row.selected, .task-swipe .task-row.selected { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
+.section-head { color: var(--ink-2-glass); font-family: var(--font); }
