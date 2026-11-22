@@ -2,7 +2,7 @@
 // squashes with the distance it travels, scale(1 + s, 1 - 0.45 s) with s <= 0.18, settling in one damped overshoot.
 // Reduced motion: it snaps and crossfades. Transform only.
 import { useLayoutEffect, useRef, type RefObject } from 'react'
-import { addSystem, crossfade, Spring, SPRING, wake } from './liquidSpring'
+import { addSystem, crossfade, Spring, SPRINGS, wake } from '../lib/spring'
 import { prefersReducedMotion } from './motion'
 
 /** Squash for a thumb stretch value (pure, tested). */
@@ -16,7 +16,7 @@ export function useThumb(row: RefObject<HTMLElement | null>, thumb: RefObject<HT
   useLayoutEffect(() => {
     const el = thumb.current
     if (!el) return
-    const s = { X: new Spring(0, SPRING.snappy, 0.05), S: new Spring(0, { k: 500, z: 0.55 }, 0.0005), w: 0, shown: false }
+    const s = { X: new Spring(0, SPRINGS.snappy, 0.05), S: new Spring(0, { k: 500, z: 0.55 }, 0.0005), w: 0, shown: false }
     st.current = s
     const remove = addSystem({
       springs: [s.X, s.S],
@@ -38,7 +38,7 @@ export function useThumb(row: RefObject<HTMLElement | null>, thumb: RefObject<HT
       } else {
         const dist = Math.abs(x - s.X.x) / Math.max(1, tab.offsetWidth)
         s.S.v += Math.min(1.6, dist * 0.9)
-        s.S.to(0); s.X.to(x, SPRING.snappy)
+        s.S.to(0); s.X.to(x, SPRINGS.snappy)
       }
       s.shown = true
       const q = squash(s.S.x)

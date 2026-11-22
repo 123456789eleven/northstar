@@ -1,5 +1,6 @@
 // Global primary navigation: the curved glass district strip along the bottom (same band as the Life map's), on phone and
 // desktop. The active district is lit; a poppy dot means something there is behind or overdue. You sits in the top bar.
+import { lensProps } from '../lib/lens'
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -76,7 +77,7 @@ export default function DistrictStrip({ phone }: { phone: boolean }) {
       <svg className="dstrip-bg" viewBox="0 0 700 80" preserveAspectRatio="none" aria-hidden="true">
         <path d={phone ? 'M2 14 Q350 -6 698 14 L698 72 Q698 78 692 78 L8 78 Q2 78 2 72 Z' : 'M3 26 Q350 -10 697 26 L697 70 Q697 78 689 78 L11 78 Q3 78 3 70 Z'} className="dstrip-shadow" />
       </svg>
-      <div className="dstrip-glass" style={clip ? { clipPath: clip } : undefined} aria-hidden="true" />
+      <div className={`dstrip-glass ${lensProps('tabbar').className}`} data-lens-preset="tabbar" style={clip ? { clipPath: clip } : undefined} aria-hidden="true" />
       <div ref={row} className="dstrip-row" onKeyDown={onKey}>
         <span ref={pill} className="dstrip-pill lq-ind x" aria-hidden="true">
           <span className="lq-fill"><i className="lq-mid" /><i className="lq-cap a" /><i className="lq-cap b" /></span>

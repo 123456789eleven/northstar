@@ -146,3 +146,8 @@
 .hm-day-value.is-down, .hm-stat-note.is-down { color: var(--warn); }
 .hm-day .hm-open { margin-left: auto; }
 .hm-tab, .hm-collapse, .hm-grab, .hm-reopen { border: 0; }
+
+/* While actively tilted (useTilt.ts), the panel's own backdrop-filter is off: re-sampling a blurred backdrop every frame under
+   a changing transform is the costliest combination on the page. The gentle spring makes the blur pop in/out unnoticeable. */
+.hm-glass.is-tilting { -webkit-backdrop-filter: none; backdrop-filter: none; }
+@media (prefers-reduced-motion: reduce) { .hm-glass.is-tilting { -webkit-backdrop-filter: var(--mat-thin-blur); backdrop-filter: var(--mat-thin-blur); } }

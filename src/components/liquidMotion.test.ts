@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { advance, addSystem, Spring, SPRING } from './liquidSpring'
+import { runSprings, addSystem, Spring, SPRINGS } from '../lib/spring'
 import { edgePresets, stretchFrame } from './useStretch'
 import { dropFrame, dropStart } from './droplet'
 import { squash } from './useThumb'
@@ -8,13 +8,13 @@ import { stackOffsets, trimStack } from './toastStack'
 
 const run = (s: Spring, ms: number) => {
   const remove = addSystem({ springs: [s], render: () => {} })
-  for (let t = 0; t < ms; t += 1000 / 60) advance(1 / 60)
+  for (let t = 0; t < ms; t += 1000 / 60) runSprings(1 / 60)
   remove()
 }
 
 describe('spring', () => {
   it('settles on the target within 700 ms for every preset', () => {
-    for (const p of [SPRING.snappy, SPRING.smooth, SPRING.gentle]) {
+    for (const p of [SPRINGS.snappy, SPRINGS.smooth, SPRINGS.gentle]) {
       const s = new Spring(0, p, 0.05)
       s.to(300)
       run(s, 700)
@@ -22,17 +22,17 @@ describe('spring', () => {
     }
   })
   it('snappy overshoots once, gentle barely', () => {
-    const snappy = new Spring(0, SPRING.snappy), gentle = new Spring(0, SPRING.gentle)
+    const snappy = new Spring(0, SPRINGS.snappy), gentle = new Spring(0, SPRINGS.gentle)
     let maxS = 0, maxG = 0
     snappy.to(100); gentle.to(100)
     const remove = addSystem({ springs: [snappy, gentle], render: () => { maxS = Math.max(maxS, snappy.x); maxG = Math.max(maxG, gentle.x) } })
-    for (let i = 0; i < 60; i++) advance(1 / 60)
+    for (let i = 0; i < 60; i++) runSprings(1 / 60)
     remove()
     expect(maxS).toBeGreaterThan(103)
     expect(maxG).toBeLessThan(101)
   })
   it('retargeting keeps velocity (interruptible)', () => {
-    const s = new Spring(0, SPRING.smooth)
+    const s = new Spring(0, SPRINGS.smooth)
     s.to(100)
     run(s, 100)
     const v = s.v
@@ -54,8 +54,8 @@ describe('stretch indicator', () => {
     expect(f.capB).toBe('translate3d(6px,50px,0)')
   })
   it('the edge in the direction of travel is snappy, the trailing edge gentle', () => {
-    expect(edgePresets(0, 200)).toEqual({ a: SPRING.gentle, b: SPRING.snappy })
-    expect(edgePresets(200, 0)).toEqual({ a: SPRING.snappy, b: SPRING.gentle })
+    expect(edgePresets(0, 200)).toEqual({ a: SPRINGS.gentle, b: SPRINGS.snappy })
+    expect(edgePresets(200, 0)).toEqual({ a: SPRINGS.snappy, b: SPRINGS.gentle })
   })
 })
 

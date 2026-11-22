@@ -142,6 +142,10 @@ body::before {
 html[data-lens] .lens[data-lens-on]::before { -webkit-backdrop-filter: var(--lens-filter); backdrop-filter: var(--lens-filter); }
 /* Chromium trap: mix-blend-mode on any descendant disables the backdrop-filter */
 html[data-lens] .lens[data-lens-on] * { mix-blend-mode: normal; }
+/* The sheet is also a lens element, so its own .is-morphing rule (`liquid-chrome.css`) loses the specificity fight against the
+   rule above; !important is the deliberate, narrow override for "this element is moving, so its backdrop-filter is off",
+   matching the reduced-motion `!important` block below rather than introducing a new pattern. */
+.lens.is-morphing::before { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 
 /* ---------- press, hover, motion ---------- */
 :where(a, button, [role='button'], .card-interactive, .stat-int, .kpi-link, .tab-item, .nav-link, .chip, .btn):not(:disabled) {

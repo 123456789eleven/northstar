@@ -11,6 +11,7 @@ import { SetupHost } from '../features/onboarding/SetupWizard'
 import BottomSheet from './BottomSheet'
 import { Icon, type IconName } from './Icons'
 import { districtForPath } from './districts'
+import { lensProps } from '../lib/lens'
 import { useMedia, PHONE_QUERY } from './useMedia'
 import { PlayerStrip } from '../features/game/ui/Mission'
 import './shell.css'
@@ -180,7 +181,7 @@ export function CaptureHost() {
 /** Phone capture orb: in the top bar's thumb-free corner, so it never sits over list content or the pinned add lines. */
 export function CaptureOrb() {
   return (
-    <button type="button" className="capture-orb" aria-label="Capture" aria-haspopup="dialog" onClick={() => window.dispatchEvent(new Event(OPEN_CAPTURE_SHEET))}>
+    <button type="button" className={`capture-orb ${lensProps('button').className}`} data-lens-preset="button" aria-label="Capture" aria-haspopup="dialog" onClick={() => window.dispatchEvent(new Event(OPEN_CAPTURE_SHEET))}>
       <Icon name="plus" size={22} />
     </button>
   )

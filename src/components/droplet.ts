@@ -4,7 +4,7 @@
 // Backdrop blur is off while it morphs and comes back at rest; at rest no transform or clip is held (a held transform would
 // trap nested modals). Only one droplet at a time; a second sheet, no trigger or reduced motion keep the CSS entrance.
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react'
-import { addSystem, Spring, wake } from './liquidSpring'
+import { addSystem, Spring, wake } from '../lib/spring'
 import { prefersReducedMotion } from './motion'
 
 export interface Rect { left: number; top: number; width: number; height: number }

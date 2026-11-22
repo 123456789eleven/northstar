@@ -2,7 +2,7 @@
 // direction of travel runs on the snappy spring and the trailing edge on the gentle one, so the shape stretches toward the new
 // item and then settles; only translate3d and scale move, so the corner radius never distorts. Reduced motion: snap + fade.
 import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react'
-import { addSystem, crossfade, Spring, SPRING, wake } from './liquidSpring'
+import { addSystem, crossfade, Spring, SPRINGS, wake } from '../lib/spring'
 import { prefersReducedMotion } from './motion'
 
 export type Axis = 'x' | 'y'
@@ -20,7 +20,7 @@ export function stretchFrame(axis: Axis, a: number, b: number, c: number, r: num
 
 /** Which edge leads: travelling toward larger coordinates the far edge (b) is snappy and the near edge (a) gentle. */
 export function edgePresets(from: number, to: number) {
-  return to >= from ? { a: SPRING.gentle, b: SPRING.snappy } : { a: SPRING.snappy, b: SPRING.gentle }
+  return to >= from ? { a: SPRINGS.gentle, b: SPRINGS.snappy } : { a: SPRINGS.snappy, b: SPRINGS.gentle }
 }
 
 /**
@@ -48,7 +48,7 @@ export function useStretch(host: RefObject<HTMLElement | null>, ind: RefObject<H
     if (!node) return
     const [capA, mid, capB] = [node.querySelector<HTMLElement>('.lq-cap.a'), node.querySelector<HTMLElement>('.lq-mid'), node.querySelector<HTMLElement>('.lq-cap.b')]
     const s: State = {
-      A: new Spring(0, SPRING.smooth, 0.05), B: new Spring(0, SPRING.smooth, 0.05), C: new Spring(0, SPRING.smooth, 0.05), size: 0, r: 0, shown: false, reset: undefined,
+      A: new Spring(0, SPRINGS.smooth, 0.05), B: new Spring(0, SPRINGS.smooth, 0.05), C: new Spring(0, SPRINGS.smooth, 0.05), size: 0, r: 0, shown: false, reset: undefined,
       render() {
         const f = stretchFrame(axis, s.A.x, s.B.x, s.C.x, s.r)
         if (capA) capA.style.transform = f.capA
@@ -78,7 +78,7 @@ export function useStretch(host: RefObject<HTMLElement | null>, ind: RefObject<H
       if (reduced && animate && s.shown) crossfade(node.firstElementChild, 0.2, 1)
     } else {
       const p = edgePresets(s.A.t, box.a)
-      s.A.to(box.a, p.a); s.B.to(box.b, p.b); s.C.to(box.c, SPRING.smooth)
+      s.A.to(box.a, p.a); s.B.to(box.b, p.b); s.C.to(box.c, SPRINGS.smooth)
     }
     node.style.opacity = ''
     s.shown = true

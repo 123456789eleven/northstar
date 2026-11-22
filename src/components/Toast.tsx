@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { ToastContext, type ToastOpts } from './toastContext'
 import { prefersReducedMotion } from './motion'
-import { addSystem, crossfade, Spring, SPRING, wake, type SpringSystem } from './liquidSpring'
+import { addSystem, crossfade, Spring, SPRINGS, wake, type SpringSystem } from '../lib/spring'
 import { stackOffsets, trimStack } from './toastStack'
 import './liquid-chrome.css'
 
@@ -52,7 +52,7 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
       if (!tx || !sh) continue
       let a = anims.current.get(t.id)
       if (!a) {
-        const y = new Spring(0, SPRING.smooth, 0.05), sx = new Spring(0.9, SPRING.snappy, 0.001), sy = new Spring(0.5, SPRING.snappy, 0.001), o = new Spring(0, SPRING.smooth, 0.002)
+        const y = new Spring(0, SPRINGS.smooth, 0.05), sx = new Spring(0.9, SPRINGS.snappy, 0.001), sy = new Spring(0.5, SPRINGS.snappy, 0.001), o = new Spring(0, SPRINGS.smooth, 0.002)
         const id = t.id
         const fresh: Anim = { y, sx, sy, o, born: false, remove: () => {}, sys: {
           springs: [y, sx, sy, o],
@@ -78,11 +78,11 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
           if (reduced) { a.sx.snap(1); a.sy.snap(1); a.o.snap(1); a.y.snap(ys[i]); crossfade(tx); crossfade(sh) }
           else {
             if (firstAlone) { a.y.snap(-18); a.sx.snap(0.16); a.sy.snap(0.6) } // the first one rises as a small drop
-            a.sx.to(1, { k: 240, z: 0.78 }); a.sy.to(1, SPRING.snappy); a.y.to(ys[i], SPRING.smooth)
-            window.setTimeout(() => a.o.to(1, SPRING.smooth), 120)
+            a.sx.to(1, { k: 240, z: 0.78 }); a.sy.to(1, SPRINGS.snappy); a.y.to(ys[i], SPRINGS.smooth)
+            window.setTimeout(() => a.o.to(1, SPRINGS.smooth), 120)
           }
         } else if (reduced) a.y.snap(ys[i])
-        else a.y.to(ys[i], SPRING.smooth)
+        else a.y.to(ys[i], SPRINGS.smooth)
       } else if (a.o.t > 0) {
         // absorbed by the neighbour that takes its place, or falls away when it was alone
         const idx = list.indexOf(t)
@@ -95,7 +95,7 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
         }
         a.o.to(-0.2, { k: 1400, z: 1 })
         const nbY = nb ? ys[live.indexOf(nb)] : -22
-        a.y.to(nbY, SPRING.smooth); a.sx.to(nb ? 0.7 : 0.12, SPRING.smooth); a.sy.to(nb ? 0.25 : 0.3, SPRING.smooth)
+        a.y.to(nbY, SPRINGS.smooth); a.sx.to(nb ? 0.7 : 0.12, SPRINGS.smooth); a.sy.to(nb ? 0.25 : 0.3, SPRINGS.smooth)
       }
     }
     wake()

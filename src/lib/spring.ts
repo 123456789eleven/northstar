@@ -78,7 +78,7 @@ function tick(now: number) {
   last = now
   raf = runSprings(dt) ? requestAnimationFrame(tick) : 0
 }
-function wake() {
+export function wake() {
   if (raf || typeof requestAnimationFrame === 'undefined') return
   last = performance.now()
   raf = requestAnimationFrame(tick)
@@ -112,4 +112,9 @@ export function springLinear(p: SpringPreset, points = 10): { easing: string; ms
   }
   out.push('1')
   return { easing: `linear(${out.join(', ')})`, ms }
+}
+
+/** 160 ms opacity crossfade: the reduced-motion stand-in for any spring-driven motion. */
+export function crossfade(el: Element | null | undefined, from = 0, to = 1) {
+  el?.animate?.([{ opacity: from }, { opacity: to }], { duration: 160, easing: 'linear' })
 }

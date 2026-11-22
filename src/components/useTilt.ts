@@ -2,7 +2,7 @@
 // spring and its specular highlight (a `.lq-spec` child) slides under the pointer. Touch gets a slow CSS drift instead (no JS);
 // reduced motion gets neither. Transform only; the panel returns flat when the pointer leaves.
 import { useEffect, type RefObject } from 'react'
-import { addSystem, Spring, SPRING, wake } from './liquidSpring'
+import { addSystem, Spring, SPRINGS, wake } from '../lib/spring'
 import { prefersReducedMotion } from './motion'
 
 export const MAX_TILT = 3
@@ -18,13 +18,16 @@ export function useTilt(ref: RefObject<HTMLElement | null>, on = true) {
     const el = ref.current
     if (!el || !on || typeof window === 'undefined' || !window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) return
     const spec = el.querySelector<HTMLElement>('.lq-spec')
-    const rx = new Spring(0, SPRING.gentle, 0.01), ry = new Spring(0, SPRING.gentle, 0.01)
-    const mx = new Spring(-40, SPRING.gentle, 0.2), my = new Spring(-50, SPRING.gentle, 0.2)
+    const rx = new Spring(0, SPRINGS.gentle, 0.01), ry = new Spring(0, SPRINGS.gentle, 0.01)
+    const mx = new Spring(-40, SPRINGS.gentle, 0.2), my = new Spring(-50, SPRINGS.gentle, 0.2)
     const remove = addSystem({
       springs: [rx, ry, mx, my],
       render() {
         const flat = Math.abs(rx.x) < 0.02 && Math.abs(ry.x) < 0.02 && rx.t === 0 && ry.t === 0
         el.style.transform = flat ? '' : `perspective(900px) rotateX(${rx.x}deg) rotateY(${ry.x}deg)`
+        // the panel's own backdrop-filter is the costliest thing on the page to re-sample every frame; drop it while actually
+        // tilted (same trick as the sheet's is-morphing rule) and restore it once the spring settles back to flat
+        el.classList.toggle('is-tilting', !flat)
         if (spec) spec.style.transform = `translate3d(${mx.x}px,${my.x}px,0)`
       },
     })
