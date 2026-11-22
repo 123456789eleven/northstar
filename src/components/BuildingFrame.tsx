@@ -4,6 +4,7 @@
 // arrow keys move between floors. Entering a building rises the content (the backdrop camera zooms in, CityBackdrop.tsx);
 // moving between floors slides the page up or down. Reduced motion: instant. Routes stay absolute, so every old URL works.
 import { useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
+import { useStretch } from './useStretch'
 import { Link, useLocation } from 'react-router-dom'
 import { floorForPath, hasElevator, type DistrictDef, type DistrictId } from './districts'
 import { Icon } from './Icons'
@@ -14,6 +15,7 @@ import { useLifeMap } from '../features/lifemap/useLifeMap'
 import StageMeter from '../features/buildings/StageMeter'
 import { useBuildingStage } from '../features/buildings/useBuildingStage'
 import './building.css'
+import './liquid-chrome.css'
 
 /** District hue: the area colour for the five areas, powder blue for Plan and You. */
 const hueFor = (d: DistrictDef) => (d.skill ? `var(--skill-${d.skill})` : 'var(--accent)')
@@ -62,19 +64,10 @@ export function Elevator({ district, phone }: { district: DistrictDef; phone: bo
   const { pathname, search } = useLocation()
   const { floor: current } = floorForPath(pathname, search)
   const list = useRef<HTMLOListElement>(null)
-  const [car, setCar] = useState<{ x: number; y: number; w: number; h: number } | null>(null)
+  const car = useRef<HTMLLIElement>(null)
   const active = current ? district.floors.indexOf(current) : -1
-
-  useLayoutEffect(() => {
-    const measure = () => {
-      const el = list.current?.querySelectorAll<HTMLElement>('.bf-floor-link')[active]
-      setCar(el ? { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight } : null)
-    }
-    measure()
-    const ro = typeof ResizeObserver !== 'undefined' && list.current ? new ResizeObserver(measure) : null
-    if (ro && list.current) ro.observe(list.current)
-    return () => ro?.disconnect()
-  }, [active, phone])
+  // The lit car stretches toward the new floor (leading edge snappy, trailing gentle); a new building or a width change snaps.
+  useStretch(list, car, () => list.current?.querySelectorAll<HTMLElement>('.bf-floor-link')[active] ?? null, phone ? 'x' : 'y', active, `${district.id}:${phone}`, phone ? undefined : 10)
   useLayoutEffect(() => {
     if (!phone) return
     const el = list.current?.querySelectorAll<HTMLElement>('.bf-floor-link')[active]
@@ -97,13 +90,9 @@ export function Elevator({ district, phone }: { district: DistrictDef; phone: bo
   return (
     <nav className={`bf-elevator${phone ? ' is-phone' : ''}`} aria-label={`${district.building} floors`}>
       <ol ref={list} className="bf-floors" onKeyDown={onKey}>
-        {car && (
-          <li
-            className="bf-car"
-            aria-hidden="true"
-            style={{ '--car-x': `${car.x}px`, '--car-y': `${car.y}px`, '--car-w': `${car.w}px`, '--car-h': `${car.h}px` } as CSSProperties}
-          />
-        )}
+        <li ref={car} className={`bf-car lq-ind ${phone ? 'x' : 'y'}`} aria-hidden="true" role="presentation">
+          <span className="lq-fill"><i className="lq-mid" /><i className="lq-cap a" /><i className="lq-cap b" /></span>
+        </li>
         {district.floors.map((f, i) => {
           const on = i === active
           return (

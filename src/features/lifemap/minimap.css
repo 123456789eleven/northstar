@@ -3,7 +3,7 @@
 .mm {
   position: relative; flex: 0 0 auto; width: 176px; height: 100px; border-radius: var(--r-inner); overflow: hidden; isolation: isolate;
   background: radial-gradient(70% 70% at 50% 50%, color-mix(in srgb, var(--accent) 9%, var(--page)), var(--page));
-  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent); box-shadow: var(--inner-light), var(--elev-1);
+  border: 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), var(--lg-drop);
 }
 .mm.is-phone { display: block; width: 64px; height: 38px; border-radius: 10px; }
 .mm-svg { position: absolute; inset: 0; display: block; pointer-events: none; }
@@ -28,4 +28,4 @@
 .mm-hit:hover .mm-tip, .mm-hit:focus-visible .mm-tip { opacity: 1; transform: none; }
 :root[data-motion='reduced'] .mm .lm-district, :root[data-motion='reduced'] .mm-tip { transition: none; }
 @media (prefers-reduced-motion: reduce) { .mm .lm-district, .mm-tip { transition: none; } }
-@media (forced-colors: active) { .mm { border-color: CanvasText; } }
+@media (forced-colors: active) { .mm { border: 1px solid CanvasText; } }

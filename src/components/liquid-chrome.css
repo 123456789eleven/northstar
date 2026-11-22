@@ -1,0 +1,76 @@
+/* Liquid v2 chrome and motion (docs/redesign/LIQUID_V2.md, WP-C): the stretch indicator, the droplet sheet, the toast stack
+   and the hero tilt. No strokes: surfaces separate by luminance, shadow, blur and spacing. Motion moves transform, opacity and
+   filter only; the springs live in liquidSpring.ts. Loaded by BuildingFrame, DistrictStrip, BottomSheet, Toast and HomeHud. */
+
+/* ---------- stretch indicator: two caps and a 100px middle (useStretch.ts) ---------- */
+.lq-ind { position: absolute; left: 0; top: 0; width: 0; height: 0; margin: 0; padding: 0; pointer-events: none; z-index: 0; }
+/* opaque pieces composited as one group, so the seams never show; the group's opacity makes it a soft powder fill */
+.lq-fill { position: absolute; left: 0; top: 0; opacity: 0.3; filter: drop-shadow(0 0 8px rgba(156, 200, 230, 0.9)); }
+.lq-fill > i { position: absolute; left: 0; top: 0; display: block; will-change: transform; }
+.lq-ind.x .lq-fill > i { height: var(--lq-size, 34px); background: linear-gradient(180deg, #c6e3f6, var(--accent) 55%, #7fb3d8); }
+.lq-ind.x .lq-cap { width: calc(var(--lq-r, 17px) * 2); border-radius: var(--lq-r, 17px); }
+.lq-ind.x .lq-mid { width: 100px; transform-origin: 0 0; }
+.lq-ind.y .lq-fill > i { width: var(--lq-size, 120px); background: linear-gradient(90deg, #c6e3f6, var(--accent) 60%, #7fb3d8); }
+.lq-ind.y .lq-cap { height: calc(var(--lq-r, 10px) * 2); border-radius: var(--lq-r, 10px); }
+.lq-ind.y .lq-mid { height: 100px; transform-origin: 0 0; }
+@media (forced-colors: active) { .lq-ind { display: none; } }
+@media print { .lq-ind { display: none; } }
+
+/* ---------- sheets: borderless thick glass; floating side panel on desktop; droplet morph (droplet.ts) ---------- */
+.sheet { border: 0; box-shadow: var(--lg-depth), var(--lg-drop); background-image: var(--lg-body); }
+.sheet-grab { background: rgba(255, 255, 255, 0.18); }
+.sheet-head h2 { font-family: inherit; font-weight: 650; font-size: 18px; letter-spacing: -0.01em; }
+.sheet-side { border: 0; margin: 12px 12px 12px auto; height: calc(100% - 24px); border-radius: var(--r-card, 20px); }
+.sheet-backdrop:has(.sheet-side) { padding: 0; }
+/* while the drop morphs: no CSS keyframes, no backdrop blur (a moving backdrop-filter is the costliest thing on the page) */
+.sheet.is-drop { animation: none; }
+.sheet.is-morphing { background-color: rgba(18, 22, 30, 0.97); will-change: transform, clip-path; }
+.sheet.is-morphing::before { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.sheet-backdrop.is-drop { animation: none; }
+.sheet-backdrop.is-drop.is-leaving { pointer-events: none; }
+@media (forced-colors: active) { .sheet { border: 1px solid CanvasText; } }
+
+/* ---------- toasts: up to three drops that split and merge (Toast.tsx) ---------- */
+.toast-host.is-liquid { width: min(400px, calc(100vw - 32px)); height: 0; pointer-events: none; }
+.toast-host.is-liquid .toast-shapes { position: absolute; left: -24px; right: -24px; bottom: -24px; height: 260px; pointer-events: none; filter: url(#ns-goo-toast); }
+.toast-host.is-liquid .toast-shapes > i {
+  position: absolute; left: 24px; bottom: 24px; display: block; border-radius: 14px; will-change: transform;
+  background: rgba(20, 25, 36, 0.96); /* the goo filter re-fills with the same colour; without the filter this is the plain pill */
+}
+.toast-host.is-liquid .toast {
+  position: absolute; left: 0; bottom: 0; width: max-content; max-width: 100%; pointer-events: auto; will-change: transform, opacity;
+  background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; animation: none; color: var(--ink);
+}
+.toast-host.is-liquid .toast.is-dying { pointer-events: none; }
+.toast-host.is-liquid.is-plain .toast-shapes { filter: none; }
+.toast-host.is-liquid.is-plain .toast-shapes > i { box-shadow: var(--lg-drop); }
+.toast-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+@media (forced-colors: active) { .toast-host.is-liquid .toast { border: 1px solid CanvasText; background: Canvas; } .toast-host.is-liquid .toast-shapes { display: none; } }
+@media (max-width: 819px) { .toast-host.is-liquid { left: 16px; right: auto; width: calc(100vw - 32px); } }
+
+/* ---------- hero panels: specular that follows the pointer + up to 3 degrees of tilt (useTilt.ts) ---------- */
+.lq-spec-clip { position: absolute; inset: 0; z-index: -1; border-radius: inherit; overflow: hidden; pointer-events: none; }
+.lq-spec {
+  position: absolute; left: -90px; top: -90px; width: 300px; height: 300px; border-radius: 50%; will-change: transform;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.03) 55%, transparent);
+  transform: translate3d(-40px, -50px, 0);
+}
+/* touch: the light drifts slowly on its own (composited keyframes, no JS) */
+@media (hover: none), (pointer: coarse) {
+  .lq-spec { animation: lq-drift 17s ease-in-out infinite alternate; }
+}
+@keyframes lq-drift { 0% { transform: translate3d(-30px, -40px, 0); } 50% { transform: translate3d(60px, -10px, 0); } 100% { transform: translate3d(20px, 50px, 0); } }
+:root[data-motion='reduced'] .lq-spec { animation: none; }
+@media (prefers-reduced-motion: reduce) { .lq-spec { animation: none; } }
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) { .lq-spec-clip { display: none; } }
+
+/* ---------- Home panel tabs: a liquid thumb under the selected tab ---------- */
+.hm-tabs.has-thumb { position: relative; }
+.hm-tabs.has-thumb .hm-tab { position: relative; z-index: 1; }
+.hm-tabs.has-thumb .hm-tab[aria-selected='true'] { background: transparent; box-shadow: none; }
+.hm-thumb {
+  position: absolute; left: 0; top: 0; z-index: 0; border-radius: 10px; pointer-events: none; will-change: transform;
+  background: color-mix(in srgb, var(--accent) 20%, rgba(20, 26, 36, 0.9));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 0 16px -6px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+@media (forced-colors: active) { .hm-thumb { display: none; } .hm-tabs.has-thumb .hm-tab[aria-selected='true'] { outline: 1px solid Highlight; } }
