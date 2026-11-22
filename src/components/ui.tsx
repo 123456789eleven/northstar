@@ -13,6 +13,7 @@ import ModuleTile from './ModuleTile'
 import { moduleForPath } from './moduleHue'
 import { formatDelta, trendAria, trendDirection, trendTone, type Trend } from './trend'
 import { formatNumeric, parseNumeric, prefersReducedMotion, useExit } from './motion'
+import { addSystem, Spring, SPRINGS, touch, type SpringSystem } from '../lib/spring'
 
 /** Page title row. The module's gradient tile (Aurora) comes from the route; pass icon={false} to omit it. */
 export function PageHeader({ title, sub, actions, tabs, icon }: { title: string; sub?: ReactNode; actions?: ReactNode; tabs?: ReactNode; icon?: IconName | false }) {
@@ -186,9 +187,12 @@ export function Field({ label, children, hint, error }: { label: string; childre
   )
 }
 
+/** Segmented tabs with the liquid thumb: one pill moved on the snappy spring, stretched by its velocity (scale(1+s, 1-.45s),
+ *  s <= .18) and settling with a small overshoot. Reduced motion: the thumb jumps. Selection is also ink colour + weight. */
 export function Tabs<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { value: T; label: string }[] }) {
   const ref = useRef<HTMLDivElement>(null)
-  const [ready, setReady] = useState(false)
+  const thumb = useRef<HTMLSpanElement>(null)
+  const sp = useRef<{ x: Spring; w: Spring; sq: Spring; sys: SpringSystem; placed: boolean } | null>(null)
   const labels = options.map((o) => o.label).join('|')
   // Keep the active tab in view on a narrow strip; the next tab peeks in as the scroll cue.
   useEffect(() => {
@@ -197,15 +201,39 @@ export function Tabs<T extends string>({ value, onChange, options }: { value: T;
     if (!el || !box || box.scrollWidth <= box.clientWidth) return
     box.scrollLeft += el.getBoundingClientRect().left - box.getBoundingClientRect().left - 24
   }, [value])
-  // Sliding indicator: measure the active tab, move one bar with transform. Re-measure when fonts or labels change size.
+  // One spring system per strip: x and width on snappy, the squash on its own underdamped spring (a layout effect, so it exists
+  // before the placement effect below runs on mount).
+  useLayoutEffect(() => {
+    const x = new Spring(0, SPRINGS.snappy, 0.05), w = new Spring(0, SPRINGS.snappy, 0.05), sq = new Spring(0, SQUASH, 0.0005)
+    const sys: SpringSystem = {
+      springs: [x, w, sq],
+      render: () => {
+        const t = thumb.current
+        if (!t || w.t <= 0) return
+        const s = Math.max(-0.06, Math.min(0.18, sq.x))
+        const fx = (w.x / w.t) * (1 + s)
+        t.style.transform = `translate3d(${(x.x + w.x / 2 - w.t / 2).toFixed(2)}px,0,0) scale(${fx.toFixed(4)},${(1 - 0.45 * s).toFixed(4)})`
+      },
+    }
+    sp.current = { x, w, sq, sys, placed: false }
+    const off = addSystem(sys)
+    return () => { off(); sp.current = null }
+  }, [])
+  // Measure the active tab and send the thumb there. Re-measure when fonts or labels change size.
   useLayoutEffect(() => {
     const box = ref.current
     if (!box) return
     const place = () => {
-      const el = box.querySelector<HTMLElement>('.tab.active')
-      if (!el) return
-      box.style.setProperty('--tab-x', `${el.offsetLeft}px`)
-      box.style.setProperty('--tab-w', String(el.offsetWidth / 100))
+      const el = box.querySelector<HTMLElement>('.tab.active'), s = sp.current, t = thumb.current
+      if (!el || !s || !t) return
+      const left = el.offsetLeft, width = el.offsetWidth
+      if (left === s.x.t && width === s.w.t && s.placed) return
+      t.style.width = `${width}px`
+      if (!s.placed) { s.x.snap(left); s.w.snap(width); s.placed = true; touch(s.sys); return }
+      const dist = Math.abs(left - s.x.x) / Math.max(1, width)
+      s.x.to(left, SPRINGS.snappy); s.w.to(width, SPRINGS.snappy)
+      s.sq.v += Math.min(1.6, dist * 0.9); s.sq.to(0, SQUASH)
+      touch(s.sys)
     }
     place()
     if (typeof ResizeObserver === 'undefined') return
@@ -213,21 +241,18 @@ export function Tabs<T extends string>({ value, onChange, options }: { value: T;
     box.querySelectorAll('.tab').forEach((t) => ro.observe(t))
     return () => ro.disconnect()
   }, [value, labels])
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setReady(true))
-    return () => cancelAnimationFrame(id)
-  }, [])
   return (
-    <div className={`tabs has-ind ${ready ? 'ind-ready' : ''}`} role="tablist" ref={ref}>
+    <div className="tabs has-ind" role="tablist" ref={ref}>
       {options.map((o) => (
         <button key={o.value} role="tab" aria-selected={o.value === value} className={`tab ${o.value === value ? 'active' : ''}`} onClick={() => onChange(o.value)}>
           {o.label}
         </button>
       ))}
-      <span className="tabs-ind" aria-hidden />
+      <span className="tabs-ind" aria-hidden ref={thumb} />
     </div>
   )
 }
+const SQUASH = { k: 500, z: 0.55 }
 
 const ROW_W = [68, 52, 74, 44, 60, 56]
 
