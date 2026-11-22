@@ -4,13 +4,15 @@
 // falls back to plain blur + --lg-body + --lg-depth.
 import { useEffect } from 'react'
 import { installLensScanner, lensSupported } from '../lib/lens'
+import { installPress } from '../lib/press'
 
 export function GlassDefs() {
   useEffect(() => {
     const root = document.documentElement
     if (lensSupported()) root.setAttribute('data-lens', '')
     const stopScan = installLensScanner()
-    return () => { stopScan(); root.removeAttribute('data-lens') }
+    const stopPress = installPress()
+    return () => { stopScan(); stopPress(); root.removeAttribute('data-lens') }
   }, [])
   return null
 }
